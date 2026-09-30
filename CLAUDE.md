@@ -1,1 +1,118 @@
 @AGENTS.md
+
+# ROLT — Proje Tanımı
+
+ROLT, motosiklet sürücüleri için bir **rota keşfetme, sürüş kaydetme ve paylaşma** mobil uygulamasıdır.
+Temel döngü: **rota bul → sürüşü kaydet → isterse paylaş.** Her ekranda kullanıcı bir sonraki adımı hemen anlayabilmeli; daha az karar, daha hızlı kullanım.
+
+- Platform: iOS + Android, Expo SDK 57 / React Native 0.86 / TypeScript (bu repo). Tasarım panolarındaki "Flutter" ifadesi eski bağlamdır; uygulama Expo ile yazılır.
+- Arayüz dili: **Türkçe** (kullanıcıya görünen tüm metinler Türkçe). Birimler: km, km/sa, m; ondalık ayırıcı virgül (`12,8 km`).
+- Yalnızca portre, mobil öncelikli.
+- UX referansları: **Strava** ana referans; **REVER** (keşif + kayıt + paylaşım) ve **Calimoto** (motosiklete özgü keşif/planlama) rakip araştırmasından türetilen kararlar.
+- Ürün belgeleri (repoda yok, tasarımda atıf var): `ROLT_IMPLEMENTATION_BRIEF.md`, `ROLT_MVP_SCOPE.md`.
+
+## Tasarım kaynağı (Pencil)
+
+Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/5d001c98-ecd1-4fee-823a-30f1c54e8880/pencil-new.pen`
+
+- `.pen` dosyasını **yalnızca Pencil MCP araçlarıyla** oku (`mcp__pencil__execute` içinde `Get`, `TakeScreenshot`); Read/Grep ile açma.
+- Ekran frame'leri 393 × 852 (iPhone 15/16 boyutu), yan boşluk 16 px, içerik genişliği 361 px.
+- Frame adları `NN.N Alan / Ekran — Durum` biçiminde numaralı (ör. `02.2 Record / Paused`).
+- Kanvas bölgeleri: ekranlar (y ≈ -6100 … 6700), Core Components panoları (y ≈ -14193), App Icon (y ≈ -9571), UX araştırma panoları (y ≈ 9266 … 12000).
+
+## MVP kapsamı ve ürün kuralları
+
+**Navigasyon:** Alt tarafta yüzen (floating) 3 sekmeli bar: **Keşfet / Kaydet / Profil** (Discover / Record / Profile).
+- Saved Routes (Kaydettiklerim) → Profil içinde sekme; My Rides (Sürüşler) → Profil içinde.
+
+**Route ≠ Ride (kritik ayrım):**
+- **Route** tekrar kullanılabilir bir rotadır; Discover'da listelenir.
+- **Ride** tek bir kayıt oturumudur. Public bir Ride kendiliğinden Discover rotası **olmaz**; ayrıca "Rota olarak yayımla" (Publish as Route) gerekir.
+- Seçili rota kayıt ekranına iliştirilir; rotasız (serbest sürüş) başlatma her zaman mümkündür.
+
+**Temel akışlar:**
+- **A / Rota seçerek sür:** Discover → arama/şehir/öneri → Rota Detayı → "Bu rotayı sür" → (gerekirse giriş) → Ready (rota ilişik) → Başlat → Recording. Detayda tek ana eylem; Kaydet ve Paylaş ikincil. Turn-by-turn navigasyon yok, rota çizgisi takip edilir.
+- **B / Serbest sürüş:** Record → (gerekirse giriş + izin/GPS hazırlığı) → Ready → Başlat → Recording. Rota, başlık, motosiklet seçimi ön koşul değildir. Giriş/izin ekranından dönüşte başlatma niyeti korunur.
+- **C / Duraklat, bitir, sakla:** Recording ↔ Paused → Bitir → Özet → (başlık/fotoğraf/görünürlük, hepsi opsiyonel, otomatik başlık ör. "Antalya · Pazartesi sürüşü") → "Sürüşü kaydet" → onay → isteğe bağlı Paylaş / Rota olarak yayımla. Bitirme ve silme ayrı eylemlerdir; silme onay ister.
+- **D / Kesintiden dön:** Açılışta tamamlanmamış sürüş → Devam et / Bitir / Sil (Sil onaylı).
+- **E / Sistem durumu:** Recording/Paused kullanıcı durumudur; GPS yok / Offline / Arka plan ayrı gösterge. GPS yokken nokta kaydediliyormuş izlenimi verilmez.
+
+**Kayıt güveni (P0):** Kayıt yerelde tutulur, bulut senkronu ayrı durumdur. GPS veya internet kaybı sürüşü bitirmez. "Kaydedildi" mesajı yalnızca gerçek kalıcılık sağlandıktan sonra gösterilir. Örnek metin: "Sürüş cihazına kaydediliyor. Bağlantı gelince senkronize edilecek."
+
+**Kayıt ekranı:** Harita, mesafe, süre, ortalama hız ve her zaman görünür "Duraklat". Duraklatılmışta baskın "Devam et", daha az baskın "Sürüşü bitir". Kontroller menüye gizlenmez.
+
+**Kaydetme (bookmark):** Kartta ve detayda aynı yer imi davranışı; tek dokunuş, kısa "Kaydedildi" toast'u + geri alma. Misafir kullanıcı girişe yönlendirilirse işlem girişten sonra tamamlanır.
+
+**MVP dışı:** Turn-by-turn navigasyon, gelişmiş/dairesel rota üretimi, grup sürüşü, sosyal feed.
+
+**Açık kararlar (uygulamadan önce kullanıcıya sor):**
+- Sürüş görünürlüğü varsayılanı: brief "Public" diyor; öneri "ilk sürüş Private, sonra son seçim hatırlansın". Henüz onaylanmadı.
+- Like / Follow ve Story/paylaşım şablonlarının MVP'deki yeri.
+
+## Ekran envanteri (Pencil)
+
+| Alan | Ekranlar |
+|---|---|
+| 00 Launch / Onboarding / Auth | Splash, Get Started, Giriş (boş/dolu, e-posta + Google/Apple), Şifre (mevcut/yeni hesap), Şifremi unuttum, E-posta kontrol, Yeni şifre, Şifre güncellendi |
+| 01 Discover | Home (harita odaklı: konum, arama, kategori chip'leri, bölgede N rota, "Senin için önerilenler"), Search (aktif/sonuç/sonuç yok/sıralama sheet), Önerilen rotalar — Tümü, Rota detayı (standart/uzun), Haritada keşfet — rota listesi |
+| 02 Record | Ready (rotalı/serbest, sürüş tipi şeridi alternatifi), Recording, Paused, Recovery, Sürüş modu full ekran, Durdurma onayı, Sürüşü kaydet (form), Sürüş tipi seçimi sheet |
+| 03 Profil / Ayarlar | Profil genel (Sürüşler/Performans/Kaydettiklerim sekmeleri), Profili paylaş (QR), Aktivite paylaşımı (karusel şablonlar), Kaydettiklerim (liste/kaydedildi/kaldırıldı/boş), Ayarlar ve alt sayfaları: hesap, sürüş görünürlüğü, başlangıç-bitiş gizleme, engellenenler, konum/fotoğraf izni, bildirimler, dil, ölçü birimleri, yardım/SSS, geri bildirim, gizlilik politikası, kullanım koşulları, çıkış |
+| 04 Motorum | Boş durum, Motor ekle (marka → model, bottom sheet), Eklendi, Motoru değiştir |
+| 04 Rota öner | Konum seçimi, Rota bilgileri, Önizleme, Gönderiliyor, Başarılı, Hatalı |
+| 05 Sürücü eşleşme | Yakındaki sürücüler (harita + "Günün eşleşmesi" sheet) — keşif aşamasında |
+
+Sürüş tipleri (Tone): Şehir İçi, Uzun Yol, Doğa, Viraj, Sportif, Off-road, Sahil.
+
+## Design system
+
+Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light & Dark hedefli):
+
+| # | Bileşen | Özet spec |
+|---|---|---|
+| 01 | Button | 44 px yükseklik, 30 px yatay padding, ikon 24 px + 4 px gap, radius 12, outline 1.5 px; Default / With icon / Icon only |
+| 02 | Input | 4 tip (Standard, Multi-line, Currency, Suffix…) × 8 durum (normal + error satırları) |
+| 03–04 | Checkbox / Radio | 20/24 px kontrol, 40/48 px dokunma alanı, 9 durum |
+| 05 | Badge / Tag | Small 24 / Large 32 px; tonlar: Neutral, Warning, Info, Success, Destructive |
+| 06 | Tooltip | 4 yön, kısa / çok satır |
+| 07 | Filter Chip | Dropdown (default/open/applied/disabled/removable) + Toggle |
+| 08 | Switch | Off/On × Default/Hover/Focus/Disabled |
+| 09 | Segmented Control | 2–3 seçenek, 52 px yükseklik, dış radius 12, seçili radius 8, 4 px inset |
+| 10 | App Bar | Centered / Leading / Bottom sheet varyantları |
+| 11 | Navigation Bar / Floating | 3 öğe, 64 px yükseklik, 20 px yan boşluk, 28 px alt güvenli alan payı, yarı saydam yüzey |
+| — | Route Card | Kompakt (dikey, görselli) ve Satır varyantı; opsiyonel badge + kaydet |
+| — | Map / Heading Marker | Canlı konum + yön; beyaz outline ve gölge korunur, heading ile döndürülür |
+| — | Choice Group, Satır / Ayar (Chevron, Değer, Anahtar, Onay, Radyo), Satır / Marka, Status Icon, Dialog, Toast, Empty State, Bottom sheet üst çubuğu, marka logoları (Honda, Yamaha, KTM, BMW, Ducati…), Google/Apple giriş ikonları |
+
+**Önemli:** `.pen` dosyasında tanımlı **variable (token) ve reusable component yok**; tüm renkler ham hex. Kodda bu değerleri tek bir tema modülünde (`src/theme/`) token olarak topla, ekranlarda ham hex kullanma.
+
+**Tipografi (gözlenen):**
+- UI: **Inter** — 400 (gövde), 500 (etiket), 600 (başlık). Boyutlar: 12, 13, 14, 15, 16, 18, 24, 28, 32.
+- Metrikler (mesafe, süre, hız, sayaçlar): **JetBrains Mono 500** — sayısal değerler hizalı görünsün.
+- Logo / wordmark "ROLT": **Bakbak One**.
+
+**Renkler (gözlenen, token önerisiyle):**
+
+| Rol | Değer |
+|---|---|
+| text-primary / primary button / koyu yüzey | `#101318` (ekranlarda `#000000` da yoğun kullanılmış; `#101318`'e normalize et) |
+| surface | `#FFFFFF` |
+| surface-muted / subtle | `#F3F4F4` / `#F9FAFA` |
+| border / border-strong | `#E5E6E8` / `#D2D3D6` |
+| text-secondary / text-tertiary | `#6B6E73` / `#9EA0A4` |
+| brand (logo) | `#1515FF` |
+| accent (canlı sürüş, rota çizgisi, seçili sürüş tipi) | teal `#3BD3B8` (açık `#7BF1DB`, `#B7FBEF`; koyu `#0E9E82`) |
+| error | `#DC2626` (stroke) / `#B91C1C` (metin) / `#FEE2E2` (bg) |
+| success | `#15803D` / `#DCFCE7` |
+| warning | `#B45309` / `#FEF3C7` |
+| info | `#1D4ED8` / `#DBEAFE`, `#EFF6FF` |
+
+**Radius:** 4, 8, 12 (buton/kart), 16, 24 (bottom sheet üst köşeleri `[24,24,0,0]`), 9999 (pill/chip).
+**İkonlar:** Lucide.
+**Genel dil:** Nötr, açık zemin, siyah birincil butonlar, ince border'lar; renk yalnızca durum ve canlı sürüş vurgusunda. Harita ekranların merkezinde; kontroller bottom sheet'lerde.
+
+## Kod yazarken
+
+- Ekran/bileşen yazmadan önce ilgili Pencil frame'ini MCP ile oku ve ekran görüntüsünü al; ölçüleri tahmin etme.
+- Bileşenleri Core Components'teki isim ve varyantlarla eşleştir (Button, Input, Badge, FilterChip, Switch, SegmentedControl, AppBar, NavigationBar, RouteCard…).
+- Dokunma hedefleri en az 44 × 44 (mobil 48 önerilir).
+- Kullanıcıya görünen metinleri tasarımdaki Türkçe metinlerle birebir kullan.
