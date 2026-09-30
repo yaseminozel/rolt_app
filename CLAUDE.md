@@ -72,11 +72,11 @@ Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light
 
 | # | Bileşen | Node | Özet spec |
 |---|---|---|---|
-| 01 | Button | `RC60W` | 44 px yükseklik, 30 px yatay padding, ikon 24 px + 4 px gap, radius 12, outline 1.5 px; Default / With icon / Icon only |
-| 02 | Input | `HbGNS` | 4 tip (Standard, Multi-line, Currency, Suffix…) × 8 durum (normal + error satırları) |
+| 01 | Button | `RC60W` | 44 px yükseklik, 24 px yatay padding (ikon+etiket 32), ikon 20 px + 8 px gap, radius 12, outline 1 px; Contained / Outlined / Text × Enabled / Pressed / Disabled + Destructive; Default / With icon / Icon only. (Pano başlığındaki "padding 30 / ikon 24+4 / outline 1.5" frame'lerle çelişiyor; kod frame değerlerini uygular.) |
+| 02 | Input | `HbGNS` | 4 tip (Standard, Multi-line, Currency, Select) × 8 durum (normal + error satırları) |
 | 03 | Checkbox | `QXn80` | 20/24 px kontrol, 40/48 px dokunma alanı, 9 durum + indeterminate |
 | 04 | Radio Button | `UeboI` | 20/24 px kontrol, 40/48 px dokunma alanı, 9 durum |
-| 05 | Badge / Tag | `YFU4m` | Small 24 / Large 32 px; tonlar: Neutral, Warning, Info, Success, Destructive |
+| 05 | Badge / Tag | `YFU4m` | Small 24 / Large 32 px (panoda metinli Large 44 çizilmiş; lejant ve kod 32); tonlar: Neutral, Warning, Info, Success, Destructive |
 | 06 | Tooltip | `u7cV7` | 4 yön, kısa / çok satır |
 | 07 | Filter Chip | `iCyEV` | Dropdown (default/open/applied/disabled/removable) + Toggle |
 | 08 | Switch | `NoZZf` | Off/On × Default/Hover/Focus/Disabled |
@@ -98,7 +98,7 @@ Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light
 | Satır / Marka | `B2BQNG` |
 | Anahtar (switch, Açık/Kapalı) | `kTcEC` |
 | Kontrol / Radyo | `VGCwR` |
-| Üst çubuk / Alt sayfa (bottom sheet başlığı) | `Gq75K` |
+| Üst çubuk / Alt sayfa (`Gq75K`) — ekranlarda aslında ayar/Motorum sayfalarının tam ekran üst çubuğu olarak kullanılıyor (native header kuralıyla çakışıyor, karar bekliyor) | `Gq75K` |
 | Dialog | `s5345` |
 | Toast messages (Success / Failure) | `s1KRrb` |
 | Feedback / Toast (Saved / Removed) | `X3p3d7` |
