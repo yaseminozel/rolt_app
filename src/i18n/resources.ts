@@ -10,6 +10,8 @@ import enRides from './locales/en/rides.json';
 import enRouteDetail from './locales/en/routeDetail.json';
 import enRoutes from './locales/en/routes.json';
 import enRouteSuggestion from './locales/en/routeSuggestion.json';
+import enRouteSuggestionReview from './locales/en/routeSuggestionReview.json';
+import enRouteSuggestionDetails from './locales/en/routeSuggestionDetails.json';
 import trAuth from './locales/tr/auth.json';
 import trCommon from './locales/tr/common.json';
 import trDiscover from './locales/tr/discover.json';
@@ -22,6 +24,8 @@ import trRides from './locales/tr/rides.json';
 import trRouteDetail from './locales/tr/routeDetail.json';
 import trRoutes from './locales/tr/routes.json';
 import trRouteSuggestion from './locales/tr/routeSuggestion.json';
+import trRouteSuggestionReview from './locales/tr/routeSuggestionReview.json';
+import trRouteSuggestionDetails from './locales/tr/routeSuggestionDetails.json';
 
 import type { AppLanguage } from './language';
 
@@ -34,6 +38,8 @@ export const trResources = {
   rides: trRides,
   routes: trRoutes,
   routeSuggestion: trRouteSuggestion,
+  routeSuggestionReview: trRouteSuggestionReview,
+  routeSuggestionDetails: trRouteSuggestionDetails,
   discover: trDiscover,
   routeDetail: trRouteDetail,
   explore: trExplore,
@@ -51,6 +57,8 @@ const enResources: LocaleResources = {
   rides: enRides,
   routes: enRoutes,
   routeSuggestion: enRouteSuggestion,
+  routeSuggestionReview: enRouteSuggestionReview,
+  routeSuggestionDetails: enRouteSuggestionDetails,
   discover: enDiscover,
   routeDetail: enRouteDetail,
   explore: enExplore,
