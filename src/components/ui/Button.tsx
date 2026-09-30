@@ -58,10 +58,11 @@ const neutral: Record<ButtonVariant, Palette> = {
 };
 
 const destructiveTone: Record<ButtonVariant, Palette> = {
-  // The design has no pressed state for destructive contained; keep the fill.
+  // Design decision: the board has no pressed state for destructive contained; pressing
+  // darkens to the destructive text red so touch feedback matches the neutral variant.
   contained: {
     background: colors.danger,
-    pressedBackground: colors.danger,
+    pressedBackground: colors.dangerText,
     foreground: colors.textInverse,
   },
   outlined: {

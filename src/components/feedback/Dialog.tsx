@@ -61,7 +61,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   title: {
-    ...typography.bodyLargeMedium,
+    // Design decision: node says 16 medium, the logout screen 17 semibold; 16 semibold keeps
+    // the type scale and gives the title clear weight contrast over the 14 pt description.
+    ...typography.bodyLargeSemibold,
     alignSelf: 'stretch',
     color: colors.textPrimary,
     textAlign: 'center',

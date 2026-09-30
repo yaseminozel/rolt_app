@@ -1,4 +1,4 @@
-import { BookmarkSolid, CheckCircle } from 'iconoir-react-native';
+import { BookmarkSolid, CheckCircle, XmarkCircle } from 'iconoir-react-native';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, radius, spacing, typography } from '@/theme';
@@ -38,6 +38,7 @@ export function Toast({ variant, message, actionLabel, onActionPress, style }: T
 
   if (!isBookmark) {
     const isSuccess = variant === 'success';
+    const StatusGlyph = isSuccess ? CheckCircle : XmarkCircle;
     return (
       <View
         style={[
@@ -48,12 +49,9 @@ export function Toast({ variant, message, actionLabel, onActionPress, style }: T
         ]}
         accessibilityRole="alert"
         accessibilityLiveRegion={liveRegion}>
-        {/* The design uses the check-circle glyph for both success and failure. */}
-        <CheckCircle
-          width={18}
-          height={18}
-          color={isSuccess ? colors.success : colors.dangerText}
-        />
+        {/* Design decision: the board draws check-circle for failure too; failure uses
+            xmark-circle so the icon doesn't contradict the message (matches Badge destructive). */}
+        <StatusGlyph width={18} height={18} color={isSuccess ? colors.success : colors.dangerText} />
         <Text style={[styles.message, styles.tonalMessage]}>{message}</Text>
       </View>
     );

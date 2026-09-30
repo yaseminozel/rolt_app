@@ -50,7 +50,7 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/5d
 - **Harita:** Mapbox (`@rnmapbox/maps`, Maps SDK v11). Tüm haritalar `src/components/map/BaseMap.tsx` üzerinden; token `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` (`.env.local`, bkz. `.env.example`), stil `EXPO_PUBLIC_MAPBOX_STYLE_URL` (yoksa Mapbox Outdoors). Mapbox logo/attribution gizlenmez (lisans şartı). Expo Go'da çalışmaz → development build.
 - **Rota hesaplama:** MVP'de Mapbox Directions (A→B, yola oturan çizgi); motosiklete özel tercihler (virajlı/manzaralı) için sonra Valhalla veya GraphHopper. Kaydedilen GPS izi Mapbox Map Matching ile temizlenebilir.
 - **Konum:** `expo-location` + `expo-task-manager`, arka planda konum açık (iOS "Always", Android foreground service). İzin metni tasarımdaki "Konum izni" ekranından türetildi.
-- **Backend:** Supabase (Postgres + **PostGIS**, Auth: Google/Apple/e-posta, Storage: sürüş fotoğrafları). **Realtime kullanılmıyor**: sürüş önce cihazda (SQLite) tutulur, bitince/bağlantı gelince toplu yüklenir; rota/keşif işlemleri normal sorgu. Realtime yalnızca canlı konum paylaşımı (grup sürüşü, Yakındaki Sürücüler) gelirse özellik bazında eklenir.
+- **Backend:** **Self-hosted Supabase** — entegrasyon ileride yapılacak, şimdilik backend kodu yazma; veri katmanını arayüzlerle soyutla ki mock'tan Supabase'e geçiş kolay olsun. (Postgres + **PostGIS**, Auth: Google/Apple/e-posta, Storage: sürüş fotoğrafları). **Realtime kullanılmıyor**: sürüş önce cihazda (SQLite) tutulur, bitince/bağlantı gelince toplu yüklenir; rota/keşif işlemleri normal sorgu. Realtime yalnızca canlı konum paylaşımı (grup sürüşü, Yakındaki Sürücüler) gelirse özellik bazında eklenir.
 
 **Açık kararlar (uygulamadan önce kullanıcıya sor):**
 - Sürüş görünürlüğü varsayılanı: brief "Public" diyor; öneri "ilk sürüş Private, sonra son seçim hatırlansın". Henüz onaylanmadı.
@@ -104,7 +104,7 @@ Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light
 | Satır / Marka | `B2BQNG` |
 | Anahtar (switch, Açık/Kapalı) | `kTcEC` |
 | Kontrol / Radyo | `VGCwR` |
-| Üst çubuk / Alt sayfa (`Gq75K`) — ekranlarda aslında ayar/Motorum sayfalarının tam ekran üst çubuğu olarak kullanılıyor (native header kuralıyla çakışıyor, karar bekliyor) | `Gq75K` |
+| Üst çubuk / Alt sayfa (`Gq75K`) — ekranlarda ayar/Motorum sayfalarının tam ekran üst çubuğu → kodda **native Stack header** (ayrı bileşen yok) | `Gq75K` |
 | Dialog | `s5345` |
 | Toast messages (Success / Failure) | `s1KRrb` |
 | Feedback / Toast (Saved / Removed) | `X3p3d7` |
@@ -154,6 +154,24 @@ Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26
 - **Ekran başlığı** — Pencil'de `Screen Header` / `App Bar` (ör. node `H0lpWo`, "01.4 Önerilen Rotalar — Tümü": başlık + kapat + yapışkan arama) → her sekmenin içinde **native `Stack`** header'ı.
   - Başlık/eylemler `Stack.Screen` options ile; arama alanı `Stack.SearchBar` (`placement="automatic"`) ile. Header'ı elle çizme.
   - Doküman: https://docs.expo.dev/router/advanced/native-tabs/ — kod yazmadan önce SDK 58 sürüm dokümanını tekrar kontrol et (SDK 58'de expo-router navigasyon çekirdeği yenilendi; migration guide'a bak).
+
+## Tasarım kararları (çelişkilerde senior UI kararı)
+
+Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve erişilebilirliğe göre verilir ve buraya yazılır.
+
+| Konu | Çelişki | Karar |
+|---|---|---|
+| Button ölçüleri | Pano başlığı padding 30 / ikon 24+4 / outline 1.5; frame'ler 24 / 20+8 / 1 | Frame değerleri (ekranlarda kullanılan gerçek çizim) |
+| Badge Large | Metinli Large 44 çizilmiş; lejant 32 | 32 (lejant, icon-only 32 ve 8'lik grid ile tutarlı) |
+| Hata toast'u | Failure toast check-circle ikonu kullanıyor | `xmark-circle` (ikon mesajla çelişmesin; Badge destructive ile aynı dil) |
+| Dialog başlığı | Bileşen 16 medium, Çıkış ekranı 17 semibold | 16 semibold (tip skalasında kalır, 14'lük açıklamadan ağırlıkla ayrışır) |
+| Destructive contained basılı | Tasarımda basılı durum yok | `dangerText` (#B91C1C) ile koyulaşır; nötr varyantla aynı geri bildirim |
+| Sheet başlıkları | 18/20/22 pt başlık, 14/15 pt alt başlık, #9EA0A4 ve #6B6E73 karışık | `SheetHeader`: 18 medium başlık, 14 regular `textSecondary` alt başlık (AA kontrast), 16 gutter, opsiyonel 44 pt kapat |
+| `Gq75K` üst çubuk | Sheet bileşeni gibi adlandırılmış ama tam ekran header olarak kullanılıyor | Native Stack header; kodda karşılığı yok |
+| ChoiceGroup | Radio etiketin üstüne biniyor, 22 pt ayrı radio | 8 pt boşluk + standart `RadioButton` (tek radio sistemi) |
+| TextField yazı boyu | Pano 14, ekranlar 16 | 16 (ekranlar) |
+| Rota kartı metrikleri | Genel kural Mono, kartlar Inter | Kartlarda Inter; canlı kayıt/profil metrikleri JetBrains Mono |
+| Siyah metin | Ekranlarda `#000000` | `textPrimary` (#101318) |
 
 ## Marka ve uygulama ikonu
 
