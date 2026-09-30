@@ -15,6 +15,8 @@ export const palette = {
   gray800: '#202328',
   gray900: '#101318',
   blue: '#1515FF',
+  // Brand-tinted selection fill (QKDo5 selected brand tile, g4Zy4 selected model, LreVd bike band)
+  blue25: '#F3F3FF',
   // Not in the design: pressed brand CTA, derived from `blue` at ~85 % value (same hue).
   blueDeep: '#1111D9',
   teal300: '#7BF1DB',
@@ -61,6 +63,8 @@ export const palette = {
   teal50: '#D9F8EE',
   teal700: '#0F766E',
   teal800: '#0F5F59',
+  // Onboarding eyebrow on the hero photo (sLkVv "SÜR. KEŞFET. PAYLAŞ.")
+  cyan300: '#1BF4FF',
 } as const;
 
 export const colors = {
@@ -92,6 +96,8 @@ export const colors = {
   brand: palette.blue,
   /** Pressed brand CTA; the design has no pressed state (derived, see palette.blueDeep). */
   brandPressed: palette.blueDeep,
+  /** Brand-tinted fill of selected registration options and the garage card band (QKDo5, g4Zy4, LreVd). */
+  brandSubtle: palette.blue25,
 
   accent: palette.teal400,
   accentSubtle: palette.teal100,
@@ -157,6 +163,13 @@ export const colors = {
   noteAccentSurface: palette.teal50,
   noteAccentText: palette.teal700,
   noteAccentTitle: palette.teal800,
+
+  // Onboarding hero (sLkVv): eyebrow and the bottom gradient (tTI43) that keeps white copy legible.
+  mediaEyebrow: palette.cyan300,
+  mediaGradientClear: 'rgba(0, 0, 0, 0)',
+  mediaGradientSoft: 'rgba(0, 0, 0, 0.18)',
+  mediaGradientMid: 'rgba(0, 0, 0, 0.72)',
+  mediaGradientStrong: 'rgba(0, 0, 0, 0.92)',
 
   scrim: 'rgba(15, 18, 23, 0.31)',
   glass: 'rgba(255, 255, 255, 0.64)',

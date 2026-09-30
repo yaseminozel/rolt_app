@@ -25,6 +25,8 @@ const variant = (family: string, fontSize: number, lineHeight?: number): TextVar
 /** Type scale observed in the design (Inter 12–32, JetBrains Mono for ride metrics). */
 export const typography = {
   display: variant(fontFamily.semibold, 32),
+  /** Onboarding hero heading (sLkVv): 32 medium at 1.125. */
+  displayMedium: variant(fontFamily.medium, 32, 36),
   title: variant(fontFamily.semibold, 24),
   headline: variant(fontFamily.semibold, 18),
   headlineMedium: variant(fontFamily.medium, 18, 24),
@@ -32,6 +34,8 @@ export const typography = {
   bodyLargeMedium: variant(fontFamily.medium, 16),
   bodyLargeSemibold: variant(fontFamily.semibold, 16),
   body: variant(fontFamily.regular, 14),
+  /** 14 pt at 1.4 line height, for multi-line screen descriptions (AQCUg). */
+  bodyRelaxed: variant(fontFamily.regular, 14, 20),
   bodyMedium: variant(fontFamily.medium, 14),
   bodySemibold: variant(fontFamily.semibold, 14),
   callout: variant(fontFamily.regular, 13),
@@ -41,6 +45,10 @@ export const typography = {
   /** 12 pt at 1.4 line height, for multi-line notes and helper copy. */
   captionRelaxed: variant(fontFamily.regular, 12, 17),
   captionMedium: variant(fontFamily.medium, 12),
+  /** Uppercase eyebrow above hero headings (sLkVv): 12 semibold, 10 % tracking. */
+  overline: { ...variant(fontFamily.semibold, 12, 16), letterSpacing: 1.2 },
+  /** Small uppercase label on cards (LreVd "ANA MOTORUN"): 11 semibold, 0.6 tracking. */
+  eyebrow: { ...variant(fontFamily.semibold, 11, 14), letterSpacing: 0.6 },
   metricLarge: variant(fontFamily.monoMedium, 24),
   metric: variant(fontFamily.monoMedium, 15),
   wordmark: variant(fontFamily.brand, 28),
