@@ -42,7 +42,11 @@ export type RegistrationDraft = {
   username?: string;
   city?: string;
   brand?: MotorcycleBrand;
+  /** Brand typed on 00.9 via "Listede yok mu?"; mutually exclusive with `brand`. */
+  customBrandName?: string;
   modelId?: string;
+  /** Model typed on 00.10 when the brand has no catalog match; mutually exclusive with `modelId`. */
+  customModelName?: string;
   modelYear?: number;
   roadPreferences: RoadPreference[];
   tempo?: RidingTempo;

@@ -19,5 +19,90 @@
     "zeroToTwo": "0–2 years",
     "threeToFive": "3–5 years",
     "fivePlus": "5+ years"
+  },
+  "listSeparator": " · ",
+  "usernameHandle": "@{{username}}",
+  "profile": {
+    "heading": "Let's get to know you",
+    "description": "Other riders will see this on your profile.",
+    "photoTitle": "Add a profile photo",
+    "photoTitleChange": "Change profile photo",
+    "photoDescription": "A helmet photo works too. Showing your face builds trust in matches.",
+    "photoPermissionTitle": "Photo access needed",
+    "photoPermissionMessage": "Allow access to your photos in Settings to choose a profile photo.",
+    "photoPermissionCancel": "Not now",
+    "photoPermissionOpenSettings": "Open Settings",
+    "fullNameLabel": "Full name",
+    "usernameLabel": "Username",
+    "usernamePrefix": "@",
+    "usernameChecking": "Checking…",
+    "usernameAvailable": "This username is available",
+    "usernameTaken": "This username is taken",
+    "usernameCheckFailed": "Couldn't check. Check your connection and try again.",
+    "usernameInvalidCharacters": "Use only lowercase letters, numbers, dots and underscores.",
+    "usernameTooShort": "Must be at least {{min}} characters.",
+    "usernameTooLong": "Can be at most {{max}} characters.",
+    "cityLabel": "City",
+    "cityPlaceholder": "Choose your city",
+    "cityHelper": "Used to show routes and riders near you."
+  },
+  "city": {
+    "title": "City",
+    "searchPlaceholder": "Search cities",
+    "noResults": "No cities match your search."
+  },
+  "brand": {
+    "heading": "What do you ride?",
+    "description": "Pick your brand; next we'll add the model and year.",
+    "searchPlaceholder": "Search brands",
+    "manualTitle": "Not on the list?",
+    "manualSubtitle": "Add your brand",
+    "manualLabel": "Brand name",
+    "manualPlaceholder": "e.g. Benelli"
+  },
+  "model": {
+    "heading": "Choose your model",
+    "description": "We'll add it to your garage; it shows on your profile and in matches.",
+    "brandLabel": "Brand",
+    "searchPlaceholder": "Search {{brand}} models",
+    "noResults": "No models match your search. You can type your model below.",
+    "manualLabel": "Model name",
+    "manualPlaceholder": "e.g. Leoncino 500",
+    "yearLabel": "Model year",
+    "yearOther": "Other",
+    "yearOtherPlaceholder": "e.g. 2015",
+    "yearInvalid": "Enter a year between {{min}} and {{max}}."
+  },
+  "ridingStyle": {
+    "heading": "How do you like to ride?",
+    "description": "We'll suggest routes and riding buddies based on these preferences.",
+    "roadsLabel": "Favourite roads",
+    "roadsHint": "Pick as many as you like",
+    "tempoLabel": "Your pace",
+    "experienceLabel": "Riding experience",
+    "note": "You can change your preferences anytime in Profile › Settings.",
+    "submit": "Finish sign-up"
+  },
+  "complete": {
+    "heading": "Your garage is ready, {{name}}!",
+    "headingNoBike": "Your profile is ready, {{name}}!",
+    "description": "Your profile is set up. You can now discover routes, record your rides and match with riders nearby.",
+    "mainBike": "YOUR MAIN BIKE",
+    "bikeTitle": "{{brand}} {{model}}",
+    "ridingStyleLabel": "Your riding style",
+    "tempoTag": "{{tempo}} pace",
+    "roadTags": {
+      "curvyRoads": "Curvy",
+      "coast": "Coast",
+      "mountainRoads": "Mountain roads",
+      "city": "City",
+      "longTour": "Long tour",
+      "offRoad": "Off-road",
+      "weekendGetaway": "Weekend",
+      "nightRiding": "Night riding"
+    },
+    "nextStepTitle": "Next step: location access",
+    "nextStepText": "To show routes and riders near you, we'll ask for permission on the next screen.",
+    "start": "Start exploring"
   }
 }
