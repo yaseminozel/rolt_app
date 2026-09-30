@@ -31,7 +31,13 @@
           "resizeMode": "contain"
         }
       ],
-      "expo-status-bar"
-    ]
+      "expo-status-bar",
+      "expo-router",
+      "expo-font"
+    ],
+    "scheme": "rolt",
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
