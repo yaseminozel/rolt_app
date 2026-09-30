@@ -25,7 +25,18 @@ export default function RegisterLayout() {
         <Stack.Screen name="model" />
         <Stack.Screen name="riding-style" />
         <Stack.Screen name="complete" options={{ headerBackVisible: false, gestureEnabled: false }} />
-        <Stack.Screen name="city" options={{ presentation: 'formSheet', headerShown: false }} />
+        <Stack.Screen
+          name="city"
+          options={{
+            presentation: 'formSheet',
+            headerShown: false,
+            // Opens at 60% like the design's option sheets; drag up to full height while searching.
+            sheetAllowedDetents: [0.6, 1],
+            sheetInitialDetentIndex: 0,
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 24,
+          }}
+        />
       </Stack>
     </RegistrationDraftProvider>
   );
