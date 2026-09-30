@@ -38,6 +38,8 @@
     "usernameChecking": "Kontrol ediliyor…",
     "usernameAvailable": "Bu kullanıcı adı müsait",
     "usernameTaken": "Bu kullanıcı adı alınmış",
+    "usernameSuggestionsLabel": "Önerilen kullanıcı adları",
+    "usernameSuggestionHint": "Bu kullanıcı adını seçer",
     "usernameCheckFailed": "Kontrol edilemedi. Bağlantını kontrol edip tekrar dene.",
     "usernameInvalidCharacters": "Yalnızca küçük harf, rakam, nokta ve alt çizgi kullanabilirsin.",
     "usernameTooShort": "En az {{min}} karakter olmalı.",

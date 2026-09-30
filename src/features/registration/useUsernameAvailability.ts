@@ -5,13 +5,15 @@ import {
   validateUsernameFormat,
   type UsernameFormatError,
   type UsernameService,
+  type UsernameSuggestionHints,
 } from './usernameService';
 
 export type UsernameStatus =
   | { state: 'idle' }
   | { state: 'checking' }
   | { state: 'available' }
-  | { state: 'taken' }
+  /** `suggestions`: free alternatives shown as chips under the field (eIU92); may be empty. */
+  | { state: 'taken'; suggestions: string[] }
   | { state: 'failed' }
   | { state: 'invalid'; error: UsernameFormatError };
 
@@ -23,15 +25,19 @@ type Result = { username: string; status: UsernameStatus };
 /**
  * Debounced username validation + availability check. Results for an outdated value are
  * ignored; the status stays "idle" while typing and reads "checking" only while the request
- * for the current value is in flight.
+ * for the current value is in flight. When the hints change (e.g. a city is picked) the
+ * current value is re-checked in the background and its last result stays visible meanwhile,
+ * so suggestions pick up the new city without flashing the field.
  */
 export function useUsernameAvailability(
   username: string,
+  hints: UsernameSuggestionHints = {},
   service: UsernameService = mockUsernameService,
 ): UsernameStatus {
   const [result, setResult] = useState<Result>({ username: '', status: { state: 'idle' } });
   /** Value whose availability request is in flight (set once the debounce has elapsed). */
   const [pending, setPending] = useState('');
+  const { cityPlateCode, bikeModelName } = hints;
 
   useEffect(() => {
     if (username === '') return;
@@ -44,11 +50,15 @@ export function useUsernameAvailability(
         return;
       }
       setPending(username);
-      service.isAvailable(username).then(
-        (available) => {
-          if (!cancelled) {
-            setResult({ username, status: { state: available ? 'available' : 'taken' } });
-          }
+      service.checkAvailability(username, { cityPlateCode, bikeModelName }).then(
+        (availability) => {
+          if (cancelled) return;
+          setResult({
+            username,
+            status: availability.available
+              ? { state: 'available' }
+              : { state: 'taken', suggestions: availability.suggestions },
+          });
         },
         () => {
           if (!cancelled) setResult({ username, status: { state: 'failed' } });
@@ -60,7 +70,7 @@ export function useUsernameAvailability(
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [username, service]);
+  }, [username, cityPlateCode, bikeModelName, service]);
 
   if (username === '') return { state: 'idle' };
   if (result.username === username) return result.status;

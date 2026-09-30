@@ -4,7 +4,7 @@ Code and data copied into this repository (npm dependencies carry their own lice
 
 ## Lucide icons — ISC License
 
-Used in `src/components/registration/icons/MountainIcon.tsx` and `TentIcon.tsx` (geometry from lucide-static v1.49.0).
+Used in `src/components/registration/icons/MountainIcon.tsx`, `TentIcon.tsx` and `src/components/permissions/icons/HandIcon.tsx`, `SunriseIcon.tsx` (geometry from lucide-static v1.49.0).
 
 Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide Contributors 2022.
 

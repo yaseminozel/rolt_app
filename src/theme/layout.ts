@@ -17,12 +17,16 @@ export const radius = {
   /** Ride type badge (a2e36). */
   tag: 6,
   sm: 8,
+  /** Miniature app icon on notification previews (RzQd4). */
+  appIcon: 9,
   /** Filter chips (iCyEV) and large badges (YFU4m); also list selection backgrounds and route row thumbnails. */
   chip: 10,
   md: 12,
   lg: 16,
   /** Ride type option tile (N0mch). */
   tile: 18,
+  /** Permission illustration cards (TJtI6, RzQd4). */
+  media: 20,
   xl: 24,
   xxl: 32,
   pill: 9999,
@@ -41,4 +45,6 @@ export const shadows = {
   raised: '0px 2px 5.25px rgba(8, 18, 23, 0.16)',
   floating: '0px 4px 14px rgba(0, 0, 0, 0.12)',
   overlay: '0px 3px 10.5px rgba(0, 0, 0, 0.14)',
+  /** Notification preview cards on the notification permission screen (RzQd4). */
+  notification: '0px 4px 14px rgba(16, 19, 24, 0.1)',
 } as const;

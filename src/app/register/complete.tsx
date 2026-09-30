@@ -1,4 +1,3 @@
-import * as Location from 'expo-location';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,8 +13,8 @@ import { formatNumber } from '@/i18n/format';
 
 /**
  * 00.12 Kayıt / Tamamlandı (Pencil `LreVd`). Back and swipe-back are disabled by the layout.
- * "Keşfetmeye başla" asks for foreground location (background is requested by Record),
- * then finishes the profile whatever the answer; the root guard then routes into the app.
+ * "Keşfetmeye başla" only finishes the profile: the root guard then opens the permission
+ * screens (00.13 location → 00.14 notifications), as the "Sıradaki adım" note announces.
  * Skipped data degrades gracefully: no bike → no bike band and a "Profilin hazır" heading;
  * no photo → person glyph; no city → handle only; no preferences → no tag section.
  */
@@ -41,11 +40,6 @@ export default function RegisterCompleteScreen() {
 
   const handleStart = async () => {
     setSubmitting(true);
-    try {
-      await Location.requestForegroundPermissionsAsync();
-    } catch {
-      // The answer (or a failure) does not block finishing registration.
-    }
     try {
       await completeProfile();
       // On success the guard unmounts the flow, so the loading state is left as is.

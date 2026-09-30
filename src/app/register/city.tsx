@@ -1,4 +1,4 @@
-import { Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
@@ -10,12 +10,19 @@ import { SearchField } from '@/components/ui/SearchField';
 import { matchesSearch } from '@/lib/searchText';
 import { useRegistrationDraft } from '@/features/registration/RegistrationDraftProvider';
 import { TURKISH_CITIES_ALPHABETICAL } from '@/features/location/turkishCities';
-import { colors, layout, radius, spacing, typography } from '@/theme';
+import { colors, layout, spacing, typography } from '@/theme';
 
 /**
  * City picker for 00.8 "Şehir", presented as a native form sheet. No dedicated frame exists:
  * it follows the option sheets (e.g. "Dil", `vfpFt`) — SheetHeader with close, search, and
  * single-choice rows with a check on the current city. Picking a city saves it and closes.
+ *
+ * Sheet layout (detents 60 % / 100 %, grabber and radius come from `register/_layout.tsx`):
+ * react-native-screens sizes a form sheet's scroll view to the visible sheet only when the
+ * screen root has at most two children — a non-collapsable header and the scroll view — so
+ * the title and search stay pinned while the list scrolls inside the current detent.
+ * Scrolling the list expands the sheet to full height (iOS default), and the list insets
+ * itself above the keyboard while searching.
  */
 export default function CityPickerScreen() {
   const { t } = useTranslation('registration');
@@ -35,19 +42,19 @@ export default function CityPickerScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Stack.Screen
-        options={{ sheetGrabberVisible: true, sheetCornerRadius: radius.xl, sheetAllowedDetents: [1] }}
-      />
-      <SheetHeader title={t('city.title')} onClose={() => router.back()} style={styles.header} />
-      <SearchField
-        value={query}
-        onChangeText={setQuery}
-        placeholder={t('city.searchPlaceholder')}
-        variant="filled"
-        containerStyle={styles.search}
-      />
+    <>
+      <View collapsable={false} style={styles.header}>
+        <SheetHeader title={t('city.title')} onClose={() => router.back()} style={styles.title} />
+        <SearchField
+          value={query}
+          onChangeText={setQuery}
+          placeholder={t('city.searchPlaceholder')}
+          variant="filled"
+          containerStyle={styles.search}
+        />
+      </View>
       <FlatList
+        style={styles.list}
         data={cities}
         keyExtractor={(city) => city.plateCode}
         renderItem={({ item }) => (
@@ -59,22 +66,26 @@ export default function CityPickerScreen() {
         )}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
+        automaticallyAdjustKeyboardInsets
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.lg }}
         ListEmptyComponent={<Text style={styles.empty}>{t('city.noResults')}</Text>}
         initialNumToRender={20}
       />
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  header: {
     backgroundColor: colors.surface,
   },
-  // The native grabber sits above the header.
-  header: {
+  // The native grabber sits above the title.
+  title: {
     paddingTop: spacing.lg,
+  },
+  list: {
+    flex: 1,
+    backgroundColor: colors.surface,
   },
   search: {
     marginHorizontal: layout.screenGutter,

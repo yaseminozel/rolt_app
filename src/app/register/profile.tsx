@@ -8,7 +8,10 @@ import { Alert, Linking } from 'react-native';
 import { ProfilePhotoPicker } from '@/components/registration/ProfilePhotoPicker';
 import { RegistrationStepScreen } from '@/components/registration/RegistrationStepScreen';
 import { SelectField } from '@/components/registration/SelectField';
+import { UsernameField } from '@/components/registration/UsernameField';
 import { TextField } from '@/components/ui/TextField';
+import { findModel } from '@/features/garage/fixtures/motorcycleModels';
+import { findCityByName } from '@/features/location/turkishCities';
 import { useRegistrationDraft } from '@/features/registration/RegistrationDraftProvider';
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/features/registration/usernameService';
 import {
@@ -17,9 +20,11 @@ import {
 } from '@/features/registration/useUsernameAvailability';
 
 /**
- * 00.8 Kayıt / 1 · Profil (Pencil `UZpFX`).
+ * 00.8 Kayıt / 1 · Profil (Pencil `UZpFX`; taken username `eIU92`).
  * Required: full name + an available username (the design hides "Atla" on this step).
- * Photo and city are optional.
+ * Photo and city are optional. A taken username shows up to three free suggestions,
+ * personalised with the chosen city's plate code (and the bike, when the user came back
+ * from a later step); tapping one fills the field and re-checks it.
  */
 export default function RegisterProfileScreen() {
   const { t } = useTranslation(['registration', 'common']);
@@ -29,7 +34,10 @@ export default function RegisterProfileScreen() {
   const [photoUri, setPhotoUri] = useState(draft.photoUri);
   const [fullName, setFullName] = useState(draft.fullName ?? '');
   const [username, setUsername] = useState(draft.username ?? '');
-  const usernameStatus = useUsernameAvailability(username);
+  const usernameStatus = useUsernameAvailability(username, {
+    cityPlateCode: findCityByName(draft.city)?.plateCode,
+    bikeModelName: findModel(draft.modelId)?.name ?? draft.customModelName,
+  });
 
   const canContinue = fullName.trim().length > 0 && usernameStatus.state === 'available';
 
@@ -82,7 +90,7 @@ export default function RegisterProfileScreen() {
         textContentType="name"
         returnKeyType="next"
       />
-      <TextField
+      <UsernameField
         label={t('profile.usernameLabel')}
         prefix={t('profile.usernamePrefix')}
         value={username}
@@ -94,6 +102,11 @@ export default function RegisterProfileScreen() {
         textContentType="username"
         returnKeyType="done"
         {...usernameMessages(usernameStatus, t)}
+        suggestions={usernameStatus.state === 'taken' ? usernameStatus.suggestions : undefined}
+        formatSuggestion={(suggestion) => t('usernameHandle', { username: suggestion })}
+        onSuggestionPress={setUsername}
+        suggestionsAccessibilityLabel={t('profile.usernameSuggestionsLabel')}
+        suggestionAccessibilityHint={t('profile.usernameSuggestionHint')}
       />
       <SelectField
         label={t('profile.cityLabel')}

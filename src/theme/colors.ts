@@ -57,6 +57,9 @@ export const palette = {
   gray700: '#393B41',
   orange100: '#FFEDD5',
   orange700: '#C2410C',
+  // Expired reset link note (b1m1YP "Bağlantı … gönderildi")
+  orange50: '#FFF7ED',
+  orange800: '#9A3412',
   cyan100: '#CFFAFE',
   cyan700: '#0E7490',
   // Accent info note (LreVd "Sıradaki adım: konum izni")
@@ -65,6 +68,9 @@ export const palette = {
   teal800: '#0F5F59',
   // Onboarding eyebrow on the hero photo (sLkVv "SÜR. KEŞFET. PAYLAŞ.")
   cyan300: '#1BF4FF',
+  // Notification permission illustration background (RzQd4 "Görsel", top → bottom)
+  indigo50: '#EEF0FF',
+  indigo100: '#DFE3FF',
 } as const;
 
 export const colors = {
@@ -159,6 +165,11 @@ export const colors = {
   rideCoastSurface: palette.cyan100,
   rideCoastText: palette.cyan700,
 
+  // Time-related caution note (b1m1YP expired reset link): orange tone.
+  cautionSurface: palette.orange50,
+  cautionIcon: palette.orange700,
+  cautionText: palette.orange800,
+
   // Info note (InfoNote, LreVd): accent tone.
   noteAccentSurface: palette.teal50,
   noteAccentText: palette.teal700,
@@ -170,6 +181,16 @@ export const colors = {
   mediaGradientSoft: 'rgba(0, 0, 0, 0.18)',
   mediaGradientMid: 'rgba(0, 0, 0, 0.72)',
   mediaGradientStrong: 'rgba(0, 0, 0, 0.92)',
+
+  // Location permission map preview (TJtI6): brand-blue accuracy radius, halo and position dot.
+  locationRadiusFill: 'rgba(21, 21, 255, 0.08)',
+  locationRadiusStroke: 'rgba(21, 21, 255, 0.3)',
+  locationHalo: 'rgba(21, 21, 255, 0.18)',
+
+  // Notification permission illustration (RzQd4): gradient panel and translucent preview cards.
+  notificationPanelTop: palette.indigo50,
+  notificationPanelBottom: palette.indigo100,
+  notificationCardSurface: 'rgba(255, 255, 255, 0.92)',
 
   scrim: 'rgba(15, 18, 23, 0.31)',
   glass: 'rgba(255, 255, 255, 0.64)',

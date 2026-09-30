@@ -1,0 +1,59 @@
+{
+  "location": {
+    "title": "Share your location",
+    "description": "We need your location to record routes and show riders near you.",
+    "benefits": {
+      "recordRides": {
+        "title": "Record your rides",
+        "text": "Your speed, distance and route line are created automatically."
+      },
+      "nearbyRoutes": {
+        "title": "Discover nearby routes",
+        "text": "Get suggestions based on where you are."
+      },
+      "matchRiders": {
+        "title": "Match with riders",
+        "text": "See compatible riders within 5 km."
+      }
+    },
+    "privacyNote": "Your exact location is never shared with other riders; only an approximate distance is shown.",
+    "allow": "Allow location access"
+  },
+  "notifications": {
+    "title": "Never miss a thing",
+    "description": "We'll let you know right away when ride invites and route approvals come in.",
+    "benefits": {
+      "rideInvites": {
+        "title": "Ride invites",
+        "text": "When a rider invites you to ride together."
+      },
+      "routeApprovals": {
+        "title": "Route approvals",
+        "text": "When a route you suggested goes live."
+      },
+      "dailyMatches": {
+        "title": "Daily matches",
+        "text": "When new matches are ready, at most once a day."
+      }
+    },
+    "allow": "Allow notifications",
+    "preview": {
+      "rideInvite": {
+        "title": "Deniz wants to ride together",
+        "time": "now",
+        "text": "Want to join the Şile coast ride on Saturday?"
+      },
+      "routePublished": {
+        "title": "Your route is live 🎉",
+        "time": "2h",
+        "text": "Kadıköy – Şile Coast Route was approved."
+      },
+      "dailyMatches": {
+        "title": "Today's matches are ready",
+        "time": "yesterday",
+        "text": "5 riders are a 92% match for you."
+      }
+    }
+  },
+  "notNow": "Not now"
+}

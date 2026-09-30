@@ -38,6 +38,8 @@
     "usernameChecking": "Checking…",
     "usernameAvailable": "This username is available",
     "usernameTaken": "This username is taken",
+    "usernameSuggestionsLabel": "Suggested usernames",
+    "usernameSuggestionHint": "Picks this username",
     "usernameCheckFailed": "Couldn't check. Check your connection and try again.",
     "usernameInvalidCharacters": "Use only lowercase letters, numbers, dots and underscores.",
     "usernameTooShort": "Must be at least {{min}} characters.",
