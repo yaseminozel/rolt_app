@@ -15,6 +15,8 @@ export const spacing = {
 export const radius = {
   xs: 4,
   sm: 8,
+  /** Filter chips (iCyEV) and large badges (YFU4m). */
+  chip: 10,
   md: 12,
   lg: 16,
   xl: 24,

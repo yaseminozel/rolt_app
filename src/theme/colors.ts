@@ -19,6 +19,8 @@ export const palette = {
   teal100: '#B7FBEF',
   teal400: '#3BD3B8',
   teal600: '#0E9E82',
+  // "On" track of the settings switch (kTcEC); also the route line on map cards
+  teal350: '#42EBCC',
   red100: '#FEE2E2',
   red600: '#DC2626',
   red700: '#B91C1C',
@@ -47,6 +49,12 @@ export const palette = {
   slate600: '#485260',
   slate900: '#19212B',
   gray600: '#4D4F55',
+  // Ride type badge tones (a2e36)
+  gray700: '#393B41',
+  orange100: '#FFEDD5',
+  orange700: '#C2410C',
+  cyan100: '#CFFAFE',
+  cyan700: '#0E7490',
 } as const;
 
 export const colors = {
@@ -77,6 +85,22 @@ export const colors = {
   accentSubtle: palette.teal100,
   accentLight: palette.teal300,
   accentStrong: palette.teal600,
+  /** "On" track of the settings switch (kTcEC). */
+  accentVivid: palette.teal350,
+
+  // Form controls: Button (RC60W), Checkbox (QXn80), Radio (UeboI), Switch (NoZZf).
+  /** Pressed fill of outlined/text buttons. */
+  surfacePressed: palette.gray200,
+  /** Unchecked checkbox/radio outline. */
+  controlBorder: palette.gray500,
+  /** Switch "off" track; unselected ring of the outlined radio (VGCwR). */
+  controlTrack: palette.gray300,
+  /** Switch "off" track while pressed (design: Hover). */
+  controlTrackPressed: palette.gray400,
+  /** Checked checkbox/radio fill when disabled. */
+  controlSelectedDisabled: palette.gray300,
+  /** Switch "on" track when disabled. */
+  controlOnDisabled: palette.gray400,
 
   danger: palette.red600,
   dangerText: palette.red700,
@@ -109,6 +133,13 @@ export const colors = {
   emptyStateGlyph: palette.gray600,
   /** Message text on tonal toasts (s1KRrb). */
   toastText: palette.slate900,
+
+  // Ride type badge (a2e36) tones without a status equivalent.
+  rideCityText: palette.gray700,
+  rideOffRoadSurface: palette.orange100,
+  rideOffRoadText: palette.orange700,
+  rideCoastSurface: palette.cyan100,
+  rideCoastText: palette.cyan700,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
   glass: 'rgba(255, 255, 255, 0.64)',
