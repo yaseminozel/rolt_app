@@ -28,6 +28,8 @@ export const typography = {
   /** Onboarding hero heading (sLkVv): 32 medium at 1.125. */
   displayMedium: variant(fontFamily.medium, 32, 36),
   title: variant(fontFamily.semibold, 24),
+  /** Prompt sheet heading (ydm6l "Rotayı kaydetmek için giriş yap"): 20 semibold. */
+  titleSmall: variant(fontFamily.semibold, 20, 24),
   headline: variant(fontFamily.semibold, 18),
   headlineMedium: variant(fontFamily.medium, 18, 24),
   bodyLarge: variant(fontFamily.regular, 16),

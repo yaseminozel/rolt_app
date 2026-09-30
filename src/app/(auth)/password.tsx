@@ -7,23 +7,31 @@ import { AuthScreen } from '@/components/auth/AuthScreen';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { firstParam, MIN_PASSWORD_LENGTH, parseLookupMode } from '@/features/auth/credentials';
-import { AuthError, type EmailLookupResult } from '@/features/auth/types';
+import {
+  firstParam,
+  MIN_PASSWORD_LENGTH,
+  parsePasswordMode,
+  toTimestampParam,
+  type PasswordMode,
+} from '@/features/auth/credentials';
+import { isAuthError } from '@/features/auth/types';
 import { spacing } from '@/theme';
 
 type PasswordFormProps = {
   email: string;
-  mode: EmailLookupResult;
+  mode: PasswordMode;
 };
 
 /**
- * 00.3 Auth / Şifre — Pencil `UVmmG` (existing account, "Tekrar hoş geldin!") and
- * `p7qdia` (new account, "Hesabını oluştur"). `mode` comes from the sign-in email lookup.
+ * 00.3 Auth / Şifre — Pencil `UVmmG` (existing account, "Tekrar hoş geldin!"), `rsPB8`
+ * (wrong password with remaining attempts) and `p7qdia` (new account, "Hesabını oluştur").
+ * `mode` comes from the sign-in email lookup. Running out of attempts replaces this screen
+ * with 00.3 "Hesap geçici olarak kilitlendi".
  */
 export default function PasswordScreen() {
   const params = useLocalSearchParams<{ email?: string | string[]; mode?: string | string[] }>();
   const email = firstParam(params.email);
-  const mode = parseLookupMode(params.mode);
+  const mode = parsePasswordMode(params.mode);
 
   if (!email || !mode) {
     return <Redirect href="/sign-in" />;
@@ -33,7 +41,7 @@ export default function PasswordScreen() {
 
 function PasswordForm({ email, mode }: PasswordFormProps) {
   const { t } = useTranslation('auth');
-  const { signIn, signUp, continueAsGuest } = useAuth();
+  const { signIn, signUp } = useAuth();
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -64,9 +72,21 @@ function PasswordForm({ email, mode }: PasswordFormProps) {
       // On success the root guards flip and `index` routes on (tabs or registration).
       await (isExisting ? signIn(email, password) : signUp(email, password));
     } catch (error) {
-      if (error instanceof AuthError && error.code === 'invalid-credentials') {
-        setFieldError(t('errors.invalidCredentials'));
-      } else if (error instanceof AuthError && error.code === 'email-in-use') {
+      if (isAuthError(error, 'account-locked')) {
+        router.replace({
+          pathname: '/account-locked',
+          params: { email, lockedUntil: toTimestampParam(error.details.lockedUntil) },
+        });
+        return;
+      }
+      if (isAuthError(error, 'invalid-credentials')) {
+        const { remainingAttempts } = error.details;
+        setFieldError(
+          remainingAttempts === undefined
+            ? t('errors.invalidCredentials')
+            : t('errors.wrongPassword', { count: remainingAttempts }),
+        );
+      } else if (isAuthError(error, 'email-in-use')) {
         setFormError(t('errors.emailInUse'));
       } else {
         setFormError(t('errors.network'));
@@ -81,9 +101,10 @@ function PasswordForm({ email, mode }: PasswordFormProps) {
     }
   };
 
-  const handleGuest = () => {
+  // p7qdia: the email already has an account after all, or the user meant to sign in.
+  const handleHaveAccount = () => {
     if (!submitting) {
-      continueAsGuest();
+      router.dismissTo('/sign-in');
     }
   };
 
@@ -121,7 +142,11 @@ function PasswordForm({ email, mode }: PasswordFormProps) {
           {isExisting ? (
             <Button variant="text" label={t('password.existing.forgot')} onPress={handleForgot} />
           ) : (
-            <Button variant="text" label={t('signIn.continueAsGuest')} onPress={handleGuest} />
+            <Button
+              variant="text"
+              label={t('password.new.haveAccount')}
+              onPress={handleHaveAccount}
+            />
           )}
         </View>
       </View>

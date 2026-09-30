@@ -8,7 +8,7 @@ import {
   saveSession,
 } from './authStorage';
 import { mockAuthService } from './mockAuthService';
-import type { AuthService, Session, SocialProvider } from './types';
+import type { AuthService, ProviderSignInOptions, Session, SocialProvider } from './types';
 
 type AuthContextValue = {
   /** False until persisted state has been read; the root layout waits on it. */
@@ -30,7 +30,7 @@ type AuthContextValue = {
   finishPermissionPrompts: () => void;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  signInWithProvider: (provider: SocialProvider) => Promise<void>;
+  signInWithProvider: (provider: SocialProvider, options?: ProviderSignInOptions) => Promise<void>;
   completeProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -97,7 +97,8 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
   );
 
   const signInWithProvider = useCallback(
-    async (provider: SocialProvider) => applySession(await service.signInWithProvider(provider)),
+    async (provider: SocialProvider, options?: ProviderSignInOptions) =>
+      applySession(await service.signInWithProvider(provider, options)),
     [applySession, service],
   );
 

@@ -1,33 +1,115 @@
-import { AuthError, type AuthService, type Session } from './types';
+import { AuthError, type AuthService, type Session, type SocialProvider } from './types';
 
 /**
- * In-memory AuthService used until the Supabase integration.
- * `yasemin@example.com` (the design's sample account) is pre-registered with password `12345678`;
- * any other email is treated as a new account. Delays make loading states visible.
+ * In-memory AuthService used until the Supabase integration. Delays make loading states visible.
+ *
+ * Accounts:
+ * - `yasemin@example.com` / `12345678` — password account (the design's sample user).
+ *   Three wrong passwords in a row lock password sign-in for 15 minutes (00.3 "Hesap geçici
+ *   olarak kilitlendi"); a successful sign-in resets the counter.
+ * - `deniz@example.com` — created with Google (00.2 "Hesap Google ile bağlı").
+ * - `ece@example.com` — created with Apple (same screen, Apple variant).
+ * - Any other email is a new account (00.3 "Yeni Hesap").
+ * Google / Apple sign-in without an email hint returns `<provider>.user@example.com`, a new
+ * account that goes through registration.
+ *
+ * Reset tokens (`rolt://reset-password?token=…`):
+ * - `expired` → `expired-token` for yasemin@example.com, sent 45 minutes ago (00.6 "Bağlantının süresi dolmuş")
+ * - empty or `invalid` → `invalid-token`
+ * - anything else → success; sets the new password of the last email a reset was requested
+ *   for and lifts its lock.
  */
 const NETWORK_DELAY_MS = 800;
+const MAX_FAILED_ATTEMPTS = 3;
+const LOCK_DURATION_MS = 15 * 60 * 1000;
+const EXPIRED_TOKEN = 'expired';
+const INVALID_TOKEN = 'invalid';
+const EXPIRED_TOKEN_EMAIL = 'yasemin@example.com';
+const EXPIRED_TOKEN_AGE_MS = 45 * 60 * 1000;
 
-const accounts = new Map<string, { password: string; profileCompleted: boolean }>([
-  ['yasemin@example.com', { password: '12345678', profileCompleted: true }],
+type MockAccount = {
+  profileCompleted: boolean;
+  failedAttempts: number;
+  /** Epoch ms; password sign-in is blocked until then. */
+  lockedUntil: number | null;
+} & ({ method: 'password'; password: string } | { method: 'provider'; provider: SocialProvider });
+
+const passwordAccount = (password: string, profileCompleted: boolean): MockAccount => ({
+  method: 'password',
+  password,
+  profileCompleted,
+  failedAttempts: 0,
+  lockedUntil: null,
+});
+
+const providerAccount = (provider: SocialProvider): MockAccount => ({
+  method: 'provider',
+  provider,
+  profileCompleted: true,
+  failedAttempts: 0,
+  lockedUntil: null,
+});
+
+const accounts = new Map<string, MockAccount>([
+  ['yasemin@example.com', passwordAccount('12345678', true)],
+  ['deniz@example.com', providerAccount('google')],
+  ['ece@example.com', providerAccount('apple')],
 ]);
+
+let lastResetEmail: string | null = null;
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, NETWORK_DELAY_MS));
 const normalize = (email: string) => email.trim().toLowerCase();
+const toSession = (email: string, account: MockAccount): Session => ({
+  userId: email,
+  email,
+  profileCompleted: account.profileCompleted,
+});
+
+function lockedError(lockedUntil: number) {
+  return new AuthError('account-locked', 'Too many failed attempts', {
+    lockedUntil: new Date(lockedUntil),
+  });
+}
 
 export const mockAuthService: AuthService = {
   async lookupEmail(email) {
     await wait();
-    return accounts.has(normalize(email)) ? 'existing' : 'new';
+    const account = accounts.get(normalize(email));
+    if (!account) {
+      return { status: 'new' };
+    }
+    return account.method === 'provider'
+      ? { status: 'provider', provider: account.provider }
+      : { status: 'password' };
   },
 
   async signIn(email, password) {
     await wait();
     const key = normalize(email);
     const account = accounts.get(key);
-    if (!account || account.password !== password) {
-      throw new AuthError('invalid-credentials', 'Invalid email or password');
+    if (!account || account.method !== 'password') {
+      throw new AuthError('invalid-credentials', 'Invalid email or password', {});
     }
-    return { userId: key, email: key, profileCompleted: account.profileCompleted };
+    if (account.lockedUntil !== null) {
+      if (account.lockedUntil > Date.now()) {
+        throw lockedError(account.lockedUntil);
+      }
+      account.lockedUntil = null;
+      account.failedAttempts = 0;
+    }
+    if (account.password !== password) {
+      account.failedAttempts += 1;
+      if (account.failedAttempts >= MAX_FAILED_ATTEMPTS) {
+        account.lockedUntil = Date.now() + LOCK_DURATION_MS;
+        throw lockedError(account.lockedUntil);
+      }
+      throw new AuthError('invalid-credentials', 'Invalid email or password', {
+        remainingAttempts: MAX_FAILED_ATTEMPTS - account.failedAttempts,
+      });
+    }
+    account.failedAttempts = 0;
+    return toSession(key, account);
   },
 
   async signUp(email, password) {
@@ -36,25 +118,48 @@ export const mockAuthService: AuthService = {
     if (accounts.has(key)) {
       throw new AuthError('email-in-use', 'Email already registered');
     }
-    accounts.set(key, { password, profileCompleted: false });
-    return { userId: key, email: key, profileCompleted: false };
+    const account = passwordAccount(password, false);
+    accounts.set(key, account);
+    return toSession(key, account);
   },
 
-  async signInWithProvider(provider) {
+  async signInWithProvider(provider, options) {
     await wait();
+    const hinted = options?.emailHint ? normalize(options.emailHint) : null;
+    const hintedAccount = hinted ? accounts.get(hinted) : undefined;
+    if (hinted && hintedAccount?.method === 'provider' && hintedAccount.provider === provider) {
+      return toSession(hinted, hintedAccount);
+    }
     const email = `${provider}.user@example.com`;
-    const account = accounts.get(email);
-    return { userId: email, email, profileCompleted: account?.profileCompleted ?? false };
+    let account = accounts.get(email);
+    if (!account) {
+      account = { ...providerAccount(provider), profileCompleted: false };
+      accounts.set(email, account);
+    }
+    return toSession(email, account);
   },
 
-  async requestPasswordReset() {
+  async requestPasswordReset(email) {
     await wait();
+    lastResetEmail = normalize(email);
   },
 
-  async resetPassword(token) {
+  async resetPassword(token, newPassword) {
     await wait();
-    if (!token) {
-      throw new AuthError('invalid-token', 'Reset link is invalid or expired');
+    if (token === EXPIRED_TOKEN) {
+      throw new AuthError('expired-token', 'Reset link expired', {
+        email: EXPIRED_TOKEN_EMAIL,
+        sentAt: new Date(Date.now() - EXPIRED_TOKEN_AGE_MS),
+      });
+    }
+    if (!token || token === INVALID_TOKEN) {
+      throw new AuthError('invalid-token', 'Reset link is invalid');
+    }
+    const account = lastResetEmail ? accounts.get(lastResetEmail) : undefined;
+    if (account?.method === 'password') {
+      account.password = newPassword;
+      account.failedAttempts = 0;
+      account.lockedUntil = null;
     }
   },
 

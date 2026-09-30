@@ -7,13 +7,14 @@ import { AuthScreen } from '@/components/auth/AuthScreen';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { firstParam, MIN_PASSWORD_LENGTH } from '@/features/auth/credentials';
-import { AuthError } from '@/features/auth/types';
+import { firstParam, MIN_PASSWORD_LENGTH, toTimestampParam } from '@/features/auth/credentials';
+import { isAuthError } from '@/features/auth/types';
 import { spacing } from '@/theme';
 
 /**
  * 00.6 Auth / Yeni Şifre — Pencil `U4fki9`. Opened from the reset email
  * (`rolt://reset-password?token=…`); no back button, the flow ends at 00.7.
+ * An expired or invalid link replaces it with 00.6 "Bağlantının süresi dolmuş" (`b1m1YP`).
  */
 export default function ResetPasswordScreen() {
   const { t } = useTranslation('auth');
@@ -24,7 +25,6 @@ export default function ResetPasswordScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [linkExpired, setLinkExpired] = useState(false);
 
   const handleChange = (value: string) => {
     setPassword(value);
@@ -46,17 +46,22 @@ export default function ResetPasswordScreen() {
       await service.resetPassword(token, password);
       router.replace('/password-updated');
     } catch (error) {
-      const expired = error instanceof AuthError && error.code === 'invalid-token';
-      setLinkExpired(expired);
-      setFormError(expired ? t('errors.invalidToken') : t('errors.network'));
+      if (isAuthError(error, 'expired-token')) {
+        const { email, sentAt } = error.details;
+        router.replace({
+          pathname: '/reset-link-expired',
+          params: { email, sentAt: toTimestampParam(sentAt) },
+        });
+        return;
+      }
+      if (isAuthError(error, 'invalid-token')) {
+        // Same way out as an expired link; without email/send time the screen asks for the email again.
+        router.replace('/reset-link-expired');
+        return;
+      }
+      setFormError(t('errors.network'));
       setSubmitting(false);
     }
-  };
-
-  // The screen has no back button, so an expired link needs its own way out.
-  const handleRequestNewLink = () => {
-    router.replace('/sign-in');
-    router.push('/forgot-password');
   };
 
   return (
@@ -77,16 +82,7 @@ export default function ResetPasswordScreen() {
           returnKeyType="done"
           onSubmitEditing={handleSubmit}
         />
-        <View style={styles.actions}>
-          <Button label={t('resetPassword.submit')} loading={submitting} onPress={handleSubmit} />
-          {linkExpired ? (
-            <Button
-              variant="text"
-              label={t('resetPassword.requestNewLink')}
-              onPress={handleRequestNewLink}
-            />
-          ) : null}
-        </View>
+        <Button label={t('resetPassword.submit')} loading={submitting} onPress={handleSubmit} />
       </View>
     </AuthScreen>
   );
@@ -95,8 +91,5 @@ export default function ResetPasswordScreen() {
 const styles = StyleSheet.create({
   form: {
     gap: spacing.xxl,
-  },
-  actions: {
-    gap: spacing.lg,
   },
 });

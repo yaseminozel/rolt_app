@@ -15,15 +15,26 @@ import { spacing } from '@/theme';
 
 type PendingAction = SocialProvider | 'email' | null;
 
-/** 00.1 / 00.2 Auth / Giriş — Pencil `O2QTu` (empty), `WhI3m` (filled), `TNFfZ` (submitting). */
+/**
+ * 00.1 / 00.2 Auth / Giriş — Pencil `O2QTu` (empty), `WhI3m` (filled), `TNFfZ` (submitting),
+ * `xLijq` (invalid email). The email CTA is enabled as soon as the field has text; the format
+ * is checked on submit. The lookup decides the next step: password (00.3) or the
+ * social-provider notice (00.2 "Hesap Google ile bağlı").
+ */
 export default function SignInScreen() {
   const { t } = useTranslation('auth');
   const { service, signInWithProvider, continueAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [pending, setPending] = useState<PendingAction>(null);
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
-  const canSubmitEmail = isValidEmail(email);
+  const canSubmitEmail = email.trim().length > 0;
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    setEmailError(null);
+  };
 
   const handleProvider = async (provider: SocialProvider) => {
     if (pending) {
@@ -45,11 +56,26 @@ export default function SignInScreen() {
       return;
     }
     const normalized = email.trim();
+    if (!isValidEmail(normalized)) {
+      setEmailError(t('errors.invalidEmail'));
+      return;
+    }
     setError(null);
+    setEmailError(null);
     setPending('email');
     try {
-      const mode = await service.lookupEmail(normalized);
-      router.push({ pathname: '/password', params: { email: normalized, mode } });
+      const result = await service.lookupEmail(normalized);
+      if (result.status === 'provider') {
+        router.push({
+          pathname: '/linked-account',
+          params: { email: normalized, provider: result.provider },
+        });
+      } else {
+        router.push({
+          pathname: '/password',
+          params: { email: normalized, mode: result.status === 'password' ? 'existing' : 'new' },
+        });
+      }
     } catch {
       setError(t('errors.network'));
     } finally {
@@ -90,7 +116,8 @@ export default function SignInScreen() {
             label={t('fields.email')}
             placeholder={t('fields.emailPlaceholder')}
             value={email}
-            onChangeText={setEmail}
+            onChangeText={handleEmailChange}
+            errorText={emailError ?? undefined}
             keyboardType="email-address"
             autoCapitalize="none"
             autoCorrect={false}
