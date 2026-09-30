@@ -1,84 +1,28 @@
-/** Turkey's 81 provinces in Turkish alphabetical order, used by the registration city picker. */
-export const TURKISH_CITIES: readonly string[] = [
-  'Adana',
-  'Adıyaman',
-  'Afyonkarahisar',
-  'Ağrı',
-  'Aksaray',
-  'Amasya',
-  'Ankara',
-  'Antalya',
-  'Ardahan',
-  'Artvin',
-  'Aydın',
-  'Balıkesir',
-  'Bartın',
-  'Batman',
-  'Bayburt',
-  'Bilecik',
-  'Bingöl',
-  'Bitlis',
-  'Bolu',
-  'Burdur',
-  'Bursa',
-  'Çanakkale',
-  'Çankırı',
-  'Çorum',
-  'Denizli',
-  'Diyarbakır',
-  'Düzce',
-  'Edirne',
-  'Elazığ',
-  'Erzincan',
-  'Erzurum',
-  'Eskişehir',
-  'Gaziantep',
-  'Giresun',
-  'Gümüşhane',
-  'Hakkâri',
-  'Hatay',
-  'Iğdır',
-  'Isparta',
-  'İstanbul',
-  'İzmir',
-  'Kahramanmaraş',
-  'Karabük',
-  'Karaman',
-  'Kars',
-  'Kastamonu',
-  'Kayseri',
-  'Kilis',
-  'Kırıkkale',
-  'Kırklareli',
-  'Kırşehir',
-  'Kocaeli',
-  'Konya',
-  'Kütahya',
-  'Malatya',
-  'Manisa',
-  'Mardin',
-  'Mersin',
-  'Muğla',
-  'Muş',
-  'Nevşehir',
-  'Niğde',
-  'Ordu',
-  'Osmaniye',
-  'Rize',
-  'Sakarya',
-  'Samsun',
-  'Şanlıurfa',
-  'Siirt',
-  'Sinop',
-  'Şırnak',
-  'Sivas',
-  'Tekirdağ',
-  'Tokat',
-  'Trabzon',
-  'Tunceli',
-  'Uşak',
-  'Van',
-  'Yalova',
-  'Yozgat',
-  'Zonguldak',
-];
+import cityData from './data/turkishCities.json';
+
+export type TurkishCity = {
+  /** Two-digit plate code, e.g. "34". */
+  plateCode: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  /** Geographic region, e.g. "Marmara". */
+  region: string;
+};
+
+/**
+ * Turkey's 81 provinces with plate code, centre coordinates and region.
+ * Source: github.com/mevlutcelik/turkey-cities-data (MIT); names cross-checked against
+ * github.com/muratgozel/turkey-neighbourhoods (MIT).
+ */
+export const TURKISH_CITIES: readonly TurkishCity[] = cityData;
+
+const turkishCollator = new Intl.Collator('tr');
+
+/** Cities in Turkish alphabetical order for pickers. */
+export const TURKISH_CITIES_ALPHABETICAL: readonly TurkishCity[] = [...TURKISH_CITIES].sort((a, b) =>
+  turkishCollator.compare(a.name, b.name),
+);
+
+export const findCityByName = (name: string | undefined) =>
+  TURKISH_CITIES.find((city) => city.name === name);
