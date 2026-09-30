@@ -5,7 +5,7 @@ import { DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { LogBox, Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from '@/components/feedback/ToastProvider';
@@ -16,6 +16,12 @@ import '@/i18n';
 import { appFonts, colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
+
+// Web preview only: react-native-web renders nested Pressables as nested <button>s, which React
+// DOM warns about. Native builds are unaffected, so these dev warnings are hidden on web.
+if (__DEV__ && Platform.OS === 'web') {
+  LogBox.ignoreLogs(['cannot contain a nested', 'cannot be a descendant of', 'for a non-boolean attribute']);
+}
 
 const navigationTheme: Theme = {
   ...DefaultTheme,

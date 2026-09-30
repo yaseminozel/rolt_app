@@ -53,8 +53,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "ROLT, profiline ve sürüşlerine fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
-          "cameraPermission": false,
+          "photosPermission": "ROLT, profiline, sürüşlerine ve önerdiğin rotalara fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
+          "cameraPermission": "ROLT, rotalarına ve sürüşlerine fotoğraf ekleyebilmen için kamerayı kullanır.",
           "microphonePermission": false
         }
       ],
@@ -77,7 +77,7 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "ROLT, profiline ve sürüşlerine fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
+          "photosPermission": "ROLT, profiline, sürüşlerine ve önerdiğin rotalara fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
           "savePhotosPermission": false,
           "isAccessMediaLocationEnabled": true
         }

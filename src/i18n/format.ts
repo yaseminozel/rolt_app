@@ -86,3 +86,56 @@ export function formatSpeed(kmh: number) {
 export function formatElevation(meters: number) {
   return i18n.t('units.meters', { value: formatNumber(Math.round(meters)) });
 }
+
+const TR_BACK_VOWELS = 'aıou';
+const TR_VOWELS = 'aıoueiöü';
+/** Voiceless consonants ("fıstıkçı şahap") harden a following d → t. */
+const TR_VOICELESS = 'fstkçşhp';
+
+/** Last vowel of a Turkish word (lower-cased), defaulting to "e" for vowelless tokens. */
+function lastTurkishVowel(word: string) {
+  const lower = word.toLocaleLowerCase('tr');
+  for (let index = lower.length - 1; index >= 0; index -= 1) {
+    if (TR_VOWELS.includes(lower[index])) {
+      return lower[index];
+    }
+  }
+  return 'e';
+}
+
+/**
+ * Turkish locative suffix for a proper noun, apostrophe included:
+ * "Büyükada" → "’da", "Kadıköy" → "’de", "Şişli" → "’de", "Bostancı İskelesi" → "’nde".
+ * Two-word names ending in a possessive vowel ("… İskelesi", "… Sahili") take the buffer "n".
+ */
+export function turkishLocativeSuffix(name: string) {
+  const trimmed = name.trim();
+  const last = trimmed.toLocaleLowerCase('tr').slice(-1);
+  const vowel = TR_BACK_VOWELS.includes(lastTurkishVowel(trimmed)) ? 'a' : 'e';
+  if (isTurkishCompoundPossessive(trimmed)) {
+    return `’nd${vowel}`;
+  }
+  return `’${TR_VOICELESS.includes(last) ? 't' : 'd'}${vowel}`;
+}
+
+/**
+ * Turkish accusative suffix for a proper noun, apostrophe included:
+ * "Büyükada" → "’yı", "Kadıköy" → "’ü", "Bostancı İskelesi" → "’ni", "Şile Feneri" → "’ni".
+ * Limitation: a one-word name that is itself a possessive compound ("Denizkızı") is read as
+ * a plain vowel ending ("’yı"); rare for place names returned by search.
+ */
+export function turkishAccusativeSuffix(name: string) {
+  const trimmed = name.trim();
+  const last = trimmed.toLocaleLowerCase('tr').slice(-1);
+  const lastVowel = lastTurkishVowel(trimmed);
+  const vowel = 'aı'.includes(lastVowel) ? 'ı' : 'ei'.includes(lastVowel) ? 'i' : 'ou'.includes(lastVowel) ? 'u' : 'ü';
+  if (isTurkishCompoundPossessive(trimmed)) {
+    return `’n${vowel}`;
+  }
+  return TR_VOWELS.includes(last) ? `’y${vowel}` : `’${vowel}`;
+}
+
+/** "Bostancı İskelesi", "Ağva Sahili": several words, the last ending in a possessive ı/i/u/ü. */
+function isTurkishCompoundPossessive(name: string) {
+  return /\s/.test(name) && 'ıiuü'.includes(name.toLocaleLowerCase('tr').slice(-1));
+}

@@ -1,1 +1,82 @@
-{}
+{
+  "listSeparator": " · ",
+  "tagSeparator": ", ",
+  "photoCount_one": "{{count}} photo",
+  "photoCount_other": "{{count}} photos",
+  "preview": {
+    "edit": "Edit",
+    "editA11y": "Edit route details",
+    "title": "Check before you send",
+    "description": "Take one last look before sending.",
+    "metrics": {
+      "distance": "Distance",
+      "duration": "Time",
+      "climb": "Climb"
+    },
+    "photosAndDescription": "{{photos}} · Description",
+    "descriptionOnly": "Description",
+    "moreStops_one": "+{{count}} stop",
+    "moreStops_other": "+{{count}} stops",
+    "legal": "By sending, you agree to the <rules>Community Guidelines</rules>.",
+    "submit": "Send route"
+  },
+  "sending": {
+    "title": "Sending your route",
+    "description": "This may take a few seconds. Don't close the app until sending finishes.",
+    "status": "Sending",
+    "progressA11y": "Sending progress",
+    "steps": {
+      "validateLine": {
+        "done": "Route line verified",
+        "active": "Verifying route line",
+        "pending": "Route line to be verified"
+      },
+      "uploadDetails": {
+        "done": "Route details uploaded",
+        "active": "Uploading route details",
+        "pending": "Route details to be uploaded"
+      },
+      "uploadPhotos": {
+        "done": "Photos uploaded",
+        "active": "Uploading photos",
+        "pending": "Photos to be uploaded"
+      },
+      "sendToReview": {
+        "done": "Sent for review",
+        "active": "Sending for review",
+        "pending": "Will be sent for review"
+      }
+    },
+    "photoProgress": "{{uploaded}} / {{total}}",
+    "photoProgressA11y": "{{uploaded}} of {{total}} photos uploaded",
+    "continueInBackground": "Continue in background",
+    "backgroundSuccessToast": "Your route was sent for review.",
+    "backgroundFailureToast": "Couldn't send the route. It was saved as a draft."
+  },
+  "success": {
+    "title": "Your route was sent for review",
+    "description": "Once it's checked against the community guidelines, it will be published in Discover.",
+    "status": "In review",
+    "trackingNo": "Tracking no: {{id}}",
+    "timeline": {
+      "submitted": "Sent",
+      "submittedCaption": "Now",
+      "inReview": "In review",
+      "inReviewCaption": "~24 hours",
+      "published": "Published",
+      "publishedCaption": "We'll notify you"
+    },
+    "backToDiscover": "Back to Discover",
+    "suggestAnother": "Suggest another route"
+  },
+  "failed": {
+    "title": "Couldn't send the route",
+    "descriptionNetwork": "Your connection dropped. Don't worry, your route and photos are safe on your device.",
+    "descriptionServer": "Something went wrong on our side. Don't worry, your route and photos are safe on your device.",
+    "status": "Saved as draft",
+    "errorRow": "Can't reach the server",
+    "autoRetryNote": "We'll retry automatically when you're back online.",
+    "retry": "Try again",
+    "backToDraft": "Back to draft and edit"
+  }
+}

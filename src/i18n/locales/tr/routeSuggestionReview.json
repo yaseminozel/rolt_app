@@ -1,1 +1,82 @@
-{}
+{
+  "listSeparator": " · ",
+  "tagSeparator": ", ",
+  "photoCount_one": "{{count}} fotoğraf",
+  "photoCount_other": "{{count}} fotoğraf",
+  "preview": {
+    "edit": "Düzenle",
+    "editA11y": "Rota bilgilerini düzenle",
+    "title": "Göndermeden önce kontrol et",
+    "description": "Göndermeden önce son kez gözden geçir.",
+    "metrics": {
+      "distance": "Mesafe",
+      "duration": "Süre",
+      "climb": "Tırmanış"
+    },
+    "photosAndDescription": "{{photos}} · Açıklama",
+    "descriptionOnly": "Açıklama",
+    "moreStops_one": "+{{count}} durak",
+    "moreStops_other": "+{{count}} durak",
+    "legal": "Göndererek <rules>Topluluk Kuralları</rules>’nı kabul etmiş olursun.",
+    "submit": "Rotayı gönder"
+  },
+  "sending": {
+    "title": "Rotan gönderiliyor",
+    "description": "Birkaç saniye sürebilir. Gönderim bitene kadar uygulamayı kapatma.",
+    "status": "Gönderiliyor",
+    "progressA11y": "Gönderim ilerlemesi",
+    "steps": {
+      "validateLine": {
+        "done": "Rota çizgisi doğrulandı",
+        "active": "Rota çizgisi doğrulanıyor",
+        "pending": "Rota çizgisi doğrulanacak"
+      },
+      "uploadDetails": {
+        "done": "Rota bilgileri yüklendi",
+        "active": "Rota bilgileri yükleniyor",
+        "pending": "Rota bilgileri yüklenecek"
+      },
+      "uploadPhotos": {
+        "done": "Fotoğraflar yüklendi",
+        "active": "Fotoğraflar yükleniyor",
+        "pending": "Fotoğraflar yüklenecek"
+      },
+      "sendToReview": {
+        "done": "İncelemeye gönderildi",
+        "active": "İncelemeye gönderiliyor",
+        "pending": "İncelemeye gönderilecek"
+      }
+    },
+    "photoProgress": "{{uploaded}} / {{total}}",
+    "photoProgressA11y": "{{total}} fotoğraftan {{uploaded}} tanesi yüklendi",
+    "continueInBackground": "Arka planda devam et",
+    "backgroundSuccessToast": "Rotan incelemeye gönderildi.",
+    "backgroundFailureToast": "Rota gönderilemedi. Taslak olarak kaydedildi."
+  },
+  "success": {
+    "title": "Rotan incelemeye gönderildi",
+    "description": "Topluluk kurallarına uygunluğu kontrol edildikten sonra keşfette yayınlanacak.",
+    "status": "İncelemede",
+    "trackingNo": "Takip no: {{id}}",
+    "timeline": {
+      "submitted": "Gönderildi",
+      "submittedCaption": "Şimdi",
+      "inReview": "İnceleniyor",
+      "inReviewCaption": "~24 saat",
+      "published": "Yayında",
+      "publishedCaption": "Bildirim alacaksın"
+    },
+    "backToDiscover": "Keşfete dön",
+    "suggestAnother": "Başka rota öner"
+  },
+  "failed": {
+    "title": "Rota gönderilemedi",
+    "descriptionNetwork": "Bağlantın kesildi. Endişelenme, rotan ve fotoğrafların cihazında güvende.",
+    "descriptionServer": "Sunucuda bir sorun oluştu. Endişelenme, rotan ve fotoğrafların cihazında güvende.",
+    "status": "Taslak olarak kaydedildi",
+    "errorRow": "Sunucuya ulaşılamıyor",
+    "autoRetryNote": "Bağlantın geri geldiğinde otomatik tekrar deneyeceğiz.",
+    "retry": "Yeniden dene",
+    "backToDraft": "Taslağa dön ve düzenle"
+  }
+}

@@ -1,1 +1,76 @@
-{}
+{
+  "heading": "Rota bilgilerini ekle",
+  "description": "Diğer sürücüler için kısa bilgiler ekle.",
+  "name": {
+    "label": "Rota adı",
+    "placeholder": "Örn. Kadıköy – Şile Sahil Rotası",
+    "required": "Rota adı gerekli"
+  },
+  "tags": {
+    "label": "Rota türü",
+    "max": "En fazla {{count}}",
+    "required": "En az 1 seç"
+  },
+  "difficulty": {
+    "label": "Zorluk"
+  },
+  "notes": {
+    "label": "Açıklama",
+    "placeholder": "Yol durumu, mola noktaları, dikkat edilmesi gerekenler"
+  },
+  "photos": {
+    "label": "Fotoğraflar",
+    "counter": "{{count}}/{{max}}",
+    "add": "Ekle",
+    "addA11y": "Fotoğraf ekle",
+    "cover": "Kapak",
+    "retry": "Tekrar",
+    "photoA11y": "Fotoğraf {{index}}",
+    "coverA11y": "Fotoğraf {{index}}, kapak",
+    "uploadingA11y": "Fotoğraf {{index}}, yükleniyor",
+    "failedA11y": "Fotoğraf {{index}} yüklenemedi. Tekrar denemek için dokun.",
+    "failed_one": "{{count}} fotoğraf yüklenemedi. Tekrar denemek için dokun.",
+    "failed_other": "{{count}} fotoğraf yüklenemedi. Tekrar denemek için dokun.",
+    "menu": {
+      "setCover": "Kapak yap",
+      "remove": "Kaldır",
+      "cancel": "Vazgeç"
+    }
+  },
+  "cta": "Önizlemeye geç",
+  "exitDialog": {
+    "title": "Taslak olarak kaydedilsin mi?",
+    "description": "Rotanı, duraklarını ve fotoğraflarını saklayalım. Profil › Taslaklar’dan istediğin zaman devam edebilirsin.",
+    "untitled": "Adsız rota",
+    "steps": "{{done}}/{{total}} adım tamamlandı",
+    "photos_one": "{{count}} fotoğraf",
+    "photos_other": "{{count}} fotoğraf",
+    "save": "Taslağı kaydet ve çık",
+    "discard": "Kaydetmeden çık",
+    "keepEditing": "Düzenlemeye devam et",
+    "summaryMeta": "{{steps}} · {{photos}}"
+  },
+  "addPhotos": {
+    "title": "Fotoğraf ekle",
+    "description": "Rotadan manzaralar, mola noktaları ya da yol durumu. En fazla {{count}} fotoğraf.",
+    "suggested": {
+      "title": "Bu rotada çektiğin fotoğraflar",
+      "found_one": "{{count}} bulundu",
+      "found_other": "{{count}} bulundu",
+      "note": "Konum ve saat bilgisine göre otomatik eşleştirildi.",
+      "photoA11y": "Önerilen fotoğraf {{index}}"
+    },
+    "camera": "Fotoğraf çek",
+    "gallery": "Galeriden seç",
+    "privacy": "Plakalar ve yüzler otomatik bulanıklaştırılır.",
+    "cta_one": "{{count}} fotoğrafı ekle",
+    "cta_other": "{{count}} fotoğrafı ekle",
+    "ctaEmpty": "Fotoğraf seç",
+    "cameraPermission": {
+      "title": "Kamera izni gerekli",
+      "message": "Fotoğraf çekebilmen için Ayarlar’dan kamera erişimine izin ver."
+    },
+    "permissionCancel": "Vazgeç",
+    "openSettings": "Ayarları aç"
+  }
+}

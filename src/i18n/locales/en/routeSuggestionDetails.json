@@ -1,1 +1,76 @@
-{}
+{
+  "heading": "Add route details",
+  "description": "Add a few details for other riders.",
+  "name": {
+    "label": "Route name",
+    "placeholder": "e.g. Kadıköy – Şile Coastal Route",
+    "required": "Route name is required"
+  },
+  "tags": {
+    "label": "Route type",
+    "max": "Up to {{count}}",
+    "required": "Pick at least 1"
+  },
+  "difficulty": {
+    "label": "Difficulty"
+  },
+  "notes": {
+    "label": "Description",
+    "placeholder": "Road conditions, places to stop, things to watch out for"
+  },
+  "photos": {
+    "label": "Photos",
+    "counter": "{{count}}/{{max}}",
+    "add": "Add",
+    "addA11y": "Add photos",
+    "cover": "Cover",
+    "retry": "Retry",
+    "photoA11y": "Photo {{index}}",
+    "coverA11y": "Photo {{index}}, cover",
+    "uploadingA11y": "Photo {{index}}, uploading",
+    "failedA11y": "Photo {{index}} couldn't be uploaded. Tap to try again.",
+    "failed_one": "{{count}} photo couldn't be uploaded. Tap it to try again.",
+    "failed_other": "{{count}} photos couldn't be uploaded. Tap them to try again.",
+    "menu": {
+      "setCover": "Make cover",
+      "remove": "Remove",
+      "cancel": "Cancel"
+    }
+  },
+  "cta": "Continue to preview",
+  "exitDialog": {
+    "title": "Save as a draft?",
+    "description": "We'll keep your route, stops and photos. Pick up where you left off any time from Profile › Drafts.",
+    "untitled": "Untitled route",
+    "steps": "{{done}} of {{total}} steps done",
+    "photos_one": "{{count}} photo",
+    "photos_other": "{{count}} photos",
+    "save": "Save draft and exit",
+    "discard": "Exit without saving",
+    "keepEditing": "Keep editing",
+    "summaryMeta": "{{steps}} · {{photos}}"
+  },
+  "addPhotos": {
+    "title": "Add photos",
+    "description": "Views along the route, places to stop or road conditions. Up to {{count}} photos.",
+    "suggested": {
+      "title": "Photos you took on this route",
+      "found_one": "{{count}} found",
+      "found_other": "{{count}} found",
+      "note": "Matched automatically by location and time.",
+      "photoA11y": "Suggested photo {{index}}"
+    },
+    "camera": "Take a photo",
+    "gallery": "Choose from library",
+    "privacy": "Number plates and faces are blurred automatically.",
+    "cta_one": "Add {{count}} photo",
+    "cta_other": "Add {{count}} photos",
+    "ctaEmpty": "Select photos",
+    "cameraPermission": {
+      "title": "Camera access needed",
+      "message": "Allow camera access in Settings to take photos."
+    },
+    "permissionCancel": "Not now",
+    "openSettings": "Open Settings"
+  }
+}

@@ -118,8 +118,18 @@ export function RouteSuggestionProvider({ children, initialDraft }: { children: 
       });
   }, [draft.waypoints, hasEnds]);
 
+  // Points applied from "Haritada düzenle" arrive with their line already calculated.
+  const appliedKey = useRef<string | null>(null);
+  const currentKey = useRef(waypointKey);
+
   // Recalculate shortly after the points change (typing, reordering, swapping).
   useEffect(() => {
+    currentKey.current = waypointKey;
+    if (appliedKey.current === waypointKey) {
+      appliedKey.current = null;
+      return;
+    }
+    appliedKey.current = null;
     const timer = setTimeout(recalculate, RECALCULATE_DELAY_MS);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -177,6 +187,8 @@ export function RouteSuggestionProvider({ children, initialDraft }: { children: 
 
   const applyEditedRoute = useCallback((waypoints: Waypoint[], preview: RoutePreview) => {
     requestId.current += 1;
+    const key = JSON.stringify(routableCoordinates(waypoints));
+    appliedKey.current = key === currentKey.current ? null : key;
     setDraft((current) => ({ ...current, waypoints, preview }));
     setRouteCalculation({ status: 'ready' });
   }, []);
@@ -230,7 +242,12 @@ export function RouteSuggestionProvider({ children, initialDraft }: { children: 
   }, []);
 
   const saveAsDraft = useCallback(() => {
-    const saved = saveDraft(draft, draftId ?? undefined);
+    // Uploads don't survive leaving the flow: mark unfinished ones as failed so reopening the
+    // draft shows "Tekrar" instead of a spinner that never ends.
+    const photos = draft.photos.map((photo) =>
+      photo.uploadStatus === 'uploading' ? { ...photo, uploadStatus: 'failed' as const } : photo,
+    );
+    const saved = saveDraft({ ...draft, photos }, draftId ?? undefined);
     setDraftId(saved.id);
   }, [draft, draftId]);
 

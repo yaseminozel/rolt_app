@@ -77,6 +77,12 @@ export const palette = {
   indigo100: '#DFE3FF',
   // Map scale bar ink (01.7 `rxpI9`)
   slate700: '#4C5157',
+  // Route builder (04.1 "Rota öner"): stop list separators, planned route line, no-route card
+  gray150: '#EEF0F1',
+  teal500: '#14B8A6',
+  red25: '#FEF2F2',
+  red250: '#FECACA',
+  red800: '#991B1B',
 } as const;
 
 export const colors = {
@@ -205,7 +211,29 @@ export const colors = {
   /** Map scale bar lines and labels (01.7 `rxpI9`). */
   mapScaleInk: palette.slate700,
 
+  // Route builder (04.1 "Rota öner").
+  /** Inset separators between stop rows and search sections (D8XrfG "Ayırıcı"). */
+  borderSubtle: palette.gray150,
+  /**
+   * Planned route line on the preview card and the edit map. The design draws `#10B7A6` on the
+   * card and `#14B8A6` on the map; normalised to one teal that stays legible on light maps.
+   */
+  routePlanLine: palette.teal500,
+  /** "Yol bulunamadı" card and error row fill, card outline and text (aIGJ2). */
+  dangerSubtle: palette.red25,
+  dangerBorder: palette.red250,
+  dangerStrongText: palette.red800,
+  /** Translucent hint pill over the preview card ("Noktaları seçince…", XrNal). */
+  mapHintSurface: 'rgba(255, 255, 255, 0.9)',
+
+  // Photo tiles on "Rota bilgileri" (04.2 `fGq4D`, `ldcdM`): upload veil, failed veil, "Kapak" badge.
+  mediaUploadingVeil: 'rgba(16, 19, 24, 0.5)',
+  mediaFailedVeil: 'rgba(185, 28, 28, 0.8)',
+  mediaBadge: 'rgba(16, 19, 24, 0.8)',
+
   scrim: 'rgba(15, 18, 23, 0.31)',
+  /** Behind centered dialogs over a screen ("04.x Çıkış — Taslak kaydet", `zMCLP`). */
+  dialogScrim: 'rgba(16, 19, 24, 0.6)',
   glass: 'rgba(255, 255, 255, 0.64)',
   transparent: 'transparent',
 } as const;

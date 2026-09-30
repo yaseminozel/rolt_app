@@ -61,4 +61,8 @@ export const shadows = {
   mapSheet: '0px -6px 24.5px rgba(16, 19, 24, 0.16)',
   /** Floating route preview card over the map (01.7 `SIrGF`). */
   mapCard: '0px 8px 24px rgba(16, 19, 24, 0.18)',
+  /** A / B / stop markers on the route preview card and maps (04.1 "Pin / A"). */
+  mapMarker: '0px 2px 6px rgba(16, 19, 24, 0.25)',
+  /** Centered dialog card over a scrim ("Diyalog / Taslak kaydet", `zMCLP`). */
+  dialog: '0px 12px 32px rgba(16, 19, 24, 0.25)',
 } as const;
