@@ -33,7 +33,19 @@
       ],
       "expo-status-bar",
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "@rnmapbox/maps",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "ROLT, sürüşünü kaydedebilmek ve haritada konumunu gösterebilmek için konumunu kullanır.",
+          "locationAlwaysAndWhenInUsePermission": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanır.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true,
+          "locationAlwaysPermission": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanır."
+        }
+      ]
     ],
     "scheme": "rolt",
     "experiments": {
