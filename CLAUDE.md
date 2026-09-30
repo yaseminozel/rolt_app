@@ -157,9 +157,36 @@ Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26
 - Splash `expo-splash-screen` config plugin ile: zemin `#1515FF` (Pencil `00.0 Launch / Splash`, `RBNTd`), `imageWidth: 200`.
 - İkonu değiştirmek için: Pencil'de node'u köşesiz (`cornerRadius: 0`) geçici bir kopyayla `Export` et, kopyayı sil, yukarıdaki dosyaları yeniden üret.
 
+## Kod yapısı
+
+```
+src/
+  app/                    # Expo Router rotaları (yalnızca ekranlar ve _layout'lar)
+    _layout.tsx           # root Stack + ThemeProvider + font yükleme + splash
+    index.tsx             # → /discover yönlendirmesi
+    onboarding.tsx        # 00.0 Get Started
+    (auth)/               # 00.x giriş / şifre akışı
+    (tabs)/_layout.tsx    # NativeTabs: discover / record / profile
+    (tabs)/<tab>/         # her sekmede native Stack (_layout.tsx) + index.tsx
+  components/
+    ui/                   # Core Components: Button, TextField, Checkbox, RadioButton, Switch, SegmentedControl, FilterChip, Badge, Tooltip, ChoiceGroup
+    feedback/             # StatusIcon, Toast, Dialog, EmptyState, SheetHeader
+    ride/ route/ settings/ brand/   # alana özgü bileşenler
+    layout/               # ScreenPlaceholder vb.
+  features/<alan>/        # alan tipleri, sabitler, iş mantığı (ör. rides/rideTypes.ts)
+  theme/                  # colors, typography, fonts, layout (spacing/radius/shadows)
+```
+
+- Import alias'ı: `@/` → `src/`.
+- Fontlar `useFonts` ile ağırlık başına ayrı family olarak yüklenir (`fontFamily.medium` vb.); `fontWeight` kullanma. Metrikler `typography.metric*` (JetBrains Mono).
+- Renk, boşluk, radius, gölge değerlerini yalnızca `@/theme` token'larından al; ekranlarda ham hex yazma. Tasarımda olup token'ı olmayan bir değer gerekiyorsa önce `src/theme`'e ekle.
+- İkonlar: `iconoir-react-native` (tasarım Iconoir kullanıyor). Tab bar ikonları istisna: NativeTabs sistem sembolü ister → Iconoir map/play/user yerine SF `map`/`play`/`person`, Material `map`/`play_arrow`/`person`.
+- Doğrulama: `npm run typecheck`, `npm run lint`, `npx expo-doctor`.
+
 ## Kod yazarken
 
+- **Kod tamamen İngilizce:** değişken, fonksiyon, bileşen, dosya, klasör, tip adları ve yorumlar. Türkçe tanımlayıcı yok (`rideType`, `surusTipi` değil). Kullanıcıya görünen metinler tasarımdaki Türkçe metinlerle birebir.
+- **Tasarımın dışına çıkma:** yalnızca Pencil'de olan ekran, bileşen, varyant, durum, ölçü, renk ve metni uygula. Eksik veya belirsiz bir şey varsa uydurma, sor.
 - Ekran/bileşen yazmadan önce ilgili Pencil frame'ini MCP ile oku ve ekran görüntüsünü al; ölçüleri tahmin etme.
-- Bileşenleri Core Components'teki isim ve varyantlarla eşleştir (Button, Input, Badge, FilterChip, Switch, SegmentedControl, AppBar, NavigationBar, RouteCard…).
+- Bileşenleri Core Components'teki isim ve varyantlarla eşleştir; aynı kavram için ikinci bir bileşen yazma.
 - Dokunma hedefleri en az 44 × 44 (mobil 48 önerilir).
-- Kullanıcıya görünen metinleri tasarımdaki Türkçe metinlerle birebir kullan.
