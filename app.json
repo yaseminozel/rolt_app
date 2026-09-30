@@ -45,6 +45,15 @@
           "isAndroidForegroundServiceEnabled": true,
           "locationAlwaysPermission": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanır."
         }
+      ],
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ROLT, profiline ve sürüşlerine fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
       ]
     ],
     "scheme": "rolt",

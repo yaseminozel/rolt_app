@@ -4,6 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { appFonts, colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -21,8 +22,28 @@ const navigationTheme: Theme = {
 };
 
 export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <ThemeProvider value={navigationTheme}>
+        <RootNavigator />
+        <StatusBar style="dark" />
+      </ThemeProvider>
+    </AuthProvider>
+  );
+}
+
+/**
+ * Route access by auth state:
+ * - (tabs): signed in with a finished profile, or guest ("Hesap oluşturmadan keşfet")
+ * - register: signed in, registration (00.8–00.12) not finished
+ * - onboarding + (auth): signed out
+ * `index` resolves the right entry point whenever a guard flips.
+ */
+function RootNavigator() {
   const [fontsLoaded, fontError] = useFonts(appFonts);
-  const ready = fontsLoaded || fontError !== null;
+  const { isReady, canUseApp, needsProfile, session, isGuest } = useAuth();
+  const ready = (fontsLoaded || fontError !== null) && isReady;
+  const signedOut = session === null && !isGuest;
 
   useEffect(() => {
     if (ready) {
@@ -35,13 +56,19 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={navigationTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Protected guard={canUseApp}>
         <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
+      <Stack.Protected guard={needsProfile}>
+        <Stack.Screen name="register" />
+      </Stack.Protected>
+      <Stack.Protected guard={signedOut}>
+        <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
         <Stack.Screen name="(auth)" />
-        <Stack.Screen name="onboarding" />
-      </Stack>
-      <StatusBar style="dark" />
-    </ThemeProvider>
+      </Stack.Protected>
+      <Stack.Screen name="legal" />
+    </Stack>
   );
 }
