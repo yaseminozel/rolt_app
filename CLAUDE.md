@@ -222,6 +222,13 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Sürücü profili aksiyonları | Tasarımda 40 pt butonlar, gri dolgu | Standart 44 pt `Button`; "Takip ediliyor" hâli outlined + onay ikonu; "…" menüsü native action sheet, engelleme onayı native Alert |
 | Sürüş kartı sayaçları | Üçüncü sayı "paylaş" sanılabilir | Tasarımda kaydet sayısı (yer imi); paylaşımda sayı yok |
 | Uyum notu | Misafire de görünüyor olabilir | Yalnız giriş yapmış kullanıcıya (misafirin tercihi yok) |
+| Rota Öner çıkış diyaloğu (`zMCLP`) | Tasarımda 04.2 üzerinde gösterilmiş | Akış içinde geri gitmek serbest (taslak sağlayıcıda); diyalog yalnız akıştan çıkarken (04.1'den geri) ve giriş varsa açılır (`SuggestionExitGuard`) |
+| Rota Öner doğrulama | "Önizlemeye geç" hataları ve gri CTA birlikte | CTA eksik alanda aktif, basınca hatalar gösterilir ve ilk hataya kaydırılır; yalnız fotoğraf yüklenirken / hatalıyken pasif. Ad + en az 1 tür zorunlu, zorluk varsayılan Orta |
+| Şematik rota kartı | Tasarımda harita değil çizim | `RoutePreviewMap` SVG ile çizer (Mapbox'sız, her ortamda çalışır) |
+| "Yola yapıştır" kapalı | Davranış tanımsız | Düzenlerken düz çizgiler, "Bitti"de yola oturtmak için tek rota hesabı |
+| Gönderim arka planda | "Uygulamayı kapatma" ile "Arka planda devam et" çelişiyor | Gönderim ekrandan bağımsız sürer, bitince toast; metin "uygulamayı zorla kapatma" olarak yorumlandı |
+| Otomatik yeniden deneme | Bağlantı kütüphanesi yok | Yalnız ağ hatasında, hatalı ekranı açıkken uygulama ön plana dönünce |
+| Bu rotada çekilen fotoğraflar | — | Son 60 gün / 200 fotoğraf, rota çizgisine 1 km içinde; hiçbiri ön seçili değil (gizlilik) |
 | Auth wordmark konumu | Ekranlara göre farklı | Status bar'ın 52 pt altı ya da native header'ın 8 pt altı; tüm auth adımlarında sabit |
 | Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
