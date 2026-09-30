@@ -1,4 +1,5 @@
 import { Xmark } from 'iconoir-react-native';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, layout, spacing, typography } from '@/theme';
@@ -11,8 +12,6 @@ export type SheetHeaderProps = {
   style?: StyleProp<ViewStyle>;
 };
 
-/** Accessible name of the close button ("Kapat" frame in the design). */
-const CLOSE_LABEL = 'Kapat';
 const CLOSE_ICON_SIZE = 22;
 
 /**
@@ -25,6 +24,7 @@ const CLOSE_ICON_SIZE = 22;
  * 14 pt secondary subtitle, 16 pt gutter and an optional close button.
  */
 export function SheetHeader({ title, subtitle, onClose, style }: SheetHeaderProps) {
+  const { t } = useTranslation();
   return (
     <View style={[styles.container, onClose ? styles.withClose : null, style]}>
       <View style={styles.text}>
@@ -37,7 +37,7 @@ export function SheetHeader({ title, subtitle, onClose, style }: SheetHeaderProp
         <Pressable
           onPress={onClose}
           accessibilityRole="button"
-          accessibilityLabel={CLOSE_LABEL}
+          accessibilityLabel={t('actions.close')}
           style={({ pressed }) => [styles.closeButton, pressed ? styles.closeButtonPressed : null]}>
           <Xmark width={CLOSE_ICON_SIZE} height={CLOSE_ICON_SIZE} color={colors.textPrimary} strokeWidth={1.5} />
         </Pressable>

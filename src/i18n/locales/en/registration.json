@@ -1,0 +1,23 @@
+{
+  "title": "Create account",
+  "roadPreferences": {
+    "curvyRoads": "Curvy roads",
+    "coast": "Coast",
+    "mountainRoads": "Mountain roads",
+    "city": "City",
+    "longTour": "Long tour",
+    "offRoad": "Off-road",
+    "weekendGetaway": "Weekend getaway",
+    "nightRiding": "Night riding"
+  },
+  "tempo": {
+    "relaxed": "Relaxed",
+    "balanced": "Balanced",
+    "sporty": "Sporty"
+  },
+  "experience": {
+    "zeroToTwo": "0–2 years",
+    "threeToFive": "3–5 years",
+    "fivePlus": "5+ years"
+  }
+}

@@ -12,6 +12,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { SvgProps } from 'react-native-svg';
 
 import { Badge } from '@/components/ui/Badge';
@@ -21,8 +22,6 @@ const COMPACT_WIDTH = 150;
 const SAVE_BUTTON_SIZE = 30;
 /** expo-blur intensity approximating the design's 5.25 px background blur. */
 const SAVE_BUTTON_BLUR_INTENSITY = 20;
-/** Accessible name of the bookmark action ("Kaydet" frame in the design). */
-const SAVE_LABEL = 'Kaydet';
 
 type RouteCardBaseProps = {
   image: ImageSourcePropType;
@@ -76,6 +75,7 @@ function CompactRouteCard({
   onPress,
   style,
 }: CompactRouteCardProps) {
+  const { t } = useTranslation();
   const BookmarkIcon = saved ? BookmarkSolid : Bookmark;
 
   return (
@@ -98,7 +98,7 @@ function CompactRouteCard({
             onPress={onToggleSave}
             hitSlop={(layout.minTouchTarget - SAVE_BUTTON_SIZE) / 2}
             accessibilityRole="button"
-            accessibilityLabel={SAVE_LABEL}
+            accessibilityLabel={t('actions.save')}
             accessibilityState={{ selected: saved }}
             style={styles.compactSaveButton}>
             {/* Design: background blur 5.25 behind the scrim-tinted "Favori" button. */}
@@ -137,6 +137,7 @@ function RowRouteCard({
   onPress,
   style,
 }: RowRouteCardProps) {
+  const { t } = useTranslation();
   const BookmarkIcon = saved ? BookmarkSolid : Bookmark;
 
   return (
@@ -173,7 +174,7 @@ function RowRouteCard({
             onPress={onToggleSave}
             hitSlop={{ top: 4, bottom: 4, left: spacing.md, right: spacing.md }}
             accessibilityRole="button"
-            accessibilityLabel={SAVE_LABEL}
+            accessibilityLabel={t('actions.save')}
             accessibilityState={{ selected: saved }}
             style={styles.rowSaveButton}>
             <BookmarkIcon width={20} height={20} color={colors.textPrimary} />

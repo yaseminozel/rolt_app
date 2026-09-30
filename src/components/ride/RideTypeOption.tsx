@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { rideTypeLabels, type RideType } from '@/features/rides/rideTypes';
+import { rideTypeLabelKey, type RideType } from '@/features/rides/rideTypes';
 import { colors, fontFamily, radius, spacing } from '@/theme';
 
 import { RideTypeIcon } from './icons/RideTypeIcon';
@@ -21,7 +22,8 @@ type RideTypeOptionProps = {
  */
 export function RideTypeOption({ type, selected, onPress, disabled, style }: RideTypeOptionProps) {
   const contentColor = selected ? colors.textPrimary : colors.textSecondary;
-  const label = rideTypeLabels[type];
+  const { t } = useTranslation('rides');
+  const label = t(rideTypeLabelKey(type));
 
   return (
     <Pressable

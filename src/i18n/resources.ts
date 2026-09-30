@@ -1,0 +1,38 @@
+import enAuth from './locales/en/auth.json';
+import enCommon from './locales/en/common.json';
+import enGarage from './locales/en/garage.json';
+import enRegistration from './locales/en/registration.json';
+import enRides from './locales/en/rides.json';
+import trAuth from './locales/tr/auth.json';
+import trCommon from './locales/tr/common.json';
+import trGarage from './locales/tr/garage.json';
+import trRegistration from './locales/tr/registration.json';
+import trRides from './locales/tr/rides.json';
+
+import type { AppLanguage } from './language';
+
+/** Turkish is the source of truth; every other language must provide the same keys. */
+export const trResources = {
+  common: trCommon,
+  auth: trAuth,
+  registration: trRegistration,
+  rides: trRides,
+  garage: trGarage,
+};
+
+type LocaleResources = typeof trResources;
+
+const enResources: LocaleResources = {
+  common: enCommon,
+  auth: enAuth,
+  registration: enRegistration,
+  rides: enRides,
+  garage: enGarage,
+};
+
+export const resources: Record<AppLanguage, LocaleResources> = {
+  tr: trResources,
+  en: enResources,
+};
+
+export const NAMESPACES = Object.keys(trResources) as (keyof LocaleResources)[];

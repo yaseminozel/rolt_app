@@ -1,0 +1,28 @@
+{
+  "tabs": {
+    "discover": "Discover",
+    "record": "Record",
+    "profile": "Profile"
+  },
+  "actions": {
+    "close": "Close",
+    "back": "Back",
+    "save": "Save",
+    "continue": "Continue",
+    "skip": "Skip",
+    "change": "Change",
+    "undo": "Undo",
+    "view": "View"
+  },
+  "a11y": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "legal": {
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy"
+  },
+  "units": {
+    "cc": "{{value}} cc"
+  }
+}

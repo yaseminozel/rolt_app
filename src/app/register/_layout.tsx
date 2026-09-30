@@ -1,15 +1,18 @@
 import { Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { RegistrationDraftProvider } from '@/features/registration/RegistrationDraftProvider';
 import { colors, fontFamily } from '@/theme';
 
-/** Registration flow 00.8–00.12 with a native header titled "Hesap oluştur". */
+/** Registration flow 00.8–00.12 with a native header titled "Hesap oluştur" (`registration:title`). */
 export default function RegisterLayout() {
+  const { t } = useTranslation('registration');
+
   return (
     <RegistrationDraftProvider>
       <Stack
         screenOptions={{
-          headerTitle: 'Hesap oluştur',
+          headerTitle: t('title'),
           headerTitleAlign: 'left',
           headerTitleStyle: { fontFamily: fontFamily.medium, fontSize: 18, color: colors.textPrimary },
           headerBackButtonDisplayMode: 'minimal',

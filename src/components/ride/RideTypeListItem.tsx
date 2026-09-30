@@ -1,7 +1,8 @@
 import { Check } from 'iconoir-react-native';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { rideTypeLabels, type RideType } from '@/features/rides/rideTypes';
+import { rideTypeLabelKey, type RideType } from '@/features/rides/rideTypes';
 import { colors, fontFamily, radius, spacing } from '@/theme';
 
 import { RideTypeIcon } from './icons/RideTypeIcon';
@@ -31,7 +32,8 @@ export function RideTypeListItem({
   disabled,
   style,
 }: RideTypeListItemProps) {
-  const label = rideTypeLabels[type];
+  const { t } = useTranslation('rides');
+  const label = t(rideTypeLabelKey(type));
 
   return (
     <Pressable

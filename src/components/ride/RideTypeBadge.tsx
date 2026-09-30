@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { rideTypeLabels, type RideType } from '@/features/rides/rideTypes';
+import { rideTypeLabelKey, type RideType } from '@/features/rides/rideTypes';
 import { colors, fontFamily, radius, spacing } from '@/theme';
 
 /** Surface and label colors per ride type tone. */
@@ -21,12 +22,13 @@ type RideTypeBadgeProps = {
 
 /** 24 pt tonal label for a ride type. Pencil node `a2e36` ("Badge / Sürüş Tipi"). */
 export function RideTypeBadge({ type, style }: RideTypeBadgeProps) {
+  const { t } = useTranslation('rides');
   const tone = rideTypeBadgeColors[type];
 
   return (
     <View style={[styles.container, { backgroundColor: tone.background }, style]}>
       <Text style={[styles.label, { color: tone.text }]} numberOfLines={1}>
-        {rideTypeLabels[type]}
+        {t(rideTypeLabelKey(type))}
       </Text>
     </View>
   );

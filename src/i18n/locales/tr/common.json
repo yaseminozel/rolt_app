@@ -1,0 +1,28 @@
+{
+  "tabs": {
+    "discover": "Keşfet",
+    "record": "Kaydet",
+    "profile": "Profil"
+  },
+  "actions": {
+    "close": "Kapat",
+    "back": "Geri",
+    "save": "Kaydet",
+    "continue": "Devam et",
+    "skip": "Atla",
+    "change": "Değiştir",
+    "undo": "Geri al",
+    "view": "Görüntüle"
+  },
+  "a11y": {
+    "showPassword": "Şifreyi göster",
+    "hidePassword": "Şifreyi gizle"
+  },
+  "legal": {
+    "terms": "Kullanım Koşulları",
+    "privacy": "Gizlilik Politikası"
+  },
+  "units": {
+    "cc": "{{value}} cc"
+  }
+}

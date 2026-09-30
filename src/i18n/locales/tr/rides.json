@@ -1,0 +1,11 @@
+{
+  "types": {
+    "city": "Şehir İçi",
+    "longRide": "Uzun Yol",
+    "nature": "Doğa",
+    "curves": "Viraj",
+    "sport": "Sportif",
+    "offRoad": "Off-road",
+    "coast": "Sahil"
+  }
+}

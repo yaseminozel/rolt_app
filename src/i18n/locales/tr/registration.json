@@ -1,0 +1,23 @@
+{
+  "title": "Hesap oluştur",
+  "roadPreferences": {
+    "curvyRoads": "Virajlı yollar",
+    "coast": "Sahil",
+    "mountainRoads": "Dağ yolları",
+    "city": "Şehir içi",
+    "longTour": "Uzun tur",
+    "offRoad": "Off-road",
+    "weekendGetaway": "Hafta sonu kaçamağı",
+    "nightRiding": "Gece sürüşü"
+  },
+  "tempo": {
+    "relaxed": "Sakin",
+    "balanced": "Dengeli",
+    "sporty": "Sportif"
+  },
+  "experience": {
+    "zeroToTwo": "0–2 yıl",
+    "threeToFive": "3–5 yıl",
+    "fivePlus": "5+ yıl"
+  }
+}

@@ -12,13 +12,5 @@ export const RIDE_TYPES: readonly RideType[] = [
   'coast',
 ];
 
-/** User-facing Turkish labels, exactly as written in the design. */
-export const rideTypeLabels: Record<RideType, string> = {
-  city: 'Şehir İçi',
-  longRide: 'Uzun Yol',
-  nature: 'Doğa',
-  curves: 'Viraj',
-  sport: 'Sportif',
-  offRoad: 'Off-road',
-  coast: 'Sahil',
-};
+/** Translation key for a ride type label (namespace `rides`). */
+export const rideTypeLabelKey = (type: RideType) => `types.${type}` as const;

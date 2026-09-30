@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "ROLT",
+    "NSLocationWhenInUseUsageDescription": "ROLT uses your location to record your rides and show where you are on the map.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "ROLT always uses your location so it can keep recording your ride while the screen is off.",
+    "NSLocationAlwaysUsageDescription": "ROLT always uses your location so it can keep recording your ride while the screen is off.",
+    "NSPhotoLibraryUsageDescription": "ROLT accesses the photos you choose so you can add them to your profile and rides."
+  },
+  "android": {
+    "app_name": "ROLT"
+  }
+}

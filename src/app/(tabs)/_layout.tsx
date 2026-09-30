@@ -1,4 +1,5 @@
 import { NativeTabs } from 'expo-router/native-tabs';
+import { useTranslation } from 'react-i18next';
 
 import { colors } from '@/theme';
 
@@ -8,19 +9,21 @@ import { colors } from '@/theme';
  * Iconoir map / play / user icons map to SF Symbols and Material Symbols.
  */
 export default function TabsLayout() {
+  const { t } = useTranslation();
+
   return (
     <NativeTabs tintColor={colors.textPrimary}>
       <NativeTabs.Trigger name="discover">
         <NativeTabs.Trigger.Icon sf="map" md="map" />
-        <NativeTabs.Trigger.Label>Keşfet</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.discover')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="record">
         <NativeTabs.Trigger.Icon sf="play" md="play_arrow" />
-        <NativeTabs.Trigger.Label>Kaydet</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.record')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <NativeTabs.Trigger.Icon sf="person" md="person" />
-        <NativeTabs.Trigger.Label>Profil</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('tabs.profile')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

@@ -7,7 +7,10 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -54,11 +57,30 @@
           "cameraPermission": false,
           "microphonePermission": false
         }
+      ],
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "tr",
+              "en"
+            ],
+            "android": [
+              "tr",
+              "en"
+            ]
+          }
+        }
       ]
     ],
     "scheme": "rolt",
     "experiments": {
       "typedRoutes": true
+    },
+    "locales": {
+      "tr": "./src/i18n/native/tr.json",
+      "en": "./src/i18n/native/en.json"
     }
   }
 }

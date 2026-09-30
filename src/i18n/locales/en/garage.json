@@ -1,0 +1,11 @@
+{
+  "categories": {
+    "naked": "Naked",
+    "sport": "Sport",
+    "sportTouring": "Sport touring",
+    "adventure": "Adventure",
+    "touring": "Touring",
+    "cruiser": "Cruiser",
+    "scrambler": "Scrambler"
+  }
+}

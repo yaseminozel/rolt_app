@@ -1,0 +1,12 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "ROLT",
+    "NSLocationWhenInUseUsageDescription": "ROLT, sürüşünü kaydedebilmek ve haritada konumunu gösterebilmek için konumunu kullanır.",
+    "NSLocationAlwaysAndWhenInUseUsageDescription": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanır.",
+    "NSLocationAlwaysUsageDescription": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanır.",
+    "NSPhotoLibraryUsageDescription": "ROLT, profiline ve sürüşlerine fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir."
+  },
+  "android": {
+    "app_name": "ROLT"
+  }
+}

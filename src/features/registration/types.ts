@@ -1,6 +1,9 @@
 import type { MotorcycleBrand } from '@/components/brand/MotorcycleBrandLogo';
 
-/** "Sevdiğin yollar" chips on 00.11 (Fv4ol). Separate from `RideType`, which classifies a single ride. */
+/**
+ * "Sevdiğin yollar" chips on 00.11 (Fv4ol); labels: `registration:roadPreferences.*`.
+ * Separate from `RideType`, which classifies a single ride.
+ */
 export type RoadPreference =
   | 'curvyRoads'
   | 'coast'
@@ -22,34 +25,15 @@ export const ROAD_PREFERENCES: readonly RoadPreference[] = [
   'nightRiding',
 ];
 
-export const roadPreferenceLabels: Record<RoadPreference, string> = {
-  curvyRoads: 'Virajlı yollar',
-  coast: 'Sahil',
-  mountainRoads: 'Dağ yolları',
-  city: 'Şehir içi',
-  longTour: 'Uzun tur',
-  offRoad: 'Off-road',
-  weekendGetaway: 'Hafta sonu kaçamağı',
-  nightRiding: 'Gece sürüşü',
-};
-
-/** "Tempon" segmented control on 00.11. */
+/** "Tempon" segmented control on 00.11 (labels: `registration:tempo.*`). */
 export type RidingTempo = 'relaxed' | 'balanced' | 'sporty';
 
-export const ridingTempoLabels: Record<RidingTempo, string> = {
-  relaxed: 'Sakin',
-  balanced: 'Dengeli',
-  sporty: 'Sportif',
-};
+export const RIDING_TEMPOS: readonly RidingTempo[] = ['relaxed', 'balanced', 'sporty'];
 
-/** "Sürüş deneyimin" segmented control on 00.11. */
+/** "Sürüş deneyimin" segmented control on 00.11 (labels: `registration:experience.*`). */
 export type ExperienceRange = 'zeroToTwo' | 'threeToFive' | 'fivePlus';
 
-export const experienceRangeLabels: Record<ExperienceRange, string> = {
-  zeroToTwo: '0–2 yıl',
-  threeToFive: '3–5 yıl',
-  fivePlus: '5+ yıl',
-};
+export const EXPERIENCE_RANGES: readonly ExperienceRange[] = ['zeroToTwo', 'threeToFive', 'fivePlus'];
 
 /** Data collected across registration steps 00.8–00.11; every field is optional because steps can be skipped. */
 export type RegistrationDraft = {

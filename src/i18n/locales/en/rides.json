@@ -1,0 +1,11 @@
+{
+  "types": {
+    "city": "City",
+    "longRide": "Long ride",
+    "nature": "Nature",
+    "curves": "Curves",
+    "sport": "Sport",
+    "offRoad": "Off-road",
+    "coast": "Coast"
+  }
+}
