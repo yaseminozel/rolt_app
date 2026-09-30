@@ -14,11 +14,15 @@ export const spacing = {
 /** Corner radii observed in the design. */
 export const radius = {
   xs: 4,
+  /** Ride type badge (a2e36). */
+  tag: 6,
   sm: 8,
-  /** Filter chips (iCyEV) and large badges (YFU4m). */
+  /** Filter chips (iCyEV) and large badges (YFU4m); also list selection backgrounds and route row thumbnails. */
   chip: 10,
   md: 12,
   lg: 16,
+  /** Ride type option tile (N0mch). */
+  tile: 18,
   xl: 24,
   xxl: 32,
   pill: 9999,
