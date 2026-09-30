@@ -24,6 +24,12 @@
     "privacy": "Privacy Policy"
   },
   "units": {
-    "cc": "{{value}} cc"
+    "cc": "{{value}} cc",
+    "km": "{{value}} km",
+    "meters": "{{value}} m",
+    "speed": "{{value}} km/h",
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "hours": "{{hours}} h",
+    "minutes": "{{minutes}} min"
   }
 }

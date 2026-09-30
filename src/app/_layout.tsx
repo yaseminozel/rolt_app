@@ -1,10 +1,17 @@
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { ToastProvider } from '@/components/feedback/ToastProvider';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
+import { takePendingAccountAction } from '@/features/auth/pendingAccountAction';
+import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
 import '@/i18n';
 import { appFonts, colors } from '@/theme';
 
@@ -23,13 +30,25 @@ const navigationTheme: Theme = {
 };
 
 export default function RootLayout() {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
-    <AuthProvider>
-      <ThemeProvider value={navigationTheme}>
-        <RootNavigator />
-        <StatusBar style="dark" />
-      </ThemeProvider>
-    </AuthProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <SavedRoutesProvider>
+            <ThemeProvider value={navigationTheme}>
+              <BottomSheetModalProvider>
+                <ToastProvider>
+                  <RootNavigator />
+                  <StatusBar style="dark" />
+                </ToastProvider>
+              </BottomSheetModalProvider>
+            </ThemeProvider>
+          </SavedRoutesProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -47,6 +66,14 @@ function RootNavigator() {
   const { isReady, canUseApp, needsProfile, needsPermissionPrompts, session, isGuest } = useAuth();
   const ready = (fontsLoaded || fontError !== null) && isReady;
   const signedOut = session === null && !isGuest;
+  const signedInToApp = canUseApp && session !== null && !needsPermissionPrompts;
+
+  // Replays the action a guest tried before signing in (e.g. saving a route), once they are in the app.
+  useEffect(() => {
+    if (signedInToApp) {
+      takePendingAccountAction()?.();
+    }
+  }, [signedInToApp]);
 
   useEffect(() => {
     if (ready) {
@@ -63,6 +90,11 @@ function RootNavigator() {
       <Stack.Screen name="index" />
       <Stack.Protected guard={canUseApp && !needsPermissionPrompts}>
         <Stack.Screen name="(tabs)" />
+        {/* Full-screen map surfaces without the tab bar (01.6, 01.7). */}
+        <Stack.Screen name="route/[id]" />
+        <Stack.Screen name="explore" />
+        <Stack.Screen name="suggest-route" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
+        <Stack.Screen name="notifications" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
       </Stack.Protected>
       <Stack.Protected guard={isGuest}>
         <Stack.Screen
@@ -89,3 +121,9 @@ function RootNavigator() {
     </Stack>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

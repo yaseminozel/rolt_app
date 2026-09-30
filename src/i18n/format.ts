@@ -43,3 +43,36 @@ export function turkishTimeLocativeSuffix(date: Date) {
   const unit = spoken % 10;
   return unit === 0 ? TR_TENS_SUFFIX[Math.floor(spoken / 10)] : TR_UNIT_SUFFIX[unit];
 }
+
+/**
+ * Distance, e.g. "72 km" on cards (`fractionDigits` 0) or "12,8 km" on route details (1).
+ * Whole numbers never show a trailing ",0".
+ */
+export function formatDistance(km: number, fractionDigits = 0) {
+  const value = formatNumber(km, { maximumFractionDigits: fractionDigits, minimumFractionDigits: 0 });
+  return i18n.t('units.km', { value });
+}
+
+/** Duration from minutes: "1 sa 25 dk", "1 sa", "50 dk" (en: "1 h 25 min", "1 h", "50 min"). */
+export function formatDuration(totalMinutes: number) {
+  const rounded = Math.round(totalMinutes);
+  const hours = Math.floor(rounded / 60);
+  const minutes = rounded % 60;
+  if (hours === 0) {
+    return i18n.t('units.minutes', { minutes });
+  }
+  if (minutes === 0) {
+    return i18n.t('units.hours', { hours });
+  }
+  return i18n.t('units.hoursMinutes', { hours, minutes });
+}
+
+/** Speed, e.g. "41 km/sa" / "41 km/h". */
+export function formatSpeed(kmh: number) {
+  return i18n.t('units.speed', { value: formatNumber(Math.round(kmh)) });
+}
+
+/** Signed elevation, e.g. "236 m", "-198 m". */
+export function formatElevation(meters: number) {
+  return i18n.t('units.meters', { value: formatNumber(Math.round(meters)) });
+}

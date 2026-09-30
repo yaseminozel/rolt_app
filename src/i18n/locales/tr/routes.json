@@ -1,0 +1,37 @@
+{
+  "tags": {
+    "coast": "Sahil",
+    "curvy": "Virajlı",
+    "scenic": "Manzara",
+    "city": "Şehir İçi",
+    "nature": "Doğa"
+  },
+  "filters": {
+    "all": "Tümü",
+    "nearby": "Yakın Rotalar"
+  },
+  "sort": {
+    "title": "Sırala",
+    "recommended": "Önerilen",
+    "nearest": "En yakın",
+    "shortest": "En kısa rota",
+    "longest": "En uzun rota",
+    "popular": "En popüler"
+  },
+  "difficulty": {
+    "easy": "Kolay",
+    "moderate": "Orta",
+    "hard": "Zor"
+  },
+  "surface": {
+    "asphalt": "Asfalt",
+    "mixed": "Karışık",
+    "gravel": "Toprak"
+  },
+  "saved": {
+    "saved": "Rota kaydedildi",
+    "removed": "Rota kaydedilenlerden çıkarıldı",
+    "view": "Görüntüle",
+    "undo": "Geri al"
+  }
+}

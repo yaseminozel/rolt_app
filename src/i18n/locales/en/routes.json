@@ -1,0 +1,37 @@
+{
+  "tags": {
+    "coast": "Coast",
+    "curvy": "Curvy",
+    "scenic": "Scenic",
+    "city": "City",
+    "nature": "Nature"
+  },
+  "filters": {
+    "all": "All",
+    "nearby": "Nearby routes"
+  },
+  "sort": {
+    "title": "Sort",
+    "recommended": "Recommended",
+    "nearest": "Nearest",
+    "shortest": "Shortest route",
+    "longest": "Longest route",
+    "popular": "Most popular"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "moderate": "Moderate",
+    "hard": "Hard"
+  },
+  "surface": {
+    "asphalt": "Asphalt",
+    "mixed": "Mixed",
+    "gravel": "Gravel"
+  },
+  "saved": {
+    "saved": "Route saved",
+    "removed": "Route removed from saved",
+    "view": "View",
+    "undo": "Undo"
+  }
+}

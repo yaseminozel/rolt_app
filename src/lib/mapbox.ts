@@ -17,9 +17,9 @@ export function initMapbox() {
   }
   initialized = true;
 
-  if (!accessToken) {
+  if (!accessToken || accessToken === 'pk.') {
     if (__DEV__) {
-      console.warn('EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN is not set; maps will not load. See .env.example.');
+      console.warn('EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN is not set in .env; native maps will not load.');
     }
     return;
   }

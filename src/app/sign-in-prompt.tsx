@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bookmark, LogIn } from 'iconoir-react-native';
-import { useState, type ComponentType } from 'react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { AppleMark, GoogleMark } from '@/components/auth/SocialProviderMark';
 import { Toast } from '@/components/feedback/Toast';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { clearPendingAccountAction } from '@/features/auth/pendingAccountAction';
 import {
   parseSignInPromptReason,
   type SignInPromptReason,
@@ -49,6 +50,18 @@ export default function SignInPromptScreen() {
   const params = useLocalSearchParams<{ reason?: string | string[] }>();
   const reason = parseSignInPromptReason(params.reason);
   const [pending, setPending] = useState<PendingAction>(null);
+  /** Set once the guest picks a sign-in method; the pending save is kept only then. */
+  const continuingToSignIn = useRef(false);
+
+  // "Şimdi değil" or swiping the sheet away drops the action the guest tried.
+  useEffect(
+    () => () => {
+      if (!continuingToSignIn.current) {
+        clearPendingAccountAction();
+      }
+    },
+    [],
+  );
   const [error, setError] = useState<string | null>(null);
 
   const Icon = reason ? reasonIcons[reason] : GenericIcon;
@@ -65,8 +78,10 @@ export default function SignInPromptScreen() {
     setPending(provider);
     try {
       // The guest guard drops this sheet once a session exists; `index` routes on.
+      continuingToSignIn.current = true;
       await signInWithProvider(provider);
     } catch {
+      continuingToSignIn.current = false;
       setError(t('errors.provider', { provider: t(`providers.${provider}`) }));
       setPending(null);
     }
@@ -76,6 +91,7 @@ export default function SignInPromptScreen() {
     if (pending) {
       return;
     }
+    continuingToSignIn.current = true;
     // Guests only get here after onboarding; marking it again makes `index` land on sign-in, never onboarding.
     markOnboardingSeen();
     leaveGuestMode();

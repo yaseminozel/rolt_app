@@ -24,6 +24,12 @@
     "privacy": "Gizlilik Politikası"
   },
   "units": {
-    "cc": "{{value}} cc"
+    "cc": "{{value}} cc",
+    "km": "{{value}} km",
+    "meters": "{{value}} m",
+    "speed": "{{value}} km/sa",
+    "hoursMinutes": "{{hours}} sa {{minutes}} dk",
+    "hours": "{{hours}} sa",
+    "minutes": "{{minutes}} dk"
   }
 }

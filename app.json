@@ -72,7 +72,8 @@
             ]
           }
         }
-      ]
+      ],
+      "expo-image"
     ],
     "scheme": "rolt",
     "experiments": {
