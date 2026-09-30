@@ -60,6 +60,10 @@ export const palette = {
   // Expired reset link note (b1m1YP "Bağlantı … gönderildi")
   orange50: '#FFF7ED',
   orange800: '#9A3412',
+  // Location permission banner outline (x3Pqz "Konum izni kapalı")
+  orange200: '#FED7AA',
+  // Section link on Discover Home (p4CIJi "Tümünü gör")
+  teal750: '#227868',
   cyan100: '#CFFAFE',
   cyan700: '#0E7490',
   // Accent info note (LreVd "Sıradaki adım: konum izni")
@@ -71,6 +75,8 @@ export const palette = {
   // Notification permission illustration background (RzQd4 "Görsel", top → bottom)
   indigo50: '#EEF0FF',
   indigo100: '#DFE3FF',
+  // Map scale bar ink (01.7 `rxpI9`)
+  slate700: '#4C5157',
 } as const;
 
 export const colors = {
@@ -111,6 +117,8 @@ export const colors = {
   accentStrong: palette.teal600,
   /** "On" track of the settings switch (kTcEC). */
   accentVivid: palette.teal350,
+  /** Teal text link beside section titles ("Tümünü gör", p4CIJi); 5.6:1 on white. */
+  accentLink: palette.teal750,
 
   // Form controls: Button (RC60W), Checkbox (QXn80), Radio (UeboI), Switch (NoZZf).
   /** Pressed fill of outlined/text buttons. */
@@ -169,6 +177,8 @@ export const colors = {
   cautionSurface: palette.orange50,
   cautionIcon: palette.orange700,
   cautionText: palette.orange800,
+  /** Outline of the location permission banner (x3Pqz). */
+  cautionBorder: palette.orange200,
 
   // Info note (InfoNote, LreVd): accent tone.
   noteAccentSurface: palette.teal50,
@@ -191,6 +201,9 @@ export const colors = {
   notificationPanelTop: palette.indigo50,
   notificationPanelBottom: palette.indigo100,
   notificationCardSurface: 'rgba(255, 255, 255, 0.92)',
+
+  /** Map scale bar lines and labels (01.7 `rxpI9`). */
+  mapScaleInk: palette.slate700,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
   glass: 'rgba(255, 255, 255, 0.64)',

@@ -1,0 +1,24 @@
+{
+  "title": "Haritada Keşfet",
+  "routesInArea_one": "Bu bölgede {{count}} rota var",
+  "routesInArea_other": "Bu bölgede {{count}} rota var",
+  "empty": {
+    "title": "Bu bölgede rota yok",
+    "description": "Haritayı kaydır ya da başka bir filtre seç."
+  },
+  "map": {
+    "locateMe": "Konumuma git",
+    "zoomIn": "Yakınlaştır",
+    "zoomOut": "Uzaklaştır",
+    "satellite": "Uydu görünümü",
+    "routeMarker": "{{number}}. {{name}}",
+    "locationUnavailable": "Konumun alınamadı. Ayarlardan konum iznini açabilirsin."
+  },
+  "preview": {
+    "authorRating": "{{author}} · {{rating}} ★ ({{count}})",
+    "away": "{{distance}} uzakta",
+    "viewDetails": "Detayı gör",
+    "startRide": "Sürmeye başla",
+    "a11yRating": "{{author}}, {{rating}} puan, {{count}} değerlendirme"
+  }
+}

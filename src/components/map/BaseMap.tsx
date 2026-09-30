@@ -3,6 +3,7 @@ import { Image, type ImageSource } from 'expo-image';
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import type { MapStyle } from './mapStyles';
 import type { MapboxModule, NativeMapViewProps } from './NativeBaseMap';
 
 /**
@@ -22,6 +23,8 @@ export type BaseMapProps = Omit<NativeMapViewProps, 'children'> & {
    * directly in screens — it crashes Expo Go.
    */
   renderLayers?: (mapbox: MapboxModule) => ReactNode;
+  /** Base map look on native maps (the Expo Go artwork has only one). */
+  mapStyle?: MapStyle;
 };
 
 /**
@@ -29,7 +32,7 @@ export type BaseMapProps = Omit<NativeMapViewProps, 'children'> & {
  * controls ("Konumuma git", "Yakınlaştırma", "Ölçek"), so Mapbox's compass and scale bar are
  * hidden; the Mapbox logo and attribution stay visible as the Mapbox terms require.
  */
-export function BaseMap({ fallbackImage, fallbackOverlay, style, ...props }: BaseMapProps) {
+export function BaseMap({ fallbackImage, fallbackOverlay, mapStyle, style, ...props }: BaseMapProps) {
   if (!isNativeMapAvailable) {
     return (
       <View style={[styles.map, style]}>
@@ -42,7 +45,7 @@ export function BaseMap({ fallbackImage, fallbackOverlay, style, ...props }: Bas
   // Lazy so Expo Go never evaluates `@rnmapbox/maps`.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { NativeBaseMap } = require('./NativeBaseMap') as typeof import('./NativeBaseMap');
-  return <NativeBaseMap style={style} {...props} />;
+  return <NativeBaseMap style={style} mapStyle={mapStyle} {...props} />;
 }
 
 const styles = StyleSheet.create({

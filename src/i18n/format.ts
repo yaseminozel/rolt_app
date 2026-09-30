@@ -28,6 +28,16 @@ export function formatClockTime(date: Date) {
   }).format(date);
 }
 
+/** Short date and time, e.g. "12 Eyl 2026, 19:30" / "12 Sept 2026, 19:30" (ride feed cards). */
+export function formatDateTime(date: Date) {
+  const day = new Intl.DateTimeFormat(activeDateLocale(), {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+  return `${day}, ${formatClockTime(date)}`;
+}
+
 /** Locative suffix of the last spoken word of 0–59 ("bir" → "de", "üç" → "te", "otuz" → "da"). */
 const TR_UNIT_SUFFIX = ['da', 'de', 'de', 'te', 'te', 'te', 'da', 'de', 'de', 'da'];
 const TR_TENS_SUFFIX = ['da', 'da', 'de', 'da', 'ta', 'de'];

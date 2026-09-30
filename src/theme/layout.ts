@@ -47,4 +47,18 @@ export const shadows = {
   overlay: '0px 3px 10.5px rgba(0, 0, 0, 0.14)',
   /** Notification preview cards on the notification permission screen (RzQd4). */
   notification: '0px 4px 14px rgba(16, 19, 24, 0.1)',
+  /** Floating pill on the Discover map card ("Bu bölgede N rota var", oxSGl). */
+  mapPill: '0px 2px 8.75px rgba(0, 0, 0, 0.12)',
+  /** Tilted photo cards of the empty search illustration (vKY7V). */
+  stackedCard: '0px 8px 15.75px rgba(8, 18, 23, 0.16)',
+  /** Round buttons over maps: back, bookmark, layers (01.6 `qw5Tm`, 01.7 `f8509u`). */
+  mapAction: '2px 4px 5.16px rgba(152, 152, 152, 0.25)',
+  /** Map controls: "Konumuma git", zoom (01.7 `rgmv0`, `jKcQQ`). */
+  mapControl: '0px 3px 10.5px rgba(16, 19, 24, 0.16)',
+  /** Photo route markers on the map (01.7 `H3OjE`). */
+  mapPin: '0px 3px 8.75px rgba(16, 19, 24, 0.28)',
+  /** Persistent sheet over the map (01.7 `uwUKg`). */
+  mapSheet: '0px -6px 24.5px rgba(16, 19, 24, 0.16)',
+  /** Floating route preview card over the map (01.7 `SIrGF`). */
+  mapCard: '0px 8px 24px rgba(16, 19, 24, 0.18)',
 } as const;

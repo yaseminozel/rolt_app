@@ -1,0 +1,90 @@
+{
+  "home": {
+    "locationLabel": "Your location:",
+    "regionLabel": "Selected region:",
+    "locationValue": "{{city}}, Türkiye",
+    "defaultRegionValue": "{{city}} (default)",
+    "changeLocationA11y": "Change region",
+    "notificationsA11y": "Notifications",
+    "categoriesA11y": "Route categories",
+    "areaRouteCount_zero": "No routes in this area yet",
+    "areaRouteCount_one": "{{count}} route in this area",
+    "areaRouteCount_other": "{{count}} routes in this area",
+    "exploreMapA11y": "Explore on the map",
+    "goToMyLocation": "Go to my location",
+    "recommendedTitle": "Recommended for you",
+    "seeAll": "See all",
+    "recommendedEmpty": "No recommendations in this category yet.",
+    "loadError": "Couldn't load routes.",
+    "retry": "Try again"
+  },
+  "permissionBanner": {
+    "title": "Location access is off",
+    "description": "We're showing the {{city}} area instead of routes near you.",
+    "action": "Turn on",
+    "actionA11y": "Turn on location access"
+  },
+  "search": {
+    "placeholder": "Search routes",
+    "cancel": "Cancel",
+    "clear": "Clear search",
+    "recentTitle": "Recent searches",
+    "clearRecent": "Clear",
+    "removeRecentA11y": "Remove {{query}} from recent searches",
+    "routesSection": "ROUTES",
+    "placesSection": "PLACES",
+    "fillSuggestionA11y": "Put {{name}} in the search field",
+    "routeMeta": "{{distance}} · {{tag}}",
+    "placeMeta": "{{district}}, {{province}}",
+    "placeRouteCount_one": "{{count}} route",
+    "placeRouteCount_other": "{{count}} routes",
+    "seeAllResults": "See all results for “{{query}}”",
+    "resultCount_one": "{{count}} result found",
+    "resultCount_other": "{{count}} results found",
+    "filter": "Filter",
+    "filterActiveA11y_one": "Filter, {{count}} filter on",
+    "filterActiveA11y_other": "Filter, {{count}} filters on",
+    "sortA11y": "Sort: {{sort}}",
+    "loading": "Searching",
+    "error": "Couldn't complete the search.",
+    "emptyTitle": "No routes found",
+    "emptyDescription": "We couldn't find a route for this search. Help us by suggesting a new one.",
+    "suggestRoute": "Suggest a route",
+    "emptyFilteredDescription": "No routes match your filters. Try changing them.",
+    "clearFilters": "Clear filters"
+  },
+  "filterSheet": {
+    "title": "Filter",
+    "distance": "Distance",
+    "distanceOptions": {
+      "under50": "< 50 km",
+      "from50to100": "50–100",
+      "from100to200": "100–200",
+      "over200": "200+ km"
+    },
+    "duration": "Duration",
+    "durationOptions": {
+      "under1h": "< 1 h",
+      "from1to3h": "1–3 h",
+      "over3h": "3+ h"
+    },
+    "roadType": "Road type",
+    "difficulty": "Difficulty",
+    "loopOnly": "Loop routes only",
+    "loopOnlyDescription": "Ends where you started",
+    "clear": "Clear",
+    "show_zero": "No matching routes",
+    "show_one": "Show {{count}} route",
+    "show_other": "Show {{count}} routes"
+  },
+  "recommended": {
+    "title": "Recommended Routes",
+    "searchPlaceholder": "Search routes",
+    "noMatches": "No routes match your search."
+  },
+  "location": {
+    "title": "Choose a region",
+    "searchPlaceholder": "Search cities",
+    "noResults": "No cities match your search."
+  }
+}

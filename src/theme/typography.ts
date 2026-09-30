@@ -53,6 +53,10 @@ export const typography = {
   eyebrow: { ...variant(fontFamily.semibold, 11, 14), letterSpacing: 0.6 },
   metricLarge: variant(fontFamily.monoMedium, 24),
   metric: variant(fontFamily.monoMedium, 15),
+  /** Ride card metric values (gKG8D "12,8 km"): Mono 14. */
+  metricSmall: variant(fontFamily.monoMedium, 14, 18),
+  /** Like / comment / save counters on ride cards (gKG8D "142"): Mono 12. */
+  metricCaption: variant(fontFamily.monoMedium, 12, 16),
   wordmark: variant(fontFamily.brand, 28),
 } as const;
 

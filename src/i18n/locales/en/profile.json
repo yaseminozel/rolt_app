@@ -1,0 +1,99 @@
+{
+  "handle": "@{{handle}}",
+  "bikeWithYear": "{{bike}} · {{year}}",
+  "stats": {
+    "followers_one": "follower",
+    "followers_other": "followers",
+    "following_one": "following",
+    "following_other": "following"
+  },
+  "match": {
+    "score": "{{value}}% match",
+    "sharedRoutes_one": "{{count}} shared route",
+    "sharedRoutes_other": "{{count}} shared routes",
+    "sharedPreference": {
+      "curvyRoads": "You both love curvy roads",
+      "coast": "You both love coastal roads",
+      "mountainRoads": "You both love mountain roads",
+      "city": "You both love riding in the city",
+      "longTour": "You both love long tours",
+      "offRoad": "You both love riding off-road",
+      "weekendGetaway": "You both love weekend getaways",
+      "nightRiding": "You both love riding at night"
+    }
+  },
+  "actions": {
+    "follow": "Follow",
+    "following": "Following",
+    "rideTogether": "Ride together",
+    "share": "Share profile",
+    "more": "More options"
+  },
+  "tabs": {
+    "label": "Profile sections",
+    "rides": "Rides",
+    "routes": "Routes",
+    "garage": "Garage"
+  },
+  "menu": {
+    "report": "Report",
+    "block": "Block",
+    "cancel": "Cancel"
+  },
+  "block": {
+    "title": "Block {{name}}?",
+    "message": "They won't be able to follow you or see your rides and routes. You can unblock them anytime in Settings > Blocked users.",
+    "confirm": "Block",
+    "done": "{{name}} blocked"
+  },
+  "report": {
+    "done": "Thanks for your report. We'll review it and take action."
+  },
+  "share": {
+    "message": "{{name}} (@{{handle}}) is on ROLT. Check out their rides!",
+    "rideMessage": "{{title}} · {{distance}} · {{duration}} — ROLT"
+  },
+  "activity": {
+    "more": "Ride options",
+    "map": "Ride map",
+    "photo": "Ride photo {{index}}",
+    "like": "Like",
+    "comment": "Comment",
+    "save": "Save",
+    "share": "Share",
+    "saved": "Ride saved",
+    "removed": "Ride removed from saved",
+    "metrics": {
+      "distance": "Distance",
+      "duration": "Time",
+      "averageSpeed": "Avg. speed"
+    }
+  },
+  "garage": {
+    "mainBike": "Main bike"
+  },
+  "empty": {
+    "rides": {
+      "title": "No rides yet",
+      "description": "Shared rides will show up here."
+    },
+    "routes": {
+      "title": "No routes yet",
+      "description": "Published routes will show up here."
+    },
+    "garage": {
+      "title": "Garage is empty",
+      "description": "Added motorcycles will show up here."
+    }
+  },
+  "unavailable": {
+    "title": "Profile unavailable",
+    "description": "This rider's profile was removed or is no longer visible.",
+    "back": "Go back"
+  },
+  "error": {
+    "title": "Couldn't load profile",
+    "description": "Check your connection and try again.",
+    "retry": "Try again"
+  }
+}

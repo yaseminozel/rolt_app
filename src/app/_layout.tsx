@@ -93,6 +93,12 @@ function RootNavigator() {
         {/* Full-screen map surfaces without the tab bar (01.6, 01.7). */}
         <Stack.Screen name="route/[id]" />
         <Stack.Screen name="explore" />
+        {/* Another rider's profile (01.8): opened from the route detail, draws its own top bar. */}
+        <Stack.Screen name="rider/[id]" />
+        <Stack.Screen
+          name="ride-together/[id]"
+          options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
+        />
         <Stack.Screen name="suggest-route" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
         <Stack.Screen name="notifications" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
       </Stack.Protected>

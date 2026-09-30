@@ -1,0 +1,37 @@
+{
+  "metrics": {
+    "distance": "Mesafe",
+    "duration": "Süre",
+    "averageSpeed": "Ort. hız",
+    "maxSpeed": "Maks. hız",
+    "elevationGain": "Yükselti",
+    "elevationLoss": "İniş"
+  },
+  "moreDetails": {
+    "show": "Detay bilgileri göster",
+    "hide": "Detay bilgileri gizle"
+  },
+  "sections": {
+    "notes": "Notlar",
+    "photos": "Sürüş görselleri",
+    "facts": "Sürüş detayları"
+  },
+  "facts": {
+    "difficulty": "Zorluk seviyesi",
+    "surface": "Yol tipi"
+  },
+  "startRide": "Rotayı sürmeye başla",
+  "morePhotos": "+{{count}}",
+  "a11y": {
+    "authorProfile": "{{name}}, profili aç",
+    "photo": "Sürüş görseli {{index}} / {{total}}",
+    "morePhotos_one": "{{count}} görsel daha",
+    "morePhotos_other": "{{count}} görsel daha",
+    "loading": "Rota yükleniyor"
+  },
+  "notFound": {
+    "title": "Rota bulunamadı",
+    "description": "Bu rota kaldırılmış ya da bağlantı hatalı olabilir.",
+    "action": "Keşfet'e dön"
+  }
+}

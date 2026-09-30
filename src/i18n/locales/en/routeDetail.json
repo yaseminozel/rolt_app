@@ -1,0 +1,37 @@
+{
+  "metrics": {
+    "distance": "Distance",
+    "duration": "Duration",
+    "averageSpeed": "Avg. speed",
+    "maxSpeed": "Max. speed",
+    "elevationGain": "Elevation gain",
+    "elevationLoss": "Descent"
+  },
+  "moreDetails": {
+    "show": "Show more details",
+    "hide": "Hide details"
+  },
+  "sections": {
+    "notes": "Notes",
+    "photos": "Ride photos",
+    "facts": "Ride details"
+  },
+  "facts": {
+    "difficulty": "Difficulty",
+    "surface": "Road type"
+  },
+  "startRide": "Start riding this route",
+  "morePhotos": "+{{count}}",
+  "a11y": {
+    "authorProfile": "{{name}}, open profile",
+    "photo": "Ride photo {{index}} of {{total}}",
+    "morePhotos_one": "{{count}} more photo",
+    "morePhotos_other": "{{count}} more photos",
+    "loading": "Loading route"
+  },
+  "notFound": {
+    "title": "Route not found",
+    "description": "This route may have been removed, or the link is broken.",
+    "action": "Back to Discover"
+  }
+}

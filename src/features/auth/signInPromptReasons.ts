@@ -6,7 +6,15 @@ import { firstParam } from './credentials';
  * sheet; unknown or missing reasons fall back to `auth:signInPrompt.generic`.
  * Add a reason here, then its copy (tr + en) and icon.
  */
-export const SIGN_IN_PROMPT_REASONS = ['saveRoute'] as const;
+export const SIGN_IN_PROMPT_REASONS = [
+  'saveRoute',
+  'followRider',
+  'likeRide',
+  'commentRide',
+  'saveRide',
+  'reportContent',
+  'blockRider',
+] as const;
 
 export type SignInPromptReason = (typeof SIGN_IN_PROMPT_REASONS)[number];
 

@@ -1,0 +1,90 @@
+{
+  "home": {
+    "locationLabel": "Konumun:",
+    "regionLabel": "Seçili bölge:",
+    "locationValue": "{{city}}, Türkiye",
+    "defaultRegionValue": "{{city}} (varsayılan)",
+    "changeLocationA11y": "Bölgeyi değiştir",
+    "notificationsA11y": "Bildirimler",
+    "categoriesA11y": "Rota kategorileri",
+    "areaRouteCount_zero": "Bu bölgede henüz rota yok",
+    "areaRouteCount_one": "Bu bölgede {{count}} rota var",
+    "areaRouteCount_other": "Bu bölgede {{count}} rota var",
+    "exploreMapA11y": "Haritada keşfet",
+    "goToMyLocation": "Konumuma git",
+    "recommendedTitle": "Senin için önerilenler",
+    "seeAll": "Tümünü gör",
+    "recommendedEmpty": "Bu kategoride şimdilik önerimiz yok.",
+    "loadError": "Rotalar yüklenemedi.",
+    "retry": "Tekrar dene"
+  },
+  "permissionBanner": {
+    "title": "Konum izni kapalı",
+    "description": "Yakınındaki rotalar yerine {{city}} bölgesini gösteriyoruz.",
+    "action": "Aç",
+    "actionA11y": "Konum iznini aç"
+  },
+  "search": {
+    "placeholder": "Rota ara",
+    "cancel": "Vazgeç",
+    "clear": "Aramayı temizle",
+    "recentTitle": "Son aramalar",
+    "clearRecent": "Temizle",
+    "removeRecentA11y": "{{query}} aramasını kaldır",
+    "routesSection": "ROTALAR",
+    "placesSection": "YERLER",
+    "fillSuggestionA11y": "{{name}} adını arama alanına yaz",
+    "routeMeta": "{{distance}} · {{tag}}",
+    "placeMeta": "{{district}}, {{province}}",
+    "placeRouteCount_one": "{{count}} rota",
+    "placeRouteCount_other": "{{count}} rota",
+    "seeAllResults": "“{{query}}” için tüm sonuçları gör",
+    "resultCount_one": "{{count}} sonuç bulundu",
+    "resultCount_other": "{{count}} sonuç bulundu",
+    "filter": "Filtrele",
+    "filterActiveA11y_one": "Filtrele, {{count}} filtre açık",
+    "filterActiveA11y_other": "Filtrele, {{count}} filtre açık",
+    "sortA11y": "Sırala: {{sort}}",
+    "loading": "Aranıyor",
+    "error": "Arama yapılamadı.",
+    "emptyTitle": "Aradığınız rota bulunamadı",
+    "emptyDescription": "Bu aramaya uygun bir rota bulamadık. Yeni bir rota önererek bize yardımcı olabilirsin.",
+    "suggestRoute": "Rota öner",
+    "emptyFilteredDescription": "Seçtiğin filtrelere uygun rota yok. Filtreleri değiştirip tekrar deneyebilirsin.",
+    "clearFilters": "Filtreleri temizle"
+  },
+  "filterSheet": {
+    "title": "Filtrele",
+    "distance": "Mesafe",
+    "distanceOptions": {
+      "under50": "< 50 km",
+      "from50to100": "50–100",
+      "from100to200": "100–200",
+      "over200": "200+ km"
+    },
+    "duration": "Süre",
+    "durationOptions": {
+      "under1h": "< 1 sa",
+      "from1to3h": "1–3 sa",
+      "over3h": "3+ sa"
+    },
+    "roadType": "Yol tipi",
+    "difficulty": "Zorluk",
+    "loopOnly": "Sadece döngü rotalar",
+    "loopOnlyDescription": "Başladığın noktaya geri döner",
+    "clear": "Temizle",
+    "show_zero": "Uygun rota yok",
+    "show_one": "{{count}} rotayı göster",
+    "show_other": "{{count}} rotayı göster"
+  },
+  "recommended": {
+    "title": "Önerilen Rotalar",
+    "searchPlaceholder": "Rotalarda ara",
+    "noMatches": "Aramanla eşleşen rota yok."
+  },
+  "location": {
+    "title": "Bölge seç",
+    "searchPlaceholder": "Şehir ara",
+    "noResults": "Aramanla eşleşen şehir yok."
+  }
+}

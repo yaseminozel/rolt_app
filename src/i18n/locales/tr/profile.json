@@ -1,0 +1,99 @@
+{
+  "handle": "@{{handle}}",
+  "bikeWithYear": "{{bike}} · {{year}}",
+  "stats": {
+    "followers_one": "Takipçi",
+    "followers_other": "Takipçi",
+    "following_one": "Takip edilen",
+    "following_other": "Takip edilen"
+  },
+  "match": {
+    "score": "%{{value}} uyum",
+    "sharedRoutes_one": "{{count}} ortak rota",
+    "sharedRoutes_other": "{{count}} ortak rota",
+    "sharedPreference": {
+      "curvyRoads": "İkiniz de virajlı yolları seviyorsunuz",
+      "coast": "İkiniz de sahil yollarını seviyorsunuz",
+      "mountainRoads": "İkiniz de dağ yollarını seviyorsunuz",
+      "city": "İkiniz de şehir içi sürüşleri seviyorsunuz",
+      "longTour": "İkiniz de uzun turları seviyorsunuz",
+      "offRoad": "İkiniz de off-road sürüşleri seviyorsunuz",
+      "weekendGetaway": "İkiniz de hafta sonu kaçamaklarını seviyorsunuz",
+      "nightRiding": "İkiniz de gece sürüşlerini seviyorsunuz"
+    }
+  },
+  "actions": {
+    "follow": "Takip et",
+    "following": "Takip ediliyor",
+    "rideTogether": "Birlikte sür",
+    "share": "Profili paylaş",
+    "more": "Diğer seçenekler"
+  },
+  "tabs": {
+    "label": "Profil bölümleri",
+    "rides": "Sürüşler",
+    "routes": "Rotalar",
+    "garage": "Garaj"
+  },
+  "menu": {
+    "report": "Şikâyet et",
+    "block": "Engelle",
+    "cancel": "Vazgeç"
+  },
+  "block": {
+    "title": "{{name}} engellensin mi?",
+    "message": "Seni takip edemez, sürüşlerini ve rotalarını göremez. Engeli istediğin zaman Ayarlar > Engellenenler'den kaldırabilirsin.",
+    "confirm": "Engelle",
+    "done": "{{name}} engellendi"
+  },
+  "report": {
+    "done": "Şikâyetin alındı. İnceleyip gerekeni yapacağız."
+  },
+  "share": {
+    "message": "{{name}} (@{{handle}}) ROLT'ta. Sürüşlerine göz at!",
+    "rideMessage": "{{title}} · {{distance}} · {{duration}} — ROLT"
+  },
+  "activity": {
+    "more": "Sürüş seçenekleri",
+    "map": "Sürüş haritası",
+    "photo": "Sürüş fotoğrafı {{index}}",
+    "like": "Beğen",
+    "comment": "Yorum yap",
+    "save": "Kaydet",
+    "share": "Paylaş",
+    "saved": "Sürüş kaydedildi",
+    "removed": "Sürüş kaydedilenlerden çıkarıldı",
+    "metrics": {
+      "distance": "Mesafe",
+      "duration": "Süre",
+      "averageSpeed": "Ort. Hız"
+    }
+  },
+  "garage": {
+    "mainBike": "Ana motor"
+  },
+  "empty": {
+    "rides": {
+      "title": "Henüz sürüş yok",
+      "description": "Paylaşılan sürüşler burada görünecek."
+    },
+    "routes": {
+      "title": "Henüz rota yok",
+      "description": "Yayımlanan rotalar burada görünecek."
+    },
+    "garage": {
+      "title": "Garaj boş",
+      "description": "Eklenen motorlar burada görünecek."
+    }
+  },
+  "unavailable": {
+    "title": "Profil görüntülenemiyor",
+    "description": "Bu sürücünün profili kaldırılmış ya da artık görünmüyor.",
+    "back": "Geri dön"
+  },
+  "error": {
+    "title": "Profil yüklenemedi",
+    "description": "Bağlantını kontrol edip tekrar dene.",
+    "retry": "Tekrar dene"
+  }
+}

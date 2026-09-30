@@ -1,0 +1,23 @@
+import type { Place } from '../types';
+
+/**
+ * MOCK DATA until the Supabase/PostGIS place index exists. The first two entries are the
+ * "YERLER" suggestions of 01.1 "Yazarken öneriler" (aZnjb); the rest are places the route
+ * fixtures pass through, so other queries get plausible suggestions too.
+ */
+export const PLACE_FIXTURES: readonly Place[] = [
+  { id: 'adrasan', name: 'Adrasan', district: 'Kumluca', province: 'Antalya', routeCount: 12, centre: [30.47, 36.305] },
+  { id: 'adrasan-bay', name: 'Adrasan Koyu', district: 'Kumluca', province: 'Antalya', routeCount: 4, centre: [30.49, 36.3] },
+  { id: 'cirali', name: 'Çıralı', district: 'Kemer', province: 'Antalya', routeCount: 6, centre: [30.477, 36.41] },
+  { id: 'olympos', name: 'Olympos', district: 'Kumluca', province: 'Antalya', routeCount: 5, centre: [30.473, 36.398] },
+  { id: 'kemer', name: 'Kemer', district: 'Kemer', province: 'Antalya', routeCount: 9, centre: [30.56, 36.598] },
+  { id: 'tekirova', name: 'Tekirova', district: 'Kemer', province: 'Antalya', routeCount: 3, centre: [30.525, 36.505] },
+  { id: 'geyikbayiri', name: 'Geyikbayırı', district: 'Konyaaltı', province: 'Antalya', routeCount: 7, centre: [30.46, 36.878] },
+  { id: 'korkuteli', name: 'Korkuteli', district: 'Korkuteli', province: 'Antalya', routeCount: 4, centre: [30.196, 37.066] },
+  { id: 'saklikent', name: 'Saklıkent', district: 'Korkuteli', province: 'Antalya', routeCount: 3, centre: [30.332, 36.866] },
+  { id: 'kas', name: 'Kaş', district: 'Kaş', province: 'Antalya', routeCount: 8, centre: [29.637, 36.201] },
+  { id: 'kalkan', name: 'Kalkan', district: 'Kaş', province: 'Antalya', routeCount: 5, centre: [29.414, 36.265] },
+  { id: 'manavgat', name: 'Manavgat', district: 'Manavgat', province: 'Antalya', routeCount: 6, centre: [31.443, 36.787] },
+  { id: 'side', name: 'Side', district: 'Manavgat', province: 'Antalya', routeCount: 4, centre: [31.389, 36.767] },
+  { id: 'gazipasa', name: 'Gazipaşa', district: 'Gazipaşa', province: 'Antalya', routeCount: 3, centre: [32.316, 36.269] },
+];

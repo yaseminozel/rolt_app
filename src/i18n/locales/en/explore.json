@@ -1,0 +1,24 @@
+{
+  "title": "Explore on map",
+  "routesInArea_one": "{{count}} route in this area",
+  "routesInArea_other": "{{count}} routes in this area",
+  "empty": {
+    "title": "No routes in this area",
+    "description": "Move the map or pick another filter."
+  },
+  "map": {
+    "locateMe": "Go to my location",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "satellite": "Satellite view",
+    "routeMarker": "{{number}}. {{name}}",
+    "locationUnavailable": "Couldn't get your location. You can allow location access in Settings."
+  },
+  "preview": {
+    "authorRating": "{{author}} · {{rating}} ★ ({{count}})",
+    "away": "{{distance}} away",
+    "viewDetails": "View details",
+    "startRide": "Start riding",
+    "a11yRating": "{{author}}, rated {{rating}}, {{count}} ratings"
+  }
+}

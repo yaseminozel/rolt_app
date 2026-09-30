@@ -17,3 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 `src/features/location/data/turkishCities.json` is derived from
 [mevlutcelik/turkey-cities-data](https://github.com/mevlutcelik/turkey-cities-data) (MIT) and cross-checked against
 [muratgozel/turkey-neighbourhoods](https://github.com/muratgozel/turkey-neighbourhoods) (MIT). See those repositories for the full license texts and copyright holders.
+
+## Unsplash photo — Unsplash License
+
+`assets/images/avatars/deniz-kaya.jpg` is the Unsplash photo the design (`gKG8D`) links to, resized. Used under the [Unsplash License](https://unsplash.com/license) (free to use, no attribution required; can't be sold unaltered or used to build a competing photo service). Replace with a real user photo once profiles come from the backend.
