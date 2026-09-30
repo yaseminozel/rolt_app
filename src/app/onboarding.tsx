@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { colors, layout, spacing, typography } from '@/theme';
 
+/** Original photo from the design (1015 × 1421); `cover` keeps its aspect ratio (the frame's "stretch" fill distorts it). */
 const heroImage = require('../../assets/images/onboarding-hero.jpg');
 
 /** "Motion / Splash Blue" (kSZP4): brand-blue layer that fades out to continue the native splash. */

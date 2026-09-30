@@ -182,6 +182,7 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Yol tercihi ikonları | Iconoir'da dağ/çadır yok; seçili çipler ikon göstermiyor | Dağ yolları ve Off-road ikonları tasarımdaki çizimden SVG; Virajlı `PathArrow`, Sahil `SeaAndSun`, Uzun tur `RideTypeIcon longRide`, Hafta sonu `Calendar`, Şehir içi `City`, Gece `HalfMoon` |
 | "e-Posta" etiketi | Etiket "e-Posta", buton "E-posta ile devam et" | "E-posta" (TDK yazımı, butonla tutarlı) |
 | Auth alt ekran başlığı | Tasarımda geri butonu yok, e-posta alanı salt okunur | Şeffaf native header, yalnız geri butonu; akış sonu ekranlarında (yeni şifre, güncellendi) geri yok |
+| Onboarding fotoğrafı (`sLkVv`) | Tasarımda görsel "stretch" ile oranı bozularak frame'e çekilmiş (motorlar yatayda ~%35 sıkışık) | Orijinal görsel (`images/image-import-3.png`, 1015×1421) `cover` ile; oran korunur, her ekran boyutunda ortadan kırpılır. Tasarımdan görsel alırken frame export'u değil orijinal dosyayı kullan |
 | Auth wordmark konumu | Ekranlara göre farklı | Status bar'ın 52 pt altı ya da native header'ın 8 pt altı; tüm auth adımlarında sabit |
 | Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
