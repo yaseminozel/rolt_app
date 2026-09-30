@@ -178,7 +178,7 @@ src/
 ```
 
 - Import alias'ı: `@/` → `src/`.
-- Fontlar `useFonts` ile ağırlık başına ayrı family olarak yüklenir (`fontFamily.medium` vb.); `fontWeight` kullanma. Metrikler `typography.metric*` (JetBrains Mono).
+- Fontlar `useFonts` ile ağırlık başına ayrı family olarak yüklenir (`fontFamily.medium` vb.); `fontWeight` kullanma. Kayıt/profil ekranlarındaki sürüş metrikleri `typography.metric*` (JetBrains Mono); rota kartlarındaki mesafe/süre tasarım gereği Inter.
 - Renk, boşluk, radius, gölge değerlerini yalnızca `@/theme` token'larından al; ekranlarda ham hex yazma. Tasarımda olup token'ı olmayan bir değer gerekiyorsa önce `src/theme`'e ekle.
 - İkonlar: `iconoir-react-native` (tasarım Iconoir kullanıyor). Tab bar ikonları istisna: NativeTabs sistem sembolü ister → Iconoir map/play/user yerine SF `map`/`play`/`person`, Material `map`/`play_arrow`/`person`.
 - Doğrulama: `npm run typecheck`, `npm run lint`, `npx expo-doctor`.
