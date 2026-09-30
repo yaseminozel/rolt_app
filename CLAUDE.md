@@ -182,6 +182,22 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Yol tercihi ikonları | Iconoir'da dağ/çadır yok; seçili çipler ikon göstermiyor | Dağ yolları ve Off-road ikonları tasarımdaki çizimden SVG; Virajlı `PathArrow`, Sahil `SeaAndSun`, Uzun tur `RideTypeIcon longRide`, Hafta sonu `Calendar`, Şehir içi `City`, Gece `HalfMoon` |
 | "e-Posta" etiketi | Etiket "e-Posta", buton "E-posta ile devam et" | "E-posta" (TDK yazımı, butonla tutarlı) |
 | Auth alt ekran başlığı | Tasarımda geri butonu yok, e-posta alanı salt okunur | Şeffaf native header, yalnız geri butonu; akış sonu ekranlarında (yeni şifre, güncellendi) geri yok |
+| Auth wordmark konumu | Ekranlara göre farklı | Status bar'ın 52 pt altı ya da native header'ın 8 pt altı; tüm auth adımlarında sabit |
+| Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
+| Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
+| Yasal linkler | Metinden ayırt edilmiyor | `textSecondary` + altı çizili (link olduğu anlaşılsın) |
+| E-posta maskeleme | "yas••••@gmail.com" | İlk 3 karakter + sabit `••••` (uzunluk sızmaz); 3 karakter veya daha kısa yerel kısımda yalnız ilk harf |
+| Tekrar gönder (sayaç) | Pasif hâli #6B6E73 | Standart pasif buton rengi |
+| Süresi dolmuş sıfırlama linki | Geri butonu olmayan ekranda çıkış yok | "Yeni bağlantı iste" metin butonu |
+| Kayıt içerik boşluğu | Auth 16 pt, kayıt 32 pt | Kayıt içeriği 32 pt, alt CTA çubuğu 16 pt (tasarım) |
+| Kayıt "Atla" | Tasarımda yalnız marka ve sürüş tarzı adımlarında | Profil ve model adımında yok; markada atla → sürüş tarzına geçer (model adımı marka ister) |
+| Model yılı hapları | Tasarım 2024–2021 | İçinde bulunulan yıl ve önceki 3 yıl + "Diğer" (1950…gelecek yıl) |
+| Tempo / Deneyim varsayılanı | Segmented control boş gösteremez | Ortadaki seçenek seçili gelir (Dengeli, 3–5 yıl); görünür olduğu için örtük onay sayılır |
+| Listede olmayan marka/model | Tasarımı yok | Kart seçilince yerinde "Marka adı" / "Model adı" alanı açılır; logosuz markada baş harf gösterilir |
+| Model satırı radio'su | 22 pt mavi halka | Standart `RadioButton` (tek radio sistemi); seçili satırın mavi zemini korunur |
+| Tamamlandı kartı etiketleri | Tek seferlik hap etiketler | Küçük nötr `Badge`, kısa etiketler, satıra sarılır; eksik veride ilgili bölüm gizlenir |
+| Şehir seçimi | Tasarımı yok | "Dil" sheet deseninde form sheet: `SheetHeader` + arama (Türkçe harf duyarsız) + işaretli satırlar |
+| Zorunlu kayıt alanları | Tasarımda belirtilmemiş | Profil: ad + müsait kullanıcı adı; fotoğraf ve şehir opsiyonel. Marka ve model zorunlu (atlanabilir adımlar hariç); yıl opsiyonel |
 
 ## Marka ve uygulama ikonu
 
