@@ -7,7 +7,7 @@ Temel döngü: **rota bul → sürüşü kaydet → isterse paylaş.** Her ekran
 
 - Platform: iOS + Android, **Expo SDK 58 (beta, `next`)** / React Native 0.88 RC / React 19.3 / TypeScript (bu repo). SDK 58 stable çıkınca `npx expo install expo@^58 --fix` ile güncelle.
 - **Node 24 zorunlu** (SDK 58: Node 22.13+ veya 24.3+; `.nvmrc` = 24). Komutlardan önce `nvm use` çalıştır; sistem varsayılanı Node 20 ve desteklenmiyor. Tasarım panolarındaki "Flutter" ifadesi eski bağlamdır; uygulama Expo ile yazılır.
-- Arayüz dili: **Türkçe** (kullanıcıya görünen tüm metinler Türkçe). Birimler: km, km/sa, m; ondalık ayırıcı virgül (`12,8 km`).
+- Arayüz dili: **Türkçe öncelikli, İngilizce destekli** (i18n, bkz. "Çoklu dil"). Birimler: km, km/sa, m; sayılar dile göre biçimlenir (TR `12,8 km`, EN `12.8 km`).
 - Yalnızca portre, mobil öncelikli.
 - UX referansları: **Strava** ana referans; **REVER** (keşif + kayıt + paylaşım) ve **Calimoto** (motosiklete özgü keşif/planlama) rakip araştırmasından türetilen kararlar.
 - Ürün belgeleri (repoda yok, tasarımda atıf var): `ROLT_IMPLEMENTATION_BRIEF.md`, `ROLT_MVP_SCOPE.md`.
@@ -207,9 +207,20 @@ src/
 - İkonlar: `iconoir-react-native` (tasarım Iconoir kullanıyor). Tab bar ikonları istisna: NativeTabs sistem sembolü ister → Iconoir map/play/user yerine SF `map`/`play`/`person`, Material `map`/`play_arrow`/`person`.
 - Doğrulama: `npm run typecheck`, `npm run lint`, `npx expo-doctor`.
 
+## Çoklu dil (i18n)
+
+- **Kullanıcıya görünen hiçbir metin kodda sabit yazılmaz** (etiket, placeholder, erişilebilirlik etiketi, hata, uyarı). Hepsi `src/i18n` üzerinden: i18next + react-i18next + expo-localization.
+- Diller: `tr` (kaynak, varsayılan, fallback) ve `en`. Her anahtar iki dilde de bulunmalı; `resources.ts` tipi eksik İngilizce anahtarda derleme hatası verir. Anahtarlar tiplidir (`src/i18n/i18next.d.ts`), yanlış anahtar derlenmez.
+- Namespace'ler: `common` (varsayılan: tab, ortak aksiyon, a11y, yasal), `auth`, `registration`, `rides`, `garage`. Dosyalar: `src/i18n/locales/<dil>/<namespace>.json`.
+- Kullanım: `const { t } = useTranslation('auth'); t('signIn.title')`. Bileşenler çağıranın metnini prop olarak alır; yalnızca kendi iç metinleri (ör. "Kapat" erişilebilirlik etiketi) için `useTranslation()` kullanır.
+- Enum etiketleri (sürüş tipi, yol tercihi, kategori) koddaki İngilizce id'den anahtar üretir: `rides:types.city`, `registration:roadPreferences.coast`, `garage:categories.naked`.
+- Sayı/birim biçimleme: `src/i18n/format.ts` (`formatNumber`), aktif dile göre.
+- Dil seçimi: `src/i18n/language.ts` → `DEFAULT_LANGUAGE_PREFERENCE` şimdilik `'tr'`. Cihaz diline geçmek için `'system'` yap (Türkçe cihaz → `tr`, diğer her dil → `en`). "03.10 Ayarlar / Dil" ekranı kullanıcı tercihini yazacak.
+- Native metinler (izin açıklamaları, uygulama adı): `src/i18n/native/{tr,en}.json` → `app.json` `locales`. Yeni izin eklenirse iki dosyaya da ekle.
+
 ## Kod yazarken
 
-- **Kod tamamen İngilizce:** değişken, fonksiyon, bileşen, dosya, klasör, tip adları ve yorumlar. Türkçe tanımlayıcı yok (`rideType`, `surusTipi` değil). Kullanıcıya görünen metinler tasarımdaki Türkçe metinlerle birebir.
+- **Kod tamamen İngilizce:** değişken, fonksiyon, bileşen, dosya, klasör, tip adları ve yorumlar. Türkçe tanımlayıcı yok (`rideType`, `surusTipi` değil). Kullanıcıya görünen metinler i18n anahtarlarıyla; Türkçe karşılıkları tasarımdaki metinlerle birebir, İngilizceleri doğal çeviri.
 - **Tasarımın dışına çıkma:** yalnızca Pencil'de olan ekran, bileşen, varyant, durum, ölçü, renk ve metni uygula. Eksik veya belirsiz bir şey varsa uydurma, sor.
 - Ekran/bileşen yazmadan önce ilgili Pencil frame'ini MCP ile oku ve ekran görüntüsünü al; ölçüleri tahmin etme.
 - Bileşenleri Core Components'teki isim ve varyantlarla eşleştir; aynı kavram için ikinci bir bileşen yazma.
