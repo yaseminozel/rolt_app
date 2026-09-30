@@ -70,6 +70,8 @@ export const colors = {
   surfaceMuted: palette.gray100,
   surfaceInverse: palette.gray900,
   surfaceInversePressed: palette.gray800,
+  /** Contained Button pressed fill (RC60W). */
+  surfaceInverseActive: palette.black,
   /** Disabled Filter Chip fill (iCyEV). */
   surfaceDisabled: palette.gray200,
 
