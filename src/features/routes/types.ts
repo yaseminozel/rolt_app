@@ -4,11 +4,11 @@ import type { ImageSourcePropType } from 'react-native';
 export type LngLat = [number, number];
 
 /**
- * Route character used by the Discover chips and badges ("Sahil", "Virajlı", "Manzara",
- * "Şehir İçi", "Doğa"); labels via `routes:tags.*`. Separate from `RideType`, which
- * classifies a recorded ride.
+ * Route character used by the Discover chips, badges and the filter sheet's "Yol tipi"
+ * ("Sahil", "Virajlı", "Manzara", "Şehir İçi", "Doğa", "Off-road"); labels via `routes:tags.*`.
+ * Separate from `RideType`, which classifies a recorded ride.
  */
-export type RouteTag = 'coast' | 'curvy' | 'scenic' | 'city' | 'nature';
+export type RouteTag = 'coast' | 'curvy' | 'scenic' | 'city' | 'nature' | 'offRoad';
 
 /** Discover filter chips: every tag, plus "Tümü" and the distance filter "Yakın Rotalar". */
 export type RouteFilter = 'all' | 'nearby' | RouteTag;
@@ -20,6 +20,8 @@ export type RouteDifficulty = 'easy' | 'moderate' | 'hard';
 export type RoadSurface = 'asphalt' | 'mixed' | 'gravel';
 
 export type RouteAuthor = {
+  /** Rider id for the rider profile (01.8, `/rider/[id]`). */
+  id: string;
   name: string;
   avatar?: ImageSourcePropType;
 };
@@ -54,6 +56,11 @@ export type Route = {
   coordinates: LngLat[];
   /** Relative popularity used by the "En popüler" / "Önerilen" sorts. */
   popularity: number;
+  /** Ends where it starts ("Sadece döngü rotalar" filter). */
+  isLoop: boolean;
+  /** Average rider rating 0–5 and number of ratings, e.g. "4,8 ★ (126)". */
+  rating: number;
+  ratingCount: number;
 };
 
 /** South-west and north-east corners. */

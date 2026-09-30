@@ -4,7 +4,8 @@
     "curvy": "Virajlı",
     "scenic": "Manzara",
     "city": "Şehir İçi",
-    "nature": "Doğa"
+    "nature": "Doğa",
+    "offRoad": "Off-road"
   },
   "filters": {
     "all": "Tümü",
@@ -21,7 +22,7 @@
   "difficulty": {
     "easy": "Kolay",
     "moderate": "Orta",
-    "hard": "Zor"
+    "hard": "Zorlu"
   },
   "surface": {
     "asphalt": "Asfalt",

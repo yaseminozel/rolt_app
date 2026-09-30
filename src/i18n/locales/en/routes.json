@@ -4,7 +4,8 @@
     "curvy": "Curvy",
     "scenic": "Scenic",
     "city": "City",
-    "nature": "Nature"
+    "nature": "Nature",
+    "offRoad": "Off-road"
   },
   "filters": {
     "all": "All",
@@ -21,7 +22,7 @@
   "difficulty": {
     "easy": "Easy",
     "moderate": "Moderate",
-    "hard": "Hard"
+    "hard": "Challenging"
   },
   "surface": {
     "asphalt": "Asphalt",
