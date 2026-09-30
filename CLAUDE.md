@@ -5,7 +5,8 @@
 ROLT, motosiklet sürücüleri için bir **rota keşfetme, sürüş kaydetme ve paylaşma** mobil uygulamasıdır.
 Temel döngü: **rota bul → sürüşü kaydet → isterse paylaş.** Her ekranda kullanıcı bir sonraki adımı hemen anlayabilmeli; daha az karar, daha hızlı kullanım.
 
-- Platform: iOS + Android, Expo SDK 57 / React Native 0.86 / TypeScript (bu repo). Tasarım panolarındaki "Flutter" ifadesi eski bağlamdır; uygulama Expo ile yazılır.
+- Platform: iOS + Android, **Expo SDK 58 (beta, `next`)** / React Native 0.88 RC / React 19.3 / TypeScript (bu repo). SDK 58 stable çıkınca `npx expo install expo@^58 --fix` ile güncelle.
+- **Node 24 zorunlu** (SDK 58: Node 22.13+ veya 24.3+; `.nvmrc` = 24). Komutlardan önce `nvm use` çalıştır; sistem varsayılanı Node 20 ve desteklenmiyor. Tasarım panolarındaki "Flutter" ifadesi eski bağlamdır; uygulama Expo ile yazılır.
 - Arayüz dili: **Türkçe** (kullanıcıya görünen tüm metinler Türkçe). Birimler: km, km/sa, m; ondalık ayırıcı virgül (`12,8 km`).
 - Yalnızca portre, mobil öncelikli.
 - UX referansları: **Strava** ana referans; **REVER** (keşif + kayıt + paylaşım) ve **Calimoto** (motosiklete özgü keşif/planlama) rakip araştırmasından türetilen kararlar.
@@ -138,7 +139,7 @@ Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light
 Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26'da Liquid Glass olarak çizer. Bunları özel JS view, blur veya yarı saydam `View` ile **yeniden çizme**. Pencil'deki görünüm yalnızca içerik (etiket, ikon, sıra, eylemler) referansıdır; stil işletim sisteminden gelir.
 
 - **Tab bar** — Pencil'de `Navigation Bar / Floating` (ör. node `Hk8Qh`; Keşfet / Kaydet / Profil) → Expo Router **NativeTabs**.
-  - SDK 57 import: `import { NativeTabs } from 'expo-router/unstable-native-tabs'` (SDK 58+ ile `expo-router/native-tabs` olur).
+  - SDK 58 import: `import { NativeTabs } from 'expo-router/native-tabs'` (eski `unstable-native-tabs` yolu SDK 55–57 içindi).
   - Yapı: `<NativeTabs.Trigger name="…">` + `NativeTabs.Trigger.Icon` (`sf` iOS SF Symbol, `md` Android Material Symbol) + `NativeTabs.Trigger.Label`.
   - iOS 26'da `backgroundColor` / `blurEffect` / `shadowColor` etkisiz; renkler için `tintColor` / `labelStyle` + `DynamicColorIOS`. Beyaz flaş olmaması için root layout `ThemeProvider` ile sarılır.
   - İsteğe bağlı: `minimizeBehavior="onScrollDown"`, `NativeTabs.BottomAccessory` (ör. devam eden sürüş göstergesi için aday).
@@ -146,7 +147,7 @@ Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26
   - Android'de aynı API Material bottom navigation üretir (maks. 5 sekme).
 - **Ekran başlığı** — Pencil'de `Screen Header` / `App Bar` (ör. node `H0lpWo`, "01.4 Önerilen Rotalar — Tümü": başlık + kapat + yapışkan arama) → her sekmenin içinde **native `Stack`** header'ı.
   - Başlık/eylemler `Stack.Screen` options ile; arama alanı `Stack.SearchBar` (`placement="automatic"`) ile. Header'ı elle çizme.
-  - Doküman: https://docs.expo.dev/router/advanced/native-tabs/ — kod yazmadan önce SDK 57 sürüm dokümanını tekrar kontrol et.
+  - Doküman: https://docs.expo.dev/router/advanced/native-tabs/ — kod yazmadan önce SDK 58 sürüm dokümanını tekrar kontrol et (SDK 58'de expo-router navigasyon çekirdeği yenilendi; migration guide'a bak).
 
 ## Marka ve uygulama ikonu
 
