@@ -4,6 +4,7 @@ import {
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
+  Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 
@@ -13,6 +14,7 @@ export const appFonts = {
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
+  Inter_800ExtraBold,
   JetBrainsMono_500Medium,
   BakbakOne_400Regular,
 };

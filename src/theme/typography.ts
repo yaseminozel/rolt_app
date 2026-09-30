@@ -9,6 +9,7 @@ export const fontFamily = {
   medium: 'Inter_500Medium',
   semibold: 'Inter_600SemiBold',
   bold: 'Inter_700Bold',
+  extraBold: 'Inter_800ExtraBold',
   monoMedium: 'JetBrainsMono_500Medium',
   brand: 'BakbakOne_400Regular',
 } as const;
