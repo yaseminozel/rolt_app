@@ -183,13 +183,20 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | "e-Posta" etiketi | Etiket "e-Posta", buton "E-posta ile devam et" | "E-posta" (TDK yazımı, butonla tutarlı) |
 | Auth alt ekran başlığı | Tasarımda geri butonu yok, e-posta alanı salt okunur | Şeffaf native header, yalnız geri butonu; akış sonu ekranlarında (yeni şifre, güncellendi) geri yok |
 | Onboarding fotoğrafı (`sLkVv`) | Tasarımda görsel "stretch" ile oranı bozularak frame'e çekilmiş (motorlar yatayda ~%35 sıkışık) | Orijinal görsel (`images/image-import-3.png`, 1015×1421) `cover` ile; oran korunur, her ekran boyutunda ortadan kırpılır. Tasarımdan görsel alırken frame export'u değil orijinal dosyayı kullan |
+| Kilit geri sayımı | Tasarımda Inter 700 22 | JetBrains Mono (`metricLarge`); sayaç rakamları titremesin. Süre dolunca kart yeşile döner, "Tekrar dene" ana eylem olur |
+| Deneme hakkı | Tasarım "2 deneme hakkın kaldı" | 3 deneme; 3. hatada doğrudan kilit ekranı (mesaj yalnız 2 ve 1 için görünür); metin i18n çoğul formuyla |
+| Bağlı hesap ekranı | Brief "birincil buton" diyordu | Tasarım (`EV75c`): resmi logolu outlined buton; Google ve Apple aynı yerleşim |
+| Turuncu uyarı notu | Amber warning token'larından farklı tonlar | Ayrı `caution*` token'ları + yerel `CautionNote` |
+| Türkçe saat eki | "14:05’te" sabit | Saate göre çalışma zamanında hesaplanır (’te/’da…); İngilizce tarih `en-GB` biçimi |
+| Misafir giriş sheet'i | "Şimdi değil" 40 pt / 13 semibold gri | Standart metin `Button` (44 pt); başlık 20 semibold; sebep (`reason`) parametresiyle başlık/ikon değişir |
+| Lucide → Iconoir | Tasarımda lock, link-2, clock-alert | `Lock`, `Link`, `Clock`; açık kilit olmadığı için süre dolunca `CheckCircle` |
 | Auth wordmark konumu | Ekranlara göre farklı | Status bar'ın 52 pt altı ya da native header'ın 8 pt altı; tüm auth adımlarında sabit |
 | Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
 | Yasal linkler | Metinden ayırt edilmiyor | `textSecondary` + altı çizili (link olduğu anlaşılsın) |
 | E-posta maskeleme | "yas••••@gmail.com" | İlk 3 karakter + sabit `••••` (uzunluk sızmaz); 3 karakter veya daha kısa yerel kısımda yalnız ilk harf |
 | Tekrar gönder (sayaç) | Pasif hâli #6B6E73 | Standart pasif buton rengi |
-| Süresi dolmuş sıfırlama linki | Geri butonu olmayan ekranda çıkış yok | "Yeni bağlantı iste" metin butonu |
+| Süresi dolmuş / geçersiz sıfırlama linki | Tasarım artık `b1m1YP` ekranını veriyor | Her ikisi de `reset-link-expired` ekranına gider; geçersiz linkte e-posta bilinmediği için gönderim notu gizlenir ve "Yeni bağlantı gönder" şifremi unuttum ekranını açar |
 | Kayıt içerik boşluğu | Auth 16 pt, kayıt 32 pt | Kayıt içeriği 32 pt, alt CTA çubuğu 16 pt (tasarım) |
 | Kayıt "Atla" | Tasarımda yalnız marka ve sürüş tarzı adımlarında | Profil ve model adımında yok; markada atla → sürüş tarzına geçer (model adımı marka ister) |
 | Model yılı hapları | Tasarım 2024–2021 | İçinde bulunulan yıl ve önceki 3 yıl + "Diğer" (1950…gelecek yıl) |
