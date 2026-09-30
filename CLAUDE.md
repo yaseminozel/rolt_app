@@ -203,6 +203,25 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Kullanıcı adı önerileri | Tasarımda örnek 3 çip | `.rides`, `_<plaka kodu>`, `<motor modeli>` sırasıyla; kurallara uyan, müsait en fazla 3 öneri. Çip dokunma alanı 45 pt'ye genişletildi |
 | Kullanıcı adı hata ikonu | Yalnız "alınmış" durumunda çizilmiş | Tüm kullanıcı adı hatalarında 20 pt ikon (başarı ikonuyla aynı yer) |
 | Şehir sheet'i | Tam ekran açılıyordu | %60 yükseklikte açılır, tam ekrana çekilebilir; başlık ve arama sabit, liste sheet içinde kayar |
+| Keşfet ana sayfa bölümleri | "Senin için önerilenler" iki kez çizilmiş | Tek bölüm |
+| Aramadan çıkış | Tasarımda çıkış yolu yok | Arama kutusunun yanında "Vazgeç"; sorgu ve filtreler temizlenir, sıralama korunur |
+| Arama durumlarında kategori çipleri | 01.2'de gizli, 01.3'te görünür | Tüm arama durumlarında gizli; aramada filtre sheet'i kullanılır |
+| Bölge etiketi | "Konumun:" / "Seçili bölge:" | Cihaz konumu → "Konumun: X"; elle seçilen → "Seçili bölge: X"; bilinmiyorsa "Seçili bölge: Antalya (varsayılan)". Konum izni açılışta istenmez, yalnız durumu okunur |
+| Filtre sheet'i | Başlıkta "Sıfırla" ve altta "Temizle" aynı işi yapıyor | Yalnız alttaki "Temizle"; seçimler "N rotayı göster" ile uygulanır. Zorluk tekrar dokununca kalkan çip ("tercih yok" mümkün) |
+| "Manzara" / "Manzaralı", "Şehir içi" / "Şehir İçi" | Ekranlara göre farklı | Tek sözlük: `routes:tags.*` ("Manzara", "Şehir İçi") |
+| Sonuç yok görseli | Tasarımdaki fotoğraflardan biri Google logolu harita ekran görüntüsü | Kullanılamaz; rota fotoğrafıyla değiştirildi |
+| Rota detayı başlık/metrikler | "Geyikbayırı Sürüşü", 12,8 km, 18:42 (sürüş verisi) | Rotanın kendi verisi (ad, 1 ondalıklı mesafe, `formatDuration`) |
+| Rota detayı metrikleri | Standart 6, uzun içerik 3 + "göster" | Varsayılan kapalı, "Detay bilgileri göster/gizle" ile açılır |
+| Harita üzerindeki yuvarlak buton | "Konumuma git" adlı ama oynat ikonu çizilmiş | Konumuma git (`MapsArrow`); oynat ikonu CTA'ya ait |
+| Katman butonu | Katman seçici tasarlanmamış | Outdoors ↔ Uydu arasında geçiş |
+| Sürüş detayları satırları | Chevron var ama gidilecek yer yok | Salt okunur, chevron yok |
+| Sürüş görselleri | Galeri tasarlanmamış | 5 sabit kutu, fazlası "+N"; kutular dokunulamaz |
+| Harita rota renkleri | Tasarım yalnız sahil/virajlı/manzara renklerini çiziyor | Şehir, Doğa, Off-road için sistem içi tonlar; önizleme kartı etiketi çizgi rengiyle aynı |
+| "N km uzakta" | Neyin uzaklığı belirsiz | Cihaz konumundan (izin varsa), yoksa seçili şehrin merkezinden rotanın en yakın noktasına |
+| Sürücü profili (01.8) | Tasarımda alt menü görünüyor | Root stack ekranı, alt menüsüz (rota detayından gelindiğinde geri dönüş bozulmasın) |
+| Sürücü profili aksiyonları | Tasarımda 40 pt butonlar, gri dolgu | Standart 44 pt `Button`; "Takip ediliyor" hâli outlined + onay ikonu; "…" menüsü native action sheet, engelleme onayı native Alert |
+| Sürüş kartı sayaçları | Üçüncü sayı "paylaş" sanılabilir | Tasarımda kaydet sayısı (yer imi); paylaşımda sayı yok |
+| Uyum notu | Misafire de görünüyor olabilir | Yalnız giriş yapmış kullanıcıya (misafirin tercihi yok) |
 | Auth wordmark konumu | Ekranlara göre farklı | Status bar'ın 52 pt altı ya da native header'ın 8 pt altı; tüm auth adımlarında sabit |
 | Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
