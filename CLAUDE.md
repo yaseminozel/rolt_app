@@ -110,6 +110,21 @@ Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light
 **İkonlar:** Lucide.
 **Genel dil:** Nötr, açık zemin, siyah birincil butonlar, ince border'lar; renk yalnızca durum ve canlı sürüş vurgusunda. Harita ekranların merkezinde; kontroller bottom sheet'lerde.
 
+## Native chrome: iOS 26 Liquid Glass (kesin karar)
+
+Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26'da Liquid Glass olarak çizer. Bunları özel JS view, blur veya yarı saydam `View` ile **yeniden çizme**. Pencil'deki görünüm yalnızca içerik (etiket, ikon, sıra, eylemler) referansıdır; stil işletim sisteminden gelir.
+
+- **Tab bar** — Pencil'de `Navigation Bar / Floating` (ör. node `Hk8Qh`; Keşfet / Kaydet / Profil) → Expo Router **NativeTabs**.
+  - SDK 57 import: `import { NativeTabs } from 'expo-router/unstable-native-tabs'` (SDK 58+ ile `expo-router/native-tabs` olur).
+  - Yapı: `<NativeTabs.Trigger name="…">` + `NativeTabs.Trigger.Icon` (`sf` iOS SF Symbol, `md` Android Material Symbol) + `NativeTabs.Trigger.Label`.
+  - iOS 26'da `backgroundColor` / `blurEffect` / `shadowColor` etkisiz; renkler için `tintColor` / `labelStyle` + `DynamicColorIOS`. Beyaz flaş olmaması için root layout `ThemeProvider` ile sarılır.
+  - İsteğe bağlı: `minimizeBehavior="onScrollDown"`, `NativeTabs.BottomAccessory` (ör. devam eden sürüş göstergesi için aday).
+  - Sınırlar: tab bar yüksekliği özelleştirilemez/ölçülemez, sekmeler statik olmalı, NativeTabs iç içe olamaz. Scroll davranışı için ScrollView ekranın ilk doğrudan çocuğu olmalı.
+  - Android'de aynı API Material bottom navigation üretir (maks. 5 sekme).
+- **Ekran başlığı** — Pencil'de `Screen Header` / `App Bar` (ör. node `H0lpWo`, "01.4 Önerilen Rotalar — Tümü": başlık + kapat + yapışkan arama) → her sekmenin içinde **native `Stack`** header'ı.
+  - Başlık/eylemler `Stack.Screen` options ile; arama alanı `Stack.SearchBar` (`placement="automatic"`) ile. Header'ı elle çizme.
+  - Doküman: https://docs.expo.dev/router/advanced/native-tabs/ — kod yazmadan önce SDK 57 sürüm dokümanını tekrar kontrol et.
+
 ## Kod yazarken
 
 - Ekran/bileşen yazmadan önce ilgili Pencil frame'ini MCP ile oku ve ekran görüntüsünü al; ölçüleri tahmin etme.
