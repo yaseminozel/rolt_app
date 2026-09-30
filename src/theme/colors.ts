@@ -15,6 +15,8 @@ export const palette = {
   gray800: '#202328',
   gray900: '#101318',
   blue: '#1515FF',
+  // Not in the design: pressed brand CTA, derived from `blue` at ~85 % value (same hue).
+  blueDeep: '#1111D9',
   teal300: '#7BF1DB',
   teal100: '#B7FBEF',
   teal400: '#3BD3B8',
@@ -55,6 +57,10 @@ export const palette = {
   orange700: '#C2410C',
   cyan100: '#CFFAFE',
   cyan700: '#0E7490',
+  // Accent info note (LreVd "Sıradaki adım: konum izni")
+  teal50: '#D9F8EE',
+  teal700: '#0F766E',
+  teal800: '#0F5F59',
 } as const;
 
 export const colors = {
@@ -64,6 +70,8 @@ export const colors = {
   textInverse: palette.white,
   /** Unselected labels in a disabled Segmented Control (Q2D2c). */
   textDisabled: palette.gray300,
+  /** Dark-gray body/label text on selectable chips and neutral notes (Fv4ol, g4Zy4). */
+  textBody: palette.gray700,
 
   surface: palette.white,
   surfaceSubtle: palette.gray50,
@@ -82,6 +90,8 @@ export const colors = {
   borderSelected: palette.gray500,
 
   brand: palette.blue,
+  /** Pressed brand CTA; the design has no pressed state (derived, see palette.blueDeep). */
+  brandPressed: palette.blueDeep,
 
   accent: palette.teal400,
   accentSubtle: palette.teal100,
@@ -142,6 +152,11 @@ export const colors = {
   rideOffRoadText: palette.orange700,
   rideCoastSurface: palette.cyan100,
   rideCoastText: palette.cyan700,
+
+  // Info note (InfoNote, LreVd): accent tone.
+  noteAccentSurface: palette.teal50,
+  noteAccentText: palette.teal700,
+  noteAccentTitle: palette.teal800,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
   glass: 'rgba(255, 255, 255, 0.64)',

@@ -16,7 +16,8 @@
   },
   "a11y": {
     "showPassword": "Şifreyi göster",
-    "hidePassword": "Şifreyi gizle"
+    "hidePassword": "Şifreyi gizle",
+    "stepProgress": "Adım {{current}} / {{total}}"
   },
   "legal": {
     "terms": "Kullanım Koşulları",

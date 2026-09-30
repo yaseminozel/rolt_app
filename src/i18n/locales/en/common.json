@@ -16,7 +16,8 @@
   },
   "a11y": {
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "stepProgress": "Step {{current}} of {{total}}"
   },
   "legal": {
     "terms": "Terms of Use",

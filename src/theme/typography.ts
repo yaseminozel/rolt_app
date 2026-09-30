@@ -35,7 +35,11 @@ export const typography = {
   bodyMedium: variant(fontFamily.medium, 14),
   bodySemibold: variant(fontFamily.semibold, 14),
   callout: variant(fontFamily.regular, 13),
+  calloutMedium: variant(fontFamily.medium, 13),
+  calloutSemibold: variant(fontFamily.semibold, 13),
   caption: variant(fontFamily.regular, 12),
+  /** 12 pt at 1.4 line height, for multi-line notes and helper copy. */
+  captionRelaxed: variant(fontFamily.regular, 12, 17),
   captionMedium: variant(fontFamily.medium, 12),
   metricLarge: variant(fontFamily.monoMedium, 24),
   metric: variant(fontFamily.monoMedium, 15),
