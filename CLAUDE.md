@@ -47,10 +47,18 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/5d
 **MVP dışı:** Turn-by-turn navigasyon, gelişmiş/dairesel rota üretimi, grup sürüşü, sosyal feed.
 
 **Teknik kararlar (2026-09-30):**
-- **Harita:** Mapbox (`@rnmapbox/maps`, Maps SDK v11). Tüm haritalar `src/components/map/BaseMap.tsx` üzerinden; token `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` (`.env.local`, bkz. `.env.example`), stil `EXPO_PUBLIC_MAPBOX_STYLE_URL` (yoksa Mapbox Outdoors). Mapbox logo/attribution gizlenmez (lisans şartı). Expo Go'da çalışmaz → development build.
+- **Harita:** Mapbox (`@rnmapbox/maps`, Maps SDK v11). Tüm haritalar `src/components/map/BaseMap.tsx` üzerinden; token `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` (`.env`, git'e girmez; şablon `.env.example`), stil `EXPO_PUBLIC_MAPBOX_STYLE_URL` (yoksa Mapbox Outdoors). Mapbox logo/attribution gizlenmez (lisans şartı).
+  - **Expo Go'da Mapbox çalışmaz** → `BaseMap` Expo Go'da tasarımdaki harita görselini gösterir (`mapFallbacks` → `assets/images/maps/*-fallback.jpg`), development/production build'de gerçek haritayı açar.
+  - **`@rnmapbox/maps`'i yalnızca `src/components/map/NativeBaseMap.tsx` import eder** (lazy yüklenir). Ekranlar Mapbox katmanlarını `renderLayers={(Mapbox) => …}` ile verir; başka hiçbir dosyada statik import yok (yoksa Expo Go açılışta çöker).
+  - ScrollView içindeki küçük harita kartları (Keşfet ana sayfa) etkileşimli harita değil, statik görseldir; dokununca tam ekran haritaya gider.
 - **Rota hesaplama:** MVP'de Mapbox Directions (A→B, yola oturan çizgi); motosiklete özel tercihler (virajlı/manzaralı) için sonra Valhalla veya GraphHopper. Kaydedilen GPS izi Mapbox Map Matching ile temizlenebilir.
 - **Konum:** `expo-location` + `expo-task-manager`, arka planda konum açık (iOS "Always", Android foreground service). İzin metni tasarımdaki "Konum izni" ekranından türetildi.
 - **Backend:** **Self-hosted Supabase** — entegrasyon ileride yapılacak, şimdilik backend kodu yazma; veri katmanını arayüzlerle soyutla ki mock'tan Supabase'e geçiş kolay olsun. (Postgres + **PostGIS**, Auth: Google/Apple/e-posta, Storage: sürüş fotoğrafları). **Realtime kullanılmıyor**: sürüş önce cihazda (SQLite) tutulur, bitince/bağlantı gelince toplu yüklenir; rota/keşif işlemleri normal sorgu. Realtime yalnızca canlı konum paylaşımı (grup sürüşü, Yakındaki Sürücüler) gelirse özellik bazında eklenir.
+
+- **Veri katmanı:** Her alan bir repository arayüzü + mock uygulama (`src/features/<alan>/`), ekranlar yalnızca React Query kancalarını (`queries.ts`) kullanır; Supabase geldiğinde yalnızca repository değişir. Rota modeli: `src/features/routes/types.ts` (Route ≠ Ride).
+- **Sheet kuralı:** Modal seçimler (sıralama, şehir/konum, misafir giriş) → native `formSheet` (Expo Router `presentation: 'formSheet'`). Harita üzerindeki kalıcı, sürüklenebilir sheet'ler (rota detayı, haritada keşfet, kayıt kontrolleri) → `@gorhom/bottom-sheet`.
+- **Misafir işlemleri:** Hesap gerektiren işlemler `useRequireAccount()(reason, action)` ile; misafire giriş sheet'i açılır, işlem saklanır ve giriş (+ yeni hesapta kayıt ve izinler) bittikten sonra otomatik tamamlanır (`pendingAccountAction.ts`). Sheet kapatılırsa işlem silinir.
+- **Geri bildirim:** Uygulama geneli tek toast `useToast()` (`ToastProvider`); kaydetme → "saved" + "Görüntüle", kaldırma → "removed" + "Geri al".
 
 **Açık kararlar (uygulamadan önce kullanıcıya sor):**
 - Sürüş görünürlüğü varsayılanı: brief "Public" diyor; öneri "ilk sürüş Private, sonra son seçim hatırlansın". Henüz onaylanmadı.
