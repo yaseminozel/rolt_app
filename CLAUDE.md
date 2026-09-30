@@ -172,6 +172,16 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | TextField yazı boyu | Pano 14, ekranlar 16 | 16 (ekranlar) |
 | Rota kartı metrikleri | Genel kural Mono, kartlar Inter | Kartlarda Inter; canlı kayıt/profil metrikleri JetBrains Mono |
 | Siyah metin | Ekranlarda `#000000` | `textPrimary` (#101318) |
+| Buton etiketi (auth/kayıt) | Ekranlar 12 semibold, pano 14 medium | 14 medium (pano) |
+| Alt sabit CTA | Kayıt ekranlarında 56 pt, Get Started 48 pt, auth 44 pt | Ekranın altına sabitlenen tam genişlik CTA `size="lg"` (48 pt); içerik içindeki butonlar 44 pt |
+| Get Started butonu | Marka mavisi, panoda yok | `Button tone="brand"`; basılı `#1111D9` |
+| Kayıt alanları | Ekran 48 pt / 14 padding / 1.5 focus | TextField standardı 44 / 12 / 1 |
+| Arama alanı | Ekran 18 pt ikon, 15 pt yazı, `#F6F7F7` | `SearchField`: 20 pt ikon, 16 pt yazı, `surfaceMuted` |
+| Tempo / Deneyim kontrolleri | Ekranda 44 pt, farklı yazı ve gölge | Standart `SegmentedControl` |
+| Model yılı | 5 ayrı hap | `SelectableChip role="radio"`, eşit genişlik |
+| Yol tercihi ikonları | Iconoir'da dağ/çadır yok; seçili çipler ikon göstermiyor | Dağ yolları ve Off-road ikonları tasarımdaki çizimden SVG; Virajlı `PathArrow`, Sahil `SeaAndSun`, Uzun tur `RideTypeIcon longRide`, Hafta sonu `Calendar`, Şehir içi `City`, Gece `HalfMoon` |
+| "e-Posta" etiketi | Etiket "e-Posta", buton "E-posta ile devam et" | "E-posta" (TDK yazımı, butonla tutarlı) |
+| Auth alt ekran başlığı | Tasarımda geri butonu yok, e-posta alanı salt okunur | Şeffaf native header, yalnız geri butonu; akış sonu ekranlarında (yeni şifre, güncellendi) geri yok |
 
 ## Marka ve uygulama ikonu
 
