@@ -37,9 +37,11 @@ import {
   useRoutesInArea,
   useSearchSuggestions,
 } from '@/features/routes/queries';
+import { findCityByName } from '@/features/location/turkishCities';
+import { distanceKm } from '@/features/routes/geo';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { countActiveSearchFilters, EMPTY_ROUTE_SEARCH_FILTERS } from '@/features/routes/searchFilters';
-import type { Route } from '@/features/routes/types';
+import type { LngLat, Route } from '@/features/routes/types';
 import { formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { colors, layout, spacing, typography } from '@/theme';
 
@@ -109,6 +111,20 @@ export default function DiscoverHomeScreen() {
   const recommended = useRecommendedRoutes(city, filter);
   const areaBounds = useMemo(() => cityAreaBounds(city), [city]);
   const area = useRoutesInArea(areaBounds, filter);
+  // Second home strip (the design repeats the first as a placeholder): routes around the region,
+  // nearest first, without the ones already in "Senin için önerilenler".
+  const nearbyRoutes = useMemo(() => {
+    if (!area.data) {
+      return undefined;
+    }
+    const shown = new Set(recommended.data?.map((route) => route.id));
+    const centre = findCityByName(city);
+    const origin: LngLat | null = centre ? [centre.longitude, centre.latitude] : null;
+    const rest = area.data.filter((route) => !shown.has(route.id));
+    return origin
+      ? [...rest].sort((a, b) => distanceKm(a.coordinates[0], origin) - distanceKm(b.coordinates[0], origin))
+      : rest;
+  }, [area.data, recommended.data, city]);
 
   const locationGranted = locationPermission === Location.PermissionStatus.GRANTED;
   const activeFilterCount = countActiveSearchFilters(searchFilters);
@@ -208,11 +224,27 @@ export default function DiscoverHomeScreen() {
             onLocatePress={locationGranted ? openExplore : enableLocation}
           />
           <RecommendedRoutesSection
+            title={t('home.recommendedTitle')}
+            emptyMessage={t('home.recommendedEmpty')}
             routes={recommended.data}
             isLoading={recommended.isPending}
             isError={recommended.isError}
             onRetry={() => recommended.refetch()}
             onSeeAll={() => router.push('/discover/recommended')}
+            onRoutePress={openRoute}
+            isSaved={isSaved}
+            onToggleSave={toggleBookmark}
+          />
+          <RecommendedRoutesSection
+            title={
+              citySource === 'device' ? t('home.nearbyTitle') : t('home.regionRoutesTitle', { city })
+            }
+            emptyMessage={t('home.nearbyEmpty')}
+            routes={nearbyRoutes}
+            isLoading={area.isPending}
+            isError={area.isError}
+            onRetry={() => area.refetch()}
+            onSeeAll={openExplore}
             onRoutePress={openRoute}
             isSaved={isSaved}
             onToggleSave={toggleBookmark}

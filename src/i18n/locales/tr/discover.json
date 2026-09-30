@@ -16,7 +16,10 @@
     "seeAll": "Tümünü gör",
     "recommendedEmpty": "Bu kategoride şimdilik önerimiz yok.",
     "loadError": "Rotalar yüklenemedi.",
-    "retry": "Tekrar dene"
+    "retry": "Tekrar dene",
+    "nearbyTitle": "Yakınındaki rotalar",
+    "regionRoutesTitle": "{{city}} bölgesindeki rotalar",
+    "nearbyEmpty": "Bu bölgede başka rota yok."
   },
   "permissionBanner": {
     "title": "Konum izni kapalı",

@@ -16,7 +16,10 @@
     "seeAll": "See all",
     "recommendedEmpty": "No recommendations in this category yet.",
     "loadError": "Couldn't load routes.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "nearbyTitle": "Routes near you",
+    "regionRoutesTitle": "Routes around {{city}}",
+    "nearbyEmpty": "No other routes in this area."
   },
   "permissionBanner": {
     "title": "Location access is off",

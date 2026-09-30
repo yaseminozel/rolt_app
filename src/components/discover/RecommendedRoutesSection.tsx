@@ -8,6 +8,10 @@ import { formatDistance, formatDuration } from '@/i18n/format';
 import { colors, layout, spacing, typography } from '@/theme';
 
 type RecommendedRoutesSectionProps = {
+  /** Section heading, e.g. "Senin için önerilenler" or "Yakınındaki rotalar". */
+  title: string;
+  /** Shown when the strip loaded but has no routes. */
+  emptyMessage: string;
   routes: Route[] | undefined;
   isLoading: boolean;
   isError: boolean;
@@ -22,10 +26,12 @@ type RecommendedRoutesSectionProps = {
 const STRIP_HEIGHT = 191;
 
 /**
- * "Senin için önerilenler" (p4CIJi `D4vGn`): section title, "Tümünü gör" and a horizontal
+ * Home route strip (p4CIJi `D4vGn` / `yVngM`): section title, "Tümünü gör" and a horizontal
  * strip of compact route cards bleeding to the screen edges.
  */
 export function RecommendedRoutesSection({
+  title,
+  emptyMessage,
   routes,
   isLoading,
   isError,
@@ -79,7 +85,7 @@ export function RecommendedRoutesSection({
   } else {
     body = (
       <View style={styles.placeholder}>
-        <Text style={styles.message}>{t('home.recommendedEmpty')}</Text>
+        <Text style={styles.message}>{emptyMessage}</Text>
       </View>
     );
   }
@@ -88,7 +94,7 @@ export function RecommendedRoutesSection({
     <View style={styles.section}>
       <View style={styles.header}>
         <Text style={styles.title} accessibilityRole="header">
-          {t('home.recommendedTitle')}
+          {title}
         </Text>
         <Pressable
           onPress={onSeeAll}
