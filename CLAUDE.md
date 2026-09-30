@@ -190,6 +190,11 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Türkçe saat eki | "14:05’te" sabit | Saate göre çalışma zamanında hesaplanır (’te/’da…); İngilizce tarih `en-GB` biçimi |
 | Misafir giriş sheet'i | "Şimdi değil" 40 pt / 13 semibold gri | Standart metin `Button` (44 pt); başlık 20 semibold; sebep (`reason`) parametresiyle başlık/ikon değişir |
 | Lucide → Iconoir | Tasarımda lock, link-2, clock-alert | `Lock`, `Link`, `Clock`; açık kilit olmadığı için süre dolunca `CheckCircle` |
+| İzin ekranları (`TJtI6`, `RzQd4`) | "Atla", rota sayısı hapı, rota çizgisi tasarımda gizli | Gizli öğeler uygulanmaz (konum bilinmeden rota sayısı göstermek yanıltıcı); boş 64 pt üst alan korunur; "Şimdi değil" standart metin butonu, ana CTA 48 pt. Her iki cevapta da sonraki adıma geçilir, geri dönüş yok |
+| Konum izni | Tasarım yalnız "izin ver" diyor | Yalnız ön plan izni; arka plan izni Kayıt akışında istenir |
+| Kullanıcı adı önerileri | Tasarımda örnek 3 çip | `.rides`, `_<plaka kodu>`, `<motor modeli>` sırasıyla; kurallara uyan, müsait en fazla 3 öneri. Çip dokunma alanı 45 pt'ye genişletildi |
+| Kullanıcı adı hata ikonu | Yalnız "alınmış" durumunda çizilmiş | Tüm kullanıcı adı hatalarında 20 pt ikon (başarı ikonuyla aynı yer) |
+| Şehir sheet'i | Tam ekran açılıyordu | %60 yükseklikte açılır, tam ekrana çekilebilir; başlık ve arama sabit, liste sheet içinde kayar |
 | Auth wordmark konumu | Ekranlara göre farklı | Status bar'ın 52 pt altı ya da native header'ın 8 pt altı; tüm auth adımlarında sabit |
 | Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
