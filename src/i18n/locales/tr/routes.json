@@ -5,7 +5,8 @@
     "scenic": "Manzara",
     "city": "Şehir İçi",
     "nature": "Doğa",
-    "offRoad": "Off-road"
+    "offRoad": "Off-road",
+    "longTour": "Uzun tur"
   },
   "filters": {
     "all": "Tümü",

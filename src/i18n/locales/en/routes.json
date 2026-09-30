@@ -5,7 +5,8 @@
     "scenic": "Scenic",
     "city": "City",
     "nature": "Nature",
-    "offRoad": "Off-road"
+    "offRoad": "Off-road",
+    "longTour": "Long tour"
   },
   "filters": {
     "all": "All",

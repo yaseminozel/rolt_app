@@ -39,6 +39,7 @@ import {
 } from '@/features/routes/queries';
 import { findCityByName } from '@/features/location/turkishCities';
 import { distanceKm } from '@/features/routes/geo';
+import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { countActiveSearchFilters, EMPTY_ROUTE_SEARCH_FILTERS } from '@/features/routes/searchFilters';
 import type { LngLat, Route } from '@/features/routes/types';
@@ -86,6 +87,7 @@ export default function DiscoverHomeScreen() {
     clearRecentSearches,
   } = useDiscoverState();
   const { isSaved, toggleBookmark } = useRouteBookmark();
+  const requireAccount = useRequireAccount();
 
   // Explore can't read the Discover stack's state, so the chosen region travels as a param.
   const openExplore = () => router.push({ pathname: '/explore', params: { city } });
@@ -317,7 +319,7 @@ export default function DiscoverHomeScreen() {
           <EmptySearchResults
             title={t('search.emptyTitle')}
             description={t('search.emptyDescription')}
-            action={{ label: t('search.suggestRoute'), onPress: () => router.push('/suggest-route') }}
+            action={{ label: t('search.suggestRoute'), onPress: () => requireAccount('suggestRoute', () => router.push('/suggest-route')) }}
           />
         </View>
       );

@@ -5,10 +5,10 @@ export type LngLat = [number, number];
 
 /**
  * Route character used by the Discover chips, badges and the filter sheet's "Yol tipi"
- * ("Sahil", "Virajlı", "Manzara", "Şehir İçi", "Doğa", "Off-road"); labels via `routes:tags.*`.
+ * ("Sahil", "Virajlı", "Manzara", "Şehir İçi", "Doğa", "Off-road", "Uzun tur"); labels via `routes:tags.*`.
  * Separate from `RideType`, which classifies a recorded ride.
  */
-export type RouteTag = 'coast' | 'curvy' | 'scenic' | 'city' | 'nature' | 'offRoad';
+export type RouteTag = 'coast' | 'curvy' | 'scenic' | 'city' | 'nature' | 'offRoad' | 'longTour';
 
 /** Discover filter chips: every tag, plus "Tümü" and the distance filter "Yakın Rotalar". */
 export type RouteFilter = 'all' | 'nearby' | RouteTag;

@@ -22,4 +22,6 @@ export const routeTagTones: Record<RouteTag, RouteTagTone> = {
   city: { ink: colors.rideCityText, surface: colors.surfaceMuted },
   nature: { ink: colors.info, surface: colors.infoSurface },
   offRoad: { ink: colors.rideOffRoadText, surface: colors.rideOffRoadSurface },
+  // Not drawn in the design; the ROLT accent teal keeps it distinct from the other lines.
+  longTour: { ink: colors.accentStrong, surface: colors.accentSubtle },
 };

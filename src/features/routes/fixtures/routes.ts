@@ -69,6 +69,7 @@ const coverByTag: Record<RouteTag, Route['coverImage']> = {
   city: photos.forestRide,
   nature: photos.forestRide,
   offRoad: photos.desertRider,
+  longTour: photos.mountainRoad,
 };
 
 function route({ from, via = [], to, ...seed }: RouteSeed, index: number): Route {

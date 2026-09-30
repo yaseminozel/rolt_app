@@ -1,13 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  Bookmark,
-  ChatBubbleEmpty,
-  Heart,
-  LogIn,
-  Prohibition,
-  UserPlus,
-  WarningTriangle,
-} from 'iconoir-react-native';
+import { Bookmark, ChatBubbleEmpty, Heart, LogIn, MapsArrowDiagonal, Prohibition, UserPlus, WarningTriangle } from 'iconoir-react-native';
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
@@ -34,6 +26,7 @@ const reasonIcons: Record<SignInPromptReason, ComponentType<SvgProps>> = {
   saveRide: Bookmark,
   reportContent: WarningTriangle,
   blockRider: Prohibition,
+  suggestRoute: MapsArrowDiagonal,
 };
 const GenericIcon = LogIn;
 

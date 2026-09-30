@@ -73,7 +73,15 @@
           }
         }
       ],
-      "expo-image"
+      "expo-image",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "ROLT, profiline ve sürüşlerine fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
+          "savePhotosPermission": false,
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
     ],
     "scheme": "rolt",
     "experiments": {

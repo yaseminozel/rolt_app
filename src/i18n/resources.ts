@@ -9,6 +9,7 @@ import enRegistration from './locales/en/registration.json';
 import enRides from './locales/en/rides.json';
 import enRouteDetail from './locales/en/routeDetail.json';
 import enRoutes from './locales/en/routes.json';
+import enRouteSuggestion from './locales/en/routeSuggestion.json';
 import trAuth from './locales/tr/auth.json';
 import trCommon from './locales/tr/common.json';
 import trDiscover from './locales/tr/discover.json';
@@ -20,6 +21,7 @@ import trRegistration from './locales/tr/registration.json';
 import trRides from './locales/tr/rides.json';
 import trRouteDetail from './locales/tr/routeDetail.json';
 import trRoutes from './locales/tr/routes.json';
+import trRouteSuggestion from './locales/tr/routeSuggestion.json';
 
 import type { AppLanguage } from './language';
 
@@ -31,6 +33,7 @@ export const trResources = {
   permissions: trPermissions,
   rides: trRides,
   routes: trRoutes,
+  routeSuggestion: trRouteSuggestion,
   discover: trDiscover,
   routeDetail: trRouteDetail,
   explore: trExplore,
@@ -47,6 +50,7 @@ const enResources: LocaleResources = {
   permissions: enPermissions,
   rides: enRides,
   routes: enRoutes,
+  routeSuggestion: enRouteSuggestion,
   discover: enDiscover,
   routeDetail: enRouteDetail,
   explore: enExplore,

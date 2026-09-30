@@ -99,7 +99,7 @@ function RootNavigator() {
           name="ride-together/[id]"
           options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
         />
-        <Stack.Screen name="suggest-route" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
+        <Stack.Screen name="suggest-route" />
         <Stack.Screen name="notifications" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
       </Stack.Protected>
       <Stack.Protected guard={isGuest}>

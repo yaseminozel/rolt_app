@@ -11,7 +11,7 @@ export const EMPTY_ROUTE_SEARCH_FILTERS: RouteSearchFilters = {
 /** Option order of the filter sheet (PXcQ0). */
 export const DISTANCE_RANGES: readonly DistanceRange[] = ['under50', 'from50to100', 'from100to200', 'over200'];
 export const DURATION_RANGES: readonly DurationRange[] = ['under1h', 'from1to3h', 'over3h'];
-export const FILTER_ROUTE_TAGS: readonly RouteTag[] = ['coast', 'curvy', 'scenic', 'city', 'nature', 'offRoad'];
+export const FILTER_ROUTE_TAGS: readonly RouteTag[] = ['coast', 'curvy', 'scenic', 'city', 'nature', 'offRoad', 'longTour'];
 export const FILTER_DIFFICULTIES: readonly RouteDifficulty[] = ['easy', 'moderate', 'hard'];
 
 /** Lower bound inclusive, upper bound exclusive. */
