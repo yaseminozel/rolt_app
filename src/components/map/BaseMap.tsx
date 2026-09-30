@@ -1,16 +1,17 @@
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Image, type ImageSource } from 'expo-image';
 import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import type { MapStyle } from './mapStyles';
 import type { MapboxModule, NativeMapViewProps } from './NativeBaseMap';
 
 /**
- * Mapbox needs native code that Expo Go doesn't ship, so there the design's own map
- * artwork is shown instead; development and production builds render the real map.
+ * Mapbox needs native code that Expo Go (and the web preview) doesn't ship, so there the
+ * design's own map artwork is shown instead; development and production builds render the real map.
  */
-export const isNativeMapAvailable = Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
+export const isNativeMapAvailable =
+  Platform.OS !== 'web' && Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
 
 export type BaseMapProps = Omit<NativeMapViewProps, 'children'> & {
   /** Map artwork from the design, shown in Expo Go (e.g. `assets/images/maps/*-fallback.jpg`). */
