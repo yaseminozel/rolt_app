@@ -65,23 +65,46 @@ Sürüş tipleri (Tone): Şehir İçi, Uzun Yol, Doğa, Viraj, Sportif, Off-road
 
 ## Design system
 
-Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light & Dark hedefli):
+Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light & Dark hedefli). Bileşeni kodlamadan önce ilgili node'u `Get(id)` + `TakeScreenshot([id])` ile oku.
 
-| # | Bileşen | Özet spec |
-|---|---|---|
-| 01 | Button | 44 px yükseklik, 30 px yatay padding, ikon 24 px + 4 px gap, radius 12, outline 1.5 px; Default / With icon / Icon only |
-| 02 | Input | 4 tip (Standard, Multi-line, Currency, Suffix…) × 8 durum (normal + error satırları) |
-| 03–04 | Checkbox / Radio | 20/24 px kontrol, 40/48 px dokunma alanı, 9 durum |
-| 05 | Badge / Tag | Small 24 / Large 32 px; tonlar: Neutral, Warning, Info, Success, Destructive |
-| 06 | Tooltip | 4 yön, kısa / çok satır |
-| 07 | Filter Chip | Dropdown (default/open/applied/disabled/removable) + Toggle |
-| 08 | Switch | Off/On × Default/Hover/Focus/Disabled |
-| 09 | Segmented Control | 2–3 seçenek, 52 px yükseklik, dış radius 12, seçili radius 8, 4 px inset |
-| 10 | App Bar | Centered / Leading / Bottom sheet varyantları |
-| 11 | Navigation Bar / Floating | 3 öğe, 64 px yükseklik, 20 px yan boşluk, 28 px alt güvenli alan payı, yarı saydam yüzey |
-| — | Route Card | Kompakt (dikey, görselli) ve Satır varyantı; opsiyonel badge + kaydet |
-| — | Map / Heading Marker | Canlı konum + yön; beyaz outline ve gölge korunur, heading ile döndürülür |
-| — | Choice Group, Satır / Ayar (Chevron, Değer, Anahtar, Onay, Radyo), Satır / Marka, Status Icon, Dialog, Toast, Empty State, Bottom sheet üst çubuğu, marka logoları (Honda, Yamaha, KTM, BMW, Ducati…), Google/Apple giriş ikonları |
+**Core Components panoları** (y ≈ -14193):
+
+| # | Bileşen | Node | Özet spec |
+|---|---|---|---|
+| 01 | Button | `RC60W` | 44 px yükseklik, 30 px yatay padding, ikon 24 px + 4 px gap, radius 12, outline 1.5 px; Default / With icon / Icon only |
+| 02 | Input | `HbGNS` | 4 tip (Standard, Multi-line, Currency, Suffix…) × 8 durum (normal + error satırları) |
+| 03 | Checkbox | `QXn80` | 20/24 px kontrol, 40/48 px dokunma alanı, 9 durum + indeterminate |
+| 04 | Radio Button | `UeboI` | 20/24 px kontrol, 40/48 px dokunma alanı, 9 durum |
+| 05 | Badge / Tag | `YFU4m` | Small 24 / Large 32 px; tonlar: Neutral, Warning, Info, Success, Destructive |
+| 06 | Tooltip | `u7cV7` | 4 yön, kısa / çok satır |
+| 07 | Filter Chip | `iCyEV` | Dropdown (default/open/applied/disabled/removable) + Toggle |
+| 08 | Switch | `NoZZf` | Off/On × Default/Hover/Focus/Disabled |
+| 09 | Segmented Control | `Q2D2c` | 2–3 seçenek, 52 px yükseklik, dış radius 12, seçili radius 8, 4 px inset |
+| 10 | App Bar | `A5ff7p` | Centered / Leading / Bottom sheet — kodda native Stack header (bkz. Native chrome) |
+| 11 | Navigation Bar / Floating | `I3pOq` | Keşfet / Kaydet / Profil — kodda NativeTabs (bkz. Native chrome) |
+| — | Route Card | `gBNKs` | Kompakt (dikey, görselli) ve Satır varyantı; opsiyonel badge + kaydet |
+| — | Map / Heading Marker | `hKYfR` | Canlı konum + yön; beyaz outline ve gölge korunur, heading ile döndürülür |
+| — | Choice Group | `n0gSMq` | İki seçenekten tek seçim; kart yüzeyi + border + radio durumu birlikte |
+
+**Yardımcı bileşenler** (y ≈ -12900 … -12300):
+
+| Bileşen | Node |
+|---|---|
+| Seçim / Sürüş Tipi (7 ton × seçili/değil) | `N0mch` |
+| Badge / Sürüş Tipi | `a2e36` |
+| List Item / Ride Type | `dlaPh` |
+| Satır / Ayar (Chevron, Değer+Chevron, Değer, Anahtar, Onay, Yok, Radyo) | `MAiVR` |
+| Satır / Marka | `B2BQNG` |
+| Anahtar (switch, Açık/Kapalı) | `kTcEC` |
+| Kontrol / Radyo | `VGCwR` |
+| Üst çubuk / Alt sayfa (bottom sheet başlığı) | `Gq75K` |
+| Dialog | `s5345` |
+| Toast messages (Success / Failure) | `s1KRrb` |
+| Feedback / Toast (Saved / Removed) | `X3p3d7` |
+| Feedback / EmptyState / SavedRoutes | `JaNLr` |
+| Status Icon (Error / Success / Warning / Info / Neutral) | `YVp1V` |
+| Brand / Google / Official, Brand / Apple / Official | `Q8Xitg`, `ZD4Th` |
+| Motosiklet marka logoları (28 px): Honda `e7KsV`, Yamaha `avNYb`, Bajaj `w2Atk`, KTM `tkGyc`, Suzuki `U4Ywf`, Kawasaki `SRC0L`, BMW `qNemJ`, Ducati `camyX`, Triumph `SVXIR`, Harley-Davidson `UQNXV` | — |
 
 **Önemli:** `.pen` dosyasında tanımlı **variable (token) ve reusable component yok**; tüm renkler ham hex. Kodda bu değerleri tek bir tema modülünde (`src/theme/`) token olarak topla, ekranlarda ham hex kullanma.
 
@@ -124,6 +147,14 @@ Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26
 - **Ekran başlığı** — Pencil'de `Screen Header` / `App Bar` (ör. node `H0lpWo`, "01.4 Önerilen Rotalar — Tümü": başlık + kapat + yapışkan arama) → her sekmenin içinde **native `Stack`** header'ı.
   - Başlık/eylemler `Stack.Screen` options ile; arama alanı `Stack.SearchBar` (`placement="automatic"`) ile. Header'ı elle çizme.
   - Doküman: https://docs.expo.dev/router/advanced/native-tabs/ — kod yazmadan önce SDK 57 sürüm dokümanını tekrar kontrol et.
+
+## Marka ve uygulama ikonu
+
+- Logo kaynakları (Pencil, 1024 px, mavi gradient `#0044FF → #0000FE` + nokta deseni): `qS2Np` (kırpılmış büyük "R"), `HgIhd` (taşan "ROLT"), `e9xZmO` (ortalanmış "ROLT" — **aktif uygulama ikonu**). Wordmark fontu Bakbak One.
+- Üç varyantın export'u: `assets/brand/rolt-icon-{r-mark,wordmark-bleed,wordmark}.png`.
+- `assets/icon.png` (iOS, köşesiz ve alfasız), `android-icon-{background,foreground,monochrome}.png` (foreground wordmark'ı 66 dp güvenli alanda), `splash-icon.png` (saydam zeminde beyaz wordmark), `favicon.png` hepsi `e9xZmO`'dan türetildi.
+- Splash `expo-splash-screen` config plugin ile: zemin `#1515FF` (Pencil `00.0 Launch / Splash`, `RBNTd`), `imageWidth: 200`.
+- İkonu değiştirmek için: Pencil'de node'u köşesiz (`cornerRadius: 0`) geçici bir kopyayla `Export` et, kopyayı sil, yukarıdaki dosyaları yeniden üret.
 
 ## Kod yazarken
 
