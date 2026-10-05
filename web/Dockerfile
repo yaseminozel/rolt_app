@@ -1,3 +1,4 @@
 FROM nginx:alpine
-COPY index.html /usr/share/nginx/html/index.html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY index.html og.jpg favicon.png apple-touch-icon.png /usr/share/nginx/html/
 EXPOSE 80

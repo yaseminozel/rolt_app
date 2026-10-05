@@ -256,7 +256,9 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 
 ## Web sitesi (roltapp.com)
 
-- Kaynak `web/` klasöründe; mobil uygulamadan bağımsız (`tsconfig.json` ve `eslint.config.js` dışında tutar). Şimdilik tek sayfa: düz metin "Coming soon", `nginx:alpine` Dockerfile ile servis edilir.
+- Kaynak `web/` klasöründe; mobil uygulamadan bağımsız (`tsconfig.json` ve `eslint.config.js` dışında tutar). Framework yok: tek `index.html` (satır içi CSS/JS, Google Fonts), `nginx:alpine` + `nginx.conf` ile servis edilir.
+- Tasarım: Pencil `/Users/noname/Documents/rolt.pen` → `Sabf6` ("00.0 Web / Yakında — Yol çalışması v4", 1440 × 900). 1100 px altında hero ve levha alt alta dizilir; animasyonlar `prefers-reduced-motion`'da kapanır. `og.jpg` bu frame'in export'u.
+- Bekleme listesi: form `supabase.roltapp.com` → `public.waitlist` tablosuna anon key ile yazar (şema: `web/supabase/waitlist.sql`; RLS yalnız ekleme, API'den okuma yok; aynı e-posta 409 → başarı sayılır). Kayıtları okumak için Supabase Studio veya `psql`.
 - Yayın: Dokploy (`palm.mers.in`), **APPS** organizasyonu → **Rolt** projesi → **Frontend** uygulaması (`rolt-frontend-omtvi9`). Aynı projede Supabase (`supabase.roltapp.com`) de var; ona dokunma.
 - Kaynak: custom git `git@github.com:muhammetilbas/rolt_app.git` (`main`), salt okunur GitHub deploy key ("Dokploy roltapp.com"), build path `/web`, Dockerfile build.
 - Alan adları: `roltapp.com` ve `www.roltapp.com`, Let's Encrypt.
