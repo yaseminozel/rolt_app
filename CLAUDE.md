@@ -254,6 +254,14 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 - Splash `expo-splash-screen` config plugin ile: zemin `#1515FF` (Pencil `00.0 Launch / Splash`, `RBNTd`), `imageWidth: 200`.
 - İkonu değiştirmek için: Pencil'de node'u köşesiz (`cornerRadius: 0`) geçici bir kopyayla `Export` et, kopyayı sil, yukarıdaki dosyaları yeniden üret.
 
+## Web sitesi (roltapp.com)
+
+- Kaynak `web/` klasöründe; mobil uygulamadan bağımsız (`tsconfig.json` ve `eslint.config.js` dışında tutar). Şimdilik tek sayfa: düz metin "Coming soon", `nginx:alpine` Dockerfile ile servis edilir.
+- Yayın: Dokploy (`palm.mers.in`), **APPS** organizasyonu → **Rolt** projesi → **Frontend** uygulaması (`rolt-frontend-omtvi9`). Aynı projede Supabase (`supabase.roltapp.com`) de var; ona dokunma.
+- Kaynak: custom git `git@github.com:muhammetilbas/rolt_app.git` (`main`), salt okunur GitHub deploy key ("Dokploy roltapp.com"), build path `/web`, Dockerfile build.
+- Alan adları: `roltapp.com` ve `www.roltapp.com`, Let's Encrypt.
+- Otomatik deploy: GitHub push webhook'u → Dokploy; watch path `web/**` olduğu için yalnız `web/` değişiklikleri yeniden deploy eder.
+
 ## Kod yapısı
 
 ```
