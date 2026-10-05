@@ -245,6 +245,7 @@
         opacity: 1; transform: rotateX(0);
         transition: transform 0.6s var(--ease-spring), opacity 0.2s;
       }
+      .waitlist[data-state='done'] .go .arrow { display: none; }
       .waitlist[data-state='done'] .go { pointer-events: none; background: var(--success); color: var(--ink); box-shadow: 0 12px 40px rgba(59, 211, 184, 0.45); }
 
       .honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
@@ -619,6 +620,7 @@
         }
         function done() {
           form.dataset.state = 'done';
+          form.querySelector('.go .label').textContent = 'Sıradasın';
           input.readOnly = true;
           input.blur();
           setNote('Plakan sırada. Yol açılınca ilk sen haberdar olacaksın.', 'success');
