@@ -6,6 +6,12 @@ const SESSION_KEY = 'rolt.session';
 const GUEST_KEY = 'rolt.guest';
 const ONBOARDING_SEEN_KEY = 'rolt.onboardingSeen';
 const PERMISSION_PROMPTS_KEY = 'rolt.permissionPromptsPending';
+const ALL_KEYS = [SESSION_KEY, GUEST_KEY, ONBOARDING_SEEN_KEY, PERMISSION_PROMPTS_KEY];
+
+// Dev only: `EXPO_PUBLIC_RESET_STATE=1 npx expo start --clear` wipes the stored state on every
+// app launch (and reload), so the whole flow starts again from onboarding.
+const shouldResetOnLaunch = __DEV__ && process.env.EXPO_PUBLIC_RESET_STATE === '1';
+let hasResetThisLaunch = false;
 
 export type PersistedAuthState = {
   session: Session | null;
@@ -36,6 +42,10 @@ async function write(key: string, value: string | null) {
 }
 
 export async function loadAuthState(): Promise<PersistedAuthState> {
+  if (shouldResetOnLaunch && !hasResetThisLaunch) {
+    hasResetThisLaunch = true;
+    await Promise.all(ALL_KEYS.map((key) => write(key, null)));
+  }
   const [session, guest, onboardingSeen, permissionPrompts] = await Promise.all([
     read(SESSION_KEY),
     read(GUEST_KEY),
