@@ -9,6 +9,7 @@ import { LogBox, Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from '@/components/feedback/ToastProvider';
+import { MapExpandProvider } from '@/components/map/MapExpandTransition';
 // Defines the background navigation location task at launch (it must exist before any update arrives).
 import '@/features/navigation/location/backgroundLocationTask';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
@@ -54,7 +55,9 @@ export default function RootLayout() {
               <ThemeProvider value={navigationTheme}>
                 <BottomSheetModalProvider>
                   <ToastProvider>
-                    <RootNavigator />
+                    <MapExpandProvider>
+                      <RootNavigator />
+                    </MapExpandProvider>
                     <StatusBar style="dark" />
                   </ToastProvider>
                 </BottomSheetModalProvider>
@@ -116,7 +119,9 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         {/* Full-screen map surfaces without the tab bar (01.6, 01.7). */}
         <Stack.Screen name="route/[id]" />
-        <Stack.Screen name="explore" />
+        {/* 07.01 opens from Discover's map card growing into it (MapExpandTransition): no push
+            animation of its own, and no edge swipe (the map takes the pans; back shrinks it). */}
+        <Stack.Screen name="explore" options={{ animation: 'none', gestureEnabled: false }} />
         {/* Another rider's profile (01.8): opened from the route detail, draws its own top bar. */}
         <Stack.Screen name="rider/[id]" />
         <Stack.Screen

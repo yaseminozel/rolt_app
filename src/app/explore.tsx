@@ -1,8 +1,9 @@
 import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { NavArrowLeft, NavigatorAlt, PathArrow, Wrench } from 'iconoir-react-native';
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -13,6 +14,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
+  BackHandler,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -44,6 +46,7 @@ import { EmptyState } from '@/components/feedback/EmptyState';
 import { StatusIcon } from '@/components/feedback/StatusIcon';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
+import { useMapExpand } from '@/components/map/MapExpandTransition';
 import { MapActionButton } from '@/components/map/MapActionButton';
 import {
   cameraBoundsFor,
@@ -149,6 +152,7 @@ export default function ExploreMapScreen() {
   const { showToast } = useToast();
   const { isSaved, toggleBookmark } = useRouteBookmark();
   const { position, locate } = useDeviceLocation();
+  const { collapse, markTargetReady, targetRevealed } = useMapExpand();
 
   const [query, setQuery] = useState('');
   // "Bu bölgede ara" narrows the selected layer once submitted (typing alone changes nothing).
@@ -308,7 +312,34 @@ export default function ExploreMapScreen() {
     );
   };
 
+  // The card's clone fades once there's a map under it: the artwork at once, Mapbox when drawn.
+  useEffect(() => {
+    if (!isNativeMapAvailable) {
+      markTargetReady();
+    }
+  }, [markTargetReady]);
+
+  // Back shrinks the map into Discover's card it grew from (or just goes back).
+  const goBack = useCallback(() => {
+    if (!router.canGoBack()) {
+      router.replace('/discover');
+    } else if (!collapse(() => router.back())) {
+      router.back();
+    }
+  }, [collapse]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        goBack();
+        return true;
+      });
+      return () => subscription.remove();
+    }, [goBack]),
+  );
+
   const handleMapIdle = (state: MapState) => {
+    markTargetReady();
     const { bounds, zoom: mapZoom } = state.properties;
     setZoom(Math.round(mapZoom * 4) / 4);
     if (!state.gestures.isGestureActive) {
@@ -602,140 +633,145 @@ export default function ExploreMapScreen() {
         />
       </Animated.View>
 
-      <BottomSheet
-        // List and selected route have different snap points; a fresh sheet per mode slides in
-        // instead of re-indexing one whose snap points are still updating on the UI thread.
-        key={selectedRoute ? 'selected' : noResults ? 'empty' : category}
-        snapPoints={snapPoints}
-        index={singleSnap ? 0 : 1}
-        enableDynamicSizing={false}
-        enablePanDownToClose={false}
-        animatedPosition={sheetTop}
-        style={styles.sheet}
-        backgroundStyle={styles.sheetBackground}
-        handleStyle={styles.sheetHandle}
-        handleIndicatorStyle={styles.sheetHandleIndicator}>
-        {selectedRoute ? (
-          <BottomSheetView style={styles.selectedContent}>
-            <View
-              onLayout={(event) =>
-                setSelectedContentHeight(Math.ceil(event.nativeEvent.layout.height))
-              }>
-              <SelectedRouteSummary
-                route={selectedRoute}
-                routeCount={routes?.length ?? 0}
-                saved={isSaved(selectedRoute.id)}
-                onBack={clearSelection}
-                onToggleSave={() =>
-                  toggleBookmark(selectedRoute.id, { toastBottomOffset: toastOffset })
-                }
-                onViewRoute={() =>
-                  router.push({ pathname: '/route/[id]', params: { id: selectedRoute.id } })
-                }
-              />
-            </View>
-          </BottomSheetView>
-        ) : noResults ? (
-          <BottomSheetView style={styles.emptyContent}>
-            <EmptyState
-              icon={<StatusIcon status="neutral" />}
-              title={t('search.noResults.title')}
-              description={t('search.noResults.description')}
-            />
-          </BottomSheetView>
-        ) : placeCategory ? (
-          <BottomSheetView style={styles.placesContent}>
-            <View style={styles.sheetTitleRow}>
-              <Text style={styles.sheetTitle} accessibilityRole="header">
-                {t(`places.title.${placeCategory}`)}
-              </Text>
-              {placesQuery.isFetching ? (
-                <ActivityIndicator size="small" color={colors.textSecondary} />
-              ) : null}
-            </View>
-            {placesQuery.isError && !places ? (
-              <Text style={styles.placesMessage}>{t('places.error')}</Text>
-            ) : sortedPlaces && sortedPlaces.length === 0 ? (
-              <Text style={styles.placesMessage}>{t(`places.empty.${placeCategory}`)}</Text>
-            ) : (
-              <BottomSheetFlatList
-                data={sortedPlaces ?? []}
-                keyExtractor={(item) => item.place.id}
-                contentContainerStyle={styles.placesList}
-                renderItem={({ item, index }) => (
-                  <ServicePlaceRow
-                    place={item.place}
-                    distanceKm={item.distance}
-                    last={index === (sortedPlaces?.length ?? 0) - 1}
-                    onPress={() => focusPlace(item.place)}
-                    onDirections={() => openDirections(item.place.coordinates, item.place.name)}
-                  />
-                )}
-              />
-            )}
-          </BottomSheetView>
-        ) : (
-          <BottomSheetView style={styles.listContent}>
-            <View style={styles.sheetTitleRow}>
-              <Text style={styles.sheetTitle} accessibilityRole="header">
-                {routes === undefined
-                  ? ''
-                  : routes.length === 0
-                    ? t('empty.title')
-                    : t('routesInArea', { count: routes.length })}
-              </Text>
-              {data === undefined ? (
-                <ActivityIndicator size="small" color={colors.textSecondary} />
-              ) : null}
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.chips}>
-              {FILTERS.map((option) => (
-                <FilterChip
-                  key={option}
-                  type="toggle"
-                  showIcon={false}
-                  label={
-                    option === 'all'
-                      ? t('routes:filters.all')
-                      : t(`routes:tags.${option as RouteTag}`)
+      {/* Comes in (slides up) as the card's clone fades, not unseen beneath it. */}
+      {targetRevealed ? (
+        <BottomSheet
+          // List and selected route have different snap points; a fresh sheet per mode slides in
+          // instead of re-indexing one whose snap points are still updating on the UI thread.
+          key={selectedRoute ? 'selected' : noResults ? 'empty' : category}
+          snapPoints={snapPoints}
+          index={singleSnap ? 0 : 1}
+          enableDynamicSizing={false}
+          enablePanDownToClose={false}
+          animatedPosition={sheetTop}
+          style={styles.sheet}
+          backgroundStyle={styles.sheetBackground}
+          handleStyle={styles.sheetHandle}
+          handleIndicatorStyle={styles.sheetHandleIndicator}>
+          {selectedRoute ? (
+            <BottomSheetView style={styles.selectedContent}>
+              <View
+                onLayout={(event) =>
+                  setSelectedContentHeight(Math.ceil(event.nativeEvent.layout.height))
+                }>
+                <SelectedRouteSummary
+                  route={selectedRoute}
+                  routeCount={routes?.length ?? 0}
+                  saved={isSaved(selectedRoute.id)}
+                  onBack={clearSelection}
+                  onToggleSave={() =>
+                    toggleBookmark(selectedRoute.id, { toastBottomOffset: toastOffset })
                   }
-                  selected={filter === option}
-                  onPress={() => setFilter(option)}
+                  onViewRoute={() =>
+                    router.push({ pathname: '/route/[id]', params: { id: selectedRoute.id } })
+                  }
                 />
-              ))}
-            </ScrollView>
-            {routes && routes.length === 0 ? (
-              <Text style={styles.emptyText}>{t('empty.description')}</Text>
-            ) : (
-              <FlatList
-                horizontal
-                data={routes ?? []}
-                keyExtractor={(route) => route.id}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.cards}
-                renderItem={({ item }) => (
-                  <RouteCard
-                    variant="compact"
-                    image={item.coverImage}
-                    title={item.name}
-                    subtitle={item.summary}
-                    distance={formatDistance(item.distanceKm)}
-                    duration={formatDuration(item.durationMinutes)}
-                    badgeLabel={t(`routes:tags.${item.tag}`)}
-                    badgeTone={routeTagBadgeTone[item.tag]}
-                    saved={isSaved(item.id)}
-                    onToggleSave={() => toggleBookmark(item.id, { toastBottomOffset: toastOffset })}
-                    onPress={() => selectRoute(item)}
-                  />
-                )}
+              </View>
+            </BottomSheetView>
+          ) : noResults ? (
+            <BottomSheetView style={styles.emptyContent}>
+              <EmptyState
+                icon={<StatusIcon status="neutral" />}
+                title={t('search.noResults.title')}
+                description={t('search.noResults.description')}
               />
-            )}
-          </BottomSheetView>
-        )}
-      </BottomSheet>
+            </BottomSheetView>
+          ) : placeCategory ? (
+            <BottomSheetView style={styles.placesContent}>
+              <View style={styles.sheetTitleRow}>
+                <Text style={styles.sheetTitle} accessibilityRole="header">
+                  {t(`places.title.${placeCategory}`)}
+                </Text>
+                {placesQuery.isFetching ? (
+                  <ActivityIndicator size="small" color={colors.textSecondary} />
+                ) : null}
+              </View>
+              {placesQuery.isError && !places ? (
+                <Text style={styles.placesMessage}>{t('places.error')}</Text>
+              ) : sortedPlaces && sortedPlaces.length === 0 ? (
+                <Text style={styles.placesMessage}>{t(`places.empty.${placeCategory}`)}</Text>
+              ) : (
+                <BottomSheetFlatList
+                  data={sortedPlaces ?? []}
+                  keyExtractor={(item) => item.place.id}
+                  contentContainerStyle={styles.placesList}
+                  renderItem={({ item, index }) => (
+                    <ServicePlaceRow
+                      place={item.place}
+                      distanceKm={item.distance}
+                      last={index === (sortedPlaces?.length ?? 0) - 1}
+                      onPress={() => focusPlace(item.place)}
+                      onDirections={() => openDirections(item.place.coordinates, item.place.name)}
+                    />
+                  )}
+                />
+              )}
+            </BottomSheetView>
+          ) : (
+            <BottomSheetView style={styles.listContent}>
+              <View style={styles.sheetTitleRow}>
+                <Text style={styles.sheetTitle} accessibilityRole="header">
+                  {routes === undefined
+                    ? ''
+                    : routes.length === 0
+                      ? t('empty.title')
+                      : t('routesInArea', { count: routes.length })}
+                </Text>
+                {data === undefined ? (
+                  <ActivityIndicator size="small" color={colors.textSecondary} />
+                ) : null}
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.chips}>
+                {FILTERS.map((option) => (
+                  <FilterChip
+                    key={option}
+                    type="toggle"
+                    showIcon={false}
+                    label={
+                      option === 'all'
+                        ? t('routes:filters.all')
+                        : t(`routes:tags.${option as RouteTag}`)
+                    }
+                    selected={filter === option}
+                    onPress={() => setFilter(option)}
+                  />
+                ))}
+              </ScrollView>
+              {routes && routes.length === 0 ? (
+                <Text style={styles.emptyText}>{t('empty.description')}</Text>
+              ) : (
+                <FlatList
+                  horizontal
+                  data={routes ?? []}
+                  keyExtractor={(route) => route.id}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.cards}
+                  renderItem={({ item }) => (
+                    <RouteCard
+                      variant="compact"
+                      image={item.coverImage}
+                      title={item.name}
+                      subtitle={item.summary}
+                      distance={formatDistance(item.distanceKm)}
+                      duration={formatDuration(item.durationMinutes)}
+                      badgeLabel={t(`routes:tags.${item.tag}`)}
+                      badgeTone={routeTagBadgeTone[item.tag]}
+                      saved={isSaved(item.id)}
+                      onToggleSave={() =>
+                        toggleBookmark(item.id, { toastBottomOffset: toastOffset })
+                      }
+                      onPress={() => selectRoute(item)}
+                    />
+                  )}
+                />
+              )}
+            </BottomSheetView>
+          )}
+        </BottomSheet>
+      ) : null}
     </View>
   );
 }
@@ -872,14 +908,6 @@ function FallbackLayer({
 function initialZoom(screenWidth: number) {
   const span = INITIAL_AREA.northEast[0] - INITIAL_AREA.southWest[0];
   return Math.log2((screenWidth * 360) / (512 * span));
-}
-
-function goBack() {
-  if (router.canGoBack()) {
-    router.back();
-  } else {
-    router.replace('/discover');
-  }
 }
 
 const styles = StyleSheet.create({

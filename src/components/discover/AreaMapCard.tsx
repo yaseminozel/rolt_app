@@ -1,16 +1,21 @@
 import { Image } from 'expo-image';
 import { Enlarge, MapPin, MapXmark } from 'iconoir-react-native';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
+import { useMapExpand } from '@/components/map/MapExpandTransition';
 import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 type AreaMapCardProps = {
   /** Routes in the region; the pill is hidden while unknown (loading or failed). */
   routeCount: number | undefined;
-  /** Opens "Haritada keşfet" (07.01); the card and its "Haritayı genişlet" button both do. */
+  /**
+   * Opens "Haritada keşfet" (07.01); the card and its "Haritayı genişlet" button both do, the
+   * card growing into the map (`MapExpandTransition`).
+   */
   onPress: () => void;
   /** No connection: the map can't load, so a muted layer explains it (05.01 `INwLr`). */
   offline?: { title: string; description: string };
@@ -30,6 +35,8 @@ const OFFLINE_ICON_SIZE = 28;
  */
 export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) {
   const { t } = useTranslation('discover');
+  const { expand, activeSource } = useMapExpand();
+  const cardRef = useRef<View>(null);
   const countLabel =
     routeCount === undefined ? undefined : t('home.areaRouteCount', { count: routeCount });
 
@@ -48,38 +55,56 @@ export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) 
     );
   }
 
+  const pill = countLabel ? (
+    <View style={styles.pillRow}>
+      <View style={styles.pill}>
+        <MapPin
+          width={PILL_ICON_SIZE}
+          height={PILL_ICON_SIZE}
+          color={colors.brand}
+          strokeWidth={1.5}
+        />
+        <Text style={styles.pillLabel}>{countLabel}</Text>
+      </View>
+    </View>
+  ) : null;
+  const button = {
+    size: 'control',
+    icon: Enlarge,
+    accessibilityLabel: t('home.expandMap'),
+    style: styles.locate,
+  } as const;
+  const open = () =>
+    expand(
+      {
+        ref: cardRef,
+        image: mapFallbacks.homeCard,
+        decorations: (
+          <>
+            {pill}
+            <MapActionButton {...button} />
+          </>
+        ),
+      },
+      onPress,
+    );
+
   return (
     <Pressable
-      onPress={onPress}
+      ref={cardRef}
+      onPress={open}
       accessibilityRole="button"
       accessibilityLabel={
         countLabel ? `${t('home.exploreMapA11y')}, ${countLabel}` : t('home.exploreMapA11y')
       }
-      style={styles.card}>
+      // Under its growing clone while the map opens or closes.
+      style={[styles.card, activeSource === cardRef && styles.hidden]}>
       <View style={styles.media}>
         <Image source={mapFallbacks.homeCard} contentFit="cover" style={StyleSheet.absoluteFill} />
         <View style={styles.stroke} />
       </View>
-      {countLabel ? (
-        <View style={styles.pillRow}>
-          <View style={styles.pill}>
-            <MapPin
-              width={PILL_ICON_SIZE}
-              height={PILL_ICON_SIZE}
-              color={colors.brand}
-              strokeWidth={1.5}
-            />
-            <Text style={styles.pillLabel}>{countLabel}</Text>
-          </View>
-        </View>
-      ) : null}
-      <MapActionButton
-        size="control"
-        icon={Enlarge}
-        accessibilityLabel={t('home.expandMap')}
-        onPress={onPress}
-        style={styles.locate}
-      />
+      {pill}
+      <MapActionButton {...button} onPress={open} />
     </Pressable>
   );
 }
@@ -91,6 +116,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.media,
     boxShadow: shadows.raised,
     backgroundColor: colors.surfaceMuted,
+  },
+  hidden: {
+    opacity: 0,
   },
   media: {
     ...StyleSheet.absoluteFill,
