@@ -4,14 +4,13 @@ import { i18n } from '@/i18n';
 
 const BASE_URL = 'https://api.mapbox.com/search/searchbox/v1';
 
-/** Preferred Search Box category ids, best first (see `resolveCategoryId`). */
-export const FUEL_CATEGORY_IDS = ['gas_station', 'fuel', 'petrol_station'] as const;
-export const REPAIR_CATEGORY_IDS = [
-  'motorcycle_repair',
-  'auto_repair',
-  'car_repair',
-  'vehicle_repair',
-] as const;
+/**
+ * Preferred Search Box category ids, best first (see `resolveCategoryId`); checked against
+ * `/list/category` on 2026-10-08. There is no motorcycle-specific repair id: `auto_repair`
+ * ("Mechanic") covers motorcycle services too, while `repair_shop` is appliance and phone repair.
+ */
+export const FUEL_CATEGORY_IDS = ['gas_station'] as const;
+export const REPAIR_CATEGORY_IDS = ['auto_repair'] as const;
 
 /** A Search Box GeoJSON result; `metadata` only on category and retrieve responses. */
 export type SearchBoxFeature = {
@@ -26,7 +25,10 @@ export type SearchBoxFeature = {
   };
 };
 
-/** Weekly opening periods; `day` 0 = Monday, `time` "HHmm". A period without `close` never closes. */
+/**
+ * Weekly opening periods; `day` 0 = Sunday … 6 = Saturday (like `Date.getDay`), `time` "HHmm".
+ * A period without `close` never closes.
+ */
 export type SearchBoxOpenHours = {
   periods?: { open: { day: number; time: string }; close?: { day: number; time: string } }[];
 };

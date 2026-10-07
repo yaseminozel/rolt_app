@@ -5,7 +5,7 @@ import type { OpeningState } from './types';
 const MINUTES_PER_DAY = 24 * 60;
 const MINUTES_PER_WEEK = 7 * MINUTES_PER_DAY;
 
-/** Minutes since Monday 00:00 for a Search Box `{ day, time }` (day 0 = Monday, time "HHmm"). */
+/** Minutes since Sunday 00:00 for a Search Box `{ day, time }` (day 0 = Sunday, time "HHmm"). */
 const weekMinute = ({ day, time }: { day: number; time: string }) =>
   day * MINUTES_PER_DAY + Number(time.slice(0, 2)) * 60 + Number(time.slice(2, 4));
 
@@ -29,7 +29,7 @@ export function openingStateFromPeriods(
     const close = period.close!;
     let end = weekMinute(close);
     if (end <= start) {
-      // Past midnight: the next day (some data repeats the opening day), or Sunday → Monday.
+      // Past midnight: the next day (some data repeats the opening day), or Saturday → Sunday.
       end += close.day === period.open.day ? MINUTES_PER_DAY : MINUTES_PER_WEEK;
     }
     return { start, end };
@@ -39,8 +39,8 @@ export function openingStateFromPeriods(
   if (covered >= MINUTES_PER_WEEK - 7 * 2) {
     return 'open24h';
   }
-  const minute =
-    ((now.getDay() + 6) % 7) * MINUTES_PER_DAY + now.getHours() * 60 + now.getMinutes();
+  // Search Box days count from Sunday, like `Date.getDay`.
+  const minute = now.getDay() * MINUTES_PER_DAY + now.getHours() * 60 + now.getMinutes();
   const open = spans.some(
     ({ start, end }) =>
       (minute >= start && minute < end) ||

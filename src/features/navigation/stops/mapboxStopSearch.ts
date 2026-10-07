@@ -23,14 +23,14 @@ const RESULT_LIMIT = 10;
 const ROUTE_POINTS = 120;
 
 /**
- * Preferred Search Box canonical ids per chip, best first. The available ids are read once from
- * `/list/category` and the first match is used, so the app doesn't depend on guessed names.
+ * Preferred Search Box canonical ids per chip, best first (all checked against `/list/category`
+ * on 2026-10-08). The available ids are read once at runtime and the first match is used.
  */
 const CATEGORY_CANDIDATES: Record<StopCategory, readonly string[]> = {
   fuel: FUEL_CATEGORY_IDS,
-  cafe: ['cafe', 'coffee', 'coffee_shop'],
+  cafe: ['cafe', 'coffee_shop', 'coffee'],
   mechanic: REPAIR_CATEGORY_IDS,
-  viewpoint: ['viewpoint', 'scenic_lookout', 'lookout', 'tourist_attraction'],
+  viewpoint: ['viewpoint', 'tourist_attraction'],
 };
 
 async function resolveCategoryIds() {
