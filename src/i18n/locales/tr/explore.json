@@ -6,19 +6,28 @@
     "title": "Bu bölgede rota yok",
     "description": "Haritayı kaydır ya da başka bir filtre seç."
   },
+  "search": {
+    "placeholder": "Bu bölgede ara"
+  },
+  "categories": {
+    "routes": "Rotalar",
+    "fuel": "Benzinlik",
+    "repair": "Tamirci"
+  },
   "map": {
     "locateMe": "Konumuma git",
-    "zoomIn": "Yakınlaştır",
-    "zoomOut": "Uzaklaştır",
-    "satellite": "Uydu görünümü",
-    "routeMarker": "{{number}}. {{name}}",
-    "locationUnavailable": "Konumun alınamadı. Ayarlardan konum iznini açabilirsin."
+    "myLocation": "Konumum",
+    "clusterUnit_one": "rota",
+    "clusterUnit_other": "rota",
+    "clusterLabel_one": "{{count}} rota, yakınlaştır",
+    "clusterLabel_other": "{{count}} rota, yakınlaştır",
+    "start": "Başlangıç",
+    "finish": "Varış",
+    "locationUnavailable": "Konumun alınamadı. Ayarlardan konum iznini açabilirsin.",
+    "layers": "Katmanlar"
   },
-  "preview": {
-    "authorRating": "{{author}} · {{rating}} ★ ({{count}})",
-    "away": "{{distance}} uzakta",
-    "viewDetails": "Detayı gör",
-    "startRide": "Sürmeye başla",
-    "a11yRating": "{{author}}, {{rating}} puan, {{count}} değerlendirme"
+  "selected": {
+    "backToRoutes": "Rotalara geri dön · {{count}}",
+    "viewRoute": "Rotayı görüntüle"
   }
 }

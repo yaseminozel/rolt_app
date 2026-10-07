@@ -11,10 +11,13 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, radius, shadows, spacing, typography } from '@/theme';
 
-/** `outlined` = white field with 1 pt border (g4Zy4 "Yamaha modeli ara"); `filled` = muted fill (QKDo5 "Marka ara"). */
-export type SearchFieldVariant = 'outlined' | 'filled';
+/**
+ * `outlined` = white field with 1 pt border (g4Zy4 "Yamaha modeli ara"); `filled` = muted fill
+ * (QKDo5 "Marka ara"); `floating` = outlined with a shadow, over a map (07.01 "Bu bölgede ara").
+ */
+export type SearchFieldVariant = 'outlined' | 'filled' | 'floating';
 
 export type SearchFieldProps = Omit<
   TextInputProps,
@@ -72,7 +75,13 @@ export function SearchField({
   const backgroundColor = disabled || filled ? colors.surfaceMuted : colors.surface;
 
   return (
-    <View style={[styles.field, { borderColor, backgroundColor }, containerStyle]}>
+    <View
+      style={[
+        styles.field,
+        { borderColor, backgroundColor },
+        variant === 'floating' && styles.floating,
+        containerStyle,
+      ]}>
       <Search
         width={ICON_SIZE}
         height={ICON_SIZE}
@@ -106,7 +115,12 @@ export function SearchField({
           accessibilityLabel={t('actions.clear')}
           hitSlop={spacing.md}
           style={styles.clear}>
-          <Xmark width={ICON_SIZE} height={ICON_SIZE} color={colors.textPrimary} strokeWidth={1.5} />
+          <Xmark
+            width={ICON_SIZE}
+            height={ICON_SIZE}
+            color={colors.textPrimary}
+            strokeWidth={1.5}
+          />
         </Pressable>
       ) : null}
     </View>
@@ -126,6 +140,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: radius.md,
     overflow: 'hidden',
+  },
+  floating: {
+    boxShadow: shadows.mapField,
   },
   input: {
     ...typography.bodyLarge,

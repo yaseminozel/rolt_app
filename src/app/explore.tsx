@@ -1,31 +1,70 @@
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { router, useLocalSearchParams } from 'expo-router';
-import { MapsArrow, NavArrowLeft } from 'iconoir-react-native';
-import { useCallback, useMemo, useRef, useState, type ComponentProps, type ComponentRef } from 'react';
+import { router } from 'expo-router';
+import { Gas, NavArrowLeft, NavigatorAlt, PathArrow, Wrench } from 'iconoir-react-native';
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+  type ComponentRef,
+  type ReactNode,
+} from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View, type LayoutChangeEvent } from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+  type LayoutChangeEvent,
+} from 'react-native';
 import { FlatList, ScrollView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 
+import {
+  ExploreRouteLines,
+  OTHER_LINE,
+  SELECTED_LINE,
+} from '@/components/explore/ExploreRouteLines';
 import { LayersIcon } from '@/components/explore/LayersIcon';
-import { RoutePreviewCard } from '@/components/explore/RoutePreviewCard';
+import { MapCategoryChip } from '@/components/explore/MapCategoryChip';
+import { routeTagBadgeTone } from '@/components/explore/routeTagBadgeTone';
+import { SelectedRouteSummary } from '@/components/explore/SelectedRouteSummary';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
-import { cameraBoundsFor, metersPerPoint, routeMidpoint, type MapPadding } from '@/components/map/mapGeometry';
-import { MapScaleBar } from '@/components/map/MapScaleBar';
+import {
+  cameraBoundsFor,
+  clusterMarkers,
+  routeMidpoint,
+  worldPoint,
+  type MapPadding,
+  type ScreenPoint,
+} from '@/components/map/mapGeometry';
 import type { MapStyle } from '@/components/map/mapStyles';
-import { MapZoomControl } from '@/components/map/MapZoomControl';
 import type { MapboxModule } from '@/components/map/NativeBaseMap';
-import { RouteLineLayers } from '@/components/map/RouteLineLayers';
-import { ROUTE_PHOTO_PIN_ANCHOR, RoutePhotoPin } from '@/components/map/RoutePhotoPin';
-import { routeTagTones } from '@/components/map/routeTagTones';
+import { ROUTE_CLUSTER_SIZE, RouteClusterMarker } from '@/components/map/RouteClusterMarker';
+import {
+  ROUTE_ENDPOINT_MARKER_WIDTH,
+  ROUTE_FINISH_MARKER_ANCHOR,
+  ROUTE_FINISH_MARKER_OFFSET,
+  ROUTE_START_MARKER_ANCHOR,
+  ROUTE_START_MARKER_OFFSET,
+  RouteEndpointMarker,
+} from '@/components/map/RouteEndpointMarker';
+import {
+  ROUTE_PHOTO_PIN_ANCHOR,
+  ROUTE_PHOTO_PIN_SIZE,
+  RoutePhotoPin,
+} from '@/components/map/RoutePhotoPin';
 import { RouteCard } from '@/components/route/RouteCard';
+import { createProjection, polylinePath } from '@/components/route-builder/routeProjection';
 import { FilterChip } from '@/components/ui/FilterChip';
+import { SearchField } from '@/components/ui/SearchField';
 import { useDeviceLocation } from '@/features/location/useDeviceLocation';
-import { findCityByName } from '@/features/location/turkishCities';
-import { distanceKm } from '@/features/routes/geo';
 import { useRoutesInArea } from '@/features/routes/queries';
 import type { Bounds, LngLat, Route, RouteFilter, RouteTag } from '@/features/routes/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
@@ -36,24 +75,31 @@ type CameraRef = ComponentRef<MapboxModule['Camera']>;
 type MapViewProps = ComponentProps<MapboxModule['MapView']>;
 type MapState = Parameters<NonNullable<MapViewProps['onMapIdle']>>[0];
 
-/** Antalya coast from Kaş to Antalya, the area drawn in the design (01.7 `eMAqs`). */
+/** Antalya coast from Kaş to Antalya, where the mock routes are. */
 const INITIAL_AREA: Bounds = { southWest: [29.35, 36.15], northEast: [30.95, 37.12] };
-/** Chip order of the design ("Tümü", then the route tags; Off-road joined the vocabulary later). */
-const FILTERS: RouteFilter[] = ['all', 'coast', 'curvy', 'scenic', 'city', 'nature', 'offRoad'];
-/** The Expo Go artwork's own scale: 140 pt = 20 km (01.7 `rxpI9`). */
-const FALLBACK_METERS_PER_POINT = 20000 / 140;
+/** Sheet chips (07.01 "Rota kategorileri"): "Tümü" and the five tags the design lists. */
+const FILTERS: RouteFilter[] = ['all', 'coast', 'curvy', 'scenic', 'city', 'nature'];
+/** Markers closer than this on screen merge into one "N rota" badge (the cluster's 72 pt halo). */
+const CLUSTER_DISTANCE = ROUTE_CLUSTER_SIZE;
 
-const TOP_BAR_HEIGHT = 48;
-const CARD_INSET = 12;
-/** Design card height, used before the card has been measured. */
-const PREVIEW_CARD_ESTIMATE = 227;
-/** Sheet (01.7 `uwUKg`): 8 top padding + 16 handle + 4 gap, then the content. */
-const SHEET_HEADER_HEIGHT = 8 + 16 + 4 + 36;
-const SHEET_CONTENT_HEIGHT = SHEET_HEADER_HEIGHT + 16 + 34 + 16 + 191 + 16;
-/** Scale bar sits 8 pt above the sheet; zoom sits 16 pt above the preview card. */
-const CONTROLS_GAP_SHEET = spacing.sm;
-const CONTROLS_GAP_CARD = spacing.lg;
+/** Header (07.01 "MapExploreSearchBar + CategoryChips"): 4 top, 44 search row, 8, 44 chip row. */
+const HEADER_HEIGHT = 4 + 44 + spacing.sm + 44;
+/** Sheet handle area: 8 top + 4 grabber + 12 bottom. */
+const HANDLE_HEIGHT = 8 + 4 + 12;
+const TITLE_HEIGHT = 36;
+const CHIPS_HEIGHT = 34;
+const CARD_HEIGHT = 191;
+const SHEET_COLLAPSED_HEIGHT = HANDLE_HEIGHT + TITLE_HEIGHT + spacing.sm;
+const SHEET_LIST_HEIGHT =
+  HANDLE_HEIGHT + TITLE_HEIGHT + spacing.lg + CHIPS_HEIGHT + spacing.lg + CARD_HEIGHT + spacing.lg;
+/** Selected-route sheet before its content is measured: pill, summary, actions. */
+const SELECTED_CONTENT_ESTIMATE = 32 + spacing.lg + 122 + spacing.lg + 44;
+/** Map buttons keep 16 pt above the sheet. */
+const CONTROLS_GAP = spacing.lg;
 const CAMERA_ANIMATION_MS = 600;
+/** Markers closer together than this (degrees) can't be split by zooming; open them at street level. */
+const CLUSTER_MIN_SPAN = 0.002;
+const CLUSTER_STREET_ZOOM = 15;
 
 const round = (value: number) => Math.round(value * 1000) / 1000;
 const roundBounds = (ne: GeoJSON.Position, sw: GeoJSON.Position): Bounds => ({
@@ -61,33 +107,37 @@ const roundBounds = (ne: GeoJSON.Position, sw: GeoJSON.Position): Bounds => ({
   northEast: [round(ne[0]), round(ne[1])],
 });
 
-/** Distance to the nearest vertex of the route. */
-const distanceToRoute = (from: LngLat, route: Route) =>
-  Math.min(...route.coordinates.map((point) => distanceKm(from, point)));
+type MapMarker =
+  | { kind: 'cluster'; key: string; coordinate: LngLat; routes: Route[] }
+  | { kind: 'photo'; key: string; coordinate: LngLat; route: Route }
+  | { kind: 'start' | 'finish'; key: string; coordinate: LngLat };
 
 /**
- * 01.7 Haritada Keşfet (Pencil `Y0OQR` "Rota listesi", `lBW4t` "Rota seçili"): routes in the
- * visible area as coloured lines with numbered photo markers, a persistent list sheet with tag
- * filters, and a preview card while a route is selected. Optional `city` param: the city chosen
- * on Discover, used for "N km uzakta" when the rider's location is unknown.
+ * 07.01 Haritada Keşfet — Rotalar (Pencil `ygtOL` clusters, `LXKWN` photo pins, `JhMSW` route
+ * selected). Routes in the visible area appear as photo pins, merged into "N rota" badges where
+ * they would overlap; the sheet lists them with tag chips. Selecting a route draws it in blue
+ * with its start and finish, greys out the others and swaps the sheet for its summary.
  */
 export default function ExploreMapScreen() {
   const { t } = useTranslation(['explore', 'routes', 'common']);
-  const { city } = useLocalSearchParams<{ city?: string }>();
   const insets = useSafeAreaInsets();
-  const { height: screenHeight } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const { showToast } = useToast();
   const { isSaved, toggleBookmark } = useRouteBookmark();
   const { position, locate } = useDeviceLocation();
 
+  const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<RouteFilter>('all');
   const [area, setArea] = useState<Bounds>(INITIAL_AREA);
-  // The selected route object (not just its id), so the card stays if the map moves it out of the list.
+  const [zoom, setZoom] = useState(() => initialZoom(screenWidth));
+  // The selected route object (not just its id), so it stays if the map moves it out of the list.
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null);
   const selectedId = selectedRoute?.id ?? null;
   const [mapStyle, setMapStyle] = useState<MapStyle>('default');
-  const [scale, setScale] = useState(isNativeMapAvailable ? 0 : FALLBACK_METERS_PER_POINT);
-  const [cardHeight, setCardHeight] = useState(PREVIEW_CARD_ESTIMATE);
+  const [selectedContentHeight, setSelectedContentHeight] = useState(SELECTED_CONTENT_ESTIMATE);
+  // Expo Go / web artwork: the points the projection fits (a cluster tap "zooms" into its routes).
+  const [fallbackFocus, setFallbackFocus] = useState<LngLat[] | null>(null);
+  const [mapSize, setMapSize] = useState({ width: screenWidth, height: screenHeight });
 
   const { data } = useRoutesInArea(area, filter);
   // Keep the previous list while a new area / filter loads, so markers and cards don't flash.
@@ -96,156 +146,264 @@ export default function ExploreMapScreen() {
     setRoutes(data);
   }
 
-  // A selected route that left the visible area keeps its line on the map.
-  const drawnRoutes =
-    selectedRoute && routes && !routes.some((route) => route.id === selectedRoute.id)
-      ? [...routes, selectedRoute]
-      : routes;
-
   const cameraRef = useRef<CameraRef>(null);
-  const sheetRef = useRef<BottomSheet>(null);
-  const zoomRef = useRef<number | null>(null);
 
-  const sheetFullHeight = SHEET_CONTENT_HEIGHT + insets.bottom;
+  const headerBottom = insets.top + HEADER_HEIGHT;
+  const listSheetHeight = SHEET_LIST_HEIGHT + insets.bottom;
+  const selectedSheetHeight = HANDLE_HEIGHT + selectedContentHeight + spacing.lg + insets.bottom;
   const snapPoints = useMemo(
-    () => [SHEET_HEADER_HEIGHT + spacing.sm + insets.bottom, sheetFullHeight],
-    [insets.bottom, sheetFullHeight],
+    () =>
+      selectedRoute
+        ? [selectedSheetHeight]
+        : [SHEET_COLLAPSED_HEIGHT + insets.bottom, listSheetHeight],
+    [insets.bottom, listSheetHeight, selectedRoute, selectedSheetHeight],
   );
-  const topReserved = insets.top + TOP_BAR_HEIGHT;
   const initialCamera = useMemo(
     () => ({
       bounds: cameraBoundsFor([INITIAL_AREA.southWest, INITIAL_AREA.northEast], {
-        top: topReserved,
+        top: headerBottom,
         right: 0,
-        bottom: sheetFullHeight,
+        bottom: listSheetHeight,
         left: 0,
       }),
     }),
-    [sheetFullHeight, topReserved],
+    [headerBottom, listSheetHeight],
   );
-  const cardBottom = insets.bottom + spacing.sm;
 
-  // Map controls ride on top of the sheet, or of the preview card while a route is selected.
-  // Seeded with the layout before the first measurement so the controls don't jump in.
-  const sheetTop = useSharedValue(screenHeight - sheetFullHeight);
-  const cardTop = useSharedValue(screenHeight - cardBottom - PREVIEW_CARD_ESTIMATE);
+  // Map buttons ride 16 pt above the sheet; seeded with the open list so they don't jump in.
+  const sheetTop = useSharedValue(screenHeight - listSheetHeight);
   const controlsHeight = useSharedValue(0);
-  const cardVisible = useSharedValue(false);
   const controlsStyle = useAnimatedStyle(() => {
-    const anchor = cardVisible.value ? cardTop.value - CONTROLS_GAP_CARD : sheetTop.value - CONTROLS_GAP_SHEET;
-    return { transform: [{ translateY: Math.max(anchor - controlsHeight.value, topReserved + spacing.lg) }] };
+    const anchor = sheetTop.value - CONTROLS_GAP - controlsHeight.value;
+    return { transform: [{ translateY: Math.max(anchor, headerBottom + spacing.lg) }] };
   });
 
-  const fitRoute = useCallback(
-    (route: Route) => {
-      const padding: MapPadding = {
-        top: topReserved + spacing.xxl,
-        right: 72,
-        bottom: cardHeight + cardBottom + spacing.xxl,
-        left: spacing.xxxl,
-      };
-      cameraRef.current?.setCamera({
-        bounds: cameraBoundsFor(route.coordinates, padding),
-        animationDuration: CAMERA_ANIMATION_MS,
-      });
-    },
-    [cardBottom, cardHeight, topReserved],
+  const cameraPadding = useCallback(
+    (bottom: number): MapPadding => ({
+      top: headerBottom + spacing.xxl,
+      right: spacing.huge + spacing.lg,
+      bottom: bottom + spacing.xxl,
+      left: spacing.huge,
+    }),
+    [headerBottom],
   );
 
   const selectRoute = useCallback(
-    (routeId: string) => {
-      const route = routes?.find((item) => item.id === routeId);
-      if (!route) {
-        return;
-      }
+    (route: Route) => {
       setSelectedRoute(route);
-      cardVisible.set(true);
-      sheetRef.current?.close();
-      fitRoute(route);
+      cameraRef.current?.setCamera({
+        bounds: cameraBoundsFor(route.coordinates, cameraPadding(selectedSheetHeight)),
+        animationDuration: CAMERA_ANIMATION_MS,
+      });
     },
-    [cardVisible, fitRoute, routes],
+    [cameraPadding, selectedSheetHeight],
   );
 
-  const clearSelection = () => {
-    setSelectedRoute(null);
-    cardVisible.set(false);
-    sheetRef.current?.snapToIndex(1);
-  };
+  const clearSelection = () => setSelectedRoute(null);
 
-  const handleCardLayout = (event: LayoutChangeEvent) => {
-    const { y, height } = event.nativeEvent.layout;
-    cardTop.set(y);
-    setCardHeight(height);
+  const openCluster = (members: Route[]) => {
+    setSelectedRoute(null);
+    const points = members.map(routeMidpoint);
+    if (!isNativeMapAvailable) {
+      setFallbackFocus(points);
+      return;
+    }
+    const lngs = points.map(([lng]) => lng);
+    const lats = points.map(([, lat]) => lat);
+    const span = Math.max(
+      Math.max(...lngs) - Math.min(...lngs),
+      Math.max(...lats) - Math.min(...lats),
+    );
+    cameraRef.current?.setCamera(
+      span < CLUSTER_MIN_SPAN
+        ? {
+            centerCoordinate: points[0],
+            zoomLevel: CLUSTER_STREET_ZOOM,
+            animationDuration: CAMERA_ANIMATION_MS,
+          }
+        : {
+            bounds: cameraBoundsFor(points, cameraPadding(listSheetHeight)),
+            animationDuration: CAMERA_ANIMATION_MS,
+          },
+    );
   };
 
   const handleMapIdle = (state: MapState) => {
-    const { bounds, zoom, center } = state.properties;
-    zoomRef.current = zoom;
-    setScale(metersPerPoint(zoom, center[1]));
+    const { bounds, zoom: mapZoom } = state.properties;
+    setZoom(Math.round(mapZoom * 4) / 4);
     if (!state.gestures.isGestureActive) {
       setArea(roundBounds(bounds.ne, bounds.sw));
     }
   };
 
-  const zoomBy = (delta: number) => {
-    if (zoomRef.current === null) {
-      return;
-    }
-    cameraRef.current?.zoomTo(zoomRef.current + delta, 300);
-  };
-
-  // Toasts clear the preview card, or float just above the list sheet.
-  const toastOffset = selectedRoute ? cardHeight + spacing.lg : sheetFullHeight - insets.bottom + spacing.sm;
+  // Toasts float just above the sheet.
+  const toastOffset =
+    (selectedRoute ? selectedSheetHeight : listSheetHeight) - insets.bottom + spacing.sm;
 
   const handleLocate = async () => {
     const coordinate = await locate();
     if (!coordinate) {
-      showToast({ variant: 'failure', message: t('map.locationUnavailable'), bottomOffset: toastOffset });
+      showToast({
+        variant: 'failure',
+        message: t('map.locationUnavailable'),
+        bottomOffset: toastOffset,
+      });
       return;
     }
-    cameraRef.current?.setCamera({ centerCoordinate: coordinate, zoomLevel: 11, animationDuration: CAMERA_ANIMATION_MS });
+    cameraRef.current?.setCamera({
+      centerCoordinate: coordinate,
+      zoomLevel: 11,
+      animationDuration: CAMERA_ANIMATION_MS,
+    });
   };
 
-  const origin = position ?? cityCentre(city ?? selectedRoute?.city);
-  const startRide = (routeId: string) => router.navigate({ pathname: '/record', params: { routeId } });
+  // Routes of the area other than the selected one (all of them while nothing is selected).
+  const otherRoutes = useMemo(
+    () => (routes ?? []).filter((route) => route.id !== selectedId),
+    [routes, selectedId],
+  );
+
+  const fallbackProject = useMemo(() => {
+    const fitPoints = selectedRoute
+      ? selectedRoute.coordinates
+      : (fallbackFocus ?? (routes ?? []).map(routeMidpoint));
+    return createProjection(fitPoints, mapSize.width, mapSize.height, {
+      top: headerBottom + ROUTE_PHOTO_PIN_SIZE.height,
+      right: spacing.huge + spacing.lg,
+      bottom: (selectedRoute ? selectedSheetHeight : listSheetHeight) + spacing.xxl,
+      left: spacing.huge,
+    });
+  }, [
+    fallbackFocus,
+    headerBottom,
+    listSheetHeight,
+    mapSize,
+    routes,
+    selectedRoute,
+    selectedSheetHeight,
+  ]);
+
+  const markers = useMemo<MapMarker[]>(() => {
+    const project = isNativeMapAvailable
+      ? (coordinate: LngLat): ScreenPoint => worldPoint(coordinate, zoom)
+      : fallbackProject;
+    const clusters = clusterMarkers(otherRoutes, {
+      id: (route) => route.id,
+      coordinate: routeMidpoint,
+      project,
+      distance: CLUSTER_DISTANCE,
+    });
+    const result: MapMarker[] = clusters.map((cluster) =>
+      // While a route is selected the others are grey count badges, single routes included.
+      cluster.members.length === 1 && !selectedRoute
+        ? {
+            kind: 'photo',
+            key: cluster.key,
+            coordinate: cluster.coordinate,
+            route: cluster.members[0],
+          }
+        : {
+            kind: 'cluster',
+            key: cluster.key,
+            coordinate: cluster.coordinate,
+            routes: cluster.members,
+          },
+    );
+    if (selectedRoute) {
+      const { coordinates } = selectedRoute;
+      result.push({ kind: 'start', key: 'start', coordinate: coordinates[0] });
+      if (!selectedRoute.isLoop) {
+        result.push({
+          kind: 'finish',
+          key: 'finish',
+          coordinate: coordinates[coordinates.length - 1],
+        });
+      }
+    }
+    return result;
+  }, [fallbackProject, otherRoutes, selectedRoute, zoom]);
+
+  const handleClusterPress = (members: Route[]) => {
+    if (selectedRoute && members.length === 1) {
+      selectRoute(members[0]);
+      return;
+    }
+    openCluster(members);
+  };
+
+  const renderMarker = (marker: MapMarker) => {
+    switch (marker.kind) {
+      case 'cluster':
+        return (
+          <RouteClusterMarker
+            count={marker.routes.length}
+            unitLabel={t('map.clusterUnit', { count: marker.routes.length })}
+            accessibilityLabel={t('map.clusterLabel', { count: marker.routes.length })}
+            tone={selectedRoute ? 'inactive' : 'active'}
+            onPress={() => handleClusterPress(marker.routes)}
+          />
+        );
+      case 'photo':
+        return (
+          <RoutePhotoPin
+            image={marker.route.coverImage}
+            accessibilityLabel={marker.route.name}
+            onPress={() => selectRoute(marker.route)}
+          />
+        );
+      case 'start':
+        return <RouteEndpointMarker kind="start" label={t('map.start')} />;
+      case 'finish':
+        return <RouteEndpointMarker kind="finish" label={t('map.finish')} />;
+    }
+  };
+
+  const handleMapLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setMapSize({ width, height });
+  };
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.screen} onLayout={handleMapLayout}>
       <BaseMap
         fallbackImage={mapFallbacks.explore}
         style={StyleSheet.absoluteFill}
         mapStyle={mapStyle}
         onMapIdle={handleMapIdle}
-        onCameraChanged={(state) => {
-          zoomRef.current = state.properties.zoom;
-        }}
+        fallbackOverlay={
+          <FallbackLayer
+            project={fallbackProject}
+            size={mapSize}
+            selected={selectedRoute}
+            others={otherRoutes}
+            markers={markers}
+            renderMarker={renderMarker}
+          />
+        }
         renderLayers={(Mapbox) => (
           <>
             <Mapbox.Camera ref={cameraRef} defaultSettings={initialCamera} />
-            {drawnRoutes ? (
-              <RouteLineLayers
+            {selectedRoute ? (
+              <ExploreRouteLines
                 mapbox={Mapbox}
-                id="explore"
-                routes={drawnRoutes}
-                colorFor={routeTagColor}
-                selectedRouteId={selectedId}
-                onPressRoute={selectRoute}
+                selected={selectedRoute}
+                others={otherRoutes}
+                onPressRoute={(routeId) => {
+                  const route = otherRoutes.find((item) => item.id === routeId);
+                  if (route) {
+                    selectRoute(route);
+                  }
+                }}
               />
             ) : null}
-            {routes?.map((route, index) => (
+            {markers.map((marker) => (
               <Mapbox.MarkerView
-                key={route.id}
-                coordinate={routeMidpoint(route)}
-                anchor={ROUTE_PHOTO_PIN_ANCHOR}
+                key={marker.key}
+                coordinate={marker.coordinate}
+                anchor={markerAnchor(marker)}
                 allowOverlap
-                isSelected={route.id === selectedId}>
-                <RoutePhotoPin
-                  image={route.coverImage}
-                  number={index + 1}
-                  accessibilityLabel={t('map.routeMarker', { number: index + 1, name: route.name })}
-                  onPress={() => selectRoute(route.id)}
-                  dimmed={selectedId !== null && route.id !== selectedId}
-                />
+                allowOverlapWithPuck>
+                {renderMarker(marker)}
               </Mapbox.MarkerView>
             ))}
             {position ? <Mapbox.LocationPuck puckBearingEnabled={false} /> : null}
@@ -253,18 +411,33 @@ export default function ExploreMapScreen() {
         )}
       />
 
-      <View style={[styles.topBar, { top: insets.top }]} pointerEvents="box-none">
-        <MapActionButton icon={NavArrowLeft} accessibilityLabel={t('common:actions.back')} onPress={goBack} />
-        <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>
-          {t('title')}
-        </Text>
-        <MapActionButton
-          icon={LayersIcon}
-          accessibilityLabel={t('map.satellite')}
-          selected={mapStyle === 'satellite'}
-          disabled={!isNativeMapAvailable}
-          onPress={() => setMapStyle((current) => (current === 'satellite' ? 'default' : 'satellite'))}
-        />
+      <View
+        style={[styles.header, { paddingTop: insets.top + spacing.xs }]}
+        pointerEvents="box-none">
+        <View style={styles.searchRow}>
+          <MapActionButton
+            icon={NavArrowLeft}
+            size="field"
+            accessibilityLabel={t('common:actions.back')}
+            onPress={goBack}
+          />
+          <SearchField
+            variant="floating"
+            value={query}
+            onChangeText={setQuery}
+            placeholder={t('search.placeholder')}
+            containerStyle={styles.search}
+          />
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryRow}
+          contentContainerStyle={styles.categoryTrack}>
+          <MapCategoryChip label={t('categories.routes')} icon={PathArrow} selected />
+          <MapCategoryChip label={t('categories.fuel')} icon={Gas} selected={false} />
+          <MapCategoryChip label={t('categories.repair')} icon={Wrench} selected={false} />
+        </ScrollView>
       </View>
 
       <Animated.View
@@ -274,26 +447,30 @@ export default function ExploreMapScreen() {
           controlsHeight.set(event.nativeEvent.layout.height);
         }}>
         <MapActionButton
-          icon={MapsArrow}
-          size="control"
-          accessibilityLabel={t('map.locateMe')}
+          icon={NavigatorAlt}
+          size="fab"
+          accessibilityLabel={t('map.myLocation')}
           onPress={handleLocate}
           disabled={!isNativeMapAvailable}
         />
-        <MapZoomControl
-          zoomInLabel={t('map.zoomIn')}
-          zoomOutLabel={t('map.zoomOut')}
-          onZoomIn={() => zoomBy(1)}
-          onZoomOut={() => zoomBy(-1)}
+        <MapActionButton
+          icon={LayersIcon}
+          size="fab"
+          accessibilityLabel={t('map.layers')}
+          selected={mapStyle === 'satellite'}
           disabled={!isNativeMapAvailable}
+          onPress={() =>
+            setMapStyle((current) => (current === 'satellite' ? 'default' : 'satellite'))
+          }
         />
-        {selectedRoute ? null : <MapScaleBar metersPerPoint={scale} style={styles.scale} />}
       </Animated.View>
 
       <BottomSheet
-        ref={sheetRef}
+        // List and selected route have different snap points; a fresh sheet per mode slides in
+        // instead of re-indexing one whose snap points are still updating on the UI thread.
+        key={selectedRoute ? 'selected' : 'list'}
         snapPoints={snapPoints}
-        index={1}
+        index={selectedRoute ? 0 : 1}
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         animatedPosition={sheetTop}
@@ -301,71 +478,218 @@ export default function ExploreMapScreen() {
         backgroundStyle={styles.sheetBackground}
         handleStyle={styles.sheetHandle}
         handleIndicatorStyle={styles.sheetHandleIndicator}>
-        <BottomSheetView style={styles.sheetContent}>
-          <View style={styles.sheetTitleRow}>
-            <Text style={styles.sheetTitle} accessibilityRole="header">
-              {routes === undefined ? '' : routes.length === 0 ? t('empty.title') : t('routesInArea', { count: routes.length })}
-            </Text>
-            {data === undefined ? <ActivityIndicator size="small" color={colors.textSecondary} /> : null}
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-            {FILTERS.map((option) => (
-              <FilterChip
-                key={option}
-                type="toggle"
-                showIcon={false}
-                label={option === 'all' ? t('routes:filters.all') : t(`routes:tags.${option as RouteTag}`)}
-                selected={filter === option}
-                onPress={() => setFilter(option)}
+        {selectedRoute ? (
+          <BottomSheetView style={styles.selectedContent}>
+            <View
+              onLayout={(event) =>
+                setSelectedContentHeight(Math.ceil(event.nativeEvent.layout.height))
+              }>
+              <SelectedRouteSummary
+                route={selectedRoute}
+                routeCount={routes?.length ?? 0}
+                saved={isSaved(selectedRoute.id)}
+                onBack={clearSelection}
+                onToggleSave={() =>
+                  toggleBookmark(selectedRoute.id, { toastBottomOffset: toastOffset })
+                }
+                onViewRoute={() =>
+                  router.push({ pathname: '/route/[id]', params: { id: selectedRoute.id } })
+                }
               />
-            ))}
-          </ScrollView>
-          {routes && routes.length === 0 ? (
-            <Text style={styles.emptyText}>{t('empty.description')}</Text>
-          ) : (
-            <FlatList
+            </View>
+          </BottomSheetView>
+        ) : (
+          <BottomSheetView style={styles.listContent}>
+            <View style={styles.sheetTitleRow}>
+              <Text style={styles.sheetTitle} accessibilityRole="header">
+                {routes === undefined
+                  ? ''
+                  : routes.length === 0
+                    ? t('empty.title')
+                    : t('routesInArea', { count: routes.length })}
+              </Text>
+              {data === undefined ? (
+                <ActivityIndicator size="small" color={colors.textSecondary} />
+              ) : null}
+            </View>
+            <ScrollView
               horizontal
-              data={routes ?? []}
-              keyExtractor={(route) => route.id}
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.cards}
-              renderItem={({ item }) => (
-                <RouteCard
-                  variant="compact"
-                  image={item.coverImage}
-                  title={item.name}
-                  subtitle={item.summary}
-                  distance={formatDistance(item.distanceKm)}
-                  duration={formatDuration(item.durationMinutes)}
-                  badgeLabel={t(`routes:tags.${item.tag}`)}
-                  saved={isSaved(item.id)}
-                  onToggleSave={() => toggleBookmark(item.id, { toastBottomOffset: toastOffset })}
-                  onPress={() => selectRoute(item.id)}
+              contentContainerStyle={styles.chips}>
+              {FILTERS.map((option) => (
+                <FilterChip
+                  key={option}
+                  type="toggle"
+                  showIcon={false}
+                  label={
+                    option === 'all'
+                      ? t('routes:filters.all')
+                      : t(`routes:tags.${option as RouteTag}`)
+                  }
+                  selected={filter === option}
+                  onPress={() => setFilter(option)}
                 />
-              )}
-            />
-          )}
-        </BottomSheetView>
+              ))}
+            </ScrollView>
+            {routes && routes.length === 0 ? (
+              <Text style={styles.emptyText}>{t('empty.description')}</Text>
+            ) : (
+              <FlatList
+                horizontal
+                data={routes ?? []}
+                keyExtractor={(route) => route.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.cards}
+                renderItem={({ item }) => (
+                  <RouteCard
+                    variant="compact"
+                    image={item.coverImage}
+                    title={item.name}
+                    subtitle={item.summary}
+                    distance={formatDistance(item.distanceKm)}
+                    duration={formatDuration(item.durationMinutes)}
+                    badgeLabel={t(`routes:tags.${item.tag}`)}
+                    badgeTone={routeTagBadgeTone[item.tag]}
+                    saved={isSaved(item.id)}
+                    onToggleSave={() => toggleBookmark(item.id, { toastBottomOffset: toastOffset })}
+                    onPress={() => selectRoute(item)}
+                  />
+                )}
+              />
+            )}
+          </BottomSheetView>
+        )}
       </BottomSheet>
-
-      {selectedRoute ? (
-        <RoutePreviewCard
-          route={selectedRoute}
-          distanceAwayKm={origin ? distanceToRoute(origin, selectedRoute) : null}
-          saved={isSaved(selectedRoute.id)}
-          onToggleSave={() => toggleBookmark(selectedRoute.id, { toastBottomOffset: toastOffset })}
-          onClose={clearSelection}
-          onViewDetails={() => router.push({ pathname: '/route/[id]', params: { id: selectedRoute.id } })}
-          onStartRide={() => startRide(selectedRoute.id)}
-          onLayout={handleCardLayout}
-          style={[styles.previewCard, { bottom: cardBottom }]}
-        />
-      ) : null}
     </View>
   );
 }
 
-const routeTagColor = (route: Route) => routeTagTones[route.tag].ink;
+function markerAnchor(marker: MapMarker) {
+  switch (marker.kind) {
+    case 'cluster':
+      return { x: 0.5, y: 0.5 };
+    case 'photo':
+      return ROUTE_PHOTO_PIN_ANCHOR;
+    case 'start':
+      return ROUTE_START_MARKER_ANCHOR;
+    case 'finish':
+      return ROUTE_FINISH_MARKER_ANCHOR;
+  }
+}
+
+/** Top-left of a marker drawn by hand over the Expo Go artwork, from its anchor point. */
+function fallbackMarkerOrigin(marker: MapMarker, point: ScreenPoint): ScreenPoint {
+  switch (marker.kind) {
+    case 'cluster':
+      return { x: point.x - ROUTE_CLUSTER_SIZE / 2, y: point.y - ROUTE_CLUSTER_SIZE / 2 };
+    case 'photo':
+      return {
+        x: point.x - ROUTE_PHOTO_PIN_SIZE.width / 2,
+        y: point.y - ROUTE_PHOTO_PIN_SIZE.height,
+      };
+    case 'start':
+      return {
+        x: point.x - ROUTE_ENDPOINT_MARKER_WIDTH / 2,
+        y: point.y - ROUTE_START_MARKER_OFFSET,
+      };
+    case 'finish':
+      return {
+        x: point.x - ROUTE_ENDPOINT_MARKER_WIDTH / 2,
+        y: point.y - ROUTE_FINISH_MARKER_OFFSET,
+      };
+  }
+}
+
+type FallbackLayerProps = {
+  project: (coordinate: LngLat) => ScreenPoint;
+  size: { width: number; height: number };
+  selected: Route | null;
+  others: readonly Route[];
+  markers: MapMarker[];
+  renderMarker: (marker: MapMarker) => ReactNode;
+};
+
+/** Expo Go / web: the same lines and markers projected onto the design's map artwork. */
+function FallbackLayer({
+  project,
+  size,
+  selected,
+  others,
+  markers,
+  renderMarker,
+}: FallbackLayerProps) {
+  return (
+    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      {selected ? (
+        <Svg
+          width={size.width}
+          height={size.height}
+          style={StyleSheet.absoluteFill}
+          pointerEvents="none">
+          {others.map((route) => {
+            const d = polylinePath(route.coordinates.map(project));
+            return (
+              <Path
+                key={route.id}
+                d={d}
+                fill="none"
+                stroke={colors.surface}
+                strokeOpacity={OTHER_LINE.casingOpacity}
+                strokeWidth={OTHER_LINE.casing}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            );
+          })}
+          {others.map((route) => (
+            <Path
+              key={`${route.id}-line`}
+              d={polylinePath(route.coordinates.map(project))}
+              fill="none"
+              stroke={colors.routeInactive}
+              strokeWidth={OTHER_LINE.width}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          ))}
+          <Path
+            d={polylinePath(selected.coordinates.map(project))}
+            fill="none"
+            stroke={colors.surface}
+            strokeWidth={SELECTED_LINE.casing}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d={polylinePath(selected.coordinates.map(project))}
+            fill="none"
+            stroke={colors.brand}
+            strokeWidth={SELECTED_LINE.width}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
+      ) : null}
+      {markers.map((marker) => {
+        const origin = fallbackMarkerOrigin(marker, project(marker.coordinate));
+        return (
+          <View
+            key={marker.key}
+            style={[styles.fallbackMarker, { left: origin.x, top: origin.y }]}
+            pointerEvents="box-none">
+            {renderMarker(marker)}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+/** Zoom that roughly fits the initial area before the map reports its own. */
+function initialZoom(screenWidth: number) {
+  const span = INITIAL_AREA.northEast[0] - INITIAL_AREA.southWest[0];
+  return Math.log2((screenWidth * 360) / (512 * span));
+}
 
 function goBack() {
   if (router.canGoBack()) {
@@ -375,44 +699,50 @@ function goBack() {
   }
 }
 
-function cityCentre(name: string | undefined): LngLat | null {
-  const city = findCityByName(name);
-  return city ? [city.longitude, city.latitude] : null;
-}
-
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.surface,
   },
-  topBar: {
+  header: {
     position: 'absolute',
-    left: layout.screenGutter,
-    right: layout.screenGutter,
-    height: TOP_BAR_HEIGHT,
+    top: 0,
+    left: 0,
+    right: 0,
+    gap: spacing.sm,
+  },
+  searchRow: {
+    height: 44,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
+    gap: spacing.sm,
+    paddingHorizontal: layout.screenGutter,
   },
-  title: {
-    ...typography.headlineMedium,
+  search: {
     flex: 1,
-    textAlign: 'center',
-    color: colors.textPrimary,
+  },
+  categoryRow: {
+    flexGrow: 0,
+    height: 44,
+    // Keeps the chip shadows from being clipped by the scroll view.
+    overflow: 'visible',
+  },
+  categoryTrack: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: layout.screenGutter,
   },
   controls: {
     position: 'absolute',
     top: 0,
     right: layout.screenGutter,
-    alignItems: 'flex-end',
-    gap: spacing.sm,
+    gap: spacing.md,
   },
-  scale: {
-    marginTop: spacing.sm,
+  fallbackMarker: {
+    position: 'absolute',
   },
   sheet: {
-    boxShadow: shadows.mapSheet,
+    boxShadow: shadows.bottomPanel,
     borderTopLeftRadius: radius.xl,
     borderTopRightRadius: radius.xl,
   },
@@ -422,8 +752,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   sheetHandle: {
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xs,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
   },
   sheetHandleIndicator: {
     width: 40,
@@ -431,12 +761,16 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: colors.border,
   },
-  sheetContent: {
+  listContent: {
     gap: spacing.lg,
-    paddingTop: spacing.xs,
+    paddingBottom: spacing.lg,
+  },
+  selectedContent: {
+    paddingHorizontal: layout.screenGutter,
+    paddingBottom: spacing.lg,
   },
   sheetTitleRow: {
-    height: 36,
+    height: TITLE_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -458,10 +792,5 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textSecondary,
     paddingHorizontal: layout.screenGutter,
-  },
-  previewCard: {
-    position: 'absolute',
-    left: CARD_INSET,
-    right: CARD_INSET,
   },
 });

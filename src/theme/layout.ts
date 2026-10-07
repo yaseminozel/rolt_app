@@ -65,6 +65,16 @@ export const shadows = {
   mapCard: '0px 8px 24px rgba(16, 19, 24, 0.18)',
   /** A / B / stop markers on the route preview card and maps (04.1 "Pin / A"). */
   mapMarker: '0px 2px 6px rgba(16, 19, 24, 0.25)',
+  /** Back button and search field over the explore map (07.01 "Back", "Field"). */
+  mapField: '0px 2px 7px rgba(15, 18, 23, 0.16)',
+  /** Category chips over the explore map (07.01 "Chip / Rotalar"). */
+  mapChip: '0px 2px 5.25px rgba(15, 18, 23, 0.14)',
+  /** 52 pt map buttons "Konumum" and "Katmanlar" (07.01 "Harita kontrolleri"). */
+  mapFab: '0px 4px 12.25px rgba(15, 18, 23, 0.14)',
+  /** Route cluster badge (07.01 "Route cluster" `Badge`). */
+  mapCluster: '0px 3px 7px rgba(15, 18, 23, 0.22)',
+  /** Start dot, finish pin, their tags and the other routes' clusters (07.01 "Rota seçili"). */
+  mapLabel: '0px 2px 5.25px rgba(0, 0, 0, 0.2)',
   /** Centered dialog card over a scrim ("Diyalog / Taslak kaydet", `zMCLP`). */
   dialog: '0px 12px 32px rgba(16, 19, 24, 0.25)',
 } as const;

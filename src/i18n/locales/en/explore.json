@@ -6,19 +6,28 @@
     "title": "No routes in this area",
     "description": "Move the map or pick another filter."
   },
+  "search": {
+    "placeholder": "Search this area"
+  },
+  "categories": {
+    "routes": "Routes",
+    "fuel": "Fuel",
+    "repair": "Repair"
+  },
   "map": {
     "locateMe": "Go to my location",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "satellite": "Satellite view",
-    "routeMarker": "{{number}}. {{name}}",
-    "locationUnavailable": "Couldn't get your location. You can allow location access in Settings."
+    "myLocation": "My location",
+    "clusterUnit_one": "route",
+    "clusterUnit_other": "routes",
+    "clusterLabel_one": "{{count}} route, zoom in",
+    "clusterLabel_other": "{{count}} routes, zoom in",
+    "start": "Start",
+    "finish": "Finish",
+    "locationUnavailable": "Couldn't get your location. You can allow location access in Settings.",
+    "layers": "Layers"
   },
-  "preview": {
-    "authorRating": "{{author}} · {{rating}} ★ ({{count}})",
-    "away": "{{distance}} away",
-    "viewDetails": "View details",
-    "startRide": "Start riding",
-    "a11yRating": "{{author}}, rated {{rating}}, {{count}} ratings"
+  "selected": {
+    "backToRoutes": "Back to routes · {{count}}",
+    "viewRoute": "View route"
   }
 }

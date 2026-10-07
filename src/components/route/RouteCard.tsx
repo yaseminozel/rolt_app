@@ -15,7 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import type { SvgProps } from 'react-native-svg';
 
-import { Badge } from '@/components/ui/Badge';
+import { Badge, type BadgeTone } from '@/components/ui/Badge';
 import { colors, fontFamily, layout, radius, shadows, spacing } from '@/theme';
 
 const COMPACT_WIDTH = 150;
@@ -40,8 +40,10 @@ type RouteCardBaseProps = {
 
 type CompactRouteCardProps = RouteCardBaseProps & {
   variant: 'compact';
-  /** Optional category label over the image, e.g. "Virajlı" (success-tone `Badge`, no icon). */
+  /** Optional category label over the image, e.g. "Virajlı" (`Badge` without icon). */
   badgeLabel?: string;
+  /** Badge tone: success everywhere except "Haritada Keşfet", which tints it by tag. */
+  badgeTone?: BadgeTone;
 };
 
 type RowRouteCardProps = RouteCardBaseProps & {
@@ -69,6 +71,7 @@ function CompactRouteCard({
   distance,
   duration,
   badgeLabel,
+  badgeTone = 'success',
   saved = false,
   onToggleSave,
   onPress,
@@ -89,7 +92,7 @@ function CompactRouteCard({
         <View style={styles.compactImageStroke} />
         {badgeLabel ? (
           <View style={styles.badge}>
-            <Badge tone="success" size="small" label={badgeLabel} showIcon={false} />
+            <Badge tone={badgeTone} size="small" label={badgeLabel} showIcon={false} />
           </View>
         ) : null}
         {onToggleSave ? (

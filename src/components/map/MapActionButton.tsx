@@ -10,6 +10,10 @@ const SIZES = {
   /** Map controls such as "Konumuma git" (01.7 `rgmv0`; 01.6 `F9KRGq` is 48). */
   control: { size: 44, icon: 20, shadow: shadows.mapControl },
   controlLarge: { size: 48, icon: 20, shadow: shadows.mapControl },
+  /** Back button beside the explore search field (07.01 "Back"). */
+  field: { size: 44, icon: 20, shadow: shadows.mapField },
+  /** "Konumum" and "Katmanlar" on the explore map (07.01 "Harita kontrolleri"). */
+  fab: { size: 52, icon: 22, shadow: shadows.mapFab },
 } as const;
 
 export type MapActionButtonProps = {

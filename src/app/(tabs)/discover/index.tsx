@@ -90,8 +90,7 @@ export default function DiscoverHomeScreen() {
   const { isSaved, toggleBookmark } = useRouteBookmark();
   const requireAccount = useRequireAccount();
 
-  // Explore can't read the Discover stack's state, so the chosen region travels as a param.
-  const openExplore = () => router.push({ pathname: '/explore', params: { city } });
+  const openExplore = () => router.push('/explore');
 
   const [searchActive, setSearchActive] = useState(false);
   const [draft, setDraft] = useState('');

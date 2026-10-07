@@ -51,22 +51,71 @@ export function routeMidpoint(route: Route): LngLat {
   return route.coordinates[Math.floor(route.coordinates.length / 2)];
 }
 
-const EARTH_CIRCUMFERENCE_M = 40075016.686;
 /** Mapbox GL renders 512 pt tiles, so zoom 0 spans 512 points. */
 const TILE_SIZE_PT = 512;
 
-/** Ground distance covered by one screen point at `zoom` and `latitude`. */
-export function metersPerPoint(zoom: number, latitude: number) {
-  return (EARTH_CIRCUMFERENCE_M * Math.cos((latitude * Math.PI) / 180)) / (TILE_SIZE_PT * 2 ** zoom);
-}
+/** A position in screen points. */
+export type ScreenPoint = { x: number; y: number };
 
 /**
- * Longest "round" distance (1, 2 or 5 × 10ⁿ metres) whose bar fits in `maxWidth` points,
- * so the scale reads e.g. 0 · 10 · 20 km like the design (`rxpI9`).
+ * Web Mercator position in points at `zoom`: differences between two results are their
+ * on-screen distance, which is all clustering needs (no camera or map view required).
  */
-export function scaleBarFor(metersPerPt: number, maxWidth: number) {
-  const maxMeters = metersPerPt * maxWidth;
-  const magnitude = 10 ** Math.floor(Math.log10(maxMeters));
-  const step = [5, 2, 1].map((factor) => factor * magnitude).find((value) => value <= maxMeters) ?? magnitude;
-  return { meters: step, width: step / metersPerPt };
+export function worldPoint([lng, lat]: LngLat, zoom: number): ScreenPoint {
+  const size = TILE_SIZE_PT * 2 ** zoom;
+  const sin = Math.sin((Math.max(-85, Math.min(85, lat)) * Math.PI) / 180);
+  return {
+    x: ((lng + 180) / 360) * size,
+    y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * size,
+  };
+}
+
+/** Markers that drew closer than the cluster distance, shown as one "N rota" badge. */
+export type MarkerCluster<T> = {
+  /** Stable while the membership stays the same (member ids joined). */
+  key: string;
+  members: T[];
+  /** Mean of the members' marker coordinates. */
+  coordinate: LngLat;
+};
+
+/**
+ * Greedy screen-space clustering: each marker joins the first cluster whose centre lies within
+ * `distance` points of it, otherwise it starts a new one. `project` maps a coordinate to screen
+ * points (`worldPoint` at the camera zoom, or the fallback artwork's projection).
+ */
+export function clusterMarkers<T>(
+  items: readonly T[],
+  options: {
+    id: (item: T) => string;
+    coordinate: (item: T) => LngLat;
+    project: (coordinate: LngLat) => ScreenPoint;
+    distance: number;
+  },
+): MarkerCluster<T>[] {
+  const groups: { members: T[]; coordinates: LngLat[]; x: number; y: number }[] = [];
+  for (const item of items) {
+    const coordinate = options.coordinate(item);
+    const point = options.project(coordinate);
+    const group = groups.find(
+      (candidate) => Math.hypot(candidate.x - point.x, candidate.y - point.y) < options.distance,
+    );
+    if (group) {
+      const count = group.members.length;
+      group.x = (group.x * count + point.x) / (count + 1);
+      group.y = (group.y * count + point.y) / (count + 1);
+      group.members.push(item);
+      group.coordinates.push(coordinate);
+    } else {
+      groups.push({ members: [item], coordinates: [coordinate], x: point.x, y: point.y });
+    }
+  }
+  return groups.map((group) => ({
+    key: group.members.map(options.id).join('+'),
+    members: group.members,
+    coordinate: [
+      group.coordinates.reduce((sum, [lng]) => sum + lng, 0) / group.coordinates.length,
+      group.coordinates.reduce((sum, [, lat]) => sum + lat, 0) / group.coordinates.length,
+    ],
+  }));
 }

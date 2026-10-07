@@ -66,7 +66,6 @@ export const palette = {
   teal700: '#0F766E',
   teal800: '#0F5F59',
   // Map scale bar ink (01.7 `rxpI9`)
-  slate700: '#4C5157',
   // Route builder (04.1 "Rota öner"): stop list separators, planned route line, no-route card
   gray150: '#EEF0F1',
   // Loading placeholders (05.01 `CImMS` "Kemik / …")
@@ -86,6 +85,9 @@ export const palette = {
   // Sign-in lockout banner (02.02 `rjPx3` "Banner"): outline and text
   red75: '#FCE9EB',
   red950: '#540C12',
+  gray350: '#999EA6',
+  gray550: '#787D85',
+  red450: '#E5484D',
 } as const;
 
 export const colors = {
@@ -194,8 +196,6 @@ export const colors = {
   /** Brand-blue halo around the position dot on the route preview map. */
   locationHalo: 'rgba(21, 21, 255, 0.18)',
 
-  /** Map scale bar lines and labels (01.7 `rxpI9`). */
-  mapScaleInk: palette.slate700,
 
   // Route builder (04.1 "Rota öner").
   /** Inset separators between stop rows and search sections (D8XrfG "Ayırıcı"). */
@@ -238,6 +238,16 @@ export const colors = {
   /** "+14 dk" badge for stops far from the route. */
   farDetourSurface: palette.orange75,
   farDetourText: palette.orange850,
+
+  // Haritada Keşfet (07.01): route clusters, the selected route's ends and the other routes.
+  /** Halo behind a route cluster badge ("Route cluster" `Halo`, brand at 16 %). */
+  clusterHalo: 'rgba(21, 21, 255, 0.16)',
+  /** Clusters of the other routes while one is selected ("Diğer rotalar"). */
+  clusterInactive: palette.gray550,
+  /** Lines of the other routes while one is selected ("Diğer rota"). */
+  routeInactive: palette.gray350,
+  /** "Varış" pin and tag on the selected route. */
+  mapFinish: palette.red450,
 
   /** Skeleton blocks while Discover Home loads (05.01 `CImMS`). */
   skeleton: palette.gray125,
