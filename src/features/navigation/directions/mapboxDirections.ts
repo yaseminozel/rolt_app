@@ -81,11 +81,22 @@ export const mapboxDirections: NavigationDirectionsService = {
     if (!response.ok || data.code !== 'Ok' || !route) {
       throw new Error(`Mapbox Directions ${data.code ?? response.status}`);
     }
-    const steps: Omit<NavigationStep, 'startDistanceM'>[] = route.legs.flatMap((leg, legIndex) =>
-      leg.steps
-        // A leg's arrive step is the next leg's start; keep it so stops are announced.
-        .filter((step) => !(step.maneuver.type === 'depart' && legIndex > 0))
-        .map((step) => ({
+    const steps: Omit<NavigationStep, 'startDistanceM'>[] = [];
+    route.legs.forEach((leg, legIndex) =>
+      leg.steps.forEach((step) => {
+        if (step.maneuver.type === 'depart' && legIndex > 0) {
+          // A leg's arrive step is the next leg's start; keep it so stops are announced, and give
+          // it the depart step's length so the maneuvers after a stop stay in place.
+          const arrive = steps[steps.length - 1];
+          steps[steps.length - 1] = {
+            ...arrive,
+            streetName: step.name || arrive.streetName,
+            distanceM: arrive.distanceM + step.distance,
+            durationS: arrive.durationS + step.duration,
+          };
+          return;
+        }
+        steps.push({
           type: TYPES[step.maneuver.type] ?? 'continue',
           modifier: step.maneuver.modifier ? MODIFIERS[step.maneuver.modifier] : undefined,
           exit: step.maneuver.exit,
@@ -93,7 +104,8 @@ export const mapboxDirections: NavigationDirectionsService = {
           streetName: step.name || undefined,
           distanceM: step.distance,
           durationS: step.duration,
-        })),
+        });
+      }),
     );
     return buildPlan(route.geometry.coordinates, steps, route.duration);
   },

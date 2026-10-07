@@ -16,6 +16,13 @@ export const NEAR_ROUTE_OFFSET_M = 1_000;
 export const LARGE_DETOUR_M = 3_000;
 /** Speed used to turn a detour into minutes on the suggestion list: 40 km/h. */
 const DETOUR_SPEED_MPS = 11;
+/**
+ * Leaving the route and rejoining it (turning across traffic, a U-turn on a divided road, an
+ * access road) costs about this much on top of there and back. Mapbox Matrix detours of 27 places
+ * around Antalya were ~3× the distance-only estimate; with this the list is closer to the
+ * preview's real detour (`useStopDetour`).
+ */
+const DETOUR_BASE_MINUTES = 3;
 /** At most three stops (note `mUNKb`). */
 export const MAX_RIDE_STOPS = 3;
 
@@ -39,13 +46,13 @@ export type StopPlacement = {
 export function placeOnRoute(coordinates: LngLat, line: LngLat[]): StopPlacement {
   const cumulative = cumulativeDistances(line);
   const projection = projectOnLine(coordinates, line, cumulative);
-  // Pulling off to a place beside the road still costs about a minute.
   const detourM = projection.offsetM < NO_DETOUR_OFFSET_M ? 0 : projection.offsetM * 2;
   return {
     alongM: projection.alongM,
     offsetM: projection.offsetM,
     detourM,
-    detourMinutes: detourM === 0 ? 0 : Math.max(1, Math.round(detourM / DETOUR_SPEED_MPS / 60)),
+    detourMinutes:
+      detourM === 0 ? 0 : Math.round(DETOUR_BASE_MINUTES + detourM / DETOUR_SPEED_MPS / 60),
     proximity:
       projection.offsetM < ON_ROUTE_OFFSET_M
         ? 'onRoute'

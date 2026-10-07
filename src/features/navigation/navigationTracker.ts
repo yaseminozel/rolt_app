@@ -35,6 +35,15 @@ export const NAVIGATION_RULES = {
   maxUsableAccuracyM: 50,
   /** Smaller moves are GPS jitter, not riding. */
   minMoveM: 2,
+  /**
+   * A fix is matched at most this far ahead of the rider (or `maxAdvanceMps` × seconds since the
+   * last match, if more): a nearer part of the line further on is the route passing itself
+   * (U-turn on a divided road, interchange, loop), not progress.
+   */
+  matchAheadM: 150,
+  /** First fix: the ride may start up to the approach threshold (200 m) away, further along a bendy road. */
+  firstMatchAheadM: 500,
+  maxAdvanceMps: 70,
 } as const;
 
 export type TrackedStop = { id: string; name: string; coordinates: LngLat };
@@ -103,6 +112,7 @@ export class NavigationTracker {
   private accuracyM: number | null = null;
   private lastFixAt: number;
   private lastRaw: LocationFix | null = null;
+  private lastMatchedAt: number | null = null;
   private offRouteCount = 0;
   private offRoute = false;
   private arrivedStopIndex: number | null = null;
@@ -151,11 +161,19 @@ export class NavigationTracker {
     this.recordRide(fix);
 
     const usable = fix.accuracyM <= NAVIGATION_RULES.maxUsableAccuracyM;
+    const aheadM =
+      this.lastMatchedAt === null
+        ? NAVIGATION_RULES.firstMatchAheadM
+        : Math.max(
+            NAVIGATION_RULES.matchAheadM,
+            (NAVIGATION_RULES.maxAdvanceMps * (fix.timestamp - this.lastMatchedAt)) / 1000,
+          );
     const projection = projectOnLine(
       fix.coordinates,
       this.plan.geometry,
       this.plan.cumulativeM,
       Math.max(0, this.traveledM - NAVIGATION_RULES.offRouteM),
+      this.traveledM + aheadM,
     );
 
     if (usable) {
@@ -168,6 +186,7 @@ export class NavigationTracker {
         this.offRouteCount = 0;
         this.offRoute = false;
         this.traveledM = Math.max(this.traveledM, projection.alongM);
+        this.lastMatchedAt = fix.timestamp;
       }
     }
 
@@ -184,7 +203,10 @@ export class NavigationTracker {
     const finish = this.plan.geometry[this.plan.geometry.length - 1];
     if (
       this.plan.distanceM - this.traveledM <= NAVIGATION_RULES.finishArrivalM ||
-      (usable && distanceM(fix.coordinates, finish) <= NAVIGATION_RULES.finishArrivalM)
+      // Near the finish counts only past halfway: on a loop the finish is the start.
+      (usable &&
+        this.traveledM >= this.plan.distanceM / 2 &&
+        distanceM(fix.coordinates, finish) <= NAVIGATION_RULES.finishArrivalM)
     ) {
       this.traveledM = this.plan.distanceM;
       this.finished = true;
@@ -250,6 +272,7 @@ export class NavigationTracker {
       this.reached[index] ? -1 : along,
     );
     this.traveledM = 0;
+    this.lastMatchedAt = null;
     this.offRoute = false;
     this.offRouteCount = 0;
     const added = Math.round((this.remainingSeconds() - remainingBefore) / 60);

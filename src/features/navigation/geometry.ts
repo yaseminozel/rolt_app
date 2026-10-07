@@ -64,12 +64,16 @@ export function projectOnLine(
   line: LngLat[],
   cumulative: number[],
   minAlongM = 0,
+  maxAlongM = Infinity,
 ): LineProjection {
   let best: LineProjection = { point: line[0], alongM: 0, offsetM: Infinity, segmentIndex: 0 };
   const cosLat = Math.cos(toRadians(point[1]));
   for (let index = 0; index < line.length - 1; index += 1) {
     if (cumulative[index + 1] < minAlongM) {
       continue;
+    }
+    if (cumulative[index] > maxAlongM) {
+      break;
     }
     const a = line[index];
     const b = line[index + 1];
