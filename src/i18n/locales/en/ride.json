@@ -1,0 +1,198 @@
+{
+  "units": {
+    "metres": "{{value}} m",
+    "kilometres": "{{value}} km",
+    "minutes": "{{value}} min",
+    "approxMinutes": "~{{value}} min"
+  },
+  "points": {
+    "myLocation": "Your location",
+    "finish": "Finish"
+  },
+  "prepare": {
+    "farTitle": "The route starts {{distance}} away",
+    "farDescription": "You’ll be guided to the starting point first. From there you can follow the route from the start.",
+    "readyTitle": "You’re ready to ride",
+    "readyDescription": "When you tap Start, guidance follows the route right away.",
+    "metrics": {
+      "distance": "Distance",
+      "route": "Route",
+      "duration": "Time",
+      "arrival": "Est. arrival",
+      "finish": "Est. finish"
+    },
+    "addStop": "Add stop",
+    "voiceGuidance": "Voice guidance",
+    "keepScreenOn": "Keep the screen on while riding",
+    "start": "Start",
+    "foregroundOnlyNote": "Location access is only on while you use the app. Recording and guidance may stop when the screen locks.",
+    "stopDetour": "+{{minutes}} min detour",
+    "stopOnRoute": "On the route",
+    "reverseOrder": "This order makes you double back on the route",
+    "planError": "The route couldn’t be calculated. Check your connection and try again.",
+    "retry": "Try again",
+    "stopAdded": "Stop added",
+    "stopRemoved": "Stop removed",
+    "a11y": {
+      "close": "Close ride setup",
+      "swap": "Swap start and finish",
+      "removeStop": "Remove stop {{name}}",
+      "reorderStop": "Reorder stop {{name}}",
+      "reorderHint": "Drag to reorder",
+      "loading": "Calculating the route"
+    }
+  },
+  "addStop": {
+    "title": "Add stop",
+    "searchPlaceholder": "Search fuel, cafés, places",
+    "categories": {
+      "all": "All",
+      "fuel": "Fuel",
+      "cafe": "Café",
+      "mechanic": "Mechanic",
+      "viewpoint": "Viewpoint"
+    },
+    "pickOnMap": "Pick on map",
+    "pickOnMapHint": "Any point near the route",
+    "recentTitle": "RECENT SEARCHES",
+    "clearRecent": "Clear",
+    "removeRecentA11y": "Remove search {{query}}",
+    "alongRouteTitle": "ALONG THE ROUTE",
+    "placement": {
+      "onRoute": "On the route · km {{km}}",
+      "nearRoute": "Near the route · km {{km}}",
+      "farFromRoute": "Off the route · km {{km}}",
+      "approach": "On the way to the start"
+    },
+    "badgeOnRoute": "On the route",
+    "badgeMinutes": "+{{minutes}} min",
+    "noResults": "No results along the route",
+    "noResultsHint": "Use Pick on map to make any point near the route a stop.",
+    "searchError": "Search failed. Try again.",
+    "back": "Back"
+  },
+  "preview": {
+    "detour": "Detour",
+    "extraTime": "Extra time",
+    "detourDistance": "+{{value}} km",
+    "detourMinutes": "+{{value}} min",
+    "newTotal": "New total: {{distance}} · ~{{duration}} · arrival {{time}}",
+    "addAsStop": "Add as stop",
+    "largeDetour": "This stop is more than 3 km off the route. Your ride will show as off-route in route comparisons.",
+    "calculating": "Calculating…",
+    "error": "The detour couldn’t be calculated. Try again.",
+    "back": "Back"
+  },
+  "pickOnMap": {
+    "hint": "Move the map to place the pin",
+    "fromRoute": "{{distance}} from the route · around km {{km}}",
+    "onRoute": "On the route · around km {{km}}",
+    "choose": "Choose this point",
+    "locating": "Finding the address…"
+  },
+  "backgroundPermission": {
+    "title": "Keep recording when the screen locks",
+    "description": "Don’t let your ride stop while the phone is in your pocket. Choose “Always” for location; it’s only used during rides.",
+    "optionsTitle": "ALLOW LOCATION ACCESS",
+    "options": {
+      "never": "Never",
+      "askNext": "Ask next time",
+      "whileUsing": "While using the app",
+      "whileUsingHint": "Recording may stop when the screen locks",
+      "always": "Always",
+      "alwaysHint": "Recommended · Keeps recording in your pocket"
+    },
+    "benefits": {
+      "screenOff": "Distance and route keep recording with the screen off",
+      "voice": "Voice guidance works from your pocket",
+      "privacy": "Location tracking stops when the ride ends"
+    },
+    "continue": "Continue",
+    "notNow": "Not now"
+  },
+  "countdown": {
+    "hint": "Mount your phone, put on your helmet",
+    "a11y": "The ride starts in {{count}} seconds"
+  },
+  "maneuver": {
+    "after": "In {{distance}}, {{action}}",
+    "action": {
+      "straight": "continue straight",
+      "right": "turn right",
+      "left": "turn left",
+      "slightRight": "bear right",
+      "slightLeft": "bear left",
+      "sharpRight": "turn sharp right",
+      "sharpLeft": "turn sharp left",
+      "uturn": "make a U-turn"
+    },
+    "now": {
+      "straight": "Continue straight",
+      "right": "Turn right",
+      "left": "Turn left",
+      "slightRight": "Bear right",
+      "slightLeft": "Bear left",
+      "sharpRight": "Turn sharp right",
+      "sharpLeft": "Turn sharp left",
+      "uturn": "Make a U-turn"
+    },
+    "roundabout": "exit the roundabout",
+    "roundaboutExit": "take exit {{exit}} at the roundabout",
+    "arrivingStop": "Stop {{number}} in {{distance}}",
+    "arrivingStopNow": "Arriving at stop {{number}}",
+    "arrivingFinish": "Finish in {{distance}}",
+    "arrivingFinishNow": "Arriving at the finish",
+    "towards": "Head towards {{street}}",
+    "followRoute": "Follow the route"
+  },
+  "navigation": {
+    "nextStop": "Next stop: {{name}} · {{distance}}",
+    "breakStop": "Stop {{number}} · {{name}}",
+    "breakLabel": "Break",
+    "arrivedStop": "You reached stop {{number}}",
+    "offRouteTitle": "You left the route",
+    "offRouteDescription": "Rebuilding the route from the best point",
+    "reconnectedTitle": "Back on the route",
+    "reconnectedDescription_one": "{{count}} min added to your arrival",
+    "reconnectedDescription_other": "{{count}} min added to your arrival",
+    "gpsWeakTitle": "Weak GPS signal",
+    "gpsLostTitle": "GPS signal lost",
+    "gpsDescription": "Recording continues. Your route completes when the signal returns.",
+    "distanceArrival": "{{distance}} · Arrival {{time}}",
+    "finish": "End",
+    "compassA11y": "Turn the map to your riding direction",
+    "soundOnA11y": "Turn voice guidance off",
+    "soundOffA11y": "Turn voice guidance on",
+    "loading": "Starting navigation",
+    "notificationTitle": "ROLT navigation",
+    "notificationBody": "Following your route"
+  },
+  "exit": {
+    "title": "Do you want to end navigation?",
+    "description": "Route tracking stops when you end navigation.",
+    "confirm": "End"
+  },
+  "arrival": {
+    "title": "You completed the route",
+    "description": "Save your ride to add the stats to your profile.",
+    "metrics": {
+      "distance": "Distance",
+      "duration": "Time",
+      "averageSpeed": "Avg. speed"
+    },
+    "save": "Save ride",
+    "leave": "Leave without saving"
+  },
+  "discard": {
+    "title": "Leave without saving?",
+    "description": "Your ride won’t be saved and its route, time and distance will be lost.",
+    "confirm": "Leave without saving",
+    "cancel": "Back to saving"
+  },
+  "voice": {
+    "offRoute": "You left the route. Rebuilding the route.",
+    "reconnected": "You’re back on the route.",
+    "stopReached": "You reached stop {{number}}.",
+    "finished": "You completed the route."
+  }
+}

@@ -6,6 +6,7 @@ import enGarage from './locales/en/garage.json';
 import enPermissions from './locales/en/permissions.json';
 import enProfile from './locales/en/profile.json';
 import enRegistration from './locales/en/registration.json';
+import enRide from './locales/en/ride.json';
 import enRides from './locales/en/rides.json';
 import enRouteDetail from './locales/en/routeDetail.json';
 import enRoutes from './locales/en/routes.json';
@@ -20,6 +21,7 @@ import trGarage from './locales/tr/garage.json';
 import trPermissions from './locales/tr/permissions.json';
 import trProfile from './locales/tr/profile.json';
 import trRegistration from './locales/tr/registration.json';
+import trRide from './locales/tr/ride.json';
 import trRides from './locales/tr/rides.json';
 import trRouteDetail from './locales/tr/routeDetail.json';
 import trRoutes from './locales/tr/routes.json';
@@ -36,6 +38,7 @@ export const trResources = {
   registration: trRegistration,
   permissions: trPermissions,
   rides: trRides,
+  ride: trRide,
   routes: trRoutes,
   routeSuggestion: trRouteSuggestion,
   routeSuggestionReview: trRouteSuggestionReview,
@@ -55,6 +58,7 @@ const enResources: LocaleResources = {
   registration: enRegistration,
   permissions: enPermissions,
   rides: enRides,
+  ride: enRide,
   routes: enRoutes,
   routeSuggestion: enRouteSuggestion,
   routeSuggestionReview: enRouteSuggestionReview,

@@ -1,0 +1,198 @@
+{
+  "units": {
+    "metres": "{{value}} m",
+    "kilometres": "{{value}} km",
+    "minutes": "{{value}} dk",
+    "approxMinutes": "~{{value}} dk"
+  },
+  "points": {
+    "myLocation": "Konumun",
+    "finish": "Varış"
+  },
+  "prepare": {
+    "farTitle": "Rota başlangıcı {{distance}} uzakta",
+    "farDescription": "Önce başlangıç noktasına yönlendirileceksin. Ardından rotayı başlangıçtan itibaren takip edebilirsin.",
+    "readyTitle": "Sürüşe hazırsın",
+    "readyDescription": "Başla'ya bastığında yönlendirme doğrudan rota üzerinden ilerler.",
+    "metrics": {
+      "distance": "Mesafe",
+      "route": "Rota",
+      "duration": "Süre",
+      "arrival": "Tahmini varış",
+      "finish": "Tahmini bitiş"
+    },
+    "addStop": "Durak ekle",
+    "voiceGuidance": "Sesli yönlendirme",
+    "keepScreenOn": "Ekranı sürüş boyu açık tut",
+    "start": "Başla",
+    "foregroundOnlyNote": "Konum izni yalnızca uygulamayı kullanırken açık. Ekran kilitlenince kayıt ve yönlendirme durabilir.",
+    "stopDetour": "+{{minutes}} dk sapma",
+    "stopOnRoute": "Rota üzerinde",
+    "reverseOrder": "Bu sırada rotada geri dönmen gerekiyor",
+    "planError": "Rota hesaplanamadı. Bağlantını kontrol edip tekrar dene.",
+    "retry": "Tekrar dene",
+    "stopAdded": "Durak eklendi",
+    "stopRemoved": "Durak kaldırıldı",
+    "a11y": {
+      "close": "Sürüş hazırlığını kapat",
+      "swap": "Başlangıç ve varışı değiştir",
+      "removeStop": "{{name}} durağını kaldır",
+      "reorderStop": "{{name}} durağının sırasını değiştir",
+      "reorderHint": "Sürükleyerek sırala",
+      "loading": "Rota hesaplanıyor"
+    }
+  },
+  "addStop": {
+    "title": "Durak ekle",
+    "searchPlaceholder": "Benzinlik, kafe, yer ara",
+    "categories": {
+      "all": "Tümü",
+      "fuel": "Benzinlik",
+      "cafe": "Kafe",
+      "mechanic": "Tamirci",
+      "viewpoint": "Manzara"
+    },
+    "pickOnMap": "Haritadan seç",
+    "pickOnMapHint": "Rotaya yakın herhangi bir nokta",
+    "recentTitle": "SON ARAMALAR",
+    "clearRecent": "Temizle",
+    "removeRecentA11y": "{{query}} aramasını kaldır",
+    "alongRouteTitle": "ROTA BOYUNCA",
+    "placement": {
+      "onRoute": "Rota üzerinde · {{km}}. km",
+      "nearRoute": "Rota yakınında · {{km}}. km",
+      "farFromRoute": "Rotadan uzak · {{km}}. km",
+      "approach": "Başlangıca giderken"
+    },
+    "badgeOnRoute": "Rota üzerinde",
+    "badgeMinutes": "+{{minutes}} dk",
+    "noResults": "Rota boyunca sonuç yok",
+    "noResultsHint": "Haritadan seç ile rotaya yakın bir noktayı durak yapabilirsin.",
+    "searchError": "Arama yapılamadı. Tekrar dene.",
+    "back": "Geri"
+  },
+  "preview": {
+    "detour": "Sapma",
+    "extraTime": "Ek süre",
+    "detourDistance": "+{{value}} km",
+    "detourMinutes": "+{{value}} dk",
+    "newTotal": "Yeni toplam: {{distance}} · ~{{duration}} · varış {{time}}",
+    "addAsStop": "Durak olarak ekle",
+    "largeDetour": "Bu durak rotadan 3 km’den fazla sapıyor. Sürüşün rota karşılaştırmasında sapmalı görünür.",
+    "calculating": "Hesaplanıyor…",
+    "error": "Sapma hesaplanamadı. Tekrar dene.",
+    "back": "Geri"
+  },
+  "pickOnMap": {
+    "hint": "Haritayı kaydır, pini konumla",
+    "fromRoute": "Rotadan {{distance}} · {{km}}. km civarı",
+    "onRoute": "Rota üzerinde · {{km}}. km civarı",
+    "choose": "Bu noktayı seç",
+    "locating": "Adres aranıyor…"
+  },
+  "backgroundPermission": {
+    "title": "Ekran kilitliyken de kaydet",
+    "description": "Telefonun cebindeyken sürüşün yarıda kesilmesin. Konum izninde “Her zaman”ı seç; konumun yalnızca sürüş sırasında kullanılır.",
+    "optionsTitle": "KONUM ERİŞİMİNE İZİN VER",
+    "options": {
+      "never": "Hiçbir zaman",
+      "askNext": "Sonraki sefer sor",
+      "whileUsing": "Uygulamayı kullanırken",
+      "whileUsingHint": "Ekran kilitlenince kayıt durabilir",
+      "always": "Her zaman",
+      "alwaysHint": "Önerilen · Kayıt cepteyken de sürer"
+    },
+    "benefits": {
+      "screenOff": "Ekran kapalıyken mesafe ve rota kaydı sürer",
+      "voice": "Sesli yönlendirme cepteyken de çalışır",
+      "privacy": "Sürüş bitince konum takibi durur"
+    },
+    "continue": "Devam et",
+    "notNow": "Şimdi değil"
+  },
+  "countdown": {
+    "hint": "Telefonunu sabitle, kaskını tak",
+    "a11y": "Sürüş {{count}} saniye sonra başlıyor"
+  },
+  "maneuver": {
+    "after": "{{distance}} sonra {{action}}",
+    "action": {
+      "straight": "düz devam et",
+      "right": "sağa dön",
+      "left": "sola dön",
+      "slightRight": "hafif sağa dön",
+      "slightLeft": "hafif sola dön",
+      "sharpRight": "keskin sağa dön",
+      "sharpLeft": "keskin sola dön",
+      "uturn": "geri dön"
+    },
+    "now": {
+      "straight": "Düz devam et",
+      "right": "Sağa dön",
+      "left": "Sola dön",
+      "slightRight": "Hafif sağa dön",
+      "slightLeft": "Hafif sola dön",
+      "sharpRight": "Keskin sağa dön",
+      "sharpLeft": "Keskin sola dön",
+      "uturn": "Geri dön"
+    },
+    "roundabout": "döner kavşaktan çık",
+    "roundaboutExit": "döner kavşakta {{exit}}. çıkıştan çık",
+    "arrivingStop": "{{distance}} sonra {{number}}. durak",
+    "arrivingStopNow": "{{number}}. durağa geliyorsun",
+    "arrivingFinish": "{{distance}} sonra varış noktası",
+    "arrivingFinishNow": "Varış noktasına geliyorsun",
+    "towards": "{{street}} yönünde ilerle",
+    "followRoute": "Rotayı takip et"
+  },
+  "navigation": {
+    "nextStop": "Sonraki durak: {{name}} · {{distance}}",
+    "breakStop": "{{number}}. durak · {{name}}",
+    "breakLabel": "Mola",
+    "arrivedStop": "{{number}}. durağa ulaştın",
+    "offRouteTitle": "Rotadan çıktın",
+    "offRouteDescription": "En uygun noktadan rota yeniden oluşturuluyor",
+    "reconnectedTitle": "Rotaya yeniden bağlandın",
+    "reconnectedDescription_one": "Varış süresine +{{count}} dk eklendi",
+    "reconnectedDescription_other": "Varış süresine +{{count}} dk eklendi",
+    "gpsWeakTitle": "GPS sinyali zayıf",
+    "gpsLostTitle": "GPS sinyali kayboldu",
+    "gpsDescription": "Kayıt sürüyor. Sinyal gelince rotan tamamlanır.",
+    "distanceArrival": "{{distance}} · Varış {{time}}",
+    "finish": "Bitir",
+    "compassA11y": "Haritayı sürüş yönüne çevir",
+    "soundOnA11y": "Sesli yönlendirmeyi kapat",
+    "soundOffA11y": "Sesli yönlendirmeyi aç",
+    "loading": "Navigasyon başlatılıyor",
+    "notificationTitle": "ROLT navigasyon",
+    "notificationBody": "Rotan takip ediliyor"
+  },
+  "exit": {
+    "title": "Navigasyonu kapatmak istiyor musun?",
+    "description": "Navigasyonu bitirdiğinde rota takibi duracak.",
+    "confirm": "Bitir"
+  },
+  "arrival": {
+    "title": "Rotayı tamamladın",
+    "description": "Sürüşünü kaydet, istatistiklerin profiline eklensin.",
+    "metrics": {
+      "distance": "Mesafe",
+      "duration": "Süre",
+      "averageSpeed": "Ort. hız"
+    },
+    "save": "Sürüşü kaydet",
+    "leave": "Kaydetmeden çık"
+  },
+  "discard": {
+    "title": "Kaydetmeden çıkılsın mı?",
+    "description": "Sürüşün kaydedilmeyecek ve rota, süre ve mesafe bilgileri kaybolacak.",
+    "confirm": "Kaydetmeden çık",
+    "cancel": "Sürüşü kaydetmeye dön"
+  },
+  "voice": {
+    "offRoute": "Rotadan çıktın. Rota yeniden oluşturuluyor.",
+    "reconnected": "Rotaya yeniden bağlandın.",
+    "stopReached": "{{number}}. durağa ulaştın.",
+    "finished": "Rotayı tamamladın."
+  }
+}
