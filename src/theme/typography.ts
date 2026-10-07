@@ -25,9 +25,9 @@ const variant = (family: string, fontSize: number, lineHeight?: number): TextVar
 /** Type scale observed in the design (Inter 12–32, JetBrains Mono for ride metrics). */
 export const typography = {
   display: variant(fontFamily.semibold, 32),
-  /** Onboarding hero heading (sLkVv): 32 medium at 1.125. */
-  displayMedium: variant(fontFamily.medium, 32, 36),
   title: variant(fontFamily.semibold, 24),
+  /** Onboarding page heading (01.01–01.03 "Başlık"): 26 bold at 1.23. */
+  onboardingTitle: variant(fontFamily.bold, 26, 32),
   /** Prompt sheet heading (ydm6l "Rotayı kaydetmek için giriş yap"): 20 semibold. */
   titleSmall: variant(fontFamily.semibold, 20, 24),
   headline: variant(fontFamily.semibold, 18),
@@ -47,8 +47,6 @@ export const typography = {
   /** 12 pt at 1.4 line height, for multi-line notes and helper copy. */
   captionRelaxed: variant(fontFamily.regular, 12, 17),
   captionMedium: variant(fontFamily.medium, 12),
-  /** Uppercase eyebrow above hero headings (sLkVv): 12 semibold, 10 % tracking. */
-  overline: { ...variant(fontFamily.semibold, 12, 16), letterSpacing: 1.2 },
   /** Small uppercase label on cards (LreVd "ANA MOTORUN"): 11 semibold, 0.6 tracking. */
   eyebrow: { ...variant(fontFamily.semibold, 11, 14), letterSpacing: 0.6 },
   metricLarge: variant(fontFamily.monoMedium, 24),

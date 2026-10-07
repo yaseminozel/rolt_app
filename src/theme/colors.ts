@@ -70,8 +70,6 @@ export const palette = {
   teal50: '#D9F8EE',
   teal700: '#0F766E',
   teal800: '#0F5F59',
-  // Onboarding eyebrow on the hero photo (sLkVv "SÜR. KEŞFET. PAYLAŞ.")
-  cyan300: '#1BF4FF',
   // Notification permission illustration background (RzQd4 "Görsel", top → bottom)
   indigo50: '#EEF0FF',
   indigo100: '#DFE3FF',
@@ -195,11 +193,8 @@ export const colors = {
   noteAccentTitle: palette.teal800,
 
   // Onboarding hero (sLkVv): eyebrow and the bottom gradient (tTI43) that keeps white copy legible.
-  mediaEyebrow: palette.cyan300,
   mediaGradientClear: 'rgba(0, 0, 0, 0)',
-  mediaGradientSoft: 'rgba(0, 0, 0, 0.18)',
   mediaGradientMid: 'rgba(0, 0, 0, 0.72)',
-  mediaGradientStrong: 'rgba(0, 0, 0, 0.92)',
 
   // Location permission map preview (TJtI6): brand-blue accuracy radius, halo and position dot.
   locationRadiusFill: 'rgba(21, 21, 255, 0.08)',

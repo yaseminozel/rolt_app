@@ -1,102 +1,195 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { NavArrowLeft } from 'iconoir-react-native';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AccessibilityInfo, Animated, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+  type ImageSourcePropType,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
+import { trackEvent } from '@/features/analytics/track';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { colors, layout, spacing, typography } from '@/theme';
+import { colors, layout, radius, spacing, typography } from '@/theme';
 
-/** Original photo from the design (1015 × 1421); `cover` keeps its aspect ratio (the frame's "stretch" fill distorts it). */
-const heroImage = require('../../assets/images/onboarding-hero.jpg');
+type OnboardingPage = {
+  key: 'discover' | 'record' | 'share';
+  /** Illustration exported from the page's "Görsel" frame (393 × 520). */
+  image: ImageSourcePropType;
+};
 
-/** "Motion / Splash Blue" (kSZP4): brand-blue layer that fades out to continue the native splash. */
-const SPLASH_FADE_MS = 450;
-/** Wordmark top below the design's 49 pt status bar (y 72 at a 32 pt line box, same optical center as y 65). */
-const WORDMARK_TOP = 23;
-const WORDMARK_LINE_HEIGHT = 32;
-const WORDMARK_TRACKING = 0.56;
-/** "Overlay / Bottom Gradient" (tTI43) covers the lower 560 of 852 pt. */
-const GRADIENT_HEIGHT = '66%';
-/** Copy block gap (design 11) and copy → CTA gap (design 44). */
-const COPY_GAP = 11;
-const COPY_TO_ACTION = 44;
-/** Body copy 14 pt at 1.64 line height. */
-const BODY_LINE_HEIGHT = 23;
+const pages: readonly OnboardingPage[] = [
+  { key: 'discover', image: require('../../assets/images/onboarding/discover.jpg') },
+  { key: 'record', image: require('../../assets/images/onboarding/record.jpg') },
+  { key: 'share', image: require('../../assets/images/onboarding/share.jpg') },
+];
 
-const bottomGradient = `linear-gradient(to bottom, ${colors.mediaGradientClear} 0%, ${colors.mediaGradientSoft} 38%, ${colors.mediaGradientMid} 68%, ${colors.mediaGradientStrong} 100%)`;
+const LAST_PAGE = pages.length - 1;
+/** Illustration frame size; it fills the width and keeps this ratio unless the screen is short. */
+const ILLUSTRATION_ASPECT = 393 / 520;
+/** Illustration bottom (y 520) → page indicator (y 528). */
+const INDICATOR_TOP = 8;
+const DOT_SIZE = 8;
+const DOT_ACTIVE_WIDTH = 20;
+const DOT_GAP = 6;
+/** Indicator top → title (20 below the 8 pt dots). */
+const COPY_TOP = INDICATOR_TOP + DOT_SIZE + spacing.xl;
+/** Title (2 lines) + 10 + body (2 lines): "Metin" 114 pt tall. */
+const COPY_HEIGHT = 114;
+const TITLE_TO_BODY = 10;
+/** "Atla" sits 8 pt below the status bar. */
+const SKIP_TOP = spacing.sm;
+/** Back + primary action row, 12 pt apart. */
+const ACTION_GAP = spacing.md;
+/** Space kept between the copy and the action row on short screens. */
+const MIN_COPY_TO_ACTIONS = spacing.xxl;
 
-/** 00.0 Onboarding / Get Started — Pencil `sLkVv`. */
+/**
+ * 01.01–01.03 Onboarding — Pencil `rqDIe` (Keşfet), `pyaeU` (Sür ve kaydet), `I7pX5R` (Paylaş).
+ * Shown once after the splash (note `YMpU5`); replaces the old Get Started screen. Pages move
+ * by swiping or "Devam et"; "Atla" (pages 1–2), "Hemen başla" and "Giriş yap" all lead to
+ * sign-in. No permission is requested here: the pages only prepare the reasons (note `OcoKg`).
+ */
 export default function OnboardingScreen() {
   const { t } = useTranslation('auth');
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
   const { markOnboardingSeen } = useAuth();
-  const [splashOpacity] = useState(() => new Animated.Value(1));
+  const scrollRef = useRef<ScrollView>(null);
+  const [pageIndex, setPageIndex] = useState(0);
+  const isLast = pageIndex === LAST_PAGE;
 
   useEffect(() => {
-    let cancelled = false;
-    AccessibilityInfo.isReduceMotionEnabled()
-      .catch(() => false)
-      .then((reduceMotion) => {
-        if (cancelled) {
-          return;
-        }
-        if (reduceMotion) {
-          splashOpacity.setValue(0);
-        } else {
-          Animated.timing(splashOpacity, {
-            toValue: 0,
-            duration: SPLASH_FADE_MS,
-            useNativeDriver: true,
-          }).start();
-        }
-      });
-    return () => {
-      cancelled = true;
-      splashOpacity.stopAnimation();
-    };
-  }, [splashOpacity]);
+    trackEvent('onboarding_page_view', { page: pageIndex + 1 });
+  }, [pageIndex]);
 
-  const handleStart = () => {
+  // Tallest footer (last page: actions + "Giriş yap" row) so the copy never slides under it.
+  const footerHeight = layout.minTouchTarget * 2 + spacing.sm + spacing.xs + insets.bottom;
+  const reservedBelowIllustration = COPY_TOP + COPY_HEIGHT + MIN_COPY_TO_ACTIONS + footerHeight;
+  const illustrationHeight = Math.min(
+    width / ILLUSTRATION_ASPECT,
+    height - reservedBelowIllustration,
+  );
+
+  const goToPage = (index: number) => {
+    scrollRef.current?.scrollTo({ x: index * width, animated: true });
+    setPageIndex(index);
+  };
+
+  const handleMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setPageIndex(Math.round(event.nativeEvent.contentOffset.x / width));
+  };
+
+  const leave = () => {
     markOnboardingSeen();
     router.replace('/sign-in');
   };
 
+  const handleSkip = () => {
+    trackEvent('onboarding_skip', { page: pageIndex + 1 });
+    leave();
+  };
+
+  const handleStart = () => {
+    trackEvent('onboarding_start');
+    leave();
+  };
+
+  const handleSignIn = () => {
+    trackEvent('onboarding_login_tap');
+    leave();
+  };
+
   return (
     <View style={styles.screen}>
-      <StatusBar style="light" />
-      <Image
-        source={heroImage}
-        style={StyleSheet.absoluteFill}
-        resizeMode="cover"
-        accessibilityIgnoresInvertColors
-      />
-      <View style={styles.gradient} />
+      <StatusBar style="dark" />
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleMomentumEnd}
+        contentInsetAdjustmentBehavior="never">
+        {pages.map((page) => (
+          <View key={page.key} style={{ width }}>
+            <Image
+              source={page.image}
+              style={[styles.illustration, { height: illustrationHeight }]}
+              resizeMode="cover"
+              accessibilityIgnoresInvertColors
+            />
+            <View style={styles.copy}>
+              <Text style={styles.title} accessibilityRole="header">
+                {t(`onboarding.pages.${page.key}.title`)}
+              </Text>
+              <Text style={styles.body}>{t(`onboarding.pages.${page.key}.body`)}</Text>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
 
-      <Text style={[styles.wordmark, { top: insets.top + WORDMARK_TOP }]}>{t('wordmark')}</Text>
+      <View
+        style={[styles.indicator, { top: illustrationHeight + INDICATOR_TOP }]}
+        accessibilityRole="progressbar"
+        accessibilityLabel={t('onboarding.pageA11y', { page: pageIndex + 1, total: pages.length })}>
+        {pages.map((page, index) => (
+          <View key={page.key} style={[styles.dot, index === pageIndex && styles.dotActive]} />
+        ))}
+      </View>
+
+      {isLast ? null : (
+        <Button
+          variant="text"
+          label={t('onboarding.skip')}
+          onPress={handleSkip}
+          style={[styles.skip, { top: insets.top + SKIP_TOP }]}
+        />
+      )}
 
       <View
         style={[
-          styles.content,
-          { paddingBottom: Math.max(insets.bottom, spacing.lg) + spacing.xxl },
+          styles.footer,
+          { paddingBottom: insets.bottom + (isLast ? spacing.xs : spacing.lg) },
         ]}>
-        <View style={styles.copy}>
-          <Text style={styles.eyebrow}>{t('onboarding.eyebrow')}</Text>
-          <Text style={styles.title} accessibilityRole="header">
-            {t('onboarding.title')}
-          </Text>
-          <Text style={styles.body}>{t('onboarding.body')}</Text>
+        <View style={styles.actions}>
+          {pageIndex > 0 ? (
+            <Button
+              variant="outlined"
+              icon={NavArrowLeft}
+              accessibilityLabel={t('onboarding.back')}
+              onPress={() => goToPage(pageIndex - 1)}
+              style={styles.back}
+            />
+          ) : null}
+          <Button
+            label={isLast ? t('onboarding.start') : t('onboarding.next')}
+            onPress={isLast ? handleStart : () => goToPage(pageIndex + 1)}
+            style={styles.primary}
+          />
         </View>
-        <Button label={t('onboarding.start')} tone="brand" size="lg" onPress={handleStart} />
+        {isLast ? (
+          <Pressable
+            onPress={handleSignIn}
+            accessibilityRole="link"
+            style={({ pressed }) => [styles.signIn, pressed && styles.signInPressed]}>
+            <Text style={styles.signInText}>
+              {t('onboarding.haveAccount')}{' '}
+              <Text style={styles.signInLink}>{t('onboarding.signIn')}</Text>
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
-
-      <Animated.View
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        style={[styles.splash, { opacity: splashOpacity }]}
-      />
     </View>
   );
 }
@@ -104,49 +197,80 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.surfaceInverse,
+    backgroundColor: colors.surface,
   },
-  gradient: {
+  illustration: {
+    width: '100%',
+  },
+  copy: {
+    marginTop: COPY_TOP,
+    gap: TITLE_TO_BODY,
+    paddingHorizontal: layout.screenGutter,
+  },
+  title: {
+    ...typography.onboardingTitle,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  body: {
+    ...typography.bodyRelaxed,
+    color: colors.textSecondary,
+    textAlign: 'center',
+  },
+  indicator: {
+    position: 'absolute',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    gap: DOT_GAP,
+  },
+  dot: {
+    width: DOT_SIZE,
+    height: DOT_SIZE,
+    borderRadius: radius.xs,
+    backgroundColor: colors.border,
+  },
+  dotActive: {
+    width: DOT_ACTIVE_WIDTH,
+    backgroundColor: colors.brand,
+  },
+  skip: {
+    position: 'absolute',
+    right: spacing.xs,
+  },
+  footer: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: GRADIENT_HEIGHT,
-    backgroundImage: bottomGradient,
-  },
-  wordmark: {
-    ...typography.wordmark,
-    position: 'absolute',
-    alignSelf: 'center',
-    lineHeight: WORDMARK_LINE_HEIGHT,
-    letterSpacing: WORDMARK_TRACKING,
-    color: colors.textInverse,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    gap: COPY_TO_ACTION,
+    gap: spacing.sm,
     paddingHorizontal: layout.screenGutter,
   },
-  copy: {
-    gap: COPY_GAP,
+  actions: {
+    flexDirection: 'row',
+    gap: ACTION_GAP,
   },
-  eyebrow: {
-    ...typography.overline,
-    color: colors.mediaEyebrow,
+  back: {
+    width: layout.minTouchTarget,
+    paddingHorizontal: 0,
   },
-  title: {
-    ...typography.displayMedium,
-    color: colors.textInverse,
+  primary: {
+    flex: 1,
   },
-  body: {
-    ...typography.body,
-    lineHeight: BODY_LINE_HEIGHT,
-    color: colors.textInverse,
+  signIn: {
+    minHeight: layout.minTouchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
   },
-  splash: {
-    ...StyleSheet.absoluteFill,
-    pointerEvents: 'none',
-    backgroundColor: colors.brand,
+  signInPressed: {
+    backgroundColor: colors.surfacePressed,
+  },
+  signInText: {
+    ...typography.bodyRelaxed,
+    color: colors.textSecondary,
+  },
+  signInLink: {
+    ...typography.bodyMedium,
+    color: colors.textPrimary,
   },
 });
