@@ -4,12 +4,11 @@ import { matchesSearch } from '@/lib/searchText';
 import { PLACE_FIXTURES } from './fixtures/places';
 import { RECOMMENDED_ROUTE_IDS, ROUTE_FIXTURES } from './fixtures/routes';
 import { distanceKm, isInBounds } from './geo';
+import { filterRoutes } from './routeFilter';
 import { matchesSearchFilters } from './searchFilters';
-import type { LngLat, Route, RouteFilter, RoutesRepository, RouteSort } from './types';
+import type { LngLat, Route, RoutesRepository, RouteSort } from './types';
 
 const NETWORK_DELAY_MS = 500;
-/** "Yakın Rotalar": routes starting within this distance of the chosen city's centre. */
-export const NEARBY_RADIUS_KM = 60;
 
 /** Typing suggestions must feel instant; the backend would serve them from a prefix index. */
 const SUGGEST_DELAY_MS = 150;
@@ -23,17 +22,6 @@ function cityCentre(city: string): LngLat | null {
 }
 
 const startOf = (route: Route) => route.coordinates[0];
-
-function applyFilter(routes: Route[], filter: RouteFilter, city: string) {
-  if (filter === 'all') {
-    return routes;
-  }
-  if (filter === 'nearby') {
-    const centre = cityCentre(city);
-    return centre ? routes.filter((route) => distanceKm(startOf(route), centre) <= NEARBY_RADIUS_KM) : routes;
-  }
-  return routes.filter((route) => route.tag === filter);
-}
 
 function applySort(routes: Route[], sort: RouteSort, city: string) {
   const sorted = [...routes];
@@ -58,7 +46,7 @@ export const mockRoutesRepository: RoutesRepository = {
     const recommended = RECOMMENDED_ROUTE_IDS.map((id) => ROUTE_FIXTURES.find((route) => route.id === id)).filter(
       (route): route is Route => route !== undefined,
     );
-    return applyFilter(recommended, filter, city);
+    return filterRoutes(recommended, filter, city);
   },
 
   async search({ query, sort, city, filters }) {
@@ -86,7 +74,7 @@ export const mockRoutesRepository: RoutesRepository = {
   async listInArea({ bounds, filter }) {
     await wait();
     const inArea = ROUTE_FIXTURES.filter((route) => route.coordinates.some((point) => isInBounds(point, bounds)));
-    return applyFilter(inArea, filter, 'Antalya');
+    return filterRoutes(inArea, filter, 'Antalya');
   },
 
   async getById(id) {

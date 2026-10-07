@@ -1,6 +1,6 @@
 import { findCityByName, TURKISH_CITIES } from '@/features/location/turkishCities';
 import { distanceKm } from '@/features/routes/geo';
-import { NEARBY_RADIUS_KM } from '@/features/routes/mockRoutesRepository';
+import { NEARBY_RADIUS_KM } from '@/features/routes/routeFilter';
 import type { Bounds, LngLat } from '@/features/routes/types';
 
 const KM_PER_DEGREE_LATITUDE = 111;

@@ -32,6 +32,7 @@
     "speed": "{{value}} km/h",
     "hoursMinutes": "{{hours}} h {{minutes}} min",
     "hours": "{{hours}} h",
-    "minutes": "{{minutes}} min"
+    "minutes": "{{minutes}} min",
+    "approx": "~{{value}}"
   }
 }

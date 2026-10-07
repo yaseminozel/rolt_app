@@ -1,9 +1,7 @@
 {
   "home": {
     "locationLabel": "Your location:",
-    "regionLabel": "Selected region:",
     "locationValue": "{{city}}, Türkiye",
-    "defaultRegionValue": "{{city}} (default)",
     "changeLocationA11y": "Change region",
     "notificationsA11y": "Notifications",
     "categoriesA11y": "Route categories",
@@ -12,20 +10,19 @@
     "areaRouteCount_other": "{{count}} routes in this area",
     "exploreMapA11y": "Explore on the map",
     "goToMyLocation": "Go to my location",
-    "recommendedTitle": "Recommended for you",
+    "recommendedTitle": "Recommended routes",
     "seeAll": "See all",
     "recommendedEmpty": "No recommendations in this category yet.",
     "loadError": "Couldn't load routes.",
     "retry": "Try again",
-    "nearbyTitle": "Routes near you",
-    "regionRoutesTitle": "Routes around {{city}}",
-    "nearbyEmpty": "No other routes in this area."
-  },
-  "permissionBanner": {
-    "title": "Location access is off",
-    "description": "We're showing the {{city}} area instead of routes near you.",
-    "action": "Turn on",
-    "actionA11y": "Turn on location access"
+    "unknownLocation": "Location not set",
+    "popularTitle": "Popular routes in Türkiye",
+    "offlineTitle": "You’re offline",
+    "mapOfflineTitle": "The map can’t load offline",
+    "mapOfflineDescription": "It will refresh when you’re back online",
+    "locationOffTitle": "Location access is off",
+    "locationOffDescription": "Turn on location access or pick a city to see routes near you on the map.",
+    "locationOffAction": "Allow"
   },
   "search": {
     "placeholder": "Search routes",

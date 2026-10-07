@@ -56,6 +56,11 @@ export function formatDuration(totalMinutes: number) {
   return i18n.t('units.hoursMinutes', { hours, minutes });
 }
 
+/** Estimated duration on route cards (05.02 "~1 sa 30 dk"): `formatDuration` with a leading "~". */
+export function formatApproxDuration(totalMinutes: number) {
+  return i18n.t('units.approx', { value: formatDuration(totalMinutes) });
+}
+
 /** Speed, e.g. "41 km/sa" / "41 km/h". */
 export function formatSpeed(kmh: number) {
   return i18n.t('units.speed', { value: formatNumber(Math.round(kmh)) });

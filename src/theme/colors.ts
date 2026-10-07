@@ -57,10 +57,6 @@ export const palette = {
   gray700: '#393B41',
   orange100: '#FFEDD5',
   orange700: '#C2410C',
-  orange50: '#FFF7ED',
-  orange800: '#9A3412',
-  // Location permission banner outline (x3Pqz "Konum izni kapalı")
-  orange200: '#FED7AA',
   // Section link on Discover Home (p4CIJi "Tümünü gör")
   teal750: '#227868',
   cyan100: '#CFFAFE',
@@ -73,6 +69,8 @@ export const palette = {
   slate700: '#4C5157',
   // Route builder (04.1 "Rota öner"): stop list separators, planned route line, no-route card
   gray150: '#EEF0F1',
+  // Loading placeholders (05.01 `CImMS` "Kemik / …")
+  gray125: '#ECEDED',
   teal500: '#14B8A6',
   red25: '#FEF2F2',
   red250: '#FECACA',
@@ -176,13 +174,6 @@ export const colors = {
   rideCoastSurface: palette.cyan100,
   rideCoastText: palette.cyan700,
 
-  // Caution tone (Discover "Konum izni kapalı" banner, x3Pqz).
-  cautionSurface: palette.orange50,
-  cautionIcon: palette.orange700,
-  cautionText: palette.orange800,
-  /** Outline of the location permission banner (x3Pqz). */
-  cautionBorder: palette.orange200,
-
   // Info note (InfoNote, LreVd): accent tone.
   noteAccentSurface: palette.teal50,
   noteAccentText: palette.teal700,
@@ -222,6 +213,9 @@ export const colors = {
   mediaUploadingVeil: 'rgba(16, 19, 24, 0.5)',
   mediaFailedVeil: 'rgba(185, 28, 28, 0.8)',
   mediaBadge: 'rgba(16, 19, 24, 0.8)',
+
+  /** Skeleton blocks while Discover Home loads (05.01 `CImMS`). */
+  skeleton: palette.gray125,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
   /** Behind centered dialogs over a screen ("04.x Çıkış — Taslak kaydet", `zMCLP`). */

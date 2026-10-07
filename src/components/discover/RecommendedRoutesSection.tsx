@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -8,15 +9,18 @@ import { formatDistance, formatDuration } from '@/i18n/format';
 import { colors, layout, spacing, typography } from '@/theme';
 
 type RecommendedRoutesSectionProps = {
-  /** Section heading, e.g. "Senin için önerilenler" or "Yakınındaki rotalar". */
+  /** Section heading, e.g. "Önerilen rotalar" or "Türkiye'de popüler rotalar". */
   title: string;
+  /** Row between the title and the strip (the category chips on Home, 05.01 `uNyfD`). */
+  filters?: ReactNode;
   /** Shown when the strip loaded but has no routes. */
   emptyMessage: string;
   routes: Route[] | undefined;
   isLoading: boolean;
   isError: boolean;
   onRetry: () => void;
-  onSeeAll: () => void;
+  /** "Tümünü gör"; hidden when omitted (offline). */
+  onSeeAll?: () => void;
   onRoutePress: (route: Route) => void;
   isSaved: (routeId: string) => boolean;
   onToggleSave: (routeId: string) => void;
@@ -26,11 +30,12 @@ type RecommendedRoutesSectionProps = {
 const STRIP_HEIGHT = 191;
 
 /**
- * Home route strip (p4CIJi `D4vGn` / `yVngM`): section title, "Tümünü gör" and a horizontal
- * strip of compact route cards bleeding to the screen edges.
+ * Home route section (05.01 `uNyfD`): title with "Tümünü gör", optional category chips and a
+ * horizontal strip of compact route cards bleeding to the screen edges.
  */
 export function RecommendedRoutesSection({
   title,
+  filters,
   emptyMessage,
   routes,
   isLoading,
@@ -96,14 +101,17 @@ export function RecommendedRoutesSection({
         <Text style={styles.title} accessibilityRole="header">
           {title}
         </Text>
-        <Pressable
-          onPress={onSeeAll}
-          accessibilityRole="link"
-          hitSlop={{ top: spacing.md, bottom: spacing.md, left: spacing.sm, right: spacing.sm }}
-          style={({ pressed }) => pressed && styles.pressed}>
-          <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
-        </Pressable>
+        {onSeeAll ? (
+          <Pressable
+            onPress={onSeeAll}
+            accessibilityRole="link"
+            hitSlop={{ top: spacing.md, bottom: spacing.md, left: spacing.sm, right: spacing.sm }}
+            style={({ pressed }) => pressed && styles.pressed}>
+            <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
+          </Pressable>
+        ) : null}
       </View>
+      {filters}
       {body}
     </View>
   );
@@ -120,13 +128,14 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   title: {
-    ...typography.bodyLargeSemibold,
+    ...typography.headline,
+    lineHeight: 22,
     flexShrink: 1,
     color: colors.textPrimary,
   },
   seeAll: {
     ...typography.bodyMedium,
-    color: colors.accentLink,
+    color: colors.brand,
   },
   pressed: {
     opacity: 0.6,

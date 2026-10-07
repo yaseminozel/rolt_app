@@ -1,9 +1,7 @@
 {
   "home": {
     "locationLabel": "Konumun:",
-    "regionLabel": "Seçili bölge:",
     "locationValue": "{{city}}, Türkiye",
-    "defaultRegionValue": "{{city}} (varsayılan)",
     "changeLocationA11y": "Bölgeyi değiştir",
     "notificationsA11y": "Bildirimler",
     "categoriesA11y": "Rota kategorileri",
@@ -12,20 +10,19 @@
     "areaRouteCount_other": "Bu bölgede {{count}} rota var",
     "exploreMapA11y": "Haritada keşfet",
     "goToMyLocation": "Konumuma git",
-    "recommendedTitle": "Senin için önerilenler",
+    "recommendedTitle": "Önerilen rotalar",
     "seeAll": "Tümünü gör",
     "recommendedEmpty": "Bu kategoride şimdilik önerimiz yok.",
     "loadError": "Rotalar yüklenemedi.",
     "retry": "Tekrar dene",
-    "nearbyTitle": "Yakınındaki rotalar",
-    "regionRoutesTitle": "{{city}} bölgesindeki rotalar",
-    "nearbyEmpty": "Bu bölgede başka rota yok."
-  },
-  "permissionBanner": {
-    "title": "Konum izni kapalı",
-    "description": "Yakınındaki rotalar yerine {{city}} bölgesini gösteriyoruz.",
-    "action": "Aç",
-    "actionA11y": "Konum iznini aç"
+    "unknownLocation": "Konum belirlenmedi",
+    "popularTitle": "Türkiye'de popüler rotalar",
+    "offlineTitle": "Çevrimdışısın",
+    "mapOfflineTitle": "Harita çevrimdışı yüklenemiyor",
+    "mapOfflineDescription": "Bağlantı gelince otomatik yenilenecek",
+    "locationOffTitle": "Konum iznin kapalı",
+    "locationOffDescription": "Yakınındaki rotaları haritada görmek için konum iznini aç ya da bir şehir seç.",
+    "locationOffAction": "İzin ver"
   },
   "search": {
     "placeholder": "Rota ara",

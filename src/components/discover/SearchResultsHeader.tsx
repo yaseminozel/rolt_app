@@ -1,4 +1,4 @@
-import { ControlSlider, Filter, NavArrowDown } from 'iconoir-react-native';
+import { ControlSlider, FilterList, NavArrowDown } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -23,8 +23,9 @@ const BADGE_SIZE = 18;
 const CONTROL_HIT_SLOP = { top: 13, bottom: 13, left: spacing.xs, right: spacing.xs };
 
 /**
- * "Sonuç başlığı" of 01.2 Search — Results (T2ku5 `E2vHj`): "8 sonuç bulundu", the
- * "Filtrele" action (filter sheet, PXcQ0) and the sort action showing the current order.
+ * "Sonuç başlığı" of 05.02 Search — Results (`I5gvd`): "8 sonuç bulundu" and the sort action
+ * showing the current order. "Filtrele" (filter sheet) is kept although the new frame drops
+ * it — it is the only way into the search filters (CLAUDE.md decision).
  */
 export function SearchResultsHeader({
   count,
@@ -64,7 +65,7 @@ export function SearchResultsHeader({
           accessibilityLabel={t('search.sortA11y', { sort: sortLabel })}
           hitSlop={CONTROL_HIT_SLOP}
           style={({ pressed }) => [styles.action, pressed && styles.pressed]}>
-          <Filter width={SORT_ICON_SIZE} height={SORT_ICON_SIZE} color={colors.textPrimary} strokeWidth={1.5} />
+          <FilterList width={SORT_ICON_SIZE} height={SORT_ICON_SIZE} color={colors.textPrimary} strokeWidth={1.5} />
           <Text style={styles.label}>{sortLabel}</Text>
           <NavArrowDown width={CHEVRON_SIZE} height={CHEVRON_SIZE} color={colors.textPrimary} strokeWidth={1.5} />
         </Pressable>

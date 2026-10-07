@@ -32,7 +32,7 @@ import {
 } from '@/features/riders/queries';
 import type { RideSummary, Rider, RiderBike } from '@/features/riders/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import { formatDateTime, formatDistance, formatDuration, formatNumber, formatSpeed } from '@/i18n/format';
+import { formatApproxDuration, formatDateTime, formatDistance, formatDuration, formatNumber, formatSpeed } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
 
@@ -358,7 +358,7 @@ function RidesFeed({ rider }: { rider: Rider }) {
 }
 
 function RoutesList({ riderId }: { riderId: string }) {
-  const { t } = useTranslation('profile');
+  const { t } = useTranslation(['profile', 'routes']);
   const routesQuery = useRiderRoutes(riderId);
   const { isSaved, toggleBookmark } = useRouteBookmark();
 
@@ -380,8 +380,8 @@ function RoutesList({ riderId }: { riderId: string }) {
           title={route.name}
           subtitle={route.summary}
           distance={formatDistance(route.distanceKm)}
-          duration={formatDuration(route.durationMinutes)}
-          averageSpeed={formatSpeed(route.averageSpeedKmh)}
+          duration={formatApproxDuration(route.durationMinutes)}
+          badgeLabel={t(`routes:tags.${route.tag}`)}
           saved={isSaved(route.id)}
           onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_BOTTOM_OFFSET })}
           onPress={() => router.push({ pathname: '/route/[id]', params: { id: route.id } })}

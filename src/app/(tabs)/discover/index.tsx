@@ -18,9 +18,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AreaMapCard } from '@/components/discover/AreaMapCard';
 import { DiscoverHeader } from '@/components/discover/DiscoverHeader';
+import { DiscoverHomeSkeleton } from '@/components/discover/DiscoverHomeSkeleton';
 import { DiscoverSearchField } from '@/components/discover/DiscoverSearchField';
 import { EmptySearchResults } from '@/components/discover/EmptySearchResults';
-import { LocationPermissionBanner } from '@/components/discover/LocationPermissionBanner';
+import { LocationOffCard } from '@/components/discover/LocationOffCard';
+import { OfflineBanner } from '@/components/discover/OfflineBanner';
 import { RecentSearches } from '@/components/discover/RecentSearches';
 import { RecommendedRoutesSection } from '@/components/discover/RecommendedRoutesSection';
 import { RouteFilterChips } from '@/components/discover/RouteFilterChips';
@@ -37,13 +39,12 @@ import {
   useRoutesInArea,
   useSearchSuggestions,
 } from '@/features/routes/queries';
-import { findCityByName } from '@/features/location/turkishCities';
-import { distanceKm } from '@/features/routes/geo';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { countActiveSearchFilters, EMPTY_ROUTE_SEARCH_FILTERS } from '@/features/routes/searchFilters';
-import type { LngLat, Route } from '@/features/routes/types';
-import { formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
+import { useIsOffline } from '@/features/network/useIsOffline';
+import type { Route } from '@/features/routes/types';
+import { formatApproxDuration, formatDistance } from '@/i18n/format';
 import { colors, layout, spacing, typography } from '@/theme';
 
 /** Home (01.5) and the search states drawn on the same screen (01.1, 01.2, 01.3). */
@@ -52,11 +53,11 @@ type HomeMode = 'home' | 'recent' | 'suggestions' | 'results';
 const SUGGESTION_DEBOUNCE_MS = 200;
 
 /**
- * Discover Home — "01.5 Discover / Home — Harita odaklı" (p4CIJi), "Konum izni kapalı"
- * (x3Pqz) and the search states on the same screen:
- * - focus the field → recent searches (01.1 M5esBr)
- * - type → suggestions (01.1 aZnjb)
- * - submit → results (01.2 T2ku5) or no results (01.3 bfMyW)
+ * Discover Home — 05.01 "Ana sayfa" (`qrtOK` map-focused, `Jbnan` no location, `INwLr` offline,
+ * `CImMS` loading) and the 05.02 search states on the same screen:
+ * - focus the field → recent searches (`cv8lX`)
+ * - type → suggestions
+ * - submit → results (`pf9Iu`) or no results (`vxlt8`)
  * - "Vazgeç" (or Android back) → Home.
  *
  * One root `FlatList` (the scroll view must be the screen's first child for the native tab
@@ -64,7 +65,7 @@ const SUGGESTION_DEBOUNCE_MS = 200;
  * automatic content inset clears the status bar and the system-drawn tab bar.
  */
 export default function DiscoverHomeScreen() {
-  const { t } = useTranslation('discover');
+  const { t } = useTranslation(['discover', 'routes']);
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
@@ -113,22 +114,19 @@ export default function DiscoverHomeScreen() {
   const recommended = useRecommendedRoutes(city, filter);
   const areaBounds = useMemo(() => cityAreaBounds(city), [city]);
   const area = useRoutesInArea(areaBounds, filter);
-  // Second home strip (the design repeats the first as a placeholder): routes around the region,
-  // nearest first, without the ones already in "Senin için önerilenler".
-  const nearbyRoutes = useMemo(() => {
-    if (!area.data) {
-      return undefined;
-    }
-    const shown = new Set(recommended.data?.map((route) => route.id));
-    const centre = findCityByName(city);
-    const origin: LngLat | null = centre ? [centre.longitude, centre.latitude] : null;
-    const rest = area.data.filter((route) => !shown.has(route.id));
-    return origin
-      ? [...rest].sort((a, b) => distanceKm(a.coordinates[0], origin) - distanceKm(b.coordinates[0], origin))
-      : rest;
-  }, [area.data, recommended.data, city]);
+  const offline = useIsOffline();
 
   const locationGranted = locationPermission === Location.PermissionStatus.GRANTED;
+  // No permission and no picked region: the region is unknown ("Konum belirlenmedi"), the map
+  // card makes way for the permission card and the strip shows popular routes nationwide.
+  const regionUnknown = citySource === 'default';
+  const showLocationOffCard = regionUnknown && locationPermission !== null && !locationGranted;
+  const homeLoading = recommended.isPending && area.isPending && !offline;
+
+  const retryConnection = () => {
+    recommended.refetch();
+    area.refetch();
+  };
   const activeFilterCount = countActiveSearchFilters(searchFilters);
 
   const submitSearch = (query: string) => {
@@ -184,19 +182,23 @@ export default function DiscoverHomeScreen() {
   const header = (
     <View style={styles.header}>
       <DiscoverHeader
-        locationLabel={citySource === 'device' ? t('home.locationLabel') : t('home.regionLabel')}
-        locationValue={
-          citySource === 'default' ? t('home.defaultRegionValue', { city }) : t('home.locationValue', { city })
-        }
+        locationLabel={t('home.locationLabel')}
+        locationValue={regionUnknown ? t('home.unknownLocation') : t('home.locationValue', { city })}
         onLocationPress={() => router.push('/discover/location')}
         onNotificationsPress={() => router.push('/notifications')}
       />
 
-      {mode === 'home' && locationPermission !== null && !locationGranted ? (
-        <LocationPermissionBanner city={city} onEnable={enableLocation} />
+      {offline ? (
+        <OfflineBanner
+          title={t('home.offlineTitle')}
+          retryLabel={t('home.retry')}
+          onRetry={retryConnection}
+        />
       ) : null}
 
-      <View style={styles.searchRow}>
+      {mode === 'home' && homeLoading ? <DiscoverHomeSkeleton /> : null}
+
+      <View style={[styles.searchRow, mode === 'home' && homeLoading && styles.hidden]}>
         <DiscoverSearchField
           ref={inputRef}
           value={draft}
@@ -216,37 +218,37 @@ export default function DiscoverHomeScreen() {
         ) : null}
       </View>
 
-      {mode === 'home' ? (
+      {mode === 'home' && !homeLoading ? (
         <>
-          <RouteFilterChips value={filter} onChange={setFilter} />
-          <AreaMapCard
-            routeCount={area.data?.length}
-            locationEnabled={locationGranted}
-            onPress={openExplore}
-            onLocatePress={locationGranted ? openExplore : enableLocation}
-          />
+          {showLocationOffCard ? (
+            <LocationOffCard
+              title={t('home.locationOffTitle')}
+              description={t('home.locationOffDescription')}
+              actionLabel={t('home.locationOffAction')}
+              onAction={enableLocation}
+            />
+          ) : (
+            <AreaMapCard
+              routeCount={area.data?.length}
+              locationEnabled={locationGranted}
+              onPress={openExplore}
+              onLocatePress={locationGranted ? openExplore : enableLocation}
+              offline={
+                offline
+                  ? { title: t('home.mapOfflineTitle'), description: t('home.mapOfflineDescription') }
+                  : undefined
+              }
+            />
+          )}
           <RecommendedRoutesSection
-            title={t('home.recommendedTitle')}
+            title={regionUnknown ? t('home.popularTitle') : t('home.recommendedTitle')}
+            filters={<RouteFilterChips value={filter} onChange={setFilter} />}
             emptyMessage={t('home.recommendedEmpty')}
             routes={recommended.data}
             isLoading={recommended.isPending}
             isError={recommended.isError}
             onRetry={() => recommended.refetch()}
-            onSeeAll={() => router.push('/discover/recommended')}
-            onRoutePress={openRoute}
-            isSaved={isSaved}
-            onToggleSave={toggleBookmark}
-          />
-          <RecommendedRoutesSection
-            title={
-              citySource === 'device' ? t('home.nearbyTitle') : t('home.regionRoutesTitle', { city })
-            }
-            emptyMessage={t('home.nearbyEmpty')}
-            routes={nearbyRoutes}
-            isLoading={area.isPending}
-            isError={area.isError}
-            onRetry={() => area.refetch()}
-            onSeeAll={openExplore}
+            onSeeAll={offline ? undefined : () => router.push('/discover/recommended')}
             onRoutePress={openRoute}
             isSaved={isSaved}
             onToggleSave={toggleBookmark}
@@ -337,8 +339,8 @@ export default function DiscoverHomeScreen() {
           title={item.name}
           subtitle={item.summary}
           distance={formatDistance(item.distanceKm)}
-          duration={formatDuration(item.durationMinutes)}
-          averageSpeed={formatSpeed(item.averageSpeedKmh)}
+          duration={formatApproxDuration(item.durationMinutes)}
+          badgeLabel={t(`routes:tags.${item.tag}`)}
           saved={isSaved(item.id)}
           onToggleSave={() => toggleBookmark(item.id)}
           onPress={() => openRoute(item)}
@@ -395,6 +397,10 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.6,
+  },
+  // The skeleton draws the search field's placeholder while Home loads.
+  hidden: {
+    display: 'none',
   },
   rowGap: {
     height: spacing.lg,

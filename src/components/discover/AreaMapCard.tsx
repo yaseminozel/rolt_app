@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { MapPin, MapsArrow, MapsArrowXmark } from 'iconoir-react-native';
+import { MapPin, MapsArrow, MapsArrowXmark, MapXmark } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -14,21 +14,39 @@ type AreaMapCardProps = {
   locationEnabled: boolean;
   onPress: () => void;
   onLocatePress: () => void;
+  /** No connection: the map can't load, so a muted layer explains it (05.01 `INwLr`). */
+  offline?: { title: string; description: string };
 };
 
 const CARD_HEIGHT = 206;
 const PILL_ICON_SIZE = 16;
 /** Pill top and button inset inside the card (oxSGl: y 14, 12 pt from the corner). */
 const PILL_TOP = 14;
+const OFFLINE_ICON_SIZE = 28;
 
 /**
  * "Harita kartı / Bölgedeki rotalar" (p4CIJi `oxSGl`). A static preview on purpose: a live
  * map inside the scrolling feed would fight the scroll gesture (and can't run in Expo Go),
  * so the card shows the design's map artwork and opens "Haritada keşfet" (01.7) on tap.
  */
-export function AreaMapCard({ routeCount, locationEnabled, onPress, onLocatePress }: AreaMapCardProps) {
+export function AreaMapCard({ routeCount, locationEnabled, onPress, onLocatePress, offline }: AreaMapCardProps) {
   const { t } = useTranslation('discover');
   const countLabel = routeCount === undefined ? undefined : t('home.areaRouteCount', { count: routeCount });
+
+  if (offline) {
+    return (
+      <View style={[styles.card, styles.offline]} accessibilityRole="summary">
+        <MapXmark
+          width={OFFLINE_ICON_SIZE}
+          height={OFFLINE_ICON_SIZE}
+          color={colors.textPrimary}
+          strokeWidth={1.5}
+        />
+        <Text style={styles.offlineTitle}>{offline.title}</Text>
+        <Text style={styles.offlineText}>{offline.description}</Text>
+      </View>
+    );
+  }
 
   return (
     <Pressable
@@ -101,6 +119,23 @@ const styles = StyleSheet.create({
   pillLabel: {
     ...typography.captionMedium,
     color: colors.textPrimary,
+  },
+  // "Çevrimdışı katmanı": icon 28, 8 pt to the title, 8 pt to the hint.
+  offline: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    boxShadow: 'none',
+  },
+  offlineTitle: {
+    ...typography.bodySemibold,
+    lineHeight: 20,
+    color: colors.textPrimary,
+  },
+  offlineText: {
+    ...typography.caption,
+    lineHeight: 16,
+    color: colors.textSecondary,
   },
   locate: {
     position: 'absolute',

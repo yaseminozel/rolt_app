@@ -4,31 +4,40 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { RouteFilterChips } from '@/components/discover/RouteFilterChips';
 import { RouteCard } from '@/components/route/RouteCard';
 import { Button } from '@/components/ui/Button';
+import { useDiscoverState } from '@/features/discover/DiscoverStateProvider';
 import { useRecommendedList } from '@/features/routes/queries';
+import { filterRoutes } from '@/features/routes/routeFilter';
+import type { RouteFilter } from '@/features/routes/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import { formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
+import { formatApproxDuration, formatDistance } from '@/i18n/format';
 import { matchesSearch } from '@/lib/searchText';
 import { colors, fontFamily, layout, spacing, typography } from '@/theme';
 
 const CLOSE_ICON_SIZE = 24;
 
 /**
- * "01.4 Discover / Önerilen Rotalar — Tümü" (PkNmw). The design's header (`biu3H`: title,
- * close and sticky "Rotalarda ara") is the native Stack header with `Stack.SearchBar`, which
- * filters the list locally.
+ * 05.03 Discover / Önerilen rotalar — Tümü (`rR0Ew`, scrolled `zZpLq`). The design's pinned
+ * header (title, close and "Rotalarda ara") is the native Stack header with `Stack.SearchBar`;
+ * the category chips under it and the search filter the list locally.
  */
 export default function RecommendedRoutesScreen() {
-  const { t } = useTranslation(['discover', 'common']);
+  const { t } = useTranslation(['discover', 'common', 'routes']);
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<RouteFilter>('all');
+  const { city } = useDiscoverState();
   const { data, isPending, isError, refetch } = useRecommendedList();
   const { isSaved, toggleBookmark } = useRouteBookmark();
 
   const routes = useMemo(
-    () => (data ?? []).filter((route) => matchesSearch(route.name, query) || matchesSearch(route.summary, query)),
-    [data, query],
+    () =>
+      filterRoutes(data ?? [], filter, city).filter(
+        (route) => matchesSearch(route.name, query) || matchesSearch(route.summary, query),
+      ),
+    [city, data, filter, query],
   );
 
   let empty = null;
@@ -87,14 +96,16 @@ export default function RecommendedRoutesScreen() {
             title={item.name}
             subtitle={item.summary}
             distance={formatDistance(item.distanceKm)}
-            duration={formatDuration(item.durationMinutes)}
-            averageSpeed={formatSpeed(item.averageSpeedKmh)}
+            duration={formatApproxDuration(item.durationMinutes)}
+            badgeLabel={t(`routes:tags.${item.tag}`)}
             saved={isSaved(item.id)}
             onToggleSave={() => toggleBookmark(item.id)}
             onPress={() => router.push({ pathname: '/route/[id]', params: { id: item.id } })}
           />
         )}
         ItemSeparatorComponent={RowGap}
+        ListHeaderComponent={<RouteFilterChips value={filter} onChange={setFilter} />}
+        ListHeaderComponentStyle={styles.chips}
         ListEmptyComponent={empty}
         style={styles.list}
         contentContainerStyle={styles.content}
@@ -122,6 +133,9 @@ const styles = StyleSheet.create({
   },
   rowGap: {
     height: spacing.lg,
+  },
+  chips: {
+    marginBottom: spacing.lg,
   },
   close: {
     width: layout.minTouchTarget,

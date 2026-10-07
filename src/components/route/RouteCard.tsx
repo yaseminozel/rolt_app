@@ -1,5 +1,5 @@
 import { BlurView } from 'expo-blur';
-import { Bookmark, BookmarkSolid, Clock, DashboardSpeed, PathArrow } from 'iconoir-react-native';
+import { Bookmark, BookmarkSolid, Clock, PathArrow } from 'iconoir-react-native';
 import type { ComponentType } from 'react';
 import {
   Image,
@@ -42,14 +42,12 @@ type CompactRouteCardProps = RouteCardBaseProps & {
   variant: 'compact';
   /** Optional category label over the image, e.g. "Virajlı" (success-tone `Badge`, no icon). */
   badgeLabel?: string;
-  averageSpeed?: never;
 };
 
 type RowRouteCardProps = RouteCardBaseProps & {
   variant: 'row';
-  /** Pre-formatted average speed, e.g. "51 km/sa". */
-  averageSpeed?: string;
-  badgeLabel?: never;
+  /** Optional category label under the subtitle ("Kategori rozeti", success tone). */
+  badgeLabel?: string;
 };
 
 export type RouteCardProps = CompactRouteCardProps | RowRouteCardProps;
@@ -57,7 +55,8 @@ export type RouteCardProps = CompactRouteCardProps | RowRouteCardProps;
 /**
  * Route discovery card. Pencil node `gBNKs`:
  * `compact` = "Card / Rota — Kompakt" (150 × 191, image on top, optional badge and bookmark),
- * `row` = "Card / Rota — Satır" (361 × 85, thumbnail, metrics, bookmark and bottom divider).
+ * `row` = "Card / Rota — Satır" (05.02 `Nt2us`: 76 × 86 thumbnail, title, subtitle, category
+ * badge, distance and duration, bookmark and bottom divider).
  */
 export function RouteCard(props: RouteCardProps) {
   return props.variant === 'compact' ? <CompactRouteCard {...props} /> : <RowRouteCard {...props} />;
@@ -131,7 +130,7 @@ function RowRouteCard({
   subtitle,
   distance,
   duration,
-  averageSpeed,
+  badgeLabel,
   saved = false,
   onToggleSave,
   onPress,
@@ -160,13 +159,17 @@ function RowRouteCard({
             <Text style={styles.subtitle} numberOfLines={1}>
               {subtitle}
             </Text>
+            {badgeLabel ? (
+              <View style={styles.rowBadge}>
+                <Text style={styles.rowBadgeLabel} numberOfLines={1}>
+                  {badgeLabel}
+                </Text>
+              </View>
+            ) : null}
           </View>
           <View style={[styles.metrics, styles.rowMetrics]}>
             <Metric icon={PathArrow} value={distance} textStyle={styles.rowMetricValue} />
             <Metric icon={Clock} value={duration} textStyle={styles.rowMetricValue} />
-            {averageSpeed ? (
-              <Metric icon={DashboardSpeed} value={averageSpeed} textStyle={styles.rowMetricValue} />
-            ) : null}
           </View>
         </View>
         {onToggleSave ? (
@@ -270,8 +273,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   rowMedia: {
-    width: 84,
-    height: 68,
+    width: 76,
+    height: 86,
     borderRadius: radius.chip,
     boxShadow: shadows.raised,
   },
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
   rowImageStroke: {
     ...StyleSheet.absoluteFill,
     borderRadius: radius.chip,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.surface,
     pointerEvents: 'none',
   },
@@ -299,7 +302,21 @@ const styles = StyleSheet.create({
   },
   rowMetrics: {
     gap: spacing.md,
-    paddingTop: spacing.xs,
+  },
+  // "Kategori rozeti": 10 pt medium on the success tint, radius 4.
+  rowBadge: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.xxs,
+    paddingVertical: spacing.xxs,
+    paddingHorizontal: spacing.xs,
+    borderRadius: radius.xs,
+    backgroundColor: colors.successSurface,
+  },
+  rowBadgeLabel: {
+    fontFamily: fontFamily.medium,
+    fontSize: 10,
+    lineHeight: 16,
+    color: colors.success,
   },
   rowMetricValue: {
     fontFamily: fontFamily.regular,
