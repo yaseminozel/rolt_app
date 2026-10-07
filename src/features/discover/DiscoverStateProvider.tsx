@@ -1,8 +1,15 @@
 import * as Location from 'expo-location';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { findCityByName } from '@/features/location/turkishCities';
 import { EMPTY_ROUTE_SEARCH_FILTERS } from '@/features/routes/searchFilters';
-import type { RouteFilter, RouteSearchFilters, RouteSort } from '@/features/routes/types';
+import type {
+  LngLat,
+  ReachWindow,
+  RouteFilter,
+  RouteSearchFilters,
+  RouteSort,
+} from '@/features/routes/types';
 import { normalizeForSearch } from '@/lib/searchText';
 
 import { nearestCityName } from './cityArea';
@@ -11,6 +18,13 @@ import { useForegroundLocationPermission } from './useForegroundLocationPermissi
 /** Region shown before the device location is known (the design's "Antalya"). */
 export const DEFAULT_DISCOVER_CITY = 'Antalya';
 const MAX_RECENT_SEARCHES = 8;
+/** ~100 m: GPS jitter must not refetch the driving times. */
+const ORIGIN_PRECISION = 1000;
+
+const roundOrigin = ([lng, lat]: LngLat): LngLat => [
+  Math.round(lng * ORIGIN_PRECISION) / ORIGIN_PRECISION,
+  Math.round(lat * ORIGIN_PRECISION) / ORIGIN_PRECISION,
+];
 
 /**
  * Where the Home region comes from; decides the header label (CLAUDE.md "Tasarım kararları"):
@@ -28,6 +42,14 @@ type DiscoverState = {
   /** Foreground location permission; `null` while it is being read. */
   locationPermission: Location.PermissionStatus | null;
   enableLocation: () => Promise<void>;
+  /**
+   * Where "1 saatte ulaşabileceğin" measures from: the device position, or the picked region's
+   * centre (the same place "Konumun:" names); `null` while the region is unknown.
+   */
+  origin: LngLat | null;
+  /** "Süre seçici" on Home and the "Başlangıca … içinde" chip on the full list share it. */
+  reachWindow: ReachWindow;
+  setReachWindow: (window: ReachWindow) => void;
 
   /** Home category chips. */
   filter: RouteFilter;
@@ -61,6 +83,8 @@ export function DiscoverStateProvider({ children }: { children: ReactNode }) {
     city: DEFAULT_DISCOVER_CITY,
     source: 'default',
   });
+  const [devicePosition, setDevicePosition] = useState<LngLat | null>(null);
+  const [reachWindow, setReachWindow] = useState<ReachWindow>(60);
   const [filter, setFilter] = useState<RouteFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sort, setSort] = useState<RouteSort>('recommended');
@@ -82,8 +106,10 @@ export function DiscoverStateProvider({ children }: { children: ReactNode }) {
         const position =
           (await Location.getLastKnownPositionAsync()) ??
           (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low }));
-        const city = nearestCityName([position.coords.longitude, position.coords.latitude]);
+        const coordinates: LngLat = [position.coords.longitude, position.coords.latitude];
+        const city = nearestCityName(coordinates);
         if (!cancelled) {
+          setDevicePosition(roundOrigin(coordinates));
           setRegion((current) => (current.source === 'manual' ? current : { city, source: 'device' }));
         }
       } catch {
@@ -94,6 +120,17 @@ export function DiscoverStateProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [permissionGranted, manualRegion]);
+
+  const origin = useMemo<LngLat | null>(() => {
+    if (region.source === 'device') {
+      return devicePosition;
+    }
+    if (region.source === 'manual') {
+      const match = findCityByName(region.city);
+      return match ? [match.longitude, match.latitude] : null;
+    }
+    return null;
+  }, [region, devicePosition]);
 
   const selectCity = useCallback((city: string) => setRegion({ city, source: 'manual' }), []);
 
@@ -126,6 +163,9 @@ export function DiscoverStateProvider({ children }: { children: ReactNode }) {
       selectCity,
       locationPermission,
       enableLocation,
+      origin,
+      reachWindow,
+      setReachWindow,
       filter,
       setFilter,
       searchQuery,
@@ -145,6 +185,8 @@ export function DiscoverStateProvider({ children }: { children: ReactNode }) {
       selectCity,
       locationPermission,
       enableLocation,
+      origin,
+      reachWindow,
       filter,
       searchQuery,
       sort,

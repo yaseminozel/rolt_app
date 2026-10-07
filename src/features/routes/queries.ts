@@ -2,8 +2,12 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { RECOMMENDED_LIST_IDS, ROUTE_FIXTURES } from './fixtures/routes';
 import { mockRoutesRepository } from './mockRoutesRepository';
+import { travelTimes } from './travelTime';
 import type {
   Bounds,
+  LngLat,
+  ReachableRoute,
+  ReachWindow,
   Route,
   RouteFilter,
   RouteSearchFilters,
@@ -24,7 +28,58 @@ export const routeKeys = {
   area: (bounds: Bounds, filter: RouteFilter, query = '') =>
     ['routes', 'area', bounds, filter, query] as const,
   detail: (id: string) => ['routes', 'detail', id] as const,
+  reachable: (origin: LngLat | null) => ['routes', 'reachable', origin] as const,
 };
+
+/** "Süre seçici" options, shortest first (05.01 `m3ezc`). */
+export const REACH_WINDOWS: readonly [ReachWindow, ReachWindow, ReachWindow] = [30, 60, 120];
+const LONGEST_REACH_MINUTES = 120;
+/** Nothing farther than this in a straight line can be driven to within two hours. */
+const REACH_SEARCH_RADIUS_KM = 220;
+/** Driving times barely change while the rider stays around; don't refetch on every visit. */
+const REACH_STALE_TIME_MS = 10 * 60 * 1000;
+
+async function listReachableRoutes(origin: LngLat): Promise<ReachableRoute[]> {
+  const candidates = await routesRepository.listStartingNear({
+    origin,
+    radiusKm: REACH_SEARCH_RADIUS_KM,
+  });
+  if (candidates.length === 0) {
+    return [];
+  }
+  const seconds = await travelTimes.durationsFrom(
+    origin,
+    candidates.map((route) => route.coordinates[0]),
+  );
+  return candidates
+    .flatMap((route, index) => {
+      const duration = seconds[index];
+      if (duration === null || duration === undefined) {
+        return [];
+      }
+      const minutesToStart = Math.max(1, Math.round(duration / 60));
+      return minutesToStart <= LONGEST_REACH_MINUTES ? [{ route, minutesToStart }] : [];
+    })
+    .sort((a, b) => a.minutesToStart - b.minutesToStart);
+}
+
+/**
+ * "1 saatte ulaşabileceğin" (05.01 `m3ezc`, 05.03 `r7NfD9`): routes whose start can be driven
+ * to from `origin` within two hours, nearest first. One request covers every window; screens
+ * cut the list with `withinReach`. Disabled while the rider's position is unknown.
+ */
+export function useReachableRoutes(origin: LngLat | null) {
+  return useQuery({
+    queryKey: routeKeys.reachable(origin),
+    queryFn: () => listReachableRoutes(origin as LngLat),
+    enabled: origin !== null,
+    staleTime: REACH_STALE_TIME_MS,
+  });
+}
+
+export function withinReach(routes: readonly ReachableRoute[] | undefined, window: ReachWindow) {
+  return (routes ?? []).filter((item) => item.minutesToStart <= window);
+}
 
 export function useRecommendedRoutes(city: string, filter: RouteFilter) {
   return useQuery({

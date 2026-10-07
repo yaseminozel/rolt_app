@@ -17,6 +17,11 @@ export type SegmentedControlProps<T extends string | number> = {
   onChange: (value: T) => void;
   disabled?: boolean;
   accessibilityLabel?: string;
+  /**
+   * `standard` is the Core component; `pill` is the compact selector of Discover Home
+   * (05.01 `m3ezc` "Süre seçici": 40 pt, fully rounded, dark selected segment, 13 pt labels).
+   */
+  variant?: 'standard' | 'pill';
 };
 
 /**
@@ -30,13 +35,15 @@ export function SegmentedControl<T extends string | number>({
   onChange,
   disabled = false,
   accessibilityLabel,
+  variant = 'standard',
 }: SegmentedControlProps<T>) {
+  const pill = variant === 'pill';
   return (
     <View
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled }}
-      style={styles.container}
+      style={[styles.container, pill && styles.pillContainer]}
     >
       {options.map((option) => {
         const selected = option.value === value;
@@ -50,14 +57,19 @@ export function SegmentedControl<T extends string | number>({
             onPress={() => {
               if (!selected) onChange(option.value);
             }}
-            style={[styles.segment, selected && styles.segmentSelected]}
+            style={[
+              styles.segment,
+              pill && styles.pillSegment,
+              selected && (pill ? styles.pillSegmentSelected : styles.segmentSelected),
+            ]}
           >
             <Text
               numberOfLines={1}
-              style={[
-                styles.label,
-                selected ? styles.labelSelected : disabled && styles.labelDisabled,
-              ]}
+              style={
+                pill
+                  ? [styles.pillLabel, selected && styles.pillLabelSelected]
+                  : [styles.label, selected ? styles.labelSelected : disabled && styles.labelDisabled]
+              }
             >
               {option.label}
             </Text>
@@ -98,5 +110,24 @@ const styles = StyleSheet.create({
   },
   labelDisabled: {
     color: colors.textDisabled,
+  },
+  pillContainer: {
+    height: 40,
+    borderRadius: radius.pill,
+  },
+  pillSegment: {
+    padding: 0,
+    borderRadius: radius.pill,
+  },
+  pillSegmentSelected: {
+    backgroundColor: colors.surfaceInverse,
+  },
+  pillLabel: {
+    ...typography.calloutMedium,
+    color: colors.textSecondary,
+  },
+  pillLabelSelected: {
+    ...typography.calloutSemibold,
+    color: colors.textInverse,
   },
 });

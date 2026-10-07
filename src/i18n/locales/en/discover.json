@@ -87,5 +87,35 @@
     "title": "Choose a region",
     "searchPlaceholder": "Search cities",
     "noResults": "No cities match your search."
+  },
+  "reach": {
+    "title": {
+      "30": "Reachable in 30 minutes",
+      "60": "Reachable in 1 hour",
+      "120": "Reachable in 2 hours"
+    },
+    "description": "By driving time from your location to the route's start",
+    "windowsA11y": "Driving time",
+    "windows": {
+      "30": "30 min",
+      "60": "1 hour",
+      "120": "2 hours"
+    },
+    "toStart": "{{duration}} to start",
+    "empty": "No routes within this time.",
+    "chip": {
+      "30": "Start within 30 min",
+      "60": "Start within 1 hour",
+      "120": "Start within 2 hours"
+    },
+    "chipA11y": "{{value}}, change driving time",
+    "routeCount_one": "{{count}} route",
+    "routeCount_other": "{{count}} routes",
+    "sheetTitle": "Driving time to start",
+    "sheetOptions": {
+      "30": "Within 30 min",
+      "60": "Within 1 hour",
+      "120": "Within 2 hours"
+    }
   }
 }

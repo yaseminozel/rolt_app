@@ -1,5 +1,12 @@
 import { BlurView } from 'expo-blur';
-import { Bookmark, BookmarkSolid, Clock, PathArrow } from 'iconoir-react-native';
+import {
+  Bookmark,
+  BookmarkSolid,
+  Clock,
+  DashboardSpeed,
+  Navigator,
+  PathArrow,
+} from 'iconoir-react-native';
 import type { ComponentType } from 'react';
 import {
   Image,
@@ -50,6 +57,10 @@ type RowRouteCardProps = RouteCardBaseProps & {
   variant: 'row';
   /** Optional category label under the subtitle ("Kategori rozeti", success tone). */
   badgeLabel?: string;
+  /** Driving time to the start above the title, e.g. "Başlangıca 24 dk" (05.01 `m3ezc`). */
+  travelTime?: string;
+  /** Pre-formatted average speed as a third metric, e.g. "31 km/sa" (05.01 `m3ezc`). */
+  speed?: string;
 };
 
 export type RouteCardProps = CompactRouteCardProps | RowRouteCardProps;
@@ -58,7 +69,8 @@ export type RouteCardProps = CompactRouteCardProps | RowRouteCardProps;
  * Route discovery card. Pencil node `gBNKs`:
  * `compact` = "Card / Rota — Kompakt" (150 × 191, image on top, optional badge and bookmark),
  * `row` = "Card / Rota — Satır" (05.02 `Nt2us`: 76 × 86 thumbnail, title, subtitle, category
- * badge, distance and duration, bookmark and bottom divider).
+ * badge, distance and duration, bookmark and bottom divider; 05.01 `m3ezc` adds the driving
+ * time to the start above the title and the average speed).
  */
 export function RouteCard(props: RouteCardProps) {
   return props.variant === 'compact' ? <CompactRouteCard {...props} /> : <RowRouteCard {...props} />;
@@ -134,6 +146,8 @@ function RowRouteCard({
   distance,
   duration,
   badgeLabel,
+  travelTime,
+  speed,
   saved = false,
   onToggleSave,
   onPress,
@@ -155,6 +169,14 @@ function RowRouteCard({
           <View style={styles.rowImageStroke} />
         </View>
         <View style={[styles.info, styles.rowInfo]}>
+          {travelTime ? (
+            <View style={styles.travelTime}>
+              <Navigator width={12} height={12} color={colors.brand} />
+              <Text style={styles.travelTimeLabel} numberOfLines={1}>
+                {travelTime}
+              </Text>
+            </View>
+          ) : null}
           <View style={styles.heading}>
             <Text style={styles.rowTitle} numberOfLines={1}>
               {title}
@@ -173,6 +195,9 @@ function RowRouteCard({
           <View style={[styles.metrics, styles.rowMetrics]}>
             <Metric icon={PathArrow} value={distance} textStyle={styles.rowMetricValue} />
             <Metric icon={Clock} value={duration} textStyle={styles.rowMetricValue} />
+            {speed ? (
+              <Metric icon={DashboardSpeed} value={speed} textStyle={styles.rowMetricValue} />
+            ) : null}
           </View>
         </View>
         {onToggleSave ? (
@@ -305,6 +330,18 @@ const styles = StyleSheet.create({
   },
   rowMetrics: {
     gap: spacing.md,
+  },
+  // "Ulaşım süresi": 12 pt navigation glyph and 12 semibold label in brand blue.
+  travelTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  travelTimeLabel: {
+    fontFamily: fontFamily.semibold,
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.brand,
   },
   // "Kategori rozeti": 10 pt medium on the success tint, radius 4.
   rowBadge: {

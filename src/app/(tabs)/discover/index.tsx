@@ -24,6 +24,7 @@ import { EmptySearchResults } from '@/components/discover/EmptySearchResults';
 import { LocationOffCard } from '@/components/discover/LocationOffCard';
 import { OfflineBanner } from '@/components/discover/OfflineBanner';
 import { RecentSearches } from '@/components/discover/RecentSearches';
+import { ReachableRoutesSection } from '@/components/discover/ReachableRoutesSection';
 import { RecommendedRoutesSection } from '@/components/discover/RecommendedRoutesSection';
 import { RouteFilterChips } from '@/components/discover/RouteFilterChips';
 import { SearchResultsHeader } from '@/components/discover/SearchResultsHeader';
@@ -34,10 +35,12 @@ import { cityAreaBounds } from '@/features/discover/cityArea';
 import { useDiscoverState } from '@/features/discover/DiscoverStateProvider';
 import { useDebouncedValue } from '@/features/discover/useDebouncedValue';
 import {
+  useReachableRoutes,
   useRecommendedRoutes,
   useRouteSearch,
   useRoutesInArea,
   useSearchSuggestions,
+  withinReach,
 } from '@/features/routes/queries';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
@@ -77,6 +80,9 @@ export default function DiscoverHomeScreen() {
     citySource,
     locationPermission,
     enableLocation,
+    origin,
+    reachWindow,
+    setReachWindow,
     filter,
     setFilter,
     searchQuery,
@@ -116,6 +122,7 @@ export default function DiscoverHomeScreen() {
   const recommended = useRecommendedRoutes(city, filter);
   const areaBounds = useMemo(() => cityAreaBounds(city), [city]);
   const area = useRoutesInArea(areaBounds, filter);
+  const reachable = useReachableRoutes(origin);
   const offline = useIsOffline();
 
   const locationGranted = locationPermission === Location.PermissionStatus.GRANTED;
@@ -128,6 +135,9 @@ export default function DiscoverHomeScreen() {
   const retryConnection = () => {
     recommended.refetch();
     area.refetch();
+    if (origin) {
+      reachable.refetch();
+    }
   };
   const activeFilterCount = countActiveSearchFilters(searchFilters);
 
@@ -259,6 +269,24 @@ export default function DiscoverHomeScreen() {
             isSaved={isSaved}
             onToggleSave={toggleBookmark}
           />
+          {/* Shown once something is reachable within the longest window; it sits last, so
+              appearing late moves nothing above it. */}
+          {reachable.data && reachable.data.length > 0 ? (
+            <ReachableRoutesSection
+              window={reachWindow}
+              onWindowChange={setReachWindow}
+              routes={withinReach(reachable.data, reachWindow)}
+              onSeeAll={
+                offline
+                  ? undefined
+                  : () =>
+                      router.push({ pathname: '/discover/recommended', params: { mode: 'reach' } })
+              }
+              onRoutePress={openRoute}
+              isSaved={isSaved}
+              onToggleSave={toggleBookmark}
+            />
+          ) : null}
         </>
       ) : null}
 

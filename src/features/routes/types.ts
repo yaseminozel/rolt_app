@@ -81,6 +81,12 @@ export type Route = {
   ratingCount: number;
 };
 
+/** "1 saatte ulaşabileceğin" windows (05.01 `m3ezc` "Süre seçici"): 30 dk, 1 saat, 2 saat. */
+export type ReachWindow = 30 | 60 | 120;
+
+/** A route with the driving time from the rider to its start ("Başlangıca 24 dk"). */
+export type ReachableRoute = { route: Route; minutesToStart: number };
+
 /** South-west and north-east corners. */
 export type Bounds = { southWest: LngLat; northEast: LngLat };
 
@@ -137,6 +143,8 @@ export interface RoutesRepository {
   suggest(params: { query: string }): Promise<SearchSuggestions>;
   /** Routes in the visible map area; `query` narrows by name, summary or city ("Bu bölgede ara"). */
   listInArea(params: { bounds: Bounds; filter: RouteFilter; query?: string }): Promise<Route[]>;
+  /** Routes starting within `radiusKm` (straight line) of `origin`; the backend uses PostGIS. */
+  listStartingNear(params: { origin: LngLat; radiusKm: number }): Promise<Route[]>;
   getById(id: string): Promise<Route | null>;
   /** Routes in the order of `ids`; missing ones are skipped ("Kaydettiklerim"). */
   listByIds(ids: readonly string[]): Promise<Route[]>;

@@ -85,6 +85,11 @@ export const mockRoutesRepository: RoutesRepository = {
     return filterRoutes(inArea, filter, 'Antalya');
   },
 
+  async listStartingNear({ origin, radiusKm }) {
+    await wait();
+    return ROUTE_FIXTURES.filter((route) => distanceKm(startOf(route), origin) <= radiusKm);
+  },
+
   async listByIds(ids) {
     await wait();
     return ids.flatMap((id) => ROUTE_FIXTURES.find((route) => route.id === id) ?? []);

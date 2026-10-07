@@ -5,7 +5,8 @@ import { colors } from '@/theme';
 
 /**
  * Discover tab stack. Home draws its own header (01.5); "Önerilen Rotalar" (01.4) uses the
- * native header with a search bar; sort, filter and region pickers are native form sheets.
+ * native header with a search bar; sort, filter, travel-time and region pickers are native
+ * form sheets.
  * `DiscoverStateProvider` keeps region, chips, search, sort and filters for all of them.
  */
 export default function DiscoverLayout() {
@@ -22,6 +23,16 @@ export default function DiscoverLayout() {
         <Stack.Screen name="recommended" />
         <Stack.Screen
           name="sort"
+          options={{
+            presentation: 'formSheet',
+            headerShown: false,
+            sheetAllowedDetents: 'fitToContents',
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 24,
+          }}
+        />
+        <Stack.Screen
+          name="reach"
           options={{
             presentation: 'formSheet',
             headerShown: false,

@@ -17,6 +17,8 @@ export const palette = {
   blue: '#1515FF',
   // Brand-tinted selection fill (QKDo5 selected brand tile, g4Zy4 selected model, LreVd bike band)
   blue25: '#F3F3FF',
+  // Applied travel-time chip (05.03 `r7NfD9` "Filtre / Başlangıca 1 saat")
+  blue40: '#EEF0FF',
   // Not in the design: pressed brand CTA, derived from `blue` at ~85 % value (same hue).
   blueDeep: '#1111D9',
   teal300: '#7BF1DB',
@@ -122,6 +124,8 @@ export const colors = {
   brandPressed: palette.blueDeep,
   /** Brand-tinted fill of selected registration options and the garage card band (QKDo5, g4Zy4, LreVd). */
   brandSubtle: palette.blue25,
+  /** Applied brand filter chip fill (05.03 "Başlangıca 1 saat içinde"). */
+  brandApplied: palette.blue40,
 
   accent: palette.teal400,
   accentSubtle: palette.teal100,
