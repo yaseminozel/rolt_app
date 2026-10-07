@@ -7,5 +7,13 @@
     "sport": "Sportif",
     "offRoad": "Off-road",
     "coast": "Sahil"
+  },
+  "autoTitle": {
+    "withCity": "{{city}} · {{weekday}} sürüşü",
+    "withoutCity": "{{weekday}} sürüşü"
+  },
+  "record": {
+    "notificationTitle": "ROLT sürüş kaydı",
+    "notificationBody": "Sürüşün kaydediliyor"
   }
 }

@@ -13,6 +13,7 @@ import { ToastProvider } from '@/components/feedback/ToastProvider';
 import '@/features/navigation/location/backgroundLocationTask';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { takePendingAccountAction } from '@/features/auth/pendingAccountAction';
+import { RideRecordingProvider } from '@/features/rides/RideRecordingProvider';
 import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
 import '@/i18n';
 import { appFonts, colors } from '@/theme';
@@ -22,7 +23,11 @@ SplashScreen.preventAutoHideAsync();
 // Web preview only: react-native-web renders nested Pressables as nested <button>s, which React
 // DOM warns about. Native builds are unaffected, so these dev warnings are hidden on web.
 if (__DEV__ && Platform.OS === 'web') {
-  LogBox.ignoreLogs(['cannot contain a nested', 'cannot be a descendant of', 'for a non-boolean attribute']);
+  LogBox.ignoreLogs([
+    'cannot contain a nested',
+    'cannot be a descendant of',
+    'for a non-boolean attribute',
+  ]);
 }
 
 const navigationTheme: Theme = {
@@ -45,14 +50,16 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <SavedRoutesProvider>
-            <ThemeProvider value={navigationTheme}>
-              <BottomSheetModalProvider>
-                <ToastProvider>
-                  <RootNavigator />
-                  <StatusBar style="dark" />
-                </ToastProvider>
-              </BottomSheetModalProvider>
-            </ThemeProvider>
+            <RideRecordingProvider>
+              <ThemeProvider value={navigationTheme}>
+                <BottomSheetModalProvider>
+                  <ToastProvider>
+                    <RootNavigator />
+                    <StatusBar style="dark" />
+                  </ToastProvider>
+                </BottomSheetModalProvider>
+              </ThemeProvider>
+            </RideRecordingProvider>
           </SavedRoutesProvider>
         </AuthProvider>
       </QueryClientProvider>
@@ -119,7 +126,10 @@ function RootNavigator() {
         <Stack.Screen name="suggest-route" />
         {/* "Rotayı sür" (06.x): its own stack of map screens and sheets. */}
         <Stack.Screen name="ride/[routeId]" options={{ gestureEnabled: false }} />
-        <Stack.Screen name="notifications" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
+        <Stack.Screen
+          name="notifications"
+          options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }}
+        />
       </Stack.Protected>
       <Stack.Protected guard={isGuest}>
         <Stack.Screen

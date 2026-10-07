@@ -81,7 +81,8 @@
           "savePhotosPermission": false,
           "isAccessMediaLocationEnabled": true
         }
-      ]
+      ],
+      "expo-sqlite"
     ],
     "scheme": "rolt",
     "experiments": {
