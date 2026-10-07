@@ -345,6 +345,13 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 - Splash `expo-splash-screen` config plugin ile: zemin `#1515FF` (Pencil `00.01 Launch / Splash`, `f1H2n6`; görünür wordmark ~100 pt), `imageWidth: 200`.
 - İkonu değiştirmek için: Pencil'de node'u köşesiz (`cornerRadius: 0`) geçici bir kopyayla `Export` et, kopyayı sil, yukarıdaki dosyaları yeniden üret.
 
+## Mobil yayın (EAS / TestFlight)
+
+- EAS projesi `@milbas/rolt_app` (`app.json` `extra.eas.projectId`), iOS bundle id `com.roltapp.rolt`, yalnız iPhone (`supportsTablet: false`), `usesNonExemptEncryption: false` (yalnız HTTPS; App Store Connect şifreleme sorusu sorulmaz).
+- `eas.json` profilleri EAS ortamlarını kullanır (`development` / `preview` / `production`); sürüm numarası EAS'ta (`appVersionSource: remote`, production `autoIncrement`).
+- `.env` EAS'a gitmez. `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` üç ortamda EAS değişkeni (`sensitive`); yeni bir `EXPO_PUBLIC_*` gerekirse `npx eas-cli@latest env:set --name … --environment production …`. **`eas env:push` kullanma**: `.env`'de Supabase sunucu sırları var. Mapbox SDK indirmesi 401 verirse `RNMAPBOX_MAPS_DOWNLOAD_TOKEN` (`secret`) eklenir.
+- TestFlight: `nvm use && npx eas-cli@latest build --platform ios --profile production --auto-submit`.
+
 ## Web sitesi (roltapp.com)
 
 - Kaynak `web/` klasöründe; mobil uygulamadan bağımsız (`tsconfig.json` ve `eslint.config.js` dışında tutar). Framework yok: tek `index.html` (satır içi CSS/JS, Google Fonts), `nginx:alpine` + `nginx.conf` ile servis edilir.

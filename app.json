@@ -7,7 +7,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
+      "bundleIdentifier": "com.roltapp.rolt",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
         "CFBundleAllowMixedLocalizations": true
       }
@@ -91,6 +95,12 @@
     "locales": {
       "tr": "./src/i18n/native/tr.json",
       "en": "./src/i18n/native/en.json"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "33f1ffce-5ef5-459a-ba50-710a0988cba8"
+      }
+    },
+    "owner": "milbas"
   }
 }
