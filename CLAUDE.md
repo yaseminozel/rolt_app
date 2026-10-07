@@ -32,7 +32,7 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 - Seçili rota kayıt ekranına iliştirilir; rotasız (serbest sürüş) başlatma her zaman mümkündür.
 
 **Temel akışlar:**
-- **A / Rota seçerek sür:** Discover → arama/şehir/öneri → Rota Detayı → "Bu rotayı sür" → (gerekirse giriş) → Ready (rota ilişik) → Başlat → Recording. Detayda tek ana eylem; Kaydet ve Paylaş ikincil. Turn-by-turn navigasyon yok, rota çizgisi takip edilir.
+- **A / Rota seçerek sür (Akış 09):** Discover → Rota Detayı → "Rotayı sürmeye başla" → (gerekirse giriş) → 06.01 Hazırlık (durak ekle, sesli yönlendirme, ekran açık) → (ilk seferde 06.04 arka plan izni) → 06.05 geri sayım → 06.06 turn-by-turn navigasyon → 06.07 varış → "Sürüşü kaydet" (Kaydet sekmesi, 08.05). Detayda tek ana eylem; Kaydet ve Paylaş ikincil.
 - **B / Serbest sürüş:** Record → (gerekirse giriş + izin/GPS hazırlığı) → Ready → Başlat → Recording. Rota, başlık, motosiklet seçimi ön koşul değildir. Giriş/izin ekranından dönüşte başlatma niyeti korunur.
 - **C / Duraklat, bitir, sakla:** Recording ↔ Paused → Bitir → Özet → (başlık/fotoğraf/görünürlük, hepsi opsiyonel, otomatik başlık ör. "Antalya · Pazartesi sürüşü") → "Sürüşü kaydet" → onay → isteğe bağlı Paylaş / Rota olarak yayımla. Bitirme ve silme ayrı eylemlerdir; silme onay ister.
 - **D / Kesintiden dön:** Açılışta tamamlanmamış sürüş → Devam et / Bitir / Sil (Sil onaylı).
@@ -44,7 +44,7 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 
 **Kaydetme (bookmark):** Kartta ve detayda aynı yer imi davranışı; tek dokunuş, kısa "Kaydedildi" toast'u + geri alma. Misafir kullanıcı girişe yönlendirilirse işlem girişten sonra tamamlanır.
 
-**MVP dışı:** Turn-by-turn navigasyon, gelişmiş/dairesel rota üretimi, grup sürüşü, sosyal feed.
+**MVP dışı:** Gelişmiş/dairesel rota üretimi, grup sürüşü. (Turn-by-turn navigasyon Akış 09 ile, Topluluk sekmesi Akış 22 ile kapsama girdi.)
 
 **Teknik kararlar (2026-09-30):**
 - **Harita:** Mapbox (`@rnmapbox/maps`, Maps SDK v11). Tüm haritalar `src/components/map/BaseMap.tsx` üzerinden; token `EXPO_PUBLIC_MAPBOX_ACCESS_TOKEN` (`.env`, git'e girmez; şablon `.env.example`), stil `EXPO_PUBLIC_MAPBOX_STYLE_URL` (yoksa Mapbox Outdoors). Mapbox logo/attribution gizlenmez (lisans şartı).
@@ -53,6 +53,7 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
   - ScrollView içindeki küçük harita kartları (Keşfet ana sayfa) etkileşimli harita değil, statik görseldir; dokununca tam ekran haritaya gider.
 - **Rota hesaplama:** MVP'de Mapbox Directions (A→B, yola oturan çizgi); motosiklete özel tercihler (virajlı/manzaralı) için sonra Valhalla veya GraphHopper. Kaydedilen GPS izi Mapbox Map Matching ile temizlenebilir.
 - **Konum:** `expo-location` + `expo-task-manager`, arka planda konum açık (iOS "Always", Android foreground service). İzin metni tasarımdaki "Konum izni" ekranından türetildi.
+- **Navigasyon (Akış 09):** `src/features/navigation/`. Mapbox Directions `steps=true` (token yoksa mock); manevra metni sağlayıcıdan değil uygulamadan (`ride:maneuver.*`, tür + yön + yol adı). Saf `NavigationTracker` (rotaya oturtma, manevra, durak varışı 30 m, mola 20 sn, GPS zayıf > 50 m / kayıp 30 sn, rotadan çıkma 40 m × 2 ölçüm, sürüş istatistikleri) + `useNavigationSession` (konum kaynağı, otomatik yeniden bağlanma, `expo-speech` 400 m / 100 m anonsları). Konum kaynakları: arka plan izni varsa `startLocationUpdatesAsync` görevi (`backgroundLocationTask.ts`, root layout'ta import edilir), yoksa ön plan `watchPositionAsync`; Expo Go / web'de ya da `EXPO_PUBLIC_SIMULATE_NAVIGATION=1` ile simülatör (`EXPO_PUBLIC_NAV_SIM_SCENARIO` = offRoute / weakGps / lostGps / break, `EXPO_PUBLIC_NAV_SIM_SPEED`). Gerçek GPS, arka plan ve Mapbox çizgisi yalnız development build'de.
 - **Backend:** **Self-hosted Supabase** — entegrasyon ileride yapılacak, şimdilik backend kodu yazma; veri katmanını arayüzlerle soyutla ki mock'tan Supabase'e geçiş kolay olsun. (Postgres + **PostGIS**, Auth: Google/Apple/e-posta, Storage: sürüş fotoğrafları). **Realtime kullanılmıyor**: sürüş önce cihazda (SQLite) tutulur, bitince/bağlantı gelince toplu yüklenir; rota/keşif işlemleri normal sorgu. Realtime yalnızca canlı konum paylaşımı (grup sürüşü, Yakındaki Sürücüler) gelirse özellik bazında eklenir.
 
 - **Veri katmanı:** Her alan bir repository arayüzü + mock uygulama (`src/features/<alan>/`), ekranlar yalnızca React Query kancalarını (`queries.ts`) kullanır; Supabase geldiğinde yalnızca repository değişir. Rota modeli: `src/features/routes/types.ts` (Route ≠ Ride).
@@ -74,7 +75,8 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 | 03 İzinler (Akış 06) | 03.01 Konum izni, 03.02 Bildirim izni (sheet) |
 | 04 Kayıt tamamlama (Akış 07) | 04.01 Profil (boş / müsait / kullanımda), 04.02 Konum (izin verilmiş / şehir ara / izin verilmemiş), 04.03 Motor (boş / seçili), 04.04–04.06 Marka / Model / Yıl sheet'leri, 04.07 Yükleniyor |
 | 05 Discover (Akış 08) | 05.01 Ana sayfa (harita odaklı / konum izni yok / çevrimdışı / iskelet), 05.02 Arama (aktif / sonuçlar / sıralama / sonuç yok), 05.03 Önerilen rotalar — Tümü, 05.04 Rota detayı (standart sokak / topografik, uzun içerik) |
-| 06–13 (Akış 09–22) | Rotayı sür, Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
+| 06 Rotayı sür (Akış 09) | 06.01 Hazırlık (başlangıçtan uzak / başlangıçta / duraklı), 06.02 Durak ekle (arama, haritadan seç), 06.03 Durak önizleme, 06.04 Arka plan konum izni (ön bilgi + iOS uyarısı), 06.05 Geri sayım, 06.06 Navigasyon (dönüş, rotadan çıktın, bağlandın, durağa varış, mola, sonraki durak, GPS zayıf, çıkış onayı), 06.07 Varış |
+| 07–13 (Akış 10–22) | Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
 | 02 Record | Ready (rotalı/serbest, sürüş tipi şeridi alternatifi), Recording, Paused, Recovery, Sürüş modu full ekran, Durdurma onayı, Sürüşü kaydet (form), Sürüş tipi seçimi sheet |
 | 03 Profil / Ayarlar | Profil genel (Sürüşler/Performans/Kaydettiklerim sekmeleri), Profili paylaş (QR), Aktivite paylaşımı (karusel şablonlar), Kaydettiklerim (liste/kaydedildi/kaldırıldı/boş), Ayarlar ve alt sayfaları: hesap, sürüş görünürlüğü, başlangıç-bitiş gizleme, engellenenler, konum/fotoğraf izni, bildirimler, dil, ölçü birimleri, yardım/SSS, geri bildirim, gizlilik politikası, kullanım koşulları, çıkış |
 | 04 Motorum | Boş durum, Motor ekle (marka → model, bottom sheet), Eklendi, Motoru değiştir |
@@ -250,6 +252,22 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Motor adımı başlığı | Boş durumda "Motorunu ekle", diğer 4 karede "Hangi motoru sürüyorsun?" | "Hangi motoru sürüyorsun?" + uzun açıklama; "ana motorun olarak kaydedilecek" notu her durumda |
 | Motor seçim satırları | Seçili değer bazen siyah bazen gri | `SettingsRow valueChevron`; seçilen değer `textPrimary` (`valueEmphasis`), "Seç" `textSecondary`; Model/Yıl önceki seçim yokken %40 opak ve pasif. İkonlar `Motorcycle`, `DashboardSpeed`, `Clock` |
 | Marka / Model / Yıl sheet'leri | 650 / 617 / 557 pt | Native `formSheet` (detent 0.76 / 0.72 / 0.65 + tam ekran), `OptionSheetList`: `SheetHeader` + çerçeveli arama + satırlar. Marka değişince model ve yıl, model değişince yıl temizlenir. Yıllar bu yıldan 1950'ye |
+| Sürüş akışı yapısı | 06.x ekranları | `src/app/ride/[routeId]/` ayrı stack (sekme barı yok), `RideSessionProvider` (rota, ⇅, ≤ 3 durak, ayarlar, plan). Durak ekle, arka plan izni ve çıkış onayı native `formSheet`; Hazırlık sheet'i `@gorhom/bottom-sheet`; navigasyon/varış panelleri sabit alt panel |
+| Başlangıçtan uzak (06.01 `N8AE4`) | "2,4 km uzakta", Mesafe = yaklaşma + rota | Cihaz rota başlangıcına > 200 m ise plan cihaz konumundan başlar (yaklaşma bacağı, başlangıç sessiz ara nokta); etiketler Mesafe / Tahmini varış. Yakınsa Rota / Tahmini bitiş, başlangıç adı rota adı (tasarım "Geyikbayırı Sürüşü"), bitiş `Route.endName` |
+| Plan noktaları | Directions 25 koordinat sınırı | Rota çizgisi duraklar arasında parçalanıp örneklenir; duraklar gerçek waypoint, ara noktalar sessiz. Duraklar sürücünün sırasıyla (sürükleyerek ters sıralanırsa çizgi geri döner) |
+| Ters sıra uyarısı (`wYzjk`) | Metin çizilmemiş | Durak satırının ikinci satırı turuncu "Bu sırada rotada geri dönmen gerekiyor" |
+| 3 km sapma uyarısı (`wYzjk`) | Metin çizilmemiş | Önizleme / haritadan seç panelinde `InfoNote` |
+| Durak önerileri | Sapma rozeti | Rota çizgisine < 20 m → yeşil "Rota üzerinde"; aksi hâlde "+N dk" (gidiş-dönüş ≈ 2 × uzaklık, 40 km/sa, en az 1 dk); < 120 m "Rota üzerinde · X. km", < 1 km "Rota yakınında", üstü "Rotadan uzak" (turuncu rozet). Önizleme gerçek sapmayı Directions ile hesaplar. Mapbox Search Box kategori + rota boyunca arama; kategori id'leri `/list/category`'den çözülür. Mock'ta tasarımdaki 6 yer her rotaya yayılır |
+| Arka plan izni seçenekleri (06.04) | Radyo listesi | iOS seçiminin temsili; dokunulmaz (karar sistemde verilir). İlk "Başla"da, izin yalnız ön plan ve tekrar sorulabiliyorsa bir kez; "Kullanırken" kalırsa Hazırlık'ta `InfoNote` uyarısı (`E0DAxE`) |
+| Rotadan çıkma (`W0nTTe`) | Onay yok | Sürücüden ~300 m ilerideki rota noktasına Directions ile bağlanıp kalan rotaya eklenir (yeniden planlama değil); kırmızı banner hesap süresince, yeşil "+N dk" banner 5 sn |
+| Durağa varış (`yqADk` vs `h3s1pA`) | Bir not "Mola ver / Devam et" diyor, diğeri aksiyon yok | Sonraki not (`h3s1pA`, `O5EZ3F`) uygulanır: varış otomatik, kart ~3 sn (hareket edene kadar), durunca pasif "Mola" çipi; aksiyon yok. Mola süresi sürüşte ayrı tutulur (`breakS`) |
+| İlerleme çubuğu (`yqADk` 5. adım) | Not "ilerleme çubuğunda durak işaretleri" diyor, karede yok | Uygulanmadı (tasarımı yok); açık soru |
+| Navigasyon "Bitir" | Çıkış onayı yalnız "rota takibi duracak" diyor | Takip durur, o ana kadarki sürüş (`completed: false`) Kaydet sekmesine geçer; varışta "Sürüşü kaydet" de aynı yere (`completedRideStore`), "Kaydetmeden çık" 08.10 diyaloğu (`Dialog actionsLayout="column"`) |
+| Varış ekranı | İki varyant | Ana varyant (illüstrasyon); "Alt. Kutlama" uygulanmadı. Süre kayıt saati (`formatRideClock` "18:42") |
+| Harita butonları (06.06) | Pusula / Ses şeffaf zemin | Okunurluk için beyaz zemin + border. Pusula elle kaydırmadan sonra sürüş yönüne takibi geri açar; Ses sesli yönlendirmeyi açıp kapatır |
+| Navigasyon harita işaretleri | — | Rota çizgisi marka mavisi; yön işareti tasarım export'u, nokta etrafında döner; durak numaraları, ulaşılınca yeşil onaylı pin; bitiş bayrağı. GPS zayıfken işaret %50 + doğruluk halkası |
+| Hazırlık ayar anahtarları | 44 × 26 siyah | Standart `Switch` (neutral) |
+| Misafir sürüş | Akış A "gerekirse giriş" | `useRequireAccount('saveRide')` (sürüş kaydedileceği için o metin) |
 | E-posta maskeleme | "yas••••@gmail.com" | İlk 3 karakter + sabit `••••` (uzunluk sızmaz); 3 karakter veya daha kısa yerel kısımda yalnız ilk harf |
 | Tekrar gönder (02.04, 02.07) | Tasarımda yalnız metin butonu | `ResendEmailForm`: salt okunur e-posta + "E-postayı tekrar gönder"; her gönderimden sonra 60 sn geri sayım (pasif standart renk). Mail uygulamasını aç / e-postayı değiştir / ipucu kaldırıldı (geri butonu 02.03'e döner) |
 | Yasal alt bilgi | Yalnız 02.01–02.02'de çizili | `AuthScreen showLegalFooter` yalnız giriş ve şifre adımlarında |
@@ -285,6 +303,7 @@ src/
     (auth)/               # 02.01–02.06 giriş / şifre akışı
     email-verification/   # 02.07 e-posta doğrulama
     register/             # 04.01–04.07 kayıt tamamlama (profil, konum, motor + sheet'ler, yükleniyor)
+    ride/[routeId]/       # 06.01–06.07 rotayı sür (hazırlık, duraklar, izin, geri sayım, navigasyon, varış)
     permissions.tsx       # 03.01–03.02 izin sheet'i
     (tabs)/_layout.tsx    # NativeTabs: discover / record / profile
     (tabs)/<tab>/         # her sekmede native Stack (_layout.tsx) + index.tsx
