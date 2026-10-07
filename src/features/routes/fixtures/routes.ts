@@ -1,9 +1,14 @@
-import type { LngLat, Route, RouteAuthor, RouteTag } from '../types';
+import type { LngLat, Route, RouteAuthor, RouteStop, RouteTag } from '../types';
+import { ROUTE_GEOMETRIES, type RouteGeometry } from './routeGeometries';
 
 /**
  * MOCK DATA until the Supabase/PostGIS route catalog exists.
- * Names, summaries and metrics are taken from the Discover designs (01.2, 01.4, 01.5, 01.6, 01.7);
- * route lines are simplified polylines between the real places the names refer to.
+ * Names and summaries are taken from the Discover designs (01.2, 01.4, 01.5, 01.6, 01.7). Lines
+ * and metrics (distance, duration, average speed, bends) are real Mapbox Directions (driving)
+ * results through each seed's `from` / `via` / `to`, generated into `routeGeometries.ts` by
+ * `scripts/generate-route-geometries.mjs` (its place table mirrors `place` below; rerun it after
+ * changing either). The hand-written metrics in the seeds are the designs' sample numbers, used
+ * only for a route without generated geometry (Suluada, a boat route).
  */
 const photos = {
   coast: require('../../../../assets/images/routes/route-coast.jpg'),
@@ -24,25 +29,29 @@ const deniz: RouteAuthor = {
   avatar: require('../../../../assets/images/avatars/deniz-kaya.jpg'),
 };
 
+/** Road-reachable points of the places (Directions snaps each to the nearest road). */
 const place = {
   antalya: [30.7133, 36.8969],
-  adrasan: [30.47, 36.305],
-  cirali: [30.477, 36.41],
-  olympos: [30.473, 36.398],
-  gelidonya: [30.41, 36.211],
+  adrasan: [30.4653, 36.3116],
+  cirali: [30.4809, 36.4159],
+  // End of the Olympos valley road at the ancient city's entrance (not the Çıralı side).
+  olympos: [30.4704, 36.3929],
+  // Karaöz trailhead of the Lycian Way to the lighthouse, where the road ends.
+  gelidonya: [30.415, 36.2636],
   suluada: [30.502, 36.268],
-  mavikent: [30.338, 36.254],
+  mavikent: [30.3475, 36.3144],
   kumluca: [30.29, 36.37],
   kemer: [30.56, 36.598],
-  tekirova: [30.525, 36.505],
+  tekirova: [30.5252, 36.4991],
   geyikbayiri: [30.46, 36.878],
-  tahtali: [30.442, 36.536],
+  // Lower station of the Olympos Teleferik; the summit is reached by cable car only.
+  tahtali: [30.487, 36.5408],
   korkuteli: [30.196, 37.066],
-  saklikent: [30.332, 36.866],
-  termessos: [30.465, 36.982],
+  saklikent: [30.3346, 36.8417],
+  // Car park below the ancient city.
+  termessos: [30.4678, 36.9884],
   kas: [29.637, 36.201],
   kalkan: [29.414, 36.265],
-  dosemealti: [30.6, 37.03],
 } satisfies Record<string, LngLat>;
 
 type PlaceKey = keyof typeof place;
@@ -66,7 +75,6 @@ const placeNames: Record<PlaceKey, string> = {
   termessos: 'Termessos',
   kas: 'Kaş',
   kalkan: 'Kalkan',
-  dosemealti: 'Döşemealtı',
 };
 
 const nameOf = (coordinates: LngLat) =>
@@ -74,7 +82,7 @@ const nameOf = (coordinates: LngLat) =>
     (Object.keys(place) as PlaceKey[]).find((key) => place[key] === coordinates) ?? 'antalya'
   ];
 
-/** Straight-ish line through the given places with a gentle bend between each pair. */
+/** Straight-ish line through the given places, for a route without generated geometry. */
 function line(...points: LngLat[]): LngLat[] {
   const result: LngLat[] = [];
   points.forEach((point, index) => {
@@ -104,14 +112,54 @@ const coverByTag: Record<RouteTag, Route['coverImage']> = {
   longTour: photos.mountainRoad,
 };
 
+type RouteContent = Omit<RouteSeed, 'from' | 'via' | 'to'>;
+
+/** Scales the seed's stops to the generated totals; the finish matches them exactly. */
+function rescaleStops(stops: RouteStop[], seed: RouteContent, geometry: RouteGeometry): RouteStop[] {
+  const distanceScale = geometry.distanceKm / seed.distanceKm;
+  const durationScale = geometry.durationMinutes / seed.durationMinutes;
+  return stops.map((stop) =>
+    stop.kind === 'end'
+      ? { ...stop, distanceKm: geometry.distanceKm, durationMinutes: geometry.durationMinutes }
+      : {
+          ...stop,
+          distanceKm: Math.round(stop.distanceKm * distanceScale),
+          durationMinutes: Math.round(stop.durationMinutes * durationScale),
+        },
+  );
+}
+
+/** Line and metrics: the generated road geometry when there is one, else the seed's own values. */
+function routeMetrics(seed: RouteContent, places: LngLat[]) {
+  const geometry: RouteGeometry | undefined = ROUTE_GEOMETRIES[seed.id];
+  if (!geometry) {
+    return {
+      coordinates: line(...places),
+      distanceKm: seed.distanceKm,
+      durationMinutes: seed.durationMinutes,
+      averageSpeedKmh: seed.averageSpeedKmh,
+      curveCount:
+        seed.curveCount ?? Math.round(seed.distanceKm * (seed.tag === 'curvy' ? 0.6 : 0.3)),
+    };
+  }
+  return {
+    coordinates: geometry.coordinates,
+    distanceKm: geometry.distanceKm,
+    durationMinutes: geometry.durationMinutes,
+    averageSpeedKmh: Math.round(geometry.distanceKm / (geometry.durationMinutes / 60)),
+    curveCount: geometry.curveCount,
+    ...(seed.stops ? { stops: rescaleStops(seed.stops, seed, geometry) } : {}),
+  };
+}
+
 function route({ from, via = [], to, ...seed }: RouteSeed, index: number): Route {
+  const metrics = routeMetrics(seed, [from, ...via, to]);
   return {
     city: 'Antalya',
     startName: nameOf(from),
     endName: nameOf(to),
-    maxSpeedKmh: Math.round(seed.averageSpeedKmh * 1.7),
-    curveCount: Math.round(seed.distanceKm * (seed.tag === 'curvy' ? 0.6 : 0.3)),
-    breakCount: Math.max(1, Math.round(seed.durationMinutes / 60)),
+    maxSpeedKmh: Math.round(metrics.averageSpeedKmh * 1.7),
+    breakCount: Math.max(1, Math.round(metrics.durationMinutes / 60)),
     elevationGainM: 120 + ((index * 37) % 400),
     elevationLossM: -(100 + ((index * 29) % 380)),
     difficulty: 'moderate',
@@ -120,12 +168,12 @@ function route({ from, via = [], to, ...seed }: RouteSeed, index: number): Route
     publishedAt: '2026-09-12',
     coverImage: coverByTag[seed.tag],
     photos: [photos.mountainRoad, photos.coast, photos.desertRider, photos.forestRide],
-    coordinates: line(from, ...via, to),
     popularity: 100 - index * 3,
     isLoop: false,
     rating: Math.round((4.9 - (index % 6) * 0.1) * 10) / 10,
     ratingCount: 126 - index * 5,
     ...seed,
+    ...metrics,
   };
 }
 
@@ -150,23 +198,23 @@ const seeds: RouteSeed[] = [
     distanceKm: 58,
     durationMinutes: 80,
     averageSpeedKmh: 41,
-    maxSpeedKmh: 72,
     elevationGainM: 236,
     elevationLossM: -198,
     notes:
       "Antalya'nın doğasında, dağ manzaraları eşliğinde keyifli bir sürüş. Virajlar akıcı, manzara harika.",
-    curveCount: 34,
     breakCount: 2,
-    // "Rota durakları" of 05.04 Uzun içerik (`w7AvU`).
+    // "Rota durakları" of 05.04 Uzun içerik (`w7AvU`); distances and times are scaled to the
+    // generated totals (`rescaleStops`).
     stops: [
       { kind: 'start', name: 'Geyikbayırı', distanceKm: 0, durationMinutes: 0 },
       { kind: 'stop', name: 'Trebenna Seyir Noktası', distanceKm: 24, durationMinutes: 30 },
       { kind: 'stop', name: 'Dağ Kahvesi', distanceKm: 42, durationMinutes: 65 },
       { kind: 'end', name: 'Tahtalı Dağı', distanceKm: 58, durationMinutes: 80 },
     ],
-    from: place.antalya,
-    via: [place.dosemealti],
-    to: place.geyikbayiri,
+    // From Geyikbayırı to Tahtalı Dağı, like its stops (there is no mountain road between them,
+    // so it runs along the Konyaaltı and Kemer coast).
+    from: place.geyikbayiri,
+    to: place.tahtali,
   },
   {
     id: 'cirali',
@@ -212,8 +260,8 @@ const seeds: RouteSeed[] = [
     distanceKm: 58,
     durationMinutes: 80,
     averageSpeedKmh: 44,
+    // No via Kumluca: it would ride the same stretch of the D400 there and back.
     from: place.adrasan,
-    via: [place.kumluca],
     to: place.tahtali,
   },
   {
@@ -270,8 +318,8 @@ const seeds: RouteSeed[] = [
     distanceKm: 48,
     durationMinutes: 90,
     averageSpeedKmh: 32,
+    // Suluada is an island; the ride ends at the Gelidonya lighthouse trailhead (sunset point).
     from: place.adrasan,
-    via: [place.suluada],
     to: place.gelidonya,
   },
   // "Önerilen Rotalar" (01.4)
