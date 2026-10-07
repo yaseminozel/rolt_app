@@ -47,7 +47,8 @@ const SCENARIOS: readonly SimulationScenario[] = ['normal', 'offRoute', 'weakGps
  */
 export default function NavigateScreen() {
   const session = useRideSession();
-  const plan = session.plan;
+  // The plan is fixed when navigation starts; Hazırlık (still mounted underneath) may re-plan later.
+  const [plan] = useState(session.plan);
   if (!plan) {
     return <Redirect href={{ pathname: '/ride/[routeId]/prepare', params: { routeId: session.route.id } }} />;
   }

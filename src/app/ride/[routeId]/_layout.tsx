@@ -47,7 +47,8 @@ export default function RideLayout() {
         <Stack.Screen name="add-stop" options={sheet([0.94])} />
         <Stack.Screen name="pick-on-map" />
         <Stack.Screen name="stop-preview" />
-        <Stack.Screen name="background-permission" options={sheet('fitToContents')} />
+        {/* Tall content (options, benefits): fixed detents so small phones scroll inside the sheet. */}
+        <Stack.Screen name="background-permission" options={sheet([0.92, 1])} />
         <Stack.Screen name="countdown" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="navigate" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="exit-confirm" options={sheet('fitToContents')} />

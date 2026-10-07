@@ -7,8 +7,9 @@ import { fixFromLocation } from './fixFromLocation';
 
 /**
  * Background location for navigation while the screen is locked or the app is in the pocket
- * (06.04 "Ekran kilitliyken de kaydet"). The task must be defined at module load, so this file
- * is imported once from the root layout. Fixes are handed to whoever is listening in-process.
+ * (06.04 "Ekran kilitliyken de kaydet"). The task must be defined at module load, before
+ * `startLocationUpdatesAsync`, so the root layout imports this file for its side effect (keep that
+ * import even though nothing from it is used there). Fixes go to whoever listens in-process.
  */
 export const NAVIGATION_LOCATION_TASK = 'rolt-navigation-location';
 
