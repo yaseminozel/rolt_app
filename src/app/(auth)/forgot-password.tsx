@@ -10,7 +10,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { firstParam, isValidEmail } from '@/features/auth/credentials';
 import { spacing } from '@/theme';
 
-/** 00.4 Auth / Şifremi Unuttum — Pencil `k0nXp`. Prefilled with the email from 00.3. */
+/** 02.03 Auth / Şifremi unuttum — Pencil `OC06s`. Prefilled with the email from 02.02. */
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation('auth');
   const { service } = useAuth();

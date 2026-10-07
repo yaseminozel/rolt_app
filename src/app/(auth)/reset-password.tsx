@@ -12,9 +12,9 @@ import { isAuthError } from '@/features/auth/types';
 import { spacing } from '@/theme';
 
 /**
- * 00.6 Auth / Yeni Şifre — Pencil `U4fki9`. Opened from the reset email
- * (`rolt://reset-password?token=…`); no back button, the flow ends at 00.7.
- * An expired or invalid link replaces it with 00.6 "Bağlantının süresi dolmuş" (`b1m1YP`).
+ * 02.05 Auth / Yeni şifre — Pencil `hMgfW`. Opened from the reset email
+ * (`rolt://reset-password?token=…`); no back button, the flow ends at 02.06.
+ * An expired or invalid link replaces it with "Bağlantının süresi dolmuş".
  */
 export default function ResetPasswordScreen() {
   const { t } = useTranslation('auth');

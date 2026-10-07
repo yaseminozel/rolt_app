@@ -83,6 +83,9 @@ export const palette = {
   red25: '#FEF2F2',
   red250: '#FECACA',
   red800: '#991B1B',
+  // Sign-in lockout banner (02.02 `rjPx3` "Banner"): outline and text
+  red75: '#FCE9EB',
+  red950: '#540C12',
 } as const;
 
 export const colors = {
@@ -223,6 +226,11 @@ export const colors = {
   dangerSubtle: palette.red25,
   dangerBorder: palette.red250,
   dangerStrongText: palette.red800,
+  /** Sign-in lockout banner (02.02 `rjPx3`): fill, outline, alert-circle glyph and text. */
+  dangerBannerSurface: palette.red50,
+  dangerBannerBorder: palette.red75,
+  dangerBannerIcon: palette.red500,
+  dangerBannerText: palette.red950,
   /** Translucent hint pill over the preview card ("Noktaları seçince…", XrNal). */
   mapHintSurface: 'rgba(255, 255, 255, 0.9)',
 

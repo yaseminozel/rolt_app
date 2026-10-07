@@ -3,6 +3,9 @@ import type { SocialProvider } from './types';
 /** Minimum password length shown on 00.3 "Yeni Hesap" ("En az 8 karakter.") and 00.6. */
 export const MIN_PASSWORD_LENGTH = 8;
 
+/** Password sign-in pause after too many wrong attempts; stated on 02.02 "Çok fazla deneme" (`rjPx3`). */
+export const LOCK_DURATION_MINUTES = 15;
+
 /** How long a password reset link stays valid; stated on 00.6 "Bağlantının süresi dolmuş". */
 export const RESET_LINK_VALIDITY_MINUTES = 30;
 

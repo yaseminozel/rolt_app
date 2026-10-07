@@ -16,10 +16,10 @@ import { spacing } from '@/theme';
 type PendingAction = SocialProvider | 'email' | null;
 
 /**
- * 00.1 / 00.2 Auth / Giriş — Pencil `O2QTu` (empty), `WhI3m` (filled), `TNFfZ` (submitting),
- * `xLijq` (invalid email). The email CTA is enabled as soon as the field has text; the format
- * is checked on submit. The lookup decides the next step: password (00.3) or the
- * social-provider notice (00.2 "Hesap Google ile bağlı").
+ * 02.01 Auth / Giriş — Pencil `ELieI` (empty), `yHjhw` (filled), `V9r7e` (submitting); the
+ * invalid-email state follows the TextField error standard. The email CTA is enabled as soon as the field has text; the format
+ * is checked on submit. The lookup decides the next step: password (02.02) or the
+ * social-provider notice ("Hesap Google ile bağlı").
  */
 export default function SignInScreen() {
   const { t } = useTranslation('auth');
@@ -90,7 +90,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <AuthScreen title={t('signIn.title')} errorMessage={error}>
+    <AuthScreen title={t('signIn.title')} errorMessage={error} showLegalFooter>
       <View style={styles.sections}>
         <View style={styles.social}>
           <Button

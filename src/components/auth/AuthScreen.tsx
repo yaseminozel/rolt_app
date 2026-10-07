@@ -16,10 +16,14 @@ export type AuthScreenProps = {
    * inline failure toast between the copy and the form.
    */
   errorMessage?: string | null;
+  /** Terms / privacy consent line pinned to the bottom; only the sign-in and password steps (02.01–02.02) show it. */
+  showLegalFooter?: boolean;
+  /** Artwork above the title, 32 pt over the copy (02.07 "Süresi dolmuş bağlantı"). */
+  illustration?: ReactNode;
   children?: ReactNode;
 };
 
-/** Wordmark top, measured from the bottom of the design's 49 pt status bar (y 101 in 00.1–00.7). */
+/** Wordmark top, measured from the bottom of the design's 49 pt status bar (y 101 in 02.01–02.07). */
 const WORDMARK_TOP = 52;
 /** Wordmark bottom (y 133) to title (y 185) in every auth frame. */
 const WORDMARK_TO_TITLE = 52;
@@ -28,12 +32,20 @@ const WORDMARK_LINE_HEIGHT = 32;
 const WORDMARK_TRACKING = 0.56;
 
 /**
- * Shared layout of the auth flow (Pencil 00.1–00.7): ROLT wordmark, title and optional
- * subtitle, the screen's form, and the legal footer pinned to the bottom.
+ * Shared layout of the auth flow (Pencil 02.01–02.07): ROLT wordmark, optional illustration,
+ * title and optional subtitle, the screen's form, and on the
+ * sign-in steps the legal footer pinned to the bottom.
  * Scrolls with the keyboard open and clears the transparent native header on the
  * screens that have one.
  */
-export function AuthScreen({ title, subtitle, errorMessage, children }: AuthScreenProps) {
+export function AuthScreen({
+  title,
+  subtitle,
+  errorMessage,
+  showLegalFooter = false,
+  illustration,
+  children,
+}: AuthScreenProps) {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { t } = useTranslation('auth');
@@ -58,7 +70,9 @@ export function AuthScreen({ title, subtitle, errorMessage, children }: AuthScre
           showsVerticalScrollIndicator={false}>
           <Text style={styles.wordmark}>{t('wordmark')}</Text>
 
-          <View style={styles.copy}>
+          {illustration ? <View style={styles.illustration}>{illustration}</View> : null}
+
+          <View style={[styles.copy, illustration ? styles.copyBelowIllustration : null]}>
             <Text style={styles.title} accessibilityRole="header">
               {title}
             </Text>
@@ -71,16 +85,18 @@ export function AuthScreen({ title, subtitle, errorMessage, children }: AuthScre
 
           <View style={styles.form}>{children}</View>
 
-          <Text style={styles.legal}>
-            <Trans
-              t={t}
-              i18nKey="legalFooter"
-              components={{
-                terms: <LegalLink href="/legal/terms" />,
-                privacy: <LegalLink href="/legal/privacy" />,
-              }}
-            />
-          </Text>
+          {showLegalFooter ? (
+            <Text style={styles.legal}>
+              <Trans
+                t={t}
+                i18nKey="legalFooter"
+                components={{
+                  terms: <LegalLink href="/legal/terms" />,
+                  privacy: <LegalLink href="/legal/privacy" />,
+                }}
+              />
+            </Text>
+          ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -120,9 +136,15 @@ const styles = StyleSheet.create({
     color: colors.brand,
     alignSelf: 'flex-start',
   },
+  illustration: {
+    marginTop: WORDMARK_TO_TITLE,
+  },
   copy: {
     marginTop: WORDMARK_TO_TITLE,
     gap: spacing.sm,
+  },
+  copyBelowIllustration: {
+    marginTop: spacing.xxxl,
   },
   title: {
     ...typography.title,

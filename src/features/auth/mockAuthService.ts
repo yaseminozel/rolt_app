@@ -1,3 +1,4 @@
+import { LOCK_DURATION_MINUTES } from './credentials';
 import { AuthError, type AuthService, type Session, type SocialProvider } from './types';
 
 /**
@@ -5,8 +6,8 @@ import { AuthError, type AuthService, type Session, type SocialProvider } from '
  *
  * Accounts:
  * - `yasemin@example.com` / `12345678` — password account (the design's sample user).
- *   Three wrong passwords in a row lock password sign-in for 15 minutes (00.3 "Hesap geçici
- *   olarak kilitlendi"); a successful sign-in resets the counter.
+ *   Three wrong passwords in a row lock password sign-in for 15 minutes (02.02 "Çok fazla
+ *   deneme"); a successful sign-in resets the counter.
  * - `deniz@example.com` — created with Google (00.2 "Hesap Google ile bağlı").
  * - `ece@example.com` — created with Apple (same screen, Apple variant).
  * - Any other email is a new account (00.3 "Yeni Hesap").
@@ -21,7 +22,7 @@ import { AuthError, type AuthService, type Session, type SocialProvider } from '
  */
 const NETWORK_DELAY_MS = 800;
 const MAX_FAILED_ATTEMPTS = 3;
-const LOCK_DURATION_MS = 15 * 60 * 1000;
+const LOCK_DURATION_MS = LOCK_DURATION_MINUTES * 60 * 1000;
 const EXPIRED_TOKEN = 'expired';
 const INVALID_TOKEN = 'invalid';
 const EXPIRED_TOKEN_EMAIL = 'yasemin@example.com';
