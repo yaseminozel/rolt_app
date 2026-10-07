@@ -75,6 +75,8 @@ export const shadows = {
   mapCluster: '0px 3px 7px rgba(15, 18, 23, 0.22)',
   /** Start dot, finish pin, their tags and the other routes' clusters (07.01 "Rota seçili"). */
   mapLabel: '0px 2px 5.25px rgba(0, 0, 0, 0.2)',
+  /** Status line over the record map (08.01–08.04 "Badge / Tag"). */
+  statusBanner: '0px 4px 3.5px rgba(167, 167, 167, 0.25)',
   /** Centered dialog card over a scrim ("Diyalog / Taslak kaydet", `zMCLP`). */
   dialog: '0px 12px 32px rgba(16, 19, 24, 0.25)',
 } as const;

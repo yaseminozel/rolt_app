@@ -126,6 +126,8 @@ function RootNavigator() {
         <Stack.Screen name="suggest-route" />
         {/* "Rotayı sür" (06.x): its own stack of map screens and sheets. */}
         <Stack.Screen name="ride/[routeId]" options={{ gestureEnabled: false }} />
+        {/* A recorded ride (08.05–08.11, 09.06–09.07): save form, detail, edit and their sheets. */}
+        <Stack.Screen name="rides/[rideId]" />
         <Stack.Screen
           name="notifications"
           options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }}

@@ -28,7 +28,7 @@ const IMAGE_BEARING = -29;
 /** Accuracy ring while GPS is weak (06.06 `CUBTG` "Konum doğruluğu"). */
 const ACCURACY_RING = 120;
 /** Square that contains the marker however it is rotated, with the dot at its centre. */
-const RIDER_BOX =
+export const RIDER_BOX =
   2 * Math.ceil(Math.hypot(HEADING_SIZE.width * HEADING_ANCHOR.x, HEADING_SIZE.height * HEADING_ANCHOR.y));
 const LINE_WIDTH = 6;
 const FOLLOW_ZOOM = 16.5;
@@ -152,7 +152,7 @@ export function NavigationMapView({
  * Heading marker in a square box centred on the position dot, so rotating the box turns the cone
  * around the dot (rotating the image itself would swing the dot off the rider's position).
  */
-function RiderMarker({ rotation, weakSignal }: { rotation: number; weakSignal?: boolean }) {
+export function RiderMarker({ rotation, weakSignal }: { rotation: number; weakSignal?: boolean }) {
   return (
     <View style={styles.riderBox} pointerEvents="none">
       {weakSignal ? <View style={styles.accuracyRing} /> : null}

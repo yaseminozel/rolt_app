@@ -14,6 +14,47 @@
   },
   "record": {
     "notificationTitle": "ROLT ride recording",
-    "notificationBody": "Your ride is being recorded"
+    "notificationBody": "Your ride is being recorded",
+    "title": "Record ride",
+    "metrics": {
+      "distance": "Distance (km)",
+      "duration": "Time",
+      "averageSpeed": "Avg. speed (km/h)"
+    },
+    "rideType": "Ride type",
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "finish": "Finish",
+    "delete": "Delete ride",
+    "expand": "Full screen",
+    "collapse": "Minimize",
+    "offlineNote": "Recording continues safely even without internet.",
+    "weakNote": "Your last valid position and time are safe on your device.",
+    "gps": {
+      "searching": "Getting GPS..",
+      "ready": "GPS ready, you can start riding",
+      "weak": "Weak GPS, recording paused"
+    },
+    "recovery": {
+      "banner": "Unfinished ride found",
+      "description": "Your ride is safe on your device. Continue where you left off or finish at the last valid point."
+    },
+    "tooShort": "Ride too short. Ride at least 1 km to save it.",
+    "permission": {
+      "title": "Location off",
+      "heading": "Location access is needed to record rides",
+      "description": "We need your location to calculate your route, distance and speed.",
+      "allow": "Allow",
+      "settings": "Go to Settings",
+      "notNow": "Not now"
+    },
+    "deleteDialog": {
+      "title": "Delete this ride?",
+      "description": "The route, stats and photos of this ride will be deleted permanently. This can't be undone.",
+      "confirm": "Delete ride",
+      "cancel": "Cancel"
+    },
+    "locationRequired": "Location access is needed to record."
   }
 }

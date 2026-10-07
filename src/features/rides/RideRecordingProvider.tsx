@@ -53,11 +53,19 @@ type RideRecordingValue = {
   /** `undefined` until the device storage has been checked for an interrupted ride. */
   interrupted: RideRecord | null | undefined;
   active: ActiveRecording | null;
-  preview: { gps: PreviewGps; position: LngLat | null; headingDeg: number | null };
+  preview: {
+    gps: PreviewGps;
+    /** When GPS became ready, for the short "GPS hazır" banner. */
+    readySince: number | null;
+    position: LngLat | null;
+    headingDeg: number | null;
+  };
   /** Watches GPS while the Ready screen is open; returns the stop function. */
   startPreview: () => () => void;
   start: (options: StartOptions) => Promise<void>;
   pause: () => void;
+  /** The ride type can change while riding (08.02 strip). */
+  setRideType: (rideType: RideType) => void;
   resume: () => void;
   /** Ends the recording into a draft for "Sürüşü kaydet", or refuses a too-short ride. */
   finish: () => Promise<FinishResult>;
@@ -93,6 +101,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const [active, setActive] = useState<ActiveRecording | null>(null);
   const [preview, setPreview] = useState<RideRecordingValue['preview']>({
     gps: 'searching',
+    readySince: null,
     position: null,
     headingDeg: null,
   });
@@ -191,7 +200,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const startPreview = useCallback(() => {
     let stop: (() => void) | null = null;
     let cancelled = false;
-    setPreview((current) => ({ ...current, gps: 'searching' }));
+    setPreview((current) => ({ ...current, gps: 'searching', readySince: null }));
     if (isSimulatedNavigation) {
       // The simulator has no warm-up; show the search briefly so the banner states are visible.
       const fallback = ROUTE_FIXTURES.find((route) => route.id === SIMULATION_FALLBACK_ROUTE);
@@ -199,6 +208,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
         () =>
           setPreview({
             gps: 'ready',
+            readySince: Date.now(),
             position: fallback?.coordinates[0] ?? null,
             headingDeg: null,
           }),
@@ -208,11 +218,13 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     }
     locationSource(undefined)
       .start((fix) => {
-        setPreview({
-          gps: fix.accuracyM <= RECORDER_RULES.readyAccuracyM ? 'ready' : 'searching',
+        const ready = fix.accuracyM <= RECORDER_RULES.readyAccuracyM;
+        setPreview((current) => ({
+          gps: ready ? 'ready' : 'searching',
+          readySince: ready ? (current.readySince ?? Date.now()) : null,
           position: fix.coordinates,
           headingDeg: fix.headingDeg,
-        });
+        }));
       })
       .then((stopSource) => {
         if (cancelled) {
@@ -266,6 +278,18 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     publish();
     persist().catch(() => undefined);
   }, [persist, publish]);
+
+  const setRideType = useCallback(
+    (rideType: RideType) => {
+      if (!recordRef.current) {
+        return;
+      }
+      recordRef.current = { ...recordRef.current, rideType };
+      publish();
+      persist().catch(() => undefined);
+    },
+    [persist, publish],
+  );
 
   const resume = useCallback(() => {
     const now = sourceRef.current?.now() ?? Date.now();
@@ -340,6 +364,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       startPreview,
       start,
       pause,
+      setRideType,
       resume,
       finish,
       discard,
@@ -347,6 +372,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     }),
     [
       active,
+      setRideType,
       discard,
       finish,
       interrupted,

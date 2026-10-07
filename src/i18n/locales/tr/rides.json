@@ -14,6 +14,47 @@
   },
   "record": {
     "notificationTitle": "ROLT sürüş kaydı",
-    "notificationBody": "Sürüşün kaydediliyor"
+    "notificationBody": "Sürüşün kaydediliyor",
+    "title": "Sürüş Kaydet",
+    "metrics": {
+      "distance": "Mesafe (km)",
+      "duration": "Süre",
+      "averageSpeed": "Ort. hız (km/sa)"
+    },
+    "rideType": "Sürüş tipi",
+    "start": "Başlat",
+    "pause": "Duraklat",
+    "resume": "Devam et",
+    "finish": "Bitir",
+    "delete": "Sürüşü sil",
+    "expand": "Tam ekran",
+    "collapse": "Küçült",
+    "offlineNote": "İnternet kesilse de kayıt güvenle devam eder.",
+    "weakNote": "Son geçerli konum ve süre cihazında güvende.",
+    "gps": {
+      "searching": "GPS alınıyor..",
+      "ready": "GPS hazır, sürüşe başlayabilirsin",
+      "weak": "GPS zayıf, kayıt duraklatıldı"
+    },
+    "recovery": {
+      "banner": "Yarım kalan sürüş bulundu",
+      "description": "Sürüş cihazında güvende. Kaldığın yerden devam edebilir veya son geçerli noktada bitirebilirsin."
+    },
+    "tooShort": "Sürüş çok kısa. Kaydetmek için en az 1 km sür.",
+    "permission": {
+      "title": "Konum kapalı",
+      "heading": "Sürüş kaydı için konum izni gerekli",
+      "description": "Rotanı, mesafeni ve hızını hesaplayabilmemiz için konumuna erişmemiz gerekiyor.",
+      "allow": "İzin ver",
+      "settings": "Ayarlar'a git",
+      "notNow": "Şimdi değil"
+    },
+    "deleteDialog": {
+      "title": "Sürüş silinsin mi?",
+      "description": "Bu sürüşe ait rota, istatistikler ve görseller kalıcı olarak silinir. Bu işlem geri alınamaz.",
+      "confirm": "Sürüşü sil",
+      "cancel": "Vazgeç"
+    },
+    "locationRequired": "Kayıt için konum izni gerekli."
   }
 }

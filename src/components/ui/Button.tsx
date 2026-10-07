@@ -16,7 +16,8 @@ export type ButtonVariant = 'contained' | 'outlined' | 'text';
 /** Color family. `destructive` is equivalent to the `destructive` boolean prop. */
 export type ButtonTone = 'neutral' | 'brand' | 'destructive';
 /** `md` = 44 pt (Core Components), `lg` = 48 pt (Get Started "Hemen başla", sLkVv). */
-export type ButtonSize = 'md' | 'lg';
+/** `xl`: 60 pt ride controls (08.01–08.03 "Başlat", "Duraklat", "Bitir"), easy to hit with gloves. */
+export type ButtonSize = 'md' | 'lg' | 'xl';
 
 export type ButtonProps = {
   /** Visible label. Omit it for the icon-only layout (then `accessibilityLabel` is required). */
@@ -48,7 +49,7 @@ const ICON_SIZE = 20;
 const ICON_STROKE = 1.5;
 /** Width of the icon-only content box (design: "Action" 48 × 44). */
 const ICON_ONLY_CONTENT_WIDTH = 48;
-const HEIGHT: Record<ButtonSize, number> = { md: 44, lg: 48 };
+const HEIGHT: Record<ButtonSize, number> = { md: 44, lg: 48, xl: 60 };
 
 type Palette = { background: string; pressedBackground: string; border?: string; foreground: string };
 
@@ -198,7 +199,9 @@ export function Button({
           <>
             {renderIcon(Icon)}
             {label ? (
-              <Text style={[styles.label, { color: tone.foreground }]} numberOfLines={1}>
+              <Text
+                style={[styles.label, size === 'xl' && styles.labelLarge, { color: tone.foreground }]}
+                numberOfLines={1}>
                 {label}
               </Text>
             ) : null}
@@ -251,5 +254,8 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.bodyMedium,
+  },
+  labelLarge: {
+    ...typography.headlineMedium,
   },
 });
