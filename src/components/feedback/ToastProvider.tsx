@@ -92,7 +92,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 function ToastContent({ toast, onAction }: { toast: ToastOptions; onAction: () => void }) {
-  if (toast.variant === 'saved' || toast.variant === 'removed') {
+  if (toast.variant === 'saved' || toast.variant === 'removed' || toast.variant === 'info') {
     const { onActionPress } = toast;
     return (
       <Toast

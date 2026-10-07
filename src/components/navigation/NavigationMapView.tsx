@@ -1,3 +1,4 @@
+import { Image as ExpoImage } from 'expo-image';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Image, StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -177,7 +178,7 @@ function FallbackMap({ line, stops = [], finish, rider, pin, overlay, style }: F
 
   return (
     <View style={[styles.fill, style]} onLayout={onLayout}>
-      <Image source={mapFallbacks.homeCard} style={StyleSheet.absoluteFill} resizeMode="cover" />
+      <ExpoImage source={mapFallbacks.homeCard} style={StyleSheet.absoluteFill} contentFit="cover" />
       {size.width > 0 ? (
         <Svg style={StyleSheet.absoluteFill} width={size.width} height={size.height}>
           <Path

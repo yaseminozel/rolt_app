@@ -1,4 +1,4 @@
-import { CoffeeCup, GasTank, MapPin, Wrench } from 'iconoir-react-native';
+import { CoffeeCup, Gas, MapPin, Wrench } from 'iconoir-react-native';
 import type { ComponentType } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
@@ -11,7 +11,7 @@ const ROW_HEIGHT = 64;
 const ICON_BOX = 40;
 
 export const stopCategoryIcons: Record<StopCategory, ComponentType<SvgProps>> = {
-  fuel: GasTank,
+  fuel: Gas,
   cafe: CoffeeCup,
   mechanic: Wrench,
   viewpoint: MountainIcon,

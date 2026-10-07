@@ -9,6 +9,8 @@ const MAX_DIRECTIONS_POINTS = 25;
 export const APPROACH_THRESHOLD_M = 200;
 /** "Rota üzerinde" below this offset, "Rota yakınında" below the next, else "Rotadan uzak" (06.02). */
 export const ON_ROUTE_OFFSET_M = 120;
+/** Places closer than this sit on the road itself and add no detour ("Rota üzerinde" badge). */
+const NO_DETOUR_OFFSET_M = 20;
 export const NEAR_ROUTE_OFFSET_M = 1_000;
 /** Detours above this trigger the warning on the stop preview (note `wYzjk`). */
 export const LARGE_DETOUR_M = 3_000;
@@ -37,12 +39,13 @@ export type StopPlacement = {
 export function placeOnRoute(coordinates: LngLat, line: LngLat[]): StopPlacement {
   const cumulative = cumulativeDistances(line);
   const projection = projectOnLine(coordinates, line, cumulative);
-  const detourM = projection.offsetM < ON_ROUTE_OFFSET_M ? 0 : projection.offsetM * 2;
+  // Pulling off to a place beside the road still costs about a minute.
+  const detourM = projection.offsetM < NO_DETOUR_OFFSET_M ? 0 : projection.offsetM * 2;
   return {
     alongM: projection.alongM,
     offsetM: projection.offsetM,
     detourM,
-    detourMinutes: Math.round(detourM / DETOUR_SPEED_MPS / 60),
+    detourMinutes: detourM === 0 ? 0 : Math.max(1, Math.round(detourM / DETOUR_SPEED_MPS / 60)),
     proximity:
       projection.offsetM < ON_ROUTE_OFFSET_M
         ? 'onRoute'
