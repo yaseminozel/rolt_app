@@ -5,9 +5,20 @@ import { usePermissionPromptSheet } from '@/features/auth/usePermissionPromptShe
 import { colors } from '@/theme';
 
 /**
- * Primary navigation (Pencil "Navigation Bar / Floating", I3pOq).
- * Rendered natively so iOS 26 draws it with Liquid Glass; the design's
- * Iconoir map / play / user icons map to SF Symbols and Material Symbols.
+ * Tab icons exported from the design's Iconoir glyphs (map, play, path-arrow, motorcycle) at
+ * 24 pt @1x–3x. iOS renders them as template images tinted by the system.
+ */
+const icons = {
+  discover: require('../../../assets/images/tabs/discover.png'),
+  record: require('../../../assets/images/tabs/record.png'),
+  community: require('../../../assets/images/tabs/community.png'),
+  profile: require('../../../assets/images/tabs/profile.png'),
+};
+
+/**
+ * Primary navigation (Pencil "Navigation Bar / Floating — MVP", `c2uK3c`): Keşfet, Kaydet,
+ * Topluluk, Profil. Rendered natively so iOS 26 draws it with Liquid Glass; the order, labels
+ * and icons come from the design.
  */
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -17,15 +28,19 @@ export default function TabsLayout() {
   return (
     <NativeTabs tintColor={colors.textPrimary}>
       <NativeTabs.Trigger name="discover">
-        <NativeTabs.Trigger.Icon sf="map" md="map" />
+        <NativeTabs.Trigger.Icon src={icons.discover} />
         <NativeTabs.Trigger.Label>{t('tabs.discover')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="record">
-        <NativeTabs.Trigger.Icon sf="play" md="play_arrow" />
+        <NativeTabs.Trigger.Icon src={icons.record} />
         <NativeTabs.Trigger.Label>{t('tabs.record')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="community">
+        <NativeTabs.Trigger.Icon src={icons.community} />
+        <NativeTabs.Trigger.Label>{t('tabs.community')}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
-        <NativeTabs.Trigger.Icon sf="person" md="person" />
+        <NativeTabs.Trigger.Icon src={icons.profile} />
         <NativeTabs.Trigger.Label>{t('tabs.profile')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
