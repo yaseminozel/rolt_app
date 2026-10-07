@@ -1,13 +1,16 @@
 import type { SocialProvider } from './types';
 
-/** Minimum password length shown on 00.3 "Yeni Hesap" ("En az 8 karakter.") and 00.6. */
+/** Minimum password length shown on 02.02 "Yeni hesap" ("En az 8 karakter.") and 02.05. */
 export const MIN_PASSWORD_LENGTH = 8;
 
 /** Password sign-in pause after too many wrong attempts; stated on 02.02 "Çok fazla deneme" (`rjPx3`). */
 export const LOCK_DURATION_MINUTES = 15;
 
-/** How long a password reset link stays valid; stated on 00.6 "Bağlantının süresi dolmuş". */
+/** How long a password reset link stays valid; stated on "Bağlantının süresi dolmuş". */
 export const RESET_LINK_VALIDITY_MINUTES = 30;
+
+/** How long an email verification link stays valid; stated on 02.07 "Süresi dolmuş bağlantı". */
+export const VERIFICATION_LINK_VALIDITY_HOURS = 24;
 
 /** 00.3 password step: sign in to an existing password account or create a new one. */
 export type PasswordMode = 'existing' | 'new';
@@ -22,7 +25,7 @@ export function isValidEmail(email: string) {
 const MASK = '••••';
 
 /**
- * Masks the local part like the design's "yas••••@gmail.com" (AQCUg): the first three
+ * Masks the local part like the design's "yas••••@gmail.com" (02.04 `U9gRlP`): the first three
  * characters stay, the rest becomes a fixed four-bullet run so the length isn't revealed.
  * Local parts of three characters or fewer keep only their first character.
  */
@@ -52,13 +55,3 @@ export function parseSocialProvider(value: string | string[] | undefined): Socia
   const provider = firstParam(value);
   return provider === 'google' || provider === 'apple' ? provider : null;
 }
-
-/** Epoch-millisecond route param (e.g. `lockedUntil`, `sentAt`) → Date, or null when missing/invalid. */
-export function parseTimestampParam(value: string | string[] | undefined): Date | null {
-  const raw = firstParam(value);
-  const ms = raw ? Number(raw) : NaN;
-  return Number.isFinite(ms) ? new Date(ms) : null;
-}
-
-/** Date → route param counterpart of `parseTimestampParam`. */
-export const toTimestampParam = (date: Date) => String(date.getTime());

@@ -17,7 +17,7 @@ export type PersistedAuthState = {
   session: Session | null;
   isGuest: boolean;
   hasSeenOnboarding: boolean;
-  /** True between finishing registration and leaving the permission screens (00.13–00.14). */
+  /** True from signing in to an unfinished account until the permission sheet (03.01–03.02) is left. */
   permissionPromptsPending: boolean;
 };
 

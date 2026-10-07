@@ -1,6 +1,7 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
 
+import { usePermissionPromptSheet } from '@/features/auth/usePermissionPromptSheet';
 import { colors } from '@/theme';
 
 /**
@@ -10,6 +11,8 @@ import { colors } from '@/theme';
  */
 export default function TabsLayout() {
   const { t } = useTranslation();
+  // Normally answered during registration; catches a sheet still due after it (e.g. app killed).
+  usePermissionPromptSheet();
 
   return (
     <NativeTabs tintColor={colors.textPrimary}>

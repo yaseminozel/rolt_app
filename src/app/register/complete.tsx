@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { motorcycleBrandNames } from '@/components/brand/MotorcycleBrandLogo';
-import { InfoNote } from '@/components/feedback/InfoNote';
 import { GarageSummaryCard, type GarageSummaryBike } from '@/components/registration/GarageSummaryCard';
 import { RegistrationStepScreen, REGISTRATION_STEP_COUNT } from '@/components/registration/RegistrationStepScreen';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -13,8 +12,8 @@ import { formatNumber } from '@/i18n/format';
 
 /**
  * 00.12 Kayıt / Tamamlandı (Pencil `LreVd`). Back and swipe-back are disabled by the layout.
- * "Keşfetmeye başla" only finishes the profile: the root guard then opens the permission
- * screens (00.13 location → 00.14 notifications), as the "Sıradaki adım" note announces.
+ * "Keşfetmeye başla" only finishes the profile; the root guard then opens the app. The
+ * design's "Sıradaki adım: konum izni" note is gone: permissions are asked before registration.
  * Skipped data degrades gracefully: no bike → no bike band and a "Profilin hazır" heading;
  * no photo → person glyph; no city → handle only; no preferences → no tag section.
  */
@@ -65,7 +64,6 @@ export default function RegisterCompleteScreen() {
         ridingStyleLabel={t('complete.ridingStyleLabel')}
         tags={tags}
       />
-      <InfoNote tone="accent" title={t('complete.nextStepTitle')} text={t('complete.nextStepText')} />
     </RegistrationStepScreen>
   );
 }

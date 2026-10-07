@@ -7,7 +7,7 @@ import { AuthScreen } from '@/components/auth/AuthScreen';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { firstParam, MIN_PASSWORD_LENGTH, toTimestampParam } from '@/features/auth/credentials';
+import { firstParam, MIN_PASSWORD_LENGTH } from '@/features/auth/credentials';
 import { isAuthError } from '@/features/auth/types';
 import { spacing } from '@/theme';
 
@@ -47,11 +47,7 @@ export default function ResetPasswordScreen() {
       router.replace('/password-updated');
     } catch (error) {
       if (isAuthError(error, 'expired-token')) {
-        const { email, sentAt } = error.details;
-        router.replace({
-          pathname: '/reset-link-expired',
-          params: { email, sentAt: toTimestampParam(sentAt) },
-        });
+        router.replace({ pathname: '/reset-link-expired', params: { email: error.details.email } });
         return;
       }
       if (isAuthError(error, 'invalid-token')) {

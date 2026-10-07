@@ -103,8 +103,6 @@
       "weekendGetaway": "Weekend",
       "nightRiding": "Night riding"
     },
-    "nextStepTitle": "Next step: location access",
-    "nextStepText": "To show routes and riders near you, we'll ask for permission on the next screen.",
     "start": "Start exploring"
   }
 }

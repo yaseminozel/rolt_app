@@ -1,12 +1,17 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { usePermissionPromptSheet } from '@/features/auth/usePermissionPromptSheet';
 import { RegistrationDraftProvider } from '@/features/registration/RegistrationDraftProvider';
 import { colors, fontFamily } from '@/theme';
 
-/** Registration flow 00.8–00.12 with a native header titled "Hesap oluştur" (`registration:title`). */
+/**
+ * Registration flow with a native header titled "Hesap oluştur" (`registration:title`).
+ * A new account first gets the permission sheet (03.01–03.02) over its first step.
+ */
 export default function RegisterLayout() {
   const { t } = useTranslation('registration');
+  usePermissionPromptSheet();
 
   return (
     <RegistrationDraftProvider>

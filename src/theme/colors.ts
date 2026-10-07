@@ -57,7 +57,6 @@ export const palette = {
   gray700: '#393B41',
   orange100: '#FFEDD5',
   orange700: '#C2410C',
-  // Expired reset link note (b1m1YP "Bağlantı … gönderildi")
   orange50: '#FFF7ED',
   orange800: '#9A3412',
   // Location permission banner outline (x3Pqz "Konum izni kapalı")
@@ -70,9 +69,6 @@ export const palette = {
   teal50: '#D9F8EE',
   teal700: '#0F766E',
   teal800: '#0F5F59',
-  // Notification permission illustration background (RzQd4 "Görsel", top → bottom)
-  indigo50: '#EEF0FF',
-  indigo100: '#DFE3FF',
   // Map scale bar ink (01.7 `rxpI9`)
   slate700: '#4C5157',
   // Route builder (04.1 "Rota öner"): stop list separators, planned route line, no-route card
@@ -180,7 +176,7 @@ export const colors = {
   rideCoastSurface: palette.cyan100,
   rideCoastText: palette.cyan700,
 
-  // Time-related caution note (b1m1YP expired reset link): orange tone.
+  // Caution tone (Discover "Konum izni kapalı" banner, x3Pqz).
   cautionSurface: palette.orange50,
   cautionIcon: palette.orange700,
   cautionText: palette.orange800,
@@ -196,15 +192,8 @@ export const colors = {
   mediaGradientClear: 'rgba(0, 0, 0, 0)',
   mediaGradientMid: 'rgba(0, 0, 0, 0.72)',
 
-  // Location permission map preview (TJtI6): brand-blue accuracy radius, halo and position dot.
-  locationRadiusFill: 'rgba(21, 21, 255, 0.08)',
-  locationRadiusStroke: 'rgba(21, 21, 255, 0.3)',
+  /** Brand-blue halo around the position dot on the route preview map. */
   locationHalo: 'rgba(21, 21, 255, 0.18)',
-
-  // Notification permission illustration (RzQd4): gradient panel and translucent preview cards.
-  notificationPanelTop: palette.indigo50,
-  notificationPanelBottom: palette.indigo100,
-  notificationCardSurface: 'rgba(255, 255, 255, 0.92)',
 
   /** Map scale bar lines and labels (01.7 `rxpI9`). */
   mapScaleInk: palette.slate700,

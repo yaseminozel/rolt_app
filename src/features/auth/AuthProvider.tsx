@@ -16,11 +16,16 @@ type AuthContextValue = {
   session: Session | null;
   isGuest: boolean;
   hasSeenOnboarding: boolean;
-  /** Signed in with a finished profile, or browsing as a guest. */
+  /** Signed in with a verified address and a finished profile, or browsing as a guest. */
   canUseApp: boolean;
-  /** Signed in but the registration flow is not finished yet. */
+  /** Signed in with a new email account whose verification link (02.07) isn't opened yet. */
+  needsEmailVerification: boolean;
+  /** Signed in and verified, but the registration flow (04.x) is not finished yet. */
   needsProfile: boolean;
-  /** Registration just finished; the location / notification permission screens (00.13–00.14) come next. */
+  /**
+   * The location / notification permission sheet (03.01–03.02) is still due: set when a
+   * sign-in lands on an account without a finished profile, shown over the next screen.
+   */
   needsPermissionPrompts: boolean;
   service: AuthService;
   markOnboardingSeen: () => void;
@@ -31,6 +36,10 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithProvider: (provider: SocialProvider, options?: ProviderSignInOptions) => Promise<void>;
+  /** Opens a verification link; rejects with `expired-token` / `invalid-token`. */
+  verifyEmail: (token: string) => Promise<void>;
+  /** Re-reads the account (e.g. verification done in the mail app); keeps the session on failure. */
+  refreshSession: () => Promise<void>;
   completeProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -81,42 +90,70 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
     saveGuest(false);
   }, []);
 
-  const finishPermissionPrompts = useCallback(() => {
-    setPermissionPromptsPending(false);
-    savePermissionPromptsPending(false);
+  const setPromptsPending = useCallback((pending: boolean) => {
+    setPermissionPromptsPending(pending);
+    savePermissionPromptsPending(pending);
   }, []);
 
+  const finishPermissionPrompts = useCallback(() => setPromptsPending(false), [setPromptsPending]);
+
+  /** Sign-in entry points: a new (or never finished) account still owes the permission sheet. */
+  const enterSession = useCallback(
+    (next: Session) => {
+      if (!next.profileCompleted) {
+        setPromptsPending(true);
+      }
+      applySession(next);
+    },
+    [applySession, setPromptsPending],
+  );
+
   const signIn = useCallback(
-    async (email: string, password: string) => applySession(await service.signIn(email, password)),
-    [applySession, service],
+    async (email: string, password: string) => enterSession(await service.signIn(email, password)),
+    [enterSession, service],
   );
 
   const signUp = useCallback(
-    async (email: string, password: string) => applySession(await service.signUp(email, password)),
-    [applySession, service],
+    async (email: string, password: string) => enterSession(await service.signUp(email, password)),
+    [enterSession, service],
   );
 
   const signInWithProvider = useCallback(
     async (provider: SocialProvider, options?: ProviderSignInOptions) =>
-      applySession(await service.signInWithProvider(provider, options)),
+      enterSession(await service.signInWithProvider(provider, options)),
+    [enterSession, service],
+  );
+
+  const verifyEmail = useCallback(
+    async (token: string) => applySession(await service.verifyEmail(token)),
     [applySession, service],
   );
 
+  const refreshSession = useCallback(async () => {
+    if (!session) {
+      return;
+    }
+    try {
+      applySession(await service.refreshSession(session));
+    } catch {
+      // Offline or a backend hiccup: keep the current session and try again later.
+    }
+  }, [applySession, service, session]);
+
   const completeProfile = useCallback(async () => {
     if (session) {
-      const completed = await service.completeProfile(session);
-      setPermissionPromptsPending(true);
-      savePermissionPromptsPending(true);
-      applySession(completed);
+      applySession(await service.completeProfile(session));
     }
   }, [applySession, service, session]);
 
   const signOut = useCallback(async () => {
     await service.signOut();
-    setPermissionPromptsPending(false);
-    savePermissionPromptsPending(false);
+    setPromptsPending(false);
     applySession(null);
-  }, [applySession, service]);
+  }, [applySession, service, setPromptsPending]);
+
+  // Sessions stored before verification existed have no flag and count as verified.
+  const verified = session !== null && session.emailVerified !== false;
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -124,9 +161,10 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       session,
       isGuest,
       hasSeenOnboarding,
-      canUseApp: isGuest || session?.profileCompleted === true,
-      needsProfile: session !== null && !session.profileCompleted,
-      needsPermissionPrompts: session?.profileCompleted === true && permissionPromptsPending,
+      canUseApp: isGuest || (verified && session?.profileCompleted === true),
+      needsEmailVerification: session !== null && !verified,
+      needsProfile: verified && session?.profileCompleted === false,
+      needsPermissionPrompts: verified && permissionPromptsPending,
       service,
       markOnboardingSeen,
       continueAsGuest,
@@ -135,10 +173,13 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       signIn,
       signUp,
       signInWithProvider,
+      verifyEmail,
+      refreshSession,
       completeProfile,
       signOut,
     }),
     [
+      verified,
       isReady,
       session,
       isGuest,
@@ -152,6 +193,8 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       signIn,
       signUp,
       signInWithProvider,
+      verifyEmail,
+      refreshSession,
       completeProfile,
       signOut,
     ],

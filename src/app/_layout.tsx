@@ -60,16 +60,25 @@ export default function RootLayout() {
 
 /**
  * Route access by auth state:
- * - (tabs): signed in with a finished profile, or guest ("Hesap oluşturmadan keşfet")
- * - register: signed in, registration (00.8–00.12) not finished
- * - permissions: registration just finished, permission screens (00.13–00.14) pending
- * - sign-in-prompt: guest hit an account-only action (00.15)
+ * - (tabs): signed in, verified, with a finished profile, or guest ("Hesap oluşturmadan keşfet")
+ * - email-verification: new email account whose verification link isn't opened yet (02.07)
+ * - register: signed in and verified, registration (04.x) not finished
+ * - permissions: form sheet (03.01–03.02) owed by a new account, presented over registration
+ * - sign-in-prompt: guest hit an account-only action
  * - onboarding + (auth): signed out
  * `index` resolves the right entry point whenever a guard flips.
  */
 function RootNavigator() {
   const [fontsLoaded, fontError] = useFonts(appFonts);
-  const { isReady, canUseApp, needsProfile, needsPermissionPrompts, session, isGuest } = useAuth();
+  const {
+    isReady,
+    canUseApp,
+    needsEmailVerification,
+    needsProfile,
+    needsPermissionPrompts,
+    session,
+    isGuest,
+  } = useAuth();
   const ready = (fontsLoaded || fontError !== null) && isReady;
   const signedOut = session === null && !isGuest;
   const signedInToApp = canUseApp && session !== null && !needsPermissionPrompts;
@@ -94,7 +103,7 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
-      <Stack.Protected guard={canUseApp && !needsPermissionPrompts}>
+      <Stack.Protected guard={canUseApp}>
         <Stack.Screen name="(tabs)" />
         {/* Full-screen map surfaces without the tab bar (01.6, 01.7). */}
         <Stack.Screen name="route/[id]" />
@@ -119,11 +128,22 @@ function RootNavigator() {
           }}
         />
       </Stack.Protected>
-      <Stack.Protected guard={needsPermissionPrompts}>
-        <Stack.Screen name="permissions" />
+      <Stack.Protected guard={needsEmailVerification}>
+        <Stack.Screen name="email-verification" />
       </Stack.Protected>
       <Stack.Protected guard={needsProfile}>
         <Stack.Screen name="register" />
+      </Stack.Protected>
+      <Stack.Protected guard={needsPermissionPrompts}>
+        <Stack.Screen
+          name="permissions"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: 'fitToContents',
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 28,
+          }}
+        />
       </Stack.Protected>
       <Stack.Protected guard={signedOut}>
         <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />

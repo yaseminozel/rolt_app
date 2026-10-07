@@ -1,59 +1,12 @@
 {
   "location": {
-    "title": "Konumunu paylaş",
-    "description": "Rotaları kaydetmek ve yakınındaki sürücüleri görmek için konumuna ihtiyacımız var.",
-    "benefits": {
-      "recordRides": {
-        "title": "Sürüşlerini kaydet",
-        "text": "Hız, mesafe ve rota çizgin otomatik oluşur."
-      },
-      "nearbyRoutes": {
-        "title": "Yakındaki rotaları keşfet",
-        "text": "Bulunduğun bölgeye göre öneriler alırsın."
-      },
-      "matchRiders": {
-        "title": "Sürücülerle eşleş",
-        "text": "5 km içindeki uygun sürücüleri görürsün."
-      }
-    },
-    "privacyNote": "Tam konumun diğer sürücülerle asla paylaşılmaz, yalnızca yaklaşık mesafe görünür.",
-    "allow": "Konum iznini ver"
+    "title": "Konuma izin ver",
+    "description": "Yakındaki rotaları keşfetmek ve sürüşünü kaydetmek için konum iznine ihtiyacımız var."
   },
   "notifications": {
-    "title": "Hiçbir şeyi kaçırma",
-    "description": "Eşleşme teklifleri ve rota onayları geldiğinde sana hemen haber verelim.",
-    "benefits": {
-      "rideInvites": {
-        "title": "Eşleşme teklifleri",
-        "text": "Bir sürücü sana birlikte sürüş teklif ettiğinde."
-      },
-      "routeApprovals": {
-        "title": "Rota onayları",
-        "text": "Önerdiğin rota yayına alındığında."
-      },
-      "dailyMatches": {
-        "title": "Günün eşleşmeleri",
-        "text": "Yeni eşleşmelerin hazır olduğunda, günde en fazla bir kez."
-      }
-    },
-    "allow": "Bildirimlere izin ver",
-    "preview": {
-      "rideInvite": {
-        "title": "Deniz birlikte sürmek istiyor",
-        "time": "şimdi",
-        "text": "Cumartesi Şile sahil turuna katılır mısın?"
-      },
-      "routePublished": {
-        "title": "Rotan yayında 🎉",
-        "time": "2 sa",
-        "text": "Kadıköy – Şile Sahil Rotası onaylandı."
-      },
-      "dailyMatches": {
-        "title": "Günün eşleşmeleri hazır",
-        "time": "dün",
-        "text": "Seninle %92 uyumlu 5 sürücü var."
-      }
-    }
+    "title": "Bildirimlere izin ver",
+    "description": "Yeni rotalardan, sürüşlerine gelen etkileşimlerden ve ROLT’taki önemli gelişmelerden haberdar ol."
   },
+  "allow": "İzin ver",
   "notNow": "Şimdi değil"
 }

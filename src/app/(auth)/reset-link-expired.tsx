@@ -4,32 +4,24 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AuthScreen } from '@/components/auth/AuthScreen';
-import { CautionNote } from '@/components/auth/CautionNote';
+import { LinkExpiredIllustration } from '@/components/auth/LinkExpiredIllustration';
 import { Button } from '@/components/ui/Button';
+import { TextField } from '@/components/ui/TextField';
 import { useAuth } from '@/features/auth/AuthProvider';
-import {
-  firstParam,
-  parseTimestampParam,
-  RESET_LINK_VALIDITY_MINUTES,
-} from '@/features/auth/credentials';
-import { formatClockTime, formatDayMonth, turkishTimeLocativeSuffix } from '@/i18n/format';
+import { firstParam, RESET_LINK_VALIDITY_MINUTES } from '@/features/auth/credentials';
 import { spacing } from '@/theme';
 
 /**
- * 00.6 Auth / Bağlantının süresi dolmuş — Pencil `b1m1YP`. Replaces 00.6 "Yeni Şifre" when the
- * reset link is expired (params: `email`, `sentAt` in epoch ms) or invalid (no params: the
- * send-time note is hidden and a new link starts from 00.4 so the email can be entered).
- * No back button; both actions leave the screen.
+ * Password reset link expired — laid out like 02.07 "Süresi dolmuş bağlantı" (Pencil `HrHxU`),
+ * the design's only expired-link screen, with the reset link's own validity. Replaces 02.05
+ * "Yeni şifre" when the link is expired (param `email`) or invalid (no email: the field is
+ * hidden and a new link starts from 02.03 so the address can be entered). No back button.
  */
 export default function ResetLinkExpiredScreen() {
   const { t } = useTranslation('auth');
   const { service } = useAuth();
-  const params = useLocalSearchParams<{
-    email?: string | string[];
-    sentAt?: string | string[];
-  }>();
+  const params = useLocalSearchParams<{ email?: string | string[] }>();
   const email = firstParam(params.email);
-  const sentAt = parseTimestampParam(params.sentAt);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +38,7 @@ export default function ResetLinkExpiredScreen() {
     setSending(true);
     try {
       await service.requestPasswordReset(email);
-      // Rebuild the reset flow under 00.5 so "E-posta adresini değiştir" still has 00.4 behind it.
+      // Rebuild the reset flow under 02.04 so going back still reaches 02.03.
       router.replace('/sign-in');
       router.push({ pathname: '/forgot-password', params: { email } });
       router.push({ pathname: '/check-email', params: { email } });
@@ -64,37 +56,29 @@ export default function ResetLinkExpiredScreen() {
 
   return (
     <AuthScreen
-      title={t('resetLinkExpired.title')}
+      illustration={<LinkExpiredIllustration />}
+      title={t('linkExpired.title')}
       subtitle={t('resetLinkExpired.subtitle', { minutes: RESET_LINK_VALIDITY_MINUTES })}
       errorMessage={error}>
-      <View style={styles.content}>
-        {sentAt ? (
-          <CautionNote
-            text={t('resetLinkExpired.sentAt', {
-              date: formatDayMonth(sentAt),
-              time: formatClockTime(sentAt),
-              suffix: turkishTimeLocativeSuffix(sentAt),
-            })}
-          />
+      <View style={styles.group}>
+        {email ? (
+          <TextField label={t('fields.email')} value={email} onChangeText={noop} disabled />
         ) : null}
-        <View style={styles.actions}>
-          <Button label={t('resetLinkExpired.resend')} loading={sending} onPress={handleResend} />
-          <Button
-            variant="text"
-            label={t('resetLinkExpired.backToSignIn')}
-            onPress={handleBackToSignIn}
-          />
-        </View>
+        <Button label={t('linkExpired.resend')} loading={sending} onPress={handleResend} />
+        <Button
+          variant="text"
+          label={t('linkExpired.backToSignIn')}
+          onPress={handleBackToSignIn}
+        />
       </View>
     </AuthScreen>
   );
 }
 
+const noop = () => {};
+
 const styles = StyleSheet.create({
-  content: {
-    gap: spacing.xxl,
-  },
-  actions: {
+  group: {
     gap: spacing.lg,
   },
 });
