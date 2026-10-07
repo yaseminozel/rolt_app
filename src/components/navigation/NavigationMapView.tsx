@@ -1,7 +1,7 @@
 import { Image as ExpoImage } from 'expo-image';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Image, StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
 import { cameraBoundsFor } from '@/components/map/mapGeometry';
@@ -21,10 +21,15 @@ const PIN_SIZE = { width: 66, height: 80 };
 
 /** "Map/Heading Marker" (06.06 `TZ73p`): 99 × 100 cone with the position dot near the bottom. */
 const HEADING_SIZE = { width: 99, height: 100 };
-/** Position dot centre inside the marker image (16 pt dot at the cone's tip). */
-const HEADING_ANCHOR = { x: 0.5, y: 0.84 };
+/** Position dot centre inside the marker image (measured on the exported artwork). */
+const HEADING_ANCHOR = { x: 0.667, y: 0.798 };
+/** The drawn cone points 29° west of north; rotations add this back so 0° faces north. */
+const IMAGE_BEARING = -29;
 /** Accuracy ring while GPS is weak (06.06 `CUBTG` "Konum doğruluğu"). */
 const ACCURACY_RING = 120;
+/** Square that contains the marker however it is rotated, with the dot at its centre. */
+const RIDER_BOX =
+  2 * Math.ceil(Math.hypot(HEADING_SIZE.width * HEADING_ANCHOR.x, HEADING_SIZE.height * HEADING_ANCHOR.y));
 const LINE_WIDTH = 6;
 const FOLLOW_ZOOM = 16.5;
 const FOLLOW_PITCH = 45;
@@ -128,7 +133,7 @@ export function NavigationMapView({
               </Mapbox.MarkerView>
             ) : null}
             {rider ? (
-              <Mapbox.MarkerView coordinate={rider.position} anchor={HEADING_ANCHOR} allowOverlap>
+              <Mapbox.MarkerView coordinate={rider.position} anchor={{ x: 0.5, y: 0.5 }} allowOverlap>
                 <RiderMarker
                   rotation={camera.mode === 'follow' ? 0 : rider.headingDeg}
                   weakSignal={rider.weakSignal}
@@ -143,14 +148,17 @@ export function NavigationMapView({
   );
 }
 
+/**
+ * Heading marker in a square box centred on the position dot, so rotating the box turns the cone
+ * around the dot (rotating the image itself would swing the dot off the rider's position).
+ */
 function RiderMarker({ rotation, weakSignal }: { rotation: number; weakSignal?: boolean }) {
   return (
-    <View style={styles.riderWrap} pointerEvents="none">
+    <View style={styles.riderBox} pointerEvents="none">
       {weakSignal ? <View style={styles.accuracyRing} /> : null}
-      <Image
-        source={headingMarker}
-        style={[styles.heading, weakSignal && styles.dimmed, { transform: [{ rotate: `${rotation}deg` }] }]}
-      />
+      <View style={[styles.riderBox, styles.riderRotor, { transform: [{ rotate: `${rotation - IMAGE_BEARING}deg` }] }]}>
+        <Image source={headingMarker} style={[styles.heading, styles.headingInBox, weakSignal && styles.dimmed]} />
+      </View>
     </View>
   );
 }
@@ -189,9 +197,6 @@ function FallbackMap({ line, stops = [], finish, rider, pin, overlay, style }: F
             strokeLinejoin="round"
             fill="none"
           />
-          {riderPoint && rider?.weakSignal ? (
-            <Circle cx={riderPoint.x} cy={riderPoint.y} r={ACCURACY_RING / 2} fill={colors.accuracyRing} stroke={colors.textSecondary} />
-          ) : null}
         </Svg>
       ) : null}
       {size.width > 0
@@ -222,21 +227,8 @@ function FallbackMap({ line, stops = [], finish, rider, pin, overlay, style }: F
       {riderPoint && rider ? (
         <View
           pointerEvents="none"
-          style={[
-            styles.absolute,
-            {
-              left: riderPoint.x - HEADING_SIZE.width * HEADING_ANCHOR.x,
-              top: riderPoint.y - HEADING_SIZE.height * HEADING_ANCHOR.y,
-            },
-          ]}>
-          <Image
-            source={headingMarker}
-            style={[
-              styles.heading,
-              rider.weakSignal && styles.dimmed,
-              { transform: [{ rotate: `${rider.headingDeg}deg` }] },
-            ]}
-          />
+          style={[styles.absolute, { left: riderPoint.x - RIDER_BOX / 2, top: riderPoint.y - RIDER_BOX / 2 }]}>
+          <RiderMarker rotation={rider.headingDeg} weakSignal={rider.weakSignal} />
         </View>
       ) : null}
       {overlay}
@@ -253,11 +245,22 @@ const styles = StyleSheet.create({
   absolute: {
     position: 'absolute',
   },
-  riderWrap: {
-    width: HEADING_SIZE.width,
-    height: HEADING_SIZE.height,
+  riderBox: {
+    width: RIDER_BOX,
+    height: RIDER_BOX,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  riderRotor: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  // Places the image so its dot lands on the box centre.
+  headingInBox: {
+    position: 'absolute',
+    left: RIDER_BOX / 2 - HEADING_SIZE.width * HEADING_ANCHOR.x,
+    top: RIDER_BOX / 2 - HEADING_SIZE.height * HEADING_ANCHOR.y,
   },
   heading: {
     width: HEADING_SIZE.width,
@@ -268,7 +271,6 @@ const styles = StyleSheet.create({
   },
   accuracyRing: {
     position: 'absolute',
-    top: HEADING_SIZE.height * HEADING_ANCHOR.y - ACCURACY_RING / 2,
     width: ACCURACY_RING,
     height: ACCURACY_RING,
     borderRadius: ACCURACY_RING / 2,

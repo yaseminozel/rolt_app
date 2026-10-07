@@ -283,9 +283,11 @@ export class NavigationTracker {
       distanceM(fix.coordinates, this.stops[lastReached].coordinates) <= NAVIGATION_RULES.breakRadiusM;
     if (atStop && speed < NAVIGATION_RULES.standingSpeedMps) {
       this.standingSince ??= fix.timestamp;
-      if (fix.timestamp - this.standingSince >= NAVIGATION_RULES.breakAfterMs) {
+      if (this.breakStopIndex === null && fix.timestamp - this.standingSince >= NAVIGATION_RULES.breakAfterMs) {
         this.breakStopIndex = lastReached;
         this.arrivedStopIndex = null;
+        // The whole stand counts as break time, not only the part after it was recognised.
+        this.ride.breakS += (fix.timestamp - this.standingSince) / 1000;
       }
     } else if (moving || !atStop) {
       this.standingSince = null;

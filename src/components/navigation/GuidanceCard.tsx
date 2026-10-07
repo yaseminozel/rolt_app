@@ -1,4 +1,4 @@
-import { MapsGoStraight, MapsTurnBack, MapsTurnLeft, MapsTurnRight } from 'iconoir-react-native';
+import { MapPin, MapsGoStraight, MapsTurnBack, MapsTurnLeft, MapsTurnRight } from 'iconoir-react-native';
 import type { ComponentType } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
@@ -37,8 +37,11 @@ type GuidanceCardProps = {
  */
 export function GuidanceCard({ icon, title, subtitle }: GuidanceCardProps) {
   let glyph;
-  if (icon === 'stopReached' || icon === 'arrive') {
+  if (icon === 'stopReached') {
     glyph = <Image source={stopReachedImage} style={styles.pin} resizeMode="contain" />;
+  } else if (icon === 'arrive') {
+    // Approaching a stop: a plain pin; the green check pin is kept for "ulaştın".
+    glyph = <MapPin width={ICON_SIZE} height={ICON_SIZE} color={colors.brand} strokeWidth={1.5} />;
   } else if (icon === 'finish') {
     glyph = <Image source={finishImage} style={styles.flag} resizeMode="contain" />;
   } else {

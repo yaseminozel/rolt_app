@@ -18,6 +18,8 @@ export type SimulationOptions = {
 };
 
 const TICK_MS = 1_000;
+/** Scenarios begin this far into the route. */
+const SCENARIO_START = 0.1;
 const OFF_ROUTE_SIDE_M = 90;
 const METRES_PER_DEGREE = 111_320;
 
@@ -32,8 +34,8 @@ function offsetRight([lng, lat]: LngLat, bearing: number, metres: number): LngLa
 /**
  * Drives along the planned line and reports fixes like a GPS would. Used where real location
  * can't run (Expo Go, web preview) or when `EXPO_PUBLIC_SIMULATE_NAVIGATION=1`. Scenarios:
- * `offRoute` leaves the line at 30 % for ~25 s, `weakGps` degrades accuracy at 30 % for ~20 s,
- * `lostGps` stops reporting at 30 % for 35 s, `break` stands 25 s at every stop.
+ * `offRoute` leaves the line at 10 % for ~25 s, `weakGps` degrades accuracy at 10 % for ~20 s,
+ * `lostGps` stops reporting at 10 % for 35 s, `break` stands 25 s at every stop (simulated time).
  */
 export function createSimulatedLocationSource({
   line,
@@ -62,7 +64,7 @@ export function createSimulatedLocationSource({
         return best;
       });
       const pausedStops = new Set<number>();
-      const scenarioStart = total * 0.3;
+      const scenarioStart = total * SCENARIO_START;
       let along = 0;
       let lastTickAt = clock();
       let pauseLeftS = 0;
