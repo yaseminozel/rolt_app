@@ -1,6 +1,6 @@
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet';
 import { router } from 'expo-router';
-import { Gas, NavArrowLeft, NavigatorAlt, PathArrow, Wrench } from 'iconoir-react-native';
+import { NavArrowLeft, NavigatorAlt, PathArrow, Wrench } from 'iconoir-react-native';
 import {
   useCallback,
   useMemo,
@@ -29,10 +29,17 @@ import {
   OTHER_LINE,
   SELECTED_LINE,
 } from '@/components/explore/ExploreRouteLines';
+import { FuelPumpIcon } from '@/components/explore/FuelPumpIcon';
 import { LayersIcon } from '@/components/explore/LayersIcon';
 import { MapCategoryChip } from '@/components/explore/MapCategoryChip';
 import { routeTagBadgeTone } from '@/components/explore/routeTagBadgeTone';
 import { SelectedRouteSummary } from '@/components/explore/SelectedRouteSummary';
+import {
+  SERVICE_PLACE_MARKER_ANCHOR,
+  SERVICE_PLACE_MARKER_SIZE,
+  ServicePlaceMarker,
+} from '@/components/explore/ServicePlaceMarker';
+import { ServicePlaceRow } from '@/components/explore/ServicePlaceRow';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
@@ -65,10 +72,14 @@ import { createProjection, polylinePath } from '@/components/route-builder/route
 import { FilterChip } from '@/components/ui/FilterChip';
 import { SearchField } from '@/components/ui/SearchField';
 import { useDeviceLocation } from '@/features/location/useDeviceLocation';
+import { usePlacesInArea } from '@/features/places/queries';
+import type { ServicePlace, ServicePlaceCategory } from '@/features/places/types';
+import { distanceKm } from '@/features/routes/geo';
 import { useRoutesInArea } from '@/features/routes/queries';
 import type { Bounds, LngLat, Route, RouteFilter, RouteTag } from '@/features/routes/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { formatDistance, formatDuration } from '@/i18n/format';
+import { openDirections } from '@/lib/openDirections';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
 
 type CameraRef = ComponentRef<MapboxModule['Camera']>;
@@ -92,6 +103,8 @@ const CARD_HEIGHT = 191;
 const SHEET_COLLAPSED_HEIGHT = HANDLE_HEIGHT + TITLE_HEIGHT + spacing.sm;
 const SHEET_LIST_HEIGHT =
   HANDLE_HEIGHT + TITLE_HEIGHT + spacing.lg + CHIPS_HEIGHT + spacing.lg + CARD_HEIGHT + spacing.lg;
+/** "Benzinlikler" / "Tamirciler" sheet (07.02, 07.03): handle plus a 400 pt scrolling list. */
+const SHEET_PLACES_HEIGHT = HANDLE_HEIGHT + 400;
 /** Selected-route sheet before its content is measured: pill, summary, actions. */
 const SELECTED_CONTENT_ESTIMATE = 32 + spacing.lg + 122 + spacing.lg + 44;
 /** Map buttons keep 16 pt above the sheet. */
@@ -107,8 +120,12 @@ const roundBounds = (ne: GeoJSON.Position, sw: GeoJSON.Position): Bounds => ({
   northEast: [round(ne[0]), round(ne[1])],
 });
 
+/** What the map shows: routes (07.01) or one kind of service place (07.02, 07.03). */
+type ExploreCategory = 'routes' | ServicePlaceCategory;
+
 type MapMarker =
   | { kind: 'cluster'; key: string; coordinate: LngLat; routes: Route[] }
+  | { kind: 'place'; key: string; coordinate: LngLat; place: ServicePlace }
   | { kind: 'photo'; key: string; coordinate: LngLat; route: Route }
   | { kind: 'start' | 'finish'; key: string; coordinate: LngLat };
 
@@ -117,6 +134,9 @@ type MapMarker =
  * selected). Routes in the visible area appear as photo pins, merged into "N rota" badges where
  * they would overlap; the sheet lists them with tag chips. Selecting a route draws it in blue
  * with its start and finish, greys out the others and swaps the sheet for its summary.
+ * The Benzinlik / Tamirci chips (07.02 `I3V8M`, 07.03 `sXCGN`) swap routes for fuel stations or
+ * repair shops in the area: pins on the map and a list with rating, distance, opening state and
+ * "Yol tarifi".
  */
 export default function ExploreMapScreen() {
   const { t } = useTranslation(['explore', 'routes', 'common']);
@@ -127,6 +147,8 @@ export default function ExploreMapScreen() {
   const { position, locate } = useDeviceLocation();
 
   const [query, setQuery] = useState('');
+  const [category, setCategory] = useState<ExploreCategory>('routes');
+  const placeCategory = category === 'routes' ? null : category;
   const [filter, setFilter] = useState<RouteFilter>('all');
   const [area, setArea] = useState<Bounds>(INITIAL_AREA);
   const [zoom, setZoom] = useState(() => initialZoom(screenWidth));
@@ -146,17 +168,26 @@ export default function ExploreMapScreen() {
     setRoutes(data);
   }
 
+  const placesQuery = usePlacesInArea(area, placeCategory);
+  const places = placeCategory ? placesQuery.data : undefined;
+
   const cameraRef = useRef<CameraRef>(null);
 
   const headerBottom = insets.top + HEADER_HEIGHT;
   const listSheetHeight = SHEET_LIST_HEIGHT + insets.bottom;
+  const placesSheetHeight = SHEET_PLACES_HEIGHT + insets.bottom;
   const selectedSheetHeight = HANDLE_HEIGHT + selectedContentHeight + spacing.lg + insets.bottom;
+  const openSheetHeight = selectedRoute
+    ? selectedSheetHeight
+    : placeCategory
+      ? placesSheetHeight
+      : listSheetHeight;
   const snapPoints = useMemo(
     () =>
       selectedRoute
         ? [selectedSheetHeight]
-        : [SHEET_COLLAPSED_HEIGHT + insets.bottom, listSheetHeight],
-    [insets.bottom, listSheetHeight, selectedRoute, selectedSheetHeight],
+        : [SHEET_COLLAPSED_HEIGHT + insets.bottom, openSheetHeight],
+    [insets.bottom, openSheetHeight, selectedRoute, selectedSheetHeight],
   );
   const initialCamera = useMemo(
     () => ({
@@ -201,6 +232,35 @@ export default function ExploreMapScreen() {
 
   const clearSelection = () => setSelectedRoute(null);
 
+  const changeCategory = (next: ExploreCategory) => {
+    setSelectedRoute(null);
+    setCategory(next);
+  };
+
+  const focusPlace = (place: ServicePlace) => {
+    cameraRef.current?.setCamera({
+      centerCoordinate: place.coordinates,
+      zoomLevel: CLUSTER_STREET_ZOOM,
+      padding: { paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: placesSheetHeight },
+      animationDuration: CAMERA_ANIMATION_MS,
+    });
+  };
+
+  // "N km": from the rider when the location is known, otherwise from the map centre.
+  const origin: LngLat = position ?? [
+    (area.southWest[0] + area.northEast[0]) / 2,
+    (area.southWest[1] + area.northEast[1]) / 2,
+  ];
+  const sortedPlaces = useMemo(
+    () =>
+      places
+        ?.map((place) => ({ place, distance: distanceKm(origin, place.coordinates) }))
+        .sort((a, b) => a.distance - b.distance),
+    // `origin` is rebuilt every render; its parts are the real inputs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [places, origin[0], origin[1]],
+  );
+
   const openCluster = (members: Route[]) => {
     setSelectedRoute(null);
     const points = members.map(routeMidpoint);
@@ -237,8 +297,7 @@ export default function ExploreMapScreen() {
   };
 
   // Toasts float just above the sheet.
-  const toastOffset =
-    (selectedRoute ? selectedSheetHeight : listSheetHeight) - insets.bottom + spacing.sm;
+  const toastOffset = openSheetHeight - insets.bottom + spacing.sm;
 
   const handleLocate = async () => {
     const coordinate = await locate();
@@ -259,31 +318,42 @@ export default function ExploreMapScreen() {
 
   // Routes of the area other than the selected one (all of them while nothing is selected).
   const otherRoutes = useMemo(
-    () => (routes ?? []).filter((route) => route.id !== selectedId),
-    [routes, selectedId],
+    () => (placeCategory ? [] : (routes ?? []).filter((route) => route.id !== selectedId)),
+    [placeCategory, routes, selectedId],
   );
 
   const fallbackProject = useMemo(() => {
     const fitPoints = selectedRoute
       ? selectedRoute.coordinates
-      : (fallbackFocus ?? (routes ?? []).map(routeMidpoint));
+      : placeCategory
+        ? (places ?? []).map((place) => place.coordinates)
+        : (fallbackFocus ?? (routes ?? []).map(routeMidpoint));
     return createProjection(fitPoints, mapSize.width, mapSize.height, {
       top: headerBottom + ROUTE_PHOTO_PIN_SIZE.height,
       right: spacing.huge + spacing.lg,
-      bottom: (selectedRoute ? selectedSheetHeight : listSheetHeight) + spacing.xxl,
+      bottom: openSheetHeight + spacing.xxl,
       left: spacing.huge,
     });
   }, [
     fallbackFocus,
     headerBottom,
-    listSheetHeight,
     mapSize,
+    openSheetHeight,
+    placeCategory,
+    places,
     routes,
     selectedRoute,
-    selectedSheetHeight,
   ]);
 
   const markers = useMemo<MapMarker[]>(() => {
+    if (placeCategory) {
+      return (places ?? []).map((place) => ({
+        kind: 'place',
+        key: place.id,
+        coordinate: place.coordinates,
+        place,
+      }));
+    }
     const project = isNativeMapAvailable
       ? (coordinate: LngLat): ScreenPoint => worldPoint(coordinate, zoom)
       : fallbackProject;
@@ -321,7 +391,7 @@ export default function ExploreMapScreen() {
       }
     }
     return result;
-  }, [fallbackProject, otherRoutes, selectedRoute, zoom]);
+  }, [fallbackProject, otherRoutes, placeCategory, places, selectedRoute, zoom]);
 
   const handleClusterPress = (members: Route[]) => {
     if (selectedRoute && members.length === 1) {
@@ -349,6 +419,14 @@ export default function ExploreMapScreen() {
             image={marker.route.coverImage}
             accessibilityLabel={marker.route.name}
             onPress={() => selectRoute(marker.route)}
+          />
+        );
+      case 'place':
+        return (
+          <ServicePlaceMarker
+            category={marker.place.category}
+            accessibilityLabel={marker.place.name}
+            onPress={isNativeMapAvailable ? () => focusPlace(marker.place) : undefined}
           />
         );
       case 'start':
@@ -434,9 +512,24 @@ export default function ExploreMapScreen() {
           showsHorizontalScrollIndicator={false}
           style={styles.categoryRow}
           contentContainerStyle={styles.categoryTrack}>
-          <MapCategoryChip label={t('categories.routes')} icon={PathArrow} selected />
-          <MapCategoryChip label={t('categories.fuel')} icon={Gas} selected={false} />
-          <MapCategoryChip label={t('categories.repair')} icon={Wrench} selected={false} />
+          <MapCategoryChip
+            label={t('categories.routes')}
+            icon={PathArrow}
+            selected={category === 'routes'}
+            onPress={() => changeCategory('routes')}
+          />
+          <MapCategoryChip
+            label={t('categories.fuel')}
+            icon={FuelPumpIcon}
+            selected={category === 'fuel'}
+            onPress={() => changeCategory('fuel')}
+          />
+          <MapCategoryChip
+            label={t('categories.repair')}
+            icon={Wrench}
+            selected={category === 'repair'}
+            onPress={() => changeCategory('repair')}
+          />
         </ScrollView>
       </View>
 
@@ -468,7 +561,7 @@ export default function ExploreMapScreen() {
       <BottomSheet
         // List and selected route have different snap points; a fresh sheet per mode slides in
         // instead of re-indexing one whose snap points are still updating on the UI thread.
-        key={selectedRoute ? 'selected' : 'list'}
+        key={selectedRoute ? 'selected' : category}
         snapPoints={snapPoints}
         index={selectedRoute ? 0 : 1}
         enableDynamicSizing={false}
@@ -497,6 +590,37 @@ export default function ExploreMapScreen() {
                 }
               />
             </View>
+          </BottomSheetView>
+        ) : placeCategory ? (
+          <BottomSheetView style={styles.placesContent}>
+            <View style={styles.sheetTitleRow}>
+              <Text style={styles.sheetTitle} accessibilityRole="header">
+                {t(`places.title.${placeCategory}`)}
+              </Text>
+              {placesQuery.isFetching ? (
+                <ActivityIndicator size="small" color={colors.textSecondary} />
+              ) : null}
+            </View>
+            {placesQuery.isError && !places ? (
+              <Text style={styles.placesMessage}>{t('places.error')}</Text>
+            ) : sortedPlaces && sortedPlaces.length === 0 ? (
+              <Text style={styles.placesMessage}>{t(`places.empty.${placeCategory}`)}</Text>
+            ) : (
+              <BottomSheetFlatList
+                data={sortedPlaces ?? []}
+                keyExtractor={(item) => item.place.id}
+                contentContainerStyle={styles.placesList}
+                renderItem={({ item, index }) => (
+                  <ServicePlaceRow
+                    place={item.place}
+                    distanceKm={item.distance}
+                    last={index === (sortedPlaces?.length ?? 0) - 1}
+                    onPress={() => focusPlace(item.place)}
+                    onDirections={() => openDirections(item.place.coordinates, item.place.name)}
+                  />
+                )}
+              />
+            )}
           </BottomSheetView>
         ) : (
           <BottomSheetView style={styles.listContent}>
@@ -568,6 +692,8 @@ function markerAnchor(marker: MapMarker) {
   switch (marker.kind) {
     case 'cluster':
       return { x: 0.5, y: 0.5 };
+    case 'place':
+      return SERVICE_PLACE_MARKER_ANCHOR;
     case 'photo':
       return ROUTE_PHOTO_PIN_ANCHOR;
     case 'start':
@@ -582,6 +708,11 @@ function fallbackMarkerOrigin(marker: MapMarker, point: ScreenPoint): ScreenPoin
   switch (marker.kind) {
     case 'cluster':
       return { x: point.x - ROUTE_CLUSTER_SIZE / 2, y: point.y - ROUTE_CLUSTER_SIZE / 2 };
+    case 'place':
+      return {
+        x: point.x - SERVICE_PLACE_MARKER_SIZE.width / 2,
+        y: point.y - SERVICE_PLACE_MARKER_SIZE.height,
+      };
     case 'photo':
       return {
         x: point.x - ROUTE_PHOTO_PIN_SIZE.width / 2,
@@ -764,6 +895,19 @@ const styles = StyleSheet.create({
   listContent: {
     gap: spacing.lg,
     paddingBottom: spacing.lg,
+  },
+  placesContent: {
+    flex: 1,
+    gap: spacing.sm,
+  },
+  placesList: {
+    paddingHorizontal: layout.screenGutter,
+    paddingBottom: spacing.lg,
+  },
+  placesMessage: {
+    ...typography.body,
+    color: colors.textSecondary,
+    paddingHorizontal: layout.screenGutter,
   },
   selectedContent: {
     paddingHorizontal: layout.screenGutter,

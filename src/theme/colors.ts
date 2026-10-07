@@ -88,6 +88,7 @@ export const palette = {
   gray350: '#999EA6',
   gray550: '#787D85',
   red450: '#E5484D',
+  yellow500: '#F7BC0D',
 } as const;
 
 export const colors = {
@@ -248,6 +249,16 @@ export const colors = {
   routeInactive: palette.gray350,
   /** "Varış" pin and tag on the selected route. */
   mapFinish: palette.red450,
+
+  // Benzinlikler / Tamirciler (07.02, 07.03): place pins, rating star, meta glyphs.
+  /** Fuel station pin head ("POI / Fuel"). */
+  placeFuel: palette.red700,
+  /** Repair shop pin head ("POI / Repair"). */
+  placeRepair: palette.gray900,
+  /** Filled star before a place's rating. */
+  ratingStar: palette.yellow500,
+  /** Pin glyph before a place's distance. */
+  metaIcon: palette.gray600,
 
   /** Skeleton blocks while Discover Home loads (05.01 `CImMS`). */
   skeleton: palette.gray125,

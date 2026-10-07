@@ -29,5 +29,22 @@
   "selected": {
     "backToRoutes": "Back to routes · {{count}}",
     "viewRoute": "View route"
+  },
+  "places": {
+    "title": {
+      "fuel": "Fuel stations",
+      "repair": "Repair shops"
+    },
+    "opening": {
+      "open24h": "Open 24 hours",
+      "open": "Open now",
+      "closed": "Closed now"
+    },
+    "directions": "Directions to {{name}}",
+    "empty": {
+      "fuel": "No fuel stations in this area. Try moving the map.",
+      "repair": "No repair shops in this area. Try moving the map."
+    },
+    "error": "Couldn't load places. Check your connection and try again."
   }
 }

@@ -29,5 +29,22 @@
   "selected": {
     "backToRoutes": "Rotalara geri dön · {{count}}",
     "viewRoute": "Rotayı görüntüle"
+  },
+  "places": {
+    "title": {
+      "fuel": "Benzinlikler",
+      "repair": "Tamirciler"
+    },
+    "opening": {
+      "open24h": "24 saat açık",
+      "open": "Şu an açık",
+      "closed": "Şu an kapalı"
+    },
+    "directions": "{{name}} için yol tarifi",
+    "empty": {
+      "fuel": "Bu bölgede benzinlik bulunamadı. Haritayı kaydırmayı dene.",
+      "repair": "Bu bölgede tamirci bulunamadı. Haritayı kaydırmayı dene."
+    },
+    "error": "Yerler yüklenemedi. Bağlantını kontrol edip tekrar dene."
   }
 }
