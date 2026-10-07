@@ -39,6 +39,12 @@ export const layout = {
 
 /** Elevations taken from the design's effect definitions. */
 export const shadows = {
+  /** Maneuver card and floating banners in navigation (06.06 "Yönlendirme kartı"). */
+  guidance: '0px 8px 21px rgba(15, 23, 41, 0.12)',
+  /** Small pills over the navigation map ("Sonraki durak", "Mola"). */
+  floatingPill: '0px 4px 12.25px rgba(0, 0, 0, 0.15)',
+  /** Persistent bottom panels over the navigation map ("Önizleme", "Rota tamamlandı"). */
+  bottomPanel: '0px -4px 17.5px rgba(0, 0, 0, 0.12)',
   subtle: '0px 1px 1.75px rgba(16, 19, 24, 0.22)',
   raised: '0px 2px 5.25px rgba(8, 18, 23, 0.16)',
   floating: '0px 4px 14px rgba(0, 0, 0, 0.12)',

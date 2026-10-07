@@ -48,6 +48,9 @@ export type Route = {
   tag: RouteTag;
   /** Province the route starts in, matching `TurkishCity.name`. */
   city: string;
+  /** Place names at the two ends, for "Rotayı sür" (06.01: start → finish). */
+  startName: string;
+  endName: string;
   distanceKm: number;
   durationMinutes: number;
   averageSpeedKmh: number;

@@ -7,7 +7,7 @@ import { colors, radius, spacing, typography } from '@/theme';
  * `success` / `failure`: tonal toast from "Toast messages" (Pencil `s1KRrb`).
  * `saved` / `removed`: dark bookmark toast from "Feedback/Toast" (Pencil `X3p3d7`).
  */
-export type ToastVariant = 'success' | 'failure' | 'saved' | 'removed';
+export type ToastVariant = 'success' | 'failure' | 'saved' | 'removed' | 'info';
 
 type TonalToastProps = {
   variant: 'success' | 'failure';
@@ -17,7 +17,8 @@ type TonalToastProps = {
 };
 
 type BookmarkToastProps = {
-  variant: 'saved' | 'removed';
+  /** `info`: same dark toast without the bookmark glyph ("Durak eklendi · Geri al", 06.02). */
+  variant: 'saved' | 'removed' | 'info';
   message: string;
   /** Trailing text action, e.g. "Görüntüle" (saved) or "Geri al" (removed). */
   actionLabel?: string;
@@ -33,7 +34,7 @@ export type ToastProps = (TonalToastProps | BookmarkToastProps) & {
  * Covers Pencil `s1KRrb` (Success / Failure) and `X3p3d7` (Saved / Removed).
  */
 export function Toast({ variant, message, actionLabel, onActionPress, style }: ToastProps) {
-  const isBookmark = variant === 'saved' || variant === 'removed';
+  const isBookmark = variant === 'saved' || variant === 'removed' || variant === 'info';
   const liveRegion = variant === 'failure' ? 'assertive' : 'polite';
 
   if (!isBookmark) {
@@ -62,7 +63,7 @@ export function Toast({ variant, message, actionLabel, onActionPress, style }: T
       style={[styles.container, styles.bookmark, style]}
       accessibilityRole="alert"
       accessibilityLiveRegion={liveRegion}>
-      <BookmarkSolid width={20} height={20} color={colors.textInverse} />
+      {variant === 'info' ? null : <BookmarkSolid width={20} height={20} color={colors.textInverse} />}
       <Text style={[styles.message, styles.bookmarkMessage]}>{message}</Text>
       {actionLabel ? (
         <Pressable

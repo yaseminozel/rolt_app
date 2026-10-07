@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import type { Route } from '@/features/routes/types';
 
 import { MAX_RIDE_STOPS, rideLine, sortStopsAlongRoute } from './ridePlan';
+import type { StopCandidate } from './stops/stopSearch';
 import type { NavigationPlan, RideStop } from './types';
 
 type RideSession = {
@@ -29,6 +30,12 @@ type RideSession = {
   /** True when the plan begins with an approach leg from the rider's position. */
   hasApproach: boolean;
   setHasApproach: (value: boolean) => void;
+  /** Place picked on 06.02, shown on the preview (06.03) before it becomes a stop. */
+  pendingStop: StopCandidate | null;
+  setPendingStop: (candidate: StopCandidate | null) => void;
+  /** Set by the exit confirmation (06.06 "Bitir"); the navigation screen ends the ride. */
+  endRequested: boolean;
+  requestEnd: () => void;
 };
 
 const RideSessionContext = createContext<RideSession | null>(null);
@@ -44,6 +51,9 @@ export function RideSessionProvider({ route, children }: { route: Route; childre
   const [keepScreenOn, setKeepScreenOn] = useState(true);
   const [plan, setPlan] = useState<NavigationPlan | null>(null);
   const [hasApproach, setHasApproach] = useState(false);
+  const [pendingStop, setPendingStop] = useState<StopCandidate | null>(null);
+  const [endRequested, setEndRequested] = useState(false);
+  const requestEnd = useCallback(() => setEndRequested(true), []);
 
   const toggleReversed = useCallback(() => {
     setReversed((value) => !value);
@@ -101,8 +111,28 @@ export function RideSessionProvider({ route, children }: { route: Route; childre
       setPlan,
       hasApproach,
       setHasApproach,
+      pendingStop,
+      setPendingStop,
+      endRequested,
+      requestEnd,
     }),
-    [route, reversed, toggleReversed, stops, addStop, removeStop, setStops, moveStop, voiceEnabled, keepScreenOn, plan, hasApproach],
+    [
+      route,
+      reversed,
+      toggleReversed,
+      stops,
+      addStop,
+      removeStop,
+      setStops,
+      moveStop,
+      voiceEnabled,
+      keepScreenOn,
+      plan,
+      hasApproach,
+      pendingStop,
+      endRequested,
+      requestEnd,
+    ],
   );
 
   return <RideSessionContext.Provider value={value}>{children}</RideSessionContext.Provider>;

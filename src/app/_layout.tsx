@@ -9,6 +9,8 @@ import { LogBox, Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ToastProvider } from '@/components/feedback/ToastProvider';
+// Defines the background navigation location task at launch (it must exist before any update arrives).
+import '@/features/navigation/location/backgroundLocationTask';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { takePendingAccountAction } from '@/features/auth/pendingAccountAction';
 import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
@@ -115,6 +117,8 @@ function RootNavigator() {
           options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
         />
         <Stack.Screen name="suggest-route" />
+        {/* "Rotayı sür" (06.x): its own stack of map screens and sheets. */}
+        <Stack.Screen name="ride/[routeId]" options={{ gestureEnabled: false }} />
         <Stack.Screen name="notifications" options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }} />
       </Stack.Protected>
       <Stack.Protected guard={isGuest}>

@@ -45,6 +45,33 @@ const place = {
   dosemealti: [30.6, 37.03],
 } satisfies Record<string, LngLat>;
 
+type PlaceKey = keyof typeof place;
+
+/** Display names of the fixture places (shown as-is, like any user content). */
+const placeNames: Record<PlaceKey, string> = {
+  antalya: 'Antalya',
+  adrasan: 'Adrasan',
+  cirali: 'Çıralı',
+  olympos: 'Olympos',
+  gelidonya: 'Gelidonya Feneri',
+  suluada: 'Suluada',
+  mavikent: 'Mavikent',
+  kumluca: 'Kumluca',
+  kemer: 'Kemer',
+  tekirova: 'Tekirova',
+  geyikbayiri: 'Geyikbayırı',
+  tahtali: 'Tahtalı Dağı',
+  korkuteli: 'Korkuteli',
+  saklikent: 'Saklıkent',
+  termessos: 'Termessos',
+  kas: 'Kaş',
+  kalkan: 'Kalkan',
+  dosemealti: 'Döşemealtı',
+};
+
+const nameOf = (coordinates: LngLat) =>
+  placeNames[(Object.keys(place) as PlaceKey[]).find((key) => place[key] === coordinates) ?? 'antalya'];
+
 /** Straight-ish line through the given places with a gentle bend between each pair. */
 function line(...points: LngLat[]): LngLat[] {
   const result: LngLat[] = [];
@@ -75,6 +102,8 @@ const coverByTag: Record<RouteTag, Route['coverImage']> = {
 function route({ from, via = [], to, ...seed }: RouteSeed, index: number): Route {
   return {
     city: 'Antalya',
+    startName: nameOf(from),
+    endName: nameOf(to),
     maxSpeedKmh: Math.round(seed.averageSpeedKmh * 1.7),
     curveCount: Math.round(seed.distanceKm * (seed.tag === 'curvy' ? 0.6 : 0.3)),
     breakCount: Math.max(1, Math.round(seed.durationMinutes / 60)),

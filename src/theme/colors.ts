@@ -71,6 +71,14 @@ export const palette = {
   gray150: '#EEF0F1',
   // Loading placeholders (05.01 `CImMS` "Kemik / …")
   gray125: '#ECEDED',
+  // Stop suggestion deviation badges (06.02 "Rozet / Sapma"): on the route, far from it
+  green75: '#E6F7F1',
+  green750: '#1F7A57',
+  orange75: '#FFF4E5',
+  orange850: '#8A4B08',
+  // Ride points card (06.01 "Map / Rota noktaları"): rider position halo, start → finish dots
+  blue75: '#DCE0FF',
+  gray450: '#8C8C8C',
   teal500: '#14B8A6',
   red25: '#FEF2F2',
   red250: '#FECACA',
@@ -214,10 +222,29 @@ export const colors = {
   mediaFailedVeil: 'rgba(185, 28, 28, 0.8)',
   mediaBadge: 'rgba(16, 19, 24, 0.8)',
 
+  // Turn-by-turn navigation (06.06): status banners, deviation badges, route line.
+  /** "GPS sinyali zayıf" banner fill and icon disc. */
+  cautionSurface: palette.orange100,
+  cautionStrong: palette.orange700,
+  /** Halo around the rider's position dot ("Konumun"). */
+  brandHalo: palette.blue75,
+  /** Translucent ring around the position while GPS accuracy is weak (06.06 "Konum doğruluğu", #999EA3). */
+  accuracyRing: 'rgba(153, 158, 163, 0.35)',
+  /** Dotted connector between start and finish on the ride points card. */
+  connectorDot: palette.gray450,
+  /** "Rota üzerinde" badge on stop suggestions. */
+  onRouteSurface: palette.green75,
+  onRouteText: palette.green750,
+  /** "+14 dk" badge for stops far from the route. */
+  farDetourSurface: palette.orange75,
+  farDetourText: palette.orange850,
+
   /** Skeleton blocks while Discover Home loads (05.01 `CImMS`). */
   skeleton: palette.gray125,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
+  /** Over the ride map behind the countdown and sheets (06.05 "Overlay / Scrim", #0000005C). */
+  mapScrim: 'rgba(0, 0, 0, 0.36)',
   /** Behind centered dialogs over a screen ("04.x Çıkış — Taslak kaydet", `zMCLP`). */
   dialogScrim: 'rgba(16, 19, 24, 0.6)',
   glass: 'rgba(255, 255, 255, 0.64)',

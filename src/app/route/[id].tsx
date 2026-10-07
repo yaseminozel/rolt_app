@@ -25,6 +25,7 @@ import { RouteFactsCard } from '@/components/route-detail/RouteFactsCard';
 import { RouteMetricsCard } from '@/components/route-detail/RouteMetricsCard';
 import { RoutePhotoStrip } from '@/components/route-detail/RoutePhotoStrip';
 import { RouteStopsCard } from '@/components/route-detail/RouteStopsCard';
+import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useDeviceLocation } from '@/features/location/useDeviceLocation';
 import { useRoute } from '@/features/routes/queries';
 import type { Route } from '@/features/routes/types';
@@ -170,10 +171,14 @@ function RouteDetail({ route }: { route: Route }) {
     cameraRef.current?.setCamera({ centerCoordinate: coordinate, zoomLevel: 12, animationDuration: 600 });
   }, [locate, showToast, t]);
 
-  // `navigate` returns to the existing tabs and switches to Record instead of stacking them again.
+  // Riding records a ride, so guests sign in first (Akış A "gerekirse giriş"); then 06.01 Hazırlık.
+  const requireAccount = useRequireAccount();
   const startRide = useCallback(
-    () => router.navigate({ pathname: '/record', params: { routeId: route.id } }),
-    [route.id],
+    () =>
+      requireAccount('saveRide', () =>
+        router.push({ pathname: '/ride/[routeId]/prepare', params: { routeId: route.id } }),
+      ),
+    [requireAccount, route.id],
   );
 
   const renderFooter = useCallback(

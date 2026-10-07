@@ -40,7 +40,8 @@
       "reorderStop": "{{name}} durağının sırasını değiştir",
       "reorderHint": "Sürükleyerek sırala",
       "loading": "Rota hesaplanıyor"
-    }
+    },
+    "locationRequired": "Sürüşü başlatmak için konum iznine ihtiyacımız var."
   },
   "addStop": {
     "title": "Durak ekle",

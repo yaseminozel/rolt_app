@@ -15,6 +15,8 @@ export type DialogProps = {
    * The design uses core Buttons: Outlined (cancel) then Contained / Destructive (confirm).
    */
   actions: ReactNode;
+  /** `row` (default): side by side; `column`: stacked full width (08.10 "Kaydetmeden çık"). */
+  actionsLayout?: 'row' | 'column';
   style?: StyleProp<ViewStyle>;
 };
 
@@ -22,7 +24,7 @@ export type DialogProps = {
  * Presentational dialog card (Pencil `s5345`): status icon, centered title and
  * description, and a row of actions. The scrim and modal presentation belong to the caller.
  */
-export function Dialog({ status, title, description, actions, style }: DialogProps) {
+export function Dialog({ status, title, description, actions, actionsLayout = 'row', style }: DialogProps) {
   return (
     <View style={[styles.card, style]} accessibilityViewIsModal>
       <View style={styles.content}>
@@ -32,10 +34,10 @@ export function Dialog({ status, title, description, actions, style }: DialogPro
         </Text>
         <Text style={styles.description}>{description}</Text>
       </View>
-      <View style={styles.actions}>
+      <View style={[styles.actions, actionsLayout === 'column' && styles.actionsColumn]}>
         {Children.map(actions, (action) =>
           action == null || typeof action === 'boolean' ? null : (
-            <View style={styles.action}>{action}</View>
+            <View style={actionsLayout === 'row' ? styles.action : null}>{action}</View>
           ),
         )}
       </View>
@@ -79,6 +81,9 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     flexDirection: 'row',
     gap: spacing.sm,
+  },
+  actionsColumn: {
+    flexDirection: 'column',
   },
   action: {
     flex: 1,

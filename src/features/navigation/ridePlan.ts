@@ -117,3 +117,19 @@ export function buildRidePoints({
 export function distanceToStart(position: LngLat | null, line: LngLat[]) {
   return position ? distanceM(position, line[0]) : null;
 }
+
+/**
+ * Where a place joins the ride for the suggestion list: on the approach leg ("Başlangıca
+ * giderken") when the ride starts away from the route and the place is closer to that leg,
+ * otherwise its position on the route line.
+ */
+export function placeOnRide(coordinates: LngLat, line: LngLat[], approachLine: LngLat[] | null) {
+  const placement = placeOnRoute(coordinates, line);
+  if (approachLine && approachLine.length > 1) {
+    const approach = placeOnRoute(coordinates, approachLine);
+    if (approach.offsetM < placement.offsetM) {
+      return { ...approach, onApproach: true as const };
+    }
+  }
+  return { ...placement, onApproach: false as const };
+}

@@ -40,7 +40,8 @@
       "reorderStop": "Reorder stop {{name}}",
       "reorderHint": "Drag to reorder",
       "loading": "Calculating the route"
-    }
+    },
+    "locationRequired": "Location access is needed to start the ride."
   },
   "addStop": {
     "title": "Add stop",

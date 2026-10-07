@@ -56,6 +56,16 @@ export function formatDuration(totalMinutes: number) {
   return i18n.t('units.hoursMinutes', { hours, minutes });
 }
 
+/** Ride clock for recorded time: "18:42" under an hour, "1:05:09" above (06.07, 08.x). */
+export function formatRideClock(totalSeconds: number) {
+  const seconds = Math.max(0, Math.round(totalSeconds));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const rest = seconds % 60;
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(rest)}` : `${pad(minutes)}:${pad(rest)}`;
+}
+
 /** Estimated duration on route cards (05.02 "~1 sa 30 dk"): `formatDuration` with a leading "~". */
 export function formatApproxDuration(totalMinutes: number) {
   return i18n.t('units.approx', { value: formatDuration(totalMinutes) });
