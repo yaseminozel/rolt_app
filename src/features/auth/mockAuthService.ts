@@ -11,8 +11,10 @@ import { AuthError, type AuthService, type Session, type SocialProvider } from '
  * - `deniz@example.com` — created with Google (00.2 "Hesap Google ile bağlı").
  * - `ece@example.com` — created with Apple (same screen, Apple variant).
  * - Any other email is a new account (02.02 "Yeni hesap"). It starts unverified (02.07 "E-posta
- *   doğrulama"); returning to the app after the verification email was sent (`refreshSession`)
- *   counts as opening the link, so the flow can be tried without a mail client.
+ *   doğrulama"); returning to the app at least 5 s after the verification email was sent
+ *   (`refreshSession`) counts as opening the link, so the flow can be tried without a mail
+ *   client. The delay keeps system sheets right after sign-up (password autofill) from
+ *   verifying instantly.
  * Google / Apple sign-in without an email hint returns `<provider>.user@example.com`, a new
  * account that goes through registration.
  *
@@ -35,6 +37,7 @@ const INVALID_TOKEN = 'invalid';
 const EXPIRED_TOKEN_EMAIL = 'yasemin@example.com';
 const EXPIRED_TOKEN_AGE_MS = 45 * 60 * 1000;
 const EXPIRED_VERIFICATION_AGE_MS = 25 * 60 * 60 * 1000;
+const SIMULATED_LINK_OPEN_DELAY_MS = 5000;
 
 type MockAccount = {
   profileCompleted: boolean;
@@ -221,7 +224,11 @@ export const mockAuthService: AuthService = {
       return session;
     }
     // Simulates the user opening the link in their mail app while ROLT was in the background.
-    if (!account.emailVerified && account.verificationSentAt !== null) {
+    if (
+      !account.emailVerified &&
+      account.verificationSentAt !== null &&
+      Date.now() - account.verificationSentAt >= SIMULATED_LINK_OPEN_DELAY_MS
+    ) {
       account.emailVerified = true;
       account.verificationSentAt = null;
     }
