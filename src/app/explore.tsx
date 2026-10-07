@@ -40,6 +40,8 @@ import {
   ServicePlaceMarker,
 } from '@/components/explore/ServicePlaceMarker';
 import { ServicePlaceRow } from '@/components/explore/ServicePlaceRow';
+import { EmptyState } from '@/components/feedback/EmptyState';
+import { StatusIcon } from '@/components/feedback/StatusIcon';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
@@ -105,6 +107,8 @@ const SHEET_LIST_HEIGHT =
   HANDLE_HEIGHT + TITLE_HEIGHT + spacing.lg + CHIPS_HEIGHT + spacing.lg + CARD_HEIGHT + spacing.lg;
 /** "Benzinlikler" / "Tamirciler" sheet (07.02, 07.03): handle plus a 400 pt scrolling list. */
 const SHEET_PLACES_HEIGHT = HANDLE_HEIGHT + 400;
+/** "Sonuç yok" sheet (07.04 `B2drm`): 16 top, `EmptyState` (40 icon, 20 title, 2 × 20 text), 16. */
+const SHEET_EMPTY_HEIGHT = HANDLE_HEIGHT + 16 + 40 + spacing.md + 20 + spacing.md + 40 + 16;
 /** Selected-route sheet before its content is measured: pill, summary, actions. */
 const SELECTED_CONTENT_ESTIMATE = 32 + spacing.lg + 122 + spacing.lg + 44;
 /** Map buttons keep 16 pt above the sheet. */
@@ -147,6 +151,8 @@ export default function ExploreMapScreen() {
   const { position, locate } = useDeviceLocation();
 
   const [query, setQuery] = useState('');
+  // "Bu bölgede ara" narrows the selected layer once submitted (typing alone changes nothing).
+  const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState<ExploreCategory>('routes');
   const placeCategory = category === 'routes' ? null : category;
   const [filter, setFilter] = useState<RouteFilter>('all');
@@ -161,15 +167,26 @@ export default function ExploreMapScreen() {
   const [fallbackFocus, setFallbackFocus] = useState<LngLat[] | null>(null);
   const [mapSize, setMapSize] = useState({ width: screenWidth, height: screenHeight });
 
-  const { data } = useRoutesInArea(area, filter);
+  const routesQuery = useRoutesInArea(area, filter, searchQuery);
+  const { data } = routesQuery;
   // Keep the previous list while a new area / filter loads, so markers and cards don't flash.
   const [routes, setRoutes] = useState<Route[] | undefined>(undefined);
   if (data && data !== routes) {
     setRoutes(data);
   }
 
-  const placesQuery = usePlacesInArea(area, placeCategory);
+  const placesQuery = usePlacesInArea(area, placeCategory, searchQuery);
   const places = placeCategory ? placesQuery.data : undefined;
+
+  // 07.04 "Aranıyor…" while a search runs, "Sonuç yok" once it finds nothing in the area.
+  const searching =
+    searchQuery !== '' && (placeCategory ? placesQuery.isFetching : routesQuery.isFetching);
+  const noResults =
+    searchQuery !== '' &&
+    !searching &&
+    (placeCategory
+      ? placesQuery.data?.length === 0 && !placesQuery.isPlaceholderData
+      : data?.length === 0);
 
   const cameraRef = useRef<CameraRef>(null);
 
@@ -177,17 +194,20 @@ export default function ExploreMapScreen() {
   const listSheetHeight = SHEET_LIST_HEIGHT + insets.bottom;
   const placesSheetHeight = SHEET_PLACES_HEIGHT + insets.bottom;
   const selectedSheetHeight = HANDLE_HEIGHT + selectedContentHeight + spacing.lg + insets.bottom;
+  const emptySheetHeight = SHEET_EMPTY_HEIGHT + insets.bottom;
   const openSheetHeight = selectedRoute
     ? selectedSheetHeight
-    : placeCategory
-      ? placesSheetHeight
-      : listSheetHeight;
+    : noResults
+      ? emptySheetHeight
+      : placeCategory
+        ? placesSheetHeight
+        : listSheetHeight;
+  // The selected route and "Sonuç yok" sheets have one height; the lists also collapse to a title.
+  const singleSnap = selectedRoute !== null || noResults;
   const snapPoints = useMemo(
     () =>
-      selectedRoute
-        ? [selectedSheetHeight]
-        : [SHEET_COLLAPSED_HEIGHT + insets.bottom, openSheetHeight],
-    [insets.bottom, openSheetHeight, selectedRoute, selectedSheetHeight],
+      singleSnap ? [openSheetHeight] : [SHEET_COLLAPSED_HEIGHT + insets.bottom, openSheetHeight],
+    [insets.bottom, openSheetHeight, singleSnap],
   );
   const initialCamera = useMemo(
     () => ({
@@ -502,7 +522,20 @@ export default function ExploreMapScreen() {
           <SearchField
             variant="floating"
             value={query}
-            onChangeText={setQuery}
+            onChangeText={(text) => {
+              setQuery(text);
+              if (text.trim() === '') {
+                setSearchQuery('');
+              }
+            }}
+            onSubmitEditing={() => {
+              setSelectedRoute(null);
+              setSearchQuery(query.trim());
+            }}
+            onClear={() => {
+              setQuery('');
+              setSearchQuery('');
+            }}
             placeholder={t('search.placeholder')}
             containerStyle={styles.search}
           />
@@ -533,6 +566,17 @@ export default function ExploreMapScreen() {
         </ScrollView>
       </View>
 
+      {searching ? (
+        <View
+          style={[styles.searchingRow, { top: headerBottom + spacing.sm }]}
+          pointerEvents="none">
+          <View style={styles.searchingPill} accessibilityLiveRegion="polite">
+            <ActivityIndicator size="small" color={colors.brand} />
+            <Text style={styles.searchingLabel}>{t('search.searching')}</Text>
+          </View>
+        </View>
+      ) : null}
+
       <Animated.View
         style={[styles.controls, controlsStyle]}
         pointerEvents="box-none"
@@ -561,9 +605,9 @@ export default function ExploreMapScreen() {
       <BottomSheet
         // List and selected route have different snap points; a fresh sheet per mode slides in
         // instead of re-indexing one whose snap points are still updating on the UI thread.
-        key={selectedRoute ? 'selected' : category}
+        key={selectedRoute ? 'selected' : noResults ? 'empty' : category}
         snapPoints={snapPoints}
-        index={selectedRoute ? 0 : 1}
+        index={singleSnap ? 0 : 1}
         enableDynamicSizing={false}
         enablePanDownToClose={false}
         animatedPosition={sheetTop}
@@ -590,6 +634,14 @@ export default function ExploreMapScreen() {
                 }
               />
             </View>
+          </BottomSheetView>
+        ) : noResults ? (
+          <BottomSheetView style={styles.emptyContent}>
+            <EmptyState
+              icon={<StatusIcon status="neutral" />}
+              title={t('search.noResults.title')}
+              description={t('search.noResults.description')}
+            />
           </BottomSheetView>
         ) : placeCategory ? (
           <BottomSheetView style={styles.placesContent}>
@@ -894,6 +946,32 @@ const styles = StyleSheet.create({
   },
   listContent: {
     gap: spacing.lg,
+    paddingBottom: spacing.lg,
+  },
+  searchingRow: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  searchingPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: 10,
+    paddingLeft: 14,
+    paddingRight: spacing.lg,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
+    boxShadow: shadows.mapFab,
+  },
+  searchingLabel: {
+    ...typography.bodySemibold,
+    color: colors.textPrimary,
+  },
+  emptyContent: {
+    paddingTop: spacing.lg,
+    paddingHorizontal: layout.screenGutter,
     paddingBottom: spacing.lg,
   },
   placesContent: {

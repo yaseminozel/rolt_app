@@ -127,9 +127,15 @@ export type SearchSuggestions = {
  */
 export interface RoutesRepository {
   listRecommended(params: { city: string; filter: RouteFilter }): Promise<Route[]>;
-  search(params: { query: string; sort: RouteSort; city: string; filters?: RouteSearchFilters }): Promise<Route[]>;
+  search(params: {
+    query: string;
+    sort: RouteSort;
+    city: string;
+    filters?: RouteSearchFilters;
+  }): Promise<Route[]>;
   /** Suggestions while typing, before the search is submitted. */
   suggest(params: { query: string }): Promise<SearchSuggestions>;
-  listInArea(params: { bounds: Bounds; filter: RouteFilter }): Promise<Route[]>;
+  /** Routes in the visible map area; `query` narrows by name, summary or city ("Bu bölgede ara"). */
+  listInArea(params: { bounds: Bounds; filter: RouteFilter; query?: string }): Promise<Route[]>;
   getById(id: string): Promise<Route | null>;
 }

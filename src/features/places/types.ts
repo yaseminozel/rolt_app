@@ -19,6 +19,10 @@ export type ServicePlace = {
 };
 
 export interface PlacesRepository {
-  /** Places of `category` inside the visible map area. */
-  listInArea(params: { bounds: Bounds; category: ServicePlaceCategory }): Promise<ServicePlace[]>;
+  /** Places of `category` inside the visible map area; `query` narrows by name ("Bu bölgede ara"). */
+  listInArea(params: {
+    bounds: Bounds;
+    category: ServicePlaceCategory;
+    query?: string;
+  }): Promise<ServicePlace[]>;
 }

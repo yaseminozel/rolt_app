@@ -1,4 +1,5 @@
 import { isInBounds } from '@/features/routes/geo';
+import { matchesSearch } from '@/lib/searchText';
 
 import type { PlacesRepository, ServicePlace } from './types';
 
@@ -112,10 +113,13 @@ const MOCK_PLACES: ServicePlace[] = [
 const NETWORK_DELAY_MS = 300;
 
 export const mockPlaces: PlacesRepository = {
-  async listInArea({ bounds, category }) {
+  async listInArea({ bounds, category, query = '' }) {
     await new Promise((resolve) => setTimeout(resolve, NETWORK_DELAY_MS));
     return MOCK_PLACES.filter(
-      (place) => place.category === category && isInBounds(place.coordinates, bounds),
+      (place) =>
+        place.category === category &&
+        isInBounds(place.coordinates, bounds) &&
+        matchesSearch(place.name, query),
     );
   },
 };

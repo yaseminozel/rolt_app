@@ -7,7 +7,12 @@
     "description": "Move the map or pick another filter."
   },
   "search": {
-    "placeholder": "Search this area"
+    "placeholder": "Search this area",
+    "searching": "Searching…",
+    "noResults": {
+      "title": "No results in this area.",
+      "description": "Move the map to try another area."
+    }
   },
   "categories": {
     "routes": "Routes",

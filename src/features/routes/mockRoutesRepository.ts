@@ -28,7 +28,9 @@ function applySort(routes: Route[], sort: RouteSort, city: string) {
   const centre = cityCentre(city);
   switch (sort) {
     case 'nearest':
-      return centre ? sorted.sort((a, b) => distanceKm(startOf(a), centre) - distanceKm(startOf(b), centre)) : sorted;
+      return centre
+        ? sorted.sort((a, b) => distanceKm(startOf(a), centre) - distanceKm(startOf(b), centre))
+        : sorted;
     case 'shortest':
       return sorted.sort((a, b) => a.distanceKm - b.distanceKm);
     case 'longest':
@@ -43,9 +45,9 @@ function applySort(routes: Route[], sort: RouteSort, city: string) {
 export const mockRoutesRepository: RoutesRepository = {
   async listRecommended({ city, filter }) {
     await wait();
-    const recommended = RECOMMENDED_ROUTE_IDS.map((id) => ROUTE_FIXTURES.find((route) => route.id === id)).filter(
-      (route): route is Route => route !== undefined,
-    );
+    const recommended = RECOMMENDED_ROUTE_IDS.map((id) =>
+      ROUTE_FIXTURES.find((route) => route.id === id),
+    ).filter((route): route is Route => route !== undefined);
     return filterRoutes(recommended, filter, city);
   },
 
@@ -71,9 +73,15 @@ export const mockRoutesRepository: RoutesRepository = {
     return { routes, places };
   },
 
-  async listInArea({ bounds, filter }) {
+  async listInArea({ bounds, filter, query = '' }) {
     await wait();
-    const inArea = ROUTE_FIXTURES.filter((route) => route.coordinates.some((point) => isInBounds(point, bounds)));
+    const inArea = ROUTE_FIXTURES.filter(
+      (route) =>
+        route.coordinates.some((point) => isInBounds(point, bounds)) &&
+        (matchesSearch(route.name, query) ||
+          matchesSearch(route.summary, query) ||
+          matchesSearch(route.city, query)),
+    );
     return filterRoutes(inArea, filter, 'Antalya');
   },
 

@@ -2,18 +2,27 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { RECOMMENDED_LIST_IDS, ROUTE_FIXTURES } from './fixtures/routes';
 import { mockRoutesRepository } from './mockRoutesRepository';
-import type { Bounds, Route, RouteFilter, RouteSearchFilters, RoutesRepository, RouteSort } from './types';
+import type {
+  Bounds,
+  Route,
+  RouteFilter,
+  RouteSearchFilters,
+  RoutesRepository,
+  RouteSort,
+} from './types';
 
 /** Swap for the Supabase implementation later; screens only use the hooks below. */
 export const routesRepository: RoutesRepository = mockRoutesRepository;
 
 export const routeKeys = {
   all: ['routes'] as const,
-  recommended: (city: string, filter: RouteFilter) => ['routes', 'recommended', city, filter] as const,
+  recommended: (city: string, filter: RouteFilter) =>
+    ['routes', 'recommended', city, filter] as const,
   search: (query: string, sort: RouteSort, city: string, filters?: RouteSearchFilters) =>
     ['routes', 'search', query, sort, city, filters ?? null] as const,
   suggestions: (query: string) => ['routes', 'suggestions', query] as const,
-  area: (bounds: Bounds, filter: RouteFilter) => ['routes', 'area', bounds, filter] as const,
+  area: (bounds: Bounds, filter: RouteFilter, query = '') =>
+    ['routes', 'area', bounds, filter, query] as const,
   detail: (id: string) => ['routes', 'detail', id] as const,
 };
 
@@ -36,7 +45,12 @@ export function useRecommendedList() {
 }
 
 /** `filters` (search filter sheet, PXcQ0) is optional; omit it for an unfiltered search. */
-export function useRouteSearch(query: string, sort: RouteSort, city: string, filters?: RouteSearchFilters) {
+export function useRouteSearch(
+  query: string,
+  sort: RouteSort,
+  city: string,
+  filters?: RouteSearchFilters,
+) {
   const trimmed = query.trim();
   return useQuery({
     queryKey: routeKeys.search(trimmed, sort, city, filters),
@@ -50,7 +64,12 @@ export function useRouteSearch(query: string, sort: RouteSort, city: string, fil
  * `useRouteSearch`, so applying the filters shows the results at once; keeps the previous
  * count while the next one loads so the button label doesn't blink.
  */
-export function useRouteSearchPreview(query: string, sort: RouteSort, city: string, filters: RouteSearchFilters) {
+export function useRouteSearchPreview(
+  query: string,
+  sort: RouteSort,
+  city: string,
+  filters: RouteSearchFilters,
+) {
   const trimmed = query.trim();
   return useQuery({
     queryKey: routeKeys.search(trimmed, sort, city, filters),
@@ -74,10 +93,10 @@ export function useSearchSuggestions(query: string) {
   });
 }
 
-export function useRoutesInArea(bounds: Bounds, filter: RouteFilter) {
+export function useRoutesInArea(bounds: Bounds, filter: RouteFilter, query = '') {
   return useQuery({
-    queryKey: routeKeys.area(bounds, filter),
-    queryFn: () => routesRepository.listInArea({ bounds, filter }),
+    queryKey: routeKeys.area(bounds, filter, query),
+    queryFn: () => routesRepository.listInArea({ bounds, filter, query }),
   });
 }
 

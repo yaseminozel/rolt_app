@@ -7,7 +7,12 @@
     "description": "Haritayı kaydır ya da başka bir filtre seç."
   },
   "search": {
-    "placeholder": "Bu bölgede ara"
+    "placeholder": "Bu bölgede ara",
+    "searching": "Aranıyor…",
+    "noResults": {
+      "title": "Bu bölgede sonuç bulunamadı.",
+      "description": "Haritayı hareket ettirerek başka bir bölgeyi deneyebilirsin."
+    }
   },
   "categories": {
     "routes": "Rotalar",
