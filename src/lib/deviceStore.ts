@@ -6,6 +6,8 @@ import Storage from 'expo-sqlite/kv-store';
  */
 export const deviceStore = {
   get: (key: string) => Storage.getItem(key),
+  /** Synchronous read, for preferences needed before the first render (language, units). */
+  getSync: (key: string) => Storage.getItemSync(key),
   set: (key: string, value: string) => Storage.setItem(key, value),
   remove: (key: string) => Storage.removeItem(key),
 };

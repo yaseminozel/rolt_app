@@ -17,9 +17,9 @@
     "notificationBody": "Your ride is being recorded",
     "title": "Record ride",
     "metrics": {
-      "distance": "Distance (km)",
+      "distance": "Distance ({{unit}})",
       "duration": "Time",
-      "averageSpeed": "Avg. speed (km/h)"
+      "averageSpeed": "Avg. speed ({{unit}})"
     },
     "rideType": "Ride type",
     "start": "Start",
@@ -40,7 +40,7 @@
       "banner": "Unfinished ride found",
       "description": "Your ride is safe on your device. Continue where you left off or finish at the last valid point."
     },
-    "tooShort": "Ride too short. Ride at least 1 km to save it.",
+    "tooShort": "Ride too short. Ride at least {{distance}} to save it.",
     "permission": {
       "title": "Location off",
       "heading": "Location access is needed to record rides",

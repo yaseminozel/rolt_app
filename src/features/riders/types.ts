@@ -89,4 +89,16 @@ export interface RidersRepository {
   setRideSaved(rideId: string, saved: boolean): Promise<void>;
   report(target: ReportTarget): Promise<void>;
   block(riderId: string): Promise<void>;
+  /** "Engellenen kullanıcılar" (10.06), most recently blocked first. */
+  listBlocked(): Promise<BlockedRider[]>;
+  unblock(riderId: string): Promise<void>;
 }
+
+/** A rider the viewer blocked (10.06): just enough to recognise them. Name is user content. */
+export type BlockedRider = {
+  id: string;
+  name: string;
+  /** Username without "@". */
+  handle: string;
+  avatar?: ImageSourcePropType;
+};

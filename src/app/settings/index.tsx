@@ -47,8 +47,24 @@ import {
   type SettingsMenuItem,
   type SettingsSectionId,
 } from '@/features/settings/settingsMenu';
+import { getUnitSystem } from '@/i18n/units';
 import { matchesSearch } from '@/lib/searchText';
 import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
+
+type SettingsPage =
+  | 'account'
+  | 'ride-visibility'
+  | 'endpoints'
+  | 'blocked'
+  | 'location'
+  | 'photos'
+  | 'notifications'
+  | 'language'
+  | 'units'
+  | 'help'
+  | 'feedback'
+  | 'privacy'
+  | 'terms';
 
 const SECTIONS: readonly SettingsSectionId[] = [
   'account',
@@ -79,15 +95,16 @@ export default function SettingsScreen() {
 
   // The React Compiler memoizes this list.
   const items = ((): SettingsMenuItem[] => {
-    // Sub pages come with the next flows (Akış 15–18).
+    // "Motorum" (11.x) comes with Akış 17.
     const pending = () => undefined;
+    const go = (page: SettingsPage) => () => router.push(`/settings/${page}`);
     return [
       {
         id: 'account',
         section: 'account',
         icon: User,
         label: t('items.account'),
-        onPress: pending,
+        onPress: go('account'),
       },
       {
         id: 'bike',
@@ -105,7 +122,7 @@ export default function SettingsScreen() {
         icon: Lock,
         label: t('items.rideVisibility'),
         value: visibility ? t(`values.visibility.${visibility}`) : undefined,
-        onPress: pending,
+        onPress: go('ride-visibility'),
       },
       {
         id: 'endpoints',
@@ -115,14 +132,14 @@ export default function SettingsScreen() {
         value: endpoints
           ? t(endpoints.hidden ? 'values.endpoints.hidden' : 'values.endpoints.visible')
           : undefined,
-        onPress: pending,
+        onPress: go('endpoints'),
       },
       {
         id: 'blocked',
         section: 'privacy',
         icon: Group,
         label: t('items.blocked'),
-        onPress: pending,
+        onPress: go('blocked'),
       },
       {
         id: 'location',
@@ -130,7 +147,7 @@ export default function SettingsScreen() {
         icon: MapPin,
         label: t('items.location'),
         value: permissions ? t(`values.location.${permissions.location}`) : undefined,
-        onPress: pending,
+        onPress: go('location'),
       },
       {
         id: 'photos',
@@ -138,7 +155,7 @@ export default function SettingsScreen() {
         icon: MediaImage,
         label: t('items.photos'),
         value: permissions ? t(`values.photos.${permissions.photos}`) : undefined,
-        onPress: pending,
+        onPress: go('photos'),
       },
       {
         id: 'notifications',
@@ -146,7 +163,7 @@ export default function SettingsScreen() {
         icon: Bell,
         label: t('items.notifications'),
         value: permissions ? t(`values.notifications.${permissions.notifications}`) : undefined,
-        onPress: pending,
+        onPress: go('notifications'),
       },
       {
         id: 'language',
@@ -154,38 +171,44 @@ export default function SettingsScreen() {
         icon: Globe,
         label: t('items.language'),
         value: t(i18n.language === 'en' ? 'values.language.en' : 'values.language.tr'),
-        onPress: pending,
+        onPress: go('language'),
       },
       {
         id: 'units',
         section: 'app',
         icon: Ruler,
         label: t('items.units'),
-        value: t('values.units'),
-        onPress: pending,
+        value: t(getUnitSystem() === 'imperial' ? 'values.unitsImperial' : 'values.units'),
+        onPress: go('units'),
       },
       {
         id: 'help',
         section: 'support',
         icon: HelpCircle,
         label: t('items.help'),
-        onPress: pending,
+        onPress: go('help'),
       },
       {
         id: 'feedback',
         section: 'support',
         icon: ChatLines,
         label: t('items.feedback'),
-        onPress: pending,
+        onPress: go('feedback'),
       },
       {
         id: 'privacyPolicy',
         section: 'support',
         icon: Page,
         label: t('items.privacyPolicy'),
-        onPress: pending,
+        onPress: go('privacy'),
       },
-      { id: 'terms', section: 'support', icon: Page, label: t('items.terms'), onPress: pending },
+      {
+        id: 'terms',
+        section: 'support',
+        icon: Page,
+        label: t('items.terms'),
+        onPress: go('terms'),
+      },
       {
         id: 'rate',
         section: 'community',
@@ -306,19 +329,18 @@ export default function SettingsScreen() {
         status="error"
         title={t('signOutDialog.title')}
         description={t('signOutDialog.description')}
-        actionsLayout="column"
         actions={[
+          <Button
+            key="cancel"
+            variant="outlined"
+            label={t('signOutDialog.cancel')}
+            onPress={() => setSignOutVisible(false)}
+          />,
           <Button
             key="signOut"
             destructive
             label={t('signOutDialog.confirm')}
             onPress={confirmSignOut}
-          />,
-          <Button
-            key="cancel"
-            variant="text"
-            label={t('signOutDialog.cancel')}
-            onPress={() => setSignOutVisible(false)}
           />,
         ]}
       />

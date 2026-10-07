@@ -60,7 +60,8 @@
     },
     "units": "Metric (km, km/h)",
     "instagram": "@roltapp",
-    "noBike": "Add"
+    "noBike": "Add",
+    "unitsImperial": "Imperial (mi, mph)"
   },
   "rateHint": {
     "ios": "Rate us on the App Store",
@@ -81,5 +82,283 @@
     "description": "Unsaved rides stay on your device and come back when you sign in again.",
     "confirm": "Sign out",
     "cancel": "Cancel"
+  },
+  "account": {
+    "title": "Account details",
+    "email": "Email",
+    "methodSection": "SIGN-IN METHOD",
+    "connected": "Connected",
+    "methods": {
+      "email": "Email",
+      "google": "Google",
+      "apple": "Apple"
+    },
+    "createdWith": {
+      "email": "This account was created with email.",
+      "google": "This account was created with Google.",
+      "apple": "This account was created with Apple."
+    },
+    "methodNote": {
+      "email": "You sign in with your email address and password. You can change your password below.",
+      "google": "Your account is managed through your Google account and can't be changed in ROLT.",
+      "apple": "Your account is managed through your Apple account and can't be changed in ROLT."
+    },
+    "securitySection": "SECURITY",
+    "changePassword": "Change password",
+    "lastChanged": "Last changed: {{when}}",
+    "justNow": "just now",
+    "passwordHint": "For a strong password use at least 8 characters, a number and an uppercase letter.",
+    "managementSection": "ACCOUNT MANAGEMENT",
+    "deleteAccount": "Delete account",
+    "deleteNote": "Deleting your account permanently removes all your rides, routes and saved items. This can't be undone.",
+    "passwordUpdated": "Your password was updated."
+  },
+  "changePassword": {
+    "title": "Change password",
+    "current": "Current password",
+    "currentPlaceholder": "Enter your current password",
+    "new": "New password",
+    "newPlaceholder": "Enter a new password",
+    "newHint": "At least 8 characters, a number and an uppercase letter.",
+    "confirm": "New password (again)",
+    "confirmPlaceholder": "Enter the new password again",
+    "forgot": "Forgot password",
+    "submit": "Update password",
+    "errors": {
+      "wrongCurrent": "Your current password is wrong.",
+      "mismatch": "The passwords don't match.",
+      "weak": "Use at least 8 characters, a number and an uppercase letter.",
+      "sameAsCurrent": "The new password must be different from the current one.",
+      "network": "Couldn't update the password. Check your connection and try again."
+    },
+    "resetSent": "We sent a password reset link to {{email}}."
+  },
+  "rideVisibility": {
+    "title": "Ride visibility",
+    "subtitle": "Who should see your new rides by default?",
+    "note": "This applies to new rides. You can change older rides one by one.",
+    "save": "Save"
+  },
+  "endpoints": {
+    "title": "Start/finish points",
+    "heading": "Choose the area to hide on maps",
+    "description": "Striped areas are hidden on maps; the route line only shows the part in between.",
+    "startHidden": "Start hidden",
+    "finishHidden": "Finish hidden",
+    "toggle": "Hide start and finish",
+    "toggleHint": "The first and last part of a recorded ride aren't shown on maps.",
+    "distanceTitle": "Distance to hide",
+    "footnote": "Distance, time and average speed don't change — only the line on the map gets shorter."
+  },
+  "blocked": {
+    "title": "Blocked users",
+    "description": "People you block can't see your rides or profile, comment or like. We don't tell them you blocked them.",
+    "count": "BLOCKED · {{count}}",
+    "unblock": "Unblock",
+    "unblocked": "{{name}} unblocked",
+    "emptyTitle": "You haven't blocked anyone",
+    "emptyDescription": "You can block a rider from the “…” menu on their profile."
+  },
+  "permission": {
+    "current": "Current permission",
+    "openSettings": "Open phone settings",
+    "location": {
+      "title": "Location access",
+      "always": "ROLT can always use your location, so it keeps recording with the screen off. To narrow it, change it in your phone settings.",
+      "whileUsing": "ROLT can use your location only while the app is open. To keep recording with the screen off, choose “Always” in your phone settings.",
+      "off": "ROLT can't access your location, so recording and nearby routes don't work. You can allow it in your phone settings."
+    },
+    "photos": {
+      "title": "Photo access",
+      "all": "ROLT can access all your photos, so adding pictures to rides and your profile is quick. To narrow it, change it in your phone settings.",
+      "limited": "ROLT can only access the photos you chose. To add pictures from your library more easily, you can widen the access.",
+      "off": "ROLT can't access your photos. To add pictures to rides and your profile, allow it in your phone settings.",
+      "valueLimited": "Selected photos"
+    }
+  },
+  "notificationsPage": {
+    "title": "Notifications",
+    "social": "SOCIAL",
+    "system": "SYSTEM",
+    "likes": "Likes",
+    "likesHint": "When someone likes your ride",
+    "comments": "Comments",
+    "commentsHint": "When your ride gets a comment",
+    "followers": "New followers",
+    "followersHint": "When someone starts following you",
+    "productUpdates": "Product updates",
+    "productUpdatesHint": "New features and important news",
+    "phoneSettings": "Phone notification settings",
+    "phoneOn": "ROLT notifications are on",
+    "phoneOff": "ROLT notifications are off",
+    "footnote": "If your phone's notifications are off, none of these settings work."
+  },
+  "languageSheet": {
+    "title": "Language",
+    "subtitle": "The language of the app interface.",
+    "trHint": "The app is shown in Turkish",
+    "enHint": "The app is shown in English",
+    "save": "Save"
+  },
+  "unitsSheet": {
+    "title": "Units",
+    "subtitle": "Which units should distance, speed and elevation use?",
+    "metric": "Metric",
+    "metricHint": "km · m · km/h",
+    "imperial": "Imperial",
+    "imperialHint": "mi · ft · mph",
+    "save": "Save"
+  },
+  "help": {
+    "title": "Help & FAQ",
+    "searchPlaceholder": "Search questions",
+    "categories": "CATEGORIES",
+    "frequent": "FREQUENTLY ASKED",
+    "results_one": "{{count}} RESULT",
+    "results_other": "{{count}} RESULTS",
+    "noResults": "No questions found for “{{query}}”",
+    "noResultsHint": "Try another word or write to us.",
+    "contact": "Write to us",
+    "contactHint": "Didn't find your answer? Send feedback",
+    "categoryNames": {
+      "recording": "Ride recording",
+      "routes": "Routes & discover",
+      "account": "Account & privacy",
+      "permissions": "Notifications & permissions"
+    },
+    "questions": {
+      "stopped": {
+        "q": "Why did my ride stop halfway?",
+        "a": "Recording doesn't end when GPS or the internet drops. When the GPS signal gets weak, recording pauses by itself and continues when the signal is back; that stretch isn't added to distance or time.\n\nIf your phone turns off or the app is closed, the ride stays on your device. When you open the app again, “Unfinished ride found” lets you continue or finish it.\n\nTo keep recording with the screen off, set location access to “Always”."
+      },
+      "gpsDrift": {
+        "q": "Why does GPS drift?",
+        "a": "Tall buildings, tunnels, narrow valleys and dense trees weaken the GPS signal. When accuracy gets worse than 50 metres, ROLT leaves that part out of the recording so the track doesn't jump.\n\nFor better results, make sure “Precise location” is on in your phone's location settings."
+      },
+      "tooShort": {
+        "q": "Why wasn't my ride saved?",
+        "a": "Rides shorter than 1 km can't be saved; finishing one shows “Ride too short”. Keep riding and finish later, or delete the ride."
+      },
+      "offline": {
+        "q": "Can I record without internet?",
+        "a": "Yes. Your ride is saved on your device first; no connection is needed. It syncs once you're online."
+      },
+      "shareRide": {
+        "q": "How do I share my route?",
+        "a": "After saving a ride, use “Share now” to share it on WhatsApp, Instagram or with a link. To share later, use “Share” on the ride detail.\n\nTo publish a route for everyone to discover, use “Suggest a route” in Discover."
+      },
+      "rideRoute": {
+        "q": "How do I ride a route?",
+        "a": "Tap “Start riding this route” on the route detail. On the prepare screen you can add stops, turn on voice guidance and start. Save your ride when you arrive."
+      },
+      "saveRoute": {
+        "q": "How do I save routes I like?",
+        "a": "Tap the bookmark on a route card or on the route detail. Saved routes are in Profile > Saved."
+      },
+      "visibility": {
+        "q": "How do I change visibility?",
+        "a": "While saving a ride, pick Everyone, My followers or Only me in “Visibility”. After saving, change it from “…” > Visibility on the ride detail.\n\nSet the default for new rides in Settings > Ride visibility."
+      },
+      "hideEndpoints": {
+        "q": "How do I hide where I live or work?",
+        "a": "In Settings > Start/finish points you can hide the first and last part of your rides on maps and choose how much. Distance, time and speed don't change."
+      },
+      "password": {
+        "q": "How do I change my password?",
+        "a": "Go to Settings > Account details > Change password and set a new one with your current password. If you sign in with Apple or Google, your password is managed there."
+      },
+      "background": {
+        "q": "Why does recording stop with the screen off?",
+        "a": "To keep recording with the screen off, ROLT needs to always use your location. Open phone settings from Settings > Location and choose “Always”."
+      },
+      "noNotifications": {
+        "q": "I'm not getting notifications. What should I do?",
+        "a": "First make sure ROLT notifications are on in your phone settings. Then choose which ones you want in Settings > Notifications."
+      },
+      "photoAccess": {
+        "q": "Why can't I see all my photos?",
+        "a": "With “Limited access”, ROLT only sees the photos you chose. Open phone settings from Settings > Photos to widen the access."
+      }
+    }
+  },
+  "feedbackPage": {
+    "title": "Send feedback",
+    "description": "Ran into a problem or have an idea? Tell us.",
+    "topic": "Topic",
+    "topics": {
+      "bug": "Bug report",
+      "idea": "Feature idea",
+      "route": "Route or map issue",
+      "other": "Other"
+    },
+    "topicSheetTitle": "Choose a topic",
+    "message": "Description",
+    "messagePlaceholder": "Tell us briefly what happened…",
+    "screenshots": "Screenshots (optional)",
+    "addScreenshot": "Add screenshot",
+    "addScreenshotHint": "Up to 3 images",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "screenshotA11y": "Screenshot {{index}}",
+    "note": "The app version and device model are added to the message automatically.",
+    "send": "Send",
+    "sent": "Thanks! We got your feedback.",
+    "failed": "Couldn't send. Check your connection and try again.",
+    "messageRequired": "Write briefly what happened."
+  },
+  "legal": {
+    "done": "Done",
+    "lastUpdated": "Last updated: {{date}}",
+    "privacy": {
+      "title": "Privacy Policy",
+      "updated": "4 March 2026",
+      "intro": "ROLT processes some data to record your rides and suggest routes to you. This text explains which data we collect, why, and how long we keep it.",
+      "sections": [
+        {
+          "title": "1. Data we collect",
+          "paragraphs": [
+            "Location: We collect your GPS track only while you record a ride. When recording stops, location tracking stops too.",
+            "Account: Your email address and the user ID from Apple or Google. We never see your password."
+          ]
+        },
+        {
+          "title": "2. How we use data",
+          "paragraphs": [
+            "We use your ride data to show you distance, time and speed summaries, and to rank route suggestions by your area."
+          ]
+        },
+        {
+          "title": "3. Sharing",
+          "paragraphs": [
+            "By default your rides are visible only to you. You can change visibility in Settings › Ride visibility."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "updated": "4 March 2026",
+      "intro": "By using ROLT you accept the terms below. If they change, we let you know in the app.",
+      "sections": [
+        {
+          "title": "1. Scope of the service",
+          "paragraphs": [
+            "ROLT offers ride recording, route discovery and ride data tracking. The service is provided as is; uninterrupted operation isn't guaranteed."
+          ]
+        },
+        {
+          "title": "2. Riding safety",
+          "paragraphs": [
+            "ROLT is not a navigation device. Don't interact with your phone while riding; start recording and put the phone away. Following traffic rules is entirely your responsibility."
+          ]
+        },
+        {
+          "title": "3. Your content",
+          "paragraphs": [
+            "You own the routes, notes and images you share. You give us a limited licence to show them in ROLT."
+          ]
+        }
+      ]
+    }
   }
 }

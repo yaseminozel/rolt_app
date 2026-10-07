@@ -60,7 +60,8 @@
     },
     "units": "Metrik (km, km/sa)",
     "instagram": "@roltapp",
-    "noBike": "Ekle"
+    "noBike": "Ekle",
+    "unitsImperial": "Imperial (mi, mph)"
   },
   "rateHint": {
     "ios": "App Store’da puan ver",
@@ -81,5 +82,283 @@
     "description": "Kaydedilmemiş sürüşün cihazında kalır; yeniden giriş yaptığında geri gelir.",
     "confirm": "Çıkış yap",
     "cancel": "Vazgeç"
+  },
+  "account": {
+    "title": "Hesap bilgileri",
+    "email": "E-posta",
+    "methodSection": "GİRİŞ YÖNTEMİ",
+    "connected": "Bağlı",
+    "methods": {
+      "email": "E-posta",
+      "google": "Google",
+      "apple": "Apple"
+    },
+    "createdWith": {
+      "email": "Bu hesap e-posta ile oluşturuldu.",
+      "google": "Bu hesap Google ile oluşturuldu.",
+      "apple": "Bu hesap Apple ile oluşturuldu."
+    },
+    "methodNote": {
+      "email": "Giriş için e-posta adresini ve şifreni kullanırsın. Şifreni aşağıdan değiştirebilirsin.",
+      "google": "Hesabın Google hesabın üzerinden yönetilir ve ROLT üzerinden değiştirilemez.",
+      "apple": "Hesabın Apple hesabın üzerinden yönetilir ve ROLT üzerinden değiştirilemez."
+    },
+    "securitySection": "GÜVENLİK",
+    "changePassword": "Şifre değiştir",
+    "lastChanged": "Son değişiklik: {{when}}",
+    "justNow": "az önce",
+    "passwordHint": "Güçlü bir şifre için en az 8 karakter, bir rakam ve bir büyük harf kullan.",
+    "managementSection": "HESAP YÖNETİMİ",
+    "deleteAccount": "Hesabı sil",
+    "deleteNote": "Hesabını silersen tüm sürüşlerin, rotaların ve kaydettiklerin kalıcı olarak silinir. Bu işlem geri alınamaz.",
+    "passwordUpdated": "Şifren güncellendi."
+  },
+  "changePassword": {
+    "title": "Şifre değiştir",
+    "current": "Mevcut şifre",
+    "currentPlaceholder": "Mevcut şifreni gir",
+    "new": "Yeni şifre",
+    "newPlaceholder": "Yeni şifreni gir",
+    "newHint": "En az 8 karakter, bir rakam ve bir büyük harf.",
+    "confirm": "Yeni şifre (tekrar)",
+    "confirmPlaceholder": "Yeni şifreni tekrar gir",
+    "forgot": "Şifremi unuttum",
+    "submit": "Şifreyi güncelle",
+    "errors": {
+      "wrongCurrent": "Mevcut şifren hatalı.",
+      "mismatch": "Şifreler eşleşmiyor.",
+      "weak": "En az 8 karakter, bir rakam ve bir büyük harf kullan.",
+      "sameAsCurrent": "Yeni şifren mevcut şifrenden farklı olmalı.",
+      "network": "Şifre güncellenemedi. Bağlantını kontrol edip tekrar dene."
+    },
+    "resetSent": "Şifre sıfırlama bağlantısını {{email}} adresine gönderdik."
+  },
+  "rideVisibility": {
+    "title": "Sürüş görünürlüğü",
+    "subtitle": "Yeni sürüşlerin varsayılan olarak kimlere görünsün?",
+    "note": "Bu ayar yeni sürüşler için geçerli. Eski sürüşlerin görünürlüğünü tek tek değiştirebilirsin.",
+    "save": "Kaydet"
+  },
+  "endpoints": {
+    "title": "Başlangıç/Bitiş noktası",
+    "heading": "Haritada gizlenecek alanı ayarla",
+    "description": "Çizgili alanlar haritada gizlenir, rota çizgisi yalnızca aradaki bölümü gösterir.",
+    "startHidden": "Başlangıç gizli",
+    "finishHidden": "Bitiş gizli",
+    "toggle": "Başlangıç ve bitişi gizle",
+    "toggleHint": "Sürüş kaydının ilk ve son bölümü haritada gösterilmez.",
+    "distanceTitle": "Gizlenecek mesafe",
+    "footnote": "Mesafe, süre ve ortalama hız değişmez — yalnızca haritadaki çizgi kısalır."
+  },
+  "blocked": {
+    "title": "Engellenen kullanıcılar",
+    "description": "Engellediğin kişiler sürüşlerini ve profilini göremez, sana yorum veya beğeni yapamaz. Engellediğini onlara bildirmeyiz.",
+    "count": "ENGELLENENLER · {{count}}",
+    "unblock": "Engeli kaldır",
+    "unblocked": "{{name}} için engel kaldırıldı",
+    "emptyTitle": "Engellediğin kimse yok",
+    "emptyDescription": "Bir sürücüyü profilindeki “…” menüsünden engelleyebilirsin."
+  },
+  "permission": {
+    "current": "Mevcut izin",
+    "openSettings": "Telefon ayarlarını aç",
+    "location": {
+      "title": "Konum izni",
+      "always": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanabiliyor. İzni daraltmak istersen telefon ayarlarından değiştir.",
+      "whileUsing": "ROLT konumunu yalnızca uygulama açıkken kullanabiliyor. Ekran kapalıyken de kayıt sürsün istersen telefon ayarlarından “Her zaman” seç.",
+      "off": "ROLT konumuna erişemiyor; sürüş kaydı ve yakındaki rotalar çalışmaz. Telefon ayarlarından konum iznini açabilirsin."
+    },
+    "photos": {
+      "title": "Fotoğraf izni",
+      "all": "ROLT tüm fotoğraflarına erişebiliyor; sürüşüne ve profiline galerinden kolayca görsel ekleyebilirsin. İzni daraltmak istersen telefon ayarlarından değiştir.",
+      "limited": "ROLT yalnızca seçtiğin fotoğraflara erişebiliyor. Sürüşüne galerinden hızlıca görsel eklemek istersen erişimi genişletebilirsin.",
+      "off": "ROLT fotoğraflarına erişemiyor. Sürüşüne ve profiline görsel eklemek için telefon ayarlarından izin verebilirsin.",
+      "valueLimited": "Seçili fotoğraflar"
+    }
+  },
+  "notificationsPage": {
+    "title": "Bildirimler",
+    "social": "SOSYAL",
+    "system": "SİSTEM",
+    "likes": "Beğeniler",
+    "likesHint": "Sürüşünü biri beğendiğinde",
+    "comments": "Yorumlar",
+    "commentsHint": "Sürüşüne yorum geldiğinde",
+    "followers": "Yeni takipçiler",
+    "followersHint": "Biri seni takip etmeye başladığında",
+    "productUpdates": "Ürün güncellemeleri",
+    "productUpdatesHint": "Yeni özellikler ve önemli duyurular",
+    "phoneSettings": "Telefon bildirim ayarları",
+    "phoneOn": "ROLT bildirimleri şu anda açık",
+    "phoneOff": "ROLT bildirimleri şu anda kapalı",
+    "footnote": "Telefonun bildirimleri kapalıysa buradaki ayarların hiçbiri çalışmaz."
+  },
+  "languageSheet": {
+    "title": "Dil",
+    "subtitle": "Uygulama arayüzünün dili.",
+    "trHint": "Uygulama arayüzü Türkçe görünür",
+    "enHint": "Uygulama arayüzü İngilizce görünür",
+    "save": "Kaydet"
+  },
+  "unitsSheet": {
+    "title": "Ölçü birimleri",
+    "subtitle": "Mesafe, hız ve yükseklik hangi birimle gösterilsin?",
+    "metric": "Metrik",
+    "metricHint": "km · m · km/sa",
+    "imperial": "Imperial",
+    "imperialHint": "mi · ft · mph",
+    "save": "Kaydet"
+  },
+  "help": {
+    "title": "Yardım ve SSS",
+    "searchPlaceholder": "Soru ara",
+    "categories": "KATEGORİLER",
+    "frequent": "SIK SORULANLAR",
+    "results_one": "{{count}} SONUÇ",
+    "results_other": "{{count}} SONUÇ",
+    "noResults": "“{{query}}” için soru bulunamadı",
+    "noResultsHint": "Farklı bir kelime dene ya da bize yaz.",
+    "contact": "Bize yaz",
+    "contactHint": "Cevabını bulamadıysan geri bildirim gönder",
+    "categoryNames": {
+      "recording": "Sürüş kaydı",
+      "routes": "Rotalar ve keşfet",
+      "account": "Hesap ve gizlilik",
+      "permissions": "Bildirimler ve izinler"
+    },
+    "questions": {
+      "stopped": {
+        "q": "Sürüşüm neden yarıda kesildi?",
+        "a": "Sürüş kaydı GPS ya da internet kesildiğinde bitmez. GPS sinyali zayıfladığında kayıt kendiliğinden duraklar ve sinyal gelince devam eder; bu aralık mesafe ve süreye eklenmez.\n\nTelefonun kapanırsa ya da uygulama kapatılırsa sürüş cihazında kalır. Uygulamayı yeniden açtığında “Yarım kalan sürüş bulundu” ile kaldığın yerden devam edebilir ya da bitirebilirsin.\n\nEkran kapalıyken de kayıt sürsün diye konum iznini “Her zaman” olarak ayarla."
+      },
+      "gpsDrift": {
+        "q": "GPS neden sapıyor?",
+        "a": "Yüksek binalar, tüneller, dar vadiler ve yoğun ağaçlık yollar GPS sinyalini zayıflatır. Konum doğruluğu 50 metreden kötüleşirse ROLT bu bölümü kayda eklemez, böylece izde sıçramalar oluşmaz.\n\nDaha iyi sonuç için telefonun konum ayarlarında “Kesin konum”un açık olduğundan emin ol."
+      },
+      "tooShort": {
+        "q": "Sürüşüm neden kaydedilmedi?",
+        "a": "1 km'den kısa sürüşler kaydedilemez; böyle bir sürüşü bitirdiğinde “Sürüş çok kısa” uyarısı çıkar. Sürmeye devam edip daha sonra bitirebilir ya da sürüşü silebilirsin."
+      },
+      "offline": {
+        "q": "İnternet olmadan kayıt yapabilir miyim?",
+        "a": "Evet. Sürüşün önce cihazına kaydedilir; internet bağlantısı gerekmez. Bağlantı geldiğinde senkronize edilir."
+      },
+      "shareRide": {
+        "q": "Rotamı nasıl paylaşırım?",
+        "a": "Sürüşünü kaydettikten sonra “Hemen paylaş” bölümünden WhatsApp, Instagram ya da bağlantı ile paylaşabilirsin. Daha sonra paylaşmak için sürüş detayındaki “Paylaş” butonunu kullan.\n\nBir rotayı herkesin keşfedebileceği şekilde yayımlamak için Keşfet'teki “Rota öner”i kullanabilirsin."
+      },
+      "rideRoute": {
+        "q": "Bir rotayı nasıl sürerim?",
+        "a": "Rota detayında “Rotayı sürmeye başla”ya dokun. Hazırlık ekranında durak ekleyebilir, sesli yönlendirmeyi açabilir ve sürüşü başlatabilirsin. Varışta sürüşünü kaydedebilirsin."
+      },
+      "saveRoute": {
+        "q": "Beğendiğim rotaları nasıl kaydederim?",
+        "a": "Rota kartındaki ya da rota detayındaki yer imine dokun. Kaydettiğin rotalar Profil > Kaydettiklerim'de durur."
+      },
+      "visibility": {
+        "q": "Görünürlüğü nasıl değiştiririm?",
+        "a": "Sürüşü kaydederken “Görünürlük” satırından Herkes, Takipçilerim ya da Sadece ben seçebilirsin. Kaydettikten sonra sürüş detayında “…” > Görünürlük'ten değiştirebilirsin.\n\nYeni sürüşlerin varsayılanını Ayarlar > Sürüş görünürlüğü'nden ayarlayabilirsin."
+      },
+      "hideEndpoints": {
+        "q": "Evimin ya da işimin yerini nasıl gizlerim?",
+        "a": "Ayarlar > Başlangıç/bitiş noktası'ndan sürüşlerinin ilk ve son bölümünü haritada gizleyebilir, gizlenecek mesafeyi seçebilirsin. Mesafe, süre ve hız değişmez."
+      },
+      "password": {
+        "q": "Şifremi nasıl değiştiririm?",
+        "a": "Ayarlar > Hesap bilgileri > Şifre değiştir'den mevcut şifrenle yeni bir şifre belirleyebilirsin. Apple ya da Google ile giriş yapıyorsan şifren o hesap üzerinden yönetilir."
+      },
+      "background": {
+        "q": "Ekran kapalıyken kayıt neden duruyor?",
+        "a": "Ekran kapalıyken kaydın sürmesi için ROLT'un konumunu her zaman kullanabilmesi gerekir. Ayarlar > Konum'dan telefon ayarlarını açıp “Her zaman”ı seç."
+      },
+      "noNotifications": {
+        "q": "Bildirim almıyorum, ne yapmalıyım?",
+        "a": "Önce telefonunun ayarlarında ROLT bildirimlerinin açık olduğundan emin ol. Ardından Ayarlar > Bildirimler'den almak istediğin bildirimleri seç."
+      },
+      "photoAccess": {
+        "q": "Fotoğraflarımın hepsini neden göremiyorum?",
+        "a": "Fotoğraf izni “Sınırlı erişim” ise ROLT yalnızca seçtiğin fotoğrafları görür. Ayarlar > Fotoğraflar'dan telefon ayarlarını açıp erişimi genişletebilirsin."
+      }
+    }
+  },
+  "feedbackPage": {
+    "title": "Geri bildirim gönder",
+    "description": "Bir sorun mu yaşadın, yoksa bir fikrin mi var? Bizimle paylaş.",
+    "topic": "Konu",
+    "topics": {
+      "bug": "Hata bildirimi",
+      "idea": "Özellik önerisi",
+      "route": "Rota veya harita sorunu",
+      "other": "Diğer"
+    },
+    "topicSheetTitle": "Konu seç",
+    "message": "Açıklama",
+    "messagePlaceholder": "Ne olduğunu kısaca anlat…",
+    "screenshots": "Ekran görüntüsü (isteğe bağlı)",
+    "addScreenshot": "Ekran görüntüsü ekle",
+    "addScreenshotHint": "En fazla 3 görsel",
+    "remove": "Kaldır",
+    "cancel": "Vazgeç",
+    "screenshotA11y": "{{index}}. ekran görüntüsü",
+    "note": "Uygulama sürümü ve cihaz modeli mesaja otomatik eklenir.",
+    "send": "Gönder",
+    "sent": "Geri bildirimin bize ulaştı. Teşekkürler!",
+    "failed": "Gönderilemedi. Bağlantını kontrol edip tekrar dene.",
+    "messageRequired": "Kısaca ne olduğunu yaz."
+  },
+  "legal": {
+    "done": "Bitti",
+    "lastUpdated": "Son güncelleme: {{date}}",
+    "privacy": {
+      "title": "Gizlilik Politikası",
+      "updated": "4 Mart 2026",
+      "intro": "ROLT, sürüşlerini kaydetmek ve sana rota önerebilmek için bazı verileri işler. Bu metin hangi verileri topladığımızı, neden topladığımızı ve ne kadar süre sakladığımızı anlatır.",
+      "sections": [
+        {
+          "title": "1. Topladığımız veriler",
+          "paragraphs": [
+            "Konum: Yalnızca bir sürüş kaydı başlattığında GPS izini toplarız. Kayıt durduğunda konum takibi de durur.",
+            "Hesap: E-posta adresin ve Apple ya da Google’dan gelen kullanıcı kimliğin. Şifreni hiçbir zaman görmeyiz."
+          ]
+        },
+        {
+          "title": "2. Verileri nasıl kullanırız",
+          "paragraphs": [
+            "Sürüş verini sana mesafe, süre ve hız özeti göstermek; rota önerilerini bulunduğun bölgeye göre sıralamak için kullanırız."
+          ]
+        },
+        {
+          "title": "3. Paylaşım",
+          "paragraphs": [
+            "Sürüşlerin varsayılan olarak yalnızca sana görünür. Görünürlüğü Ayarlar › Sürüş görünürlüğü bölümünden değiştirebilirsin."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Kullanım Koşulları",
+      "updated": "4 Mart 2026",
+      "intro": "ROLT’u kullanarak aşağıdaki koşulları kabul etmiş olursun. Koşullar değişirse uygulama içinde bildirim gönderiyoruz.",
+      "sections": [
+        {
+          "title": "1. Hizmetin kapsamı",
+          "paragraphs": [
+            "ROLT; sürüş kaydı, rota keşfi ve sürüş verisi takibi sunar. Hizmet olduğu gibi sağlanır, kesintisiz çalışacağı garanti edilmez."
+          ]
+        },
+        {
+          "title": "2. Sürüş güvenliği",
+          "paragraphs": [
+            "ROLT bir navigasyon cihazı değildir. Sürüş sırasında telefonla etkileşime geçme; kayıt başlat ve telefonu bırak. Trafik kurallarına uymak tamamen senin sorumluluğundadır."
+          ]
+        },
+        {
+          "title": "3. İçeriğin",
+          "paragraphs": [
+            "Paylaştığın rota, not ve görsellerin sahibi sensin. Bunları ROLT içinde gösterebilmemiz için bize sınırlı bir kullanım izni vermiş olursun."
+          ]
+        }
+      ]
+    }
   }
 }

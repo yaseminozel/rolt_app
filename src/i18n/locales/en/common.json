@@ -33,6 +33,13 @@
     "hoursMinutes": "{{hours}} h {{minutes}} min",
     "hours": "{{hours}} h",
     "minutes": "{{minutes}} min",
-    "approx": "~{{value}}"
+    "approx": "~{{value}}",
+    "miles": "{{value}} mi",
+    "feet": "{{value}} ft",
+    "speedImperial": "{{value}} mph",
+    "kmShort": "km",
+    "milesShort": "mi",
+    "kmhShort": "km/h",
+    "mphShort": "mph"
   }
 }

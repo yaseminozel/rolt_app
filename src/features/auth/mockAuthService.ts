@@ -47,11 +47,21 @@ type MockAccount = {
   failedAttempts: number;
   /** Epoch ms; password sign-in is blocked until then. */
   lockedUntil: number | null;
-} & ({ method: 'password'; password: string } | { method: 'provider'; provider: SocialProvider });
+} & (
+  | { method: 'password'; password: string; passwordChangedAt: number }
+  | { method: 'provider'; provider: SocialProvider }
+);
 
-const passwordAccount = (password: string, profileCompleted: boolean): MockAccount => ({
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const passwordAccount = (
+  password: string,
+  profileCompleted: boolean,
+  passwordChangedAt = Date.now(),
+): MockAccount => ({
   method: 'password',
   password,
+  passwordChangedAt,
   profileCompleted,
   emailVerified: true,
   verificationSentAt: null,
@@ -70,7 +80,8 @@ const providerAccount = (provider: SocialProvider): MockAccount => ({
 });
 
 const accounts = new Map<string, MockAccount>([
-  ['yasemin@example.com', passwordAccount('12345678', true)],
+  // The design's "Son değişiklik: 3 ay önce" (10.02).
+  ['yasemin@example.com', passwordAccount('12345678', true, Date.now() - 92 * DAY_MS)],
   ['deniz@example.com', providerAccount('google')],
   ['ece@example.com', providerAccount('apple')],
 ]);
@@ -85,6 +96,9 @@ const toSession = (email: string, account: MockAccount): Session => ({
   email,
   emailVerified: account.emailVerified,
   profileCompleted: account.profileCompleted,
+  signInMethod: account.method === 'provider' ? account.provider : 'email',
+  passwordChangedAt:
+    account.method === 'password' ? new Date(account.passwordChangedAt).toISOString() : undefined,
 });
 
 function lockedError(lockedUntil: number) {
@@ -184,6 +198,7 @@ export const mockAuthService: AuthService = {
     const account = lastResetEmail ? accounts.get(lastResetEmail) : undefined;
     if (account?.method === 'password') {
       account.password = newPassword;
+      account.passwordChangedAt = Date.now();
       account.failedAttempts = 0;
       account.lockedUntil = null;
     }
@@ -242,6 +257,17 @@ export const mockAuthService: AuthService = {
       account.profileCompleted = true;
     }
     return { ...session, profileCompleted: true };
+  },
+
+  async changePassword(session, currentPassword, newPassword) {
+    await wait();
+    const account = accounts.get(normalize(session.email));
+    if (!account || account.method !== 'password' || account.password !== currentPassword) {
+      throw new AuthError('invalid-credentials', 'Current password is wrong', {});
+    }
+    account.password = newPassword;
+    account.passwordChangedAt = Date.now();
+    return toSession(normalize(session.email), account);
   },
 
   async signOut() {

@@ -6,6 +6,16 @@ export const MIN_PASSWORD_LENGTH = 8;
 /** Password sign-in pause after too many wrong attempts; stated on 02.02 "Çok fazla deneme" (`rjPx3`). */
 export const LOCK_DURATION_MINUTES = 15;
 
+/**
+ * Rule for a changed password (10.03 "En az 8 karakter, bir rakam ve bir büyük harf."). Sign-up
+ * (02.02) still asks only for the length, as drawn there.
+ */
+export function isStrongPassword(password: string) {
+  return (
+    password.length >= MIN_PASSWORD_LENGTH && /\d/.test(password) && /[A-ZÇĞİÖŞÜ]/.test(password)
+  );
+}
+
 /** How long a password reset link stays valid; stated on "Bağlantının süresi dolmuş". */
 export const RESET_LINK_VALIDITY_MINUTES = 30;
 

@@ -1,4 +1,5 @@
 import { i18n } from './index';
+import { getUnitSystem, toDisplayDistance, toDisplayElevation, toDisplaySpeed } from './units';
 
 /** BCP 47 locale for the active language, used by Intl formatters. */
 const activeLocale = () => (i18n.language === 'tr' ? 'tr-TR' : 'en-US');
@@ -23,6 +24,30 @@ export function formatClockTime(date: Date) {
   }).format(date);
 }
 
+/**
+ * Time since `date` in words, e.g. "3 ay önce" / "3 months ago"; under a minute `justNow`
+ * (10.02 "Son değişiklik: az önce").
+ */
+export function formatTimeAgo(date: Date, now: number, justNow: string) {
+  const seconds = Math.round((date.getTime() - now) / 1000);
+  if (Math.abs(seconds) < 60) {
+    return justNow;
+  }
+  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+    ['year', 365 * 24 * 3600],
+    ['month', 30 * 24 * 3600],
+    ['week', 7 * 24 * 3600],
+    ['day', 24 * 3600],
+    ['hour', 3600],
+    ['minute', 60],
+  ];
+  const [unit, size] = units.find(([, length]) => Math.abs(seconds) >= length) ?? ['minute', 60];
+  return new Intl.RelativeTimeFormat(activeDateLocale(), { numeric: 'auto' }).format(
+    Math.round(seconds / size),
+    unit,
+  );
+}
+
 /** Short date and time, e.g. "12 Eyl 2026, 19:30" / "12 Sept 2026, 19:30" (ride feed cards). */
 export function formatDateTime(date: Date) {
   const day = new Intl.DateTimeFormat(activeDateLocale(), {
@@ -38,8 +63,11 @@ export function formatDateTime(date: Date) {
  * Whole numbers never show a trailing ",0".
  */
 export function formatDistance(km: number, fractionDigits = 0) {
-  const value = formatNumber(km, { maximumFractionDigits: fractionDigits, minimumFractionDigits: 0 });
-  return i18n.t('units.km', { value });
+  const value = formatNumber(toDisplayDistance(km), {
+    maximumFractionDigits: fractionDigits,
+    minimumFractionDigits: 0,
+  });
+  return i18n.t(getUnitSystem() === 'imperial' ? 'units.miles' : 'units.km', { value });
 }
 
 /** Duration from minutes: "1 sa 25 dk", "1 sa", "50 dk" (en: "1 h 25 min", "1 h", "50 min"). */
@@ -73,12 +101,25 @@ export function formatApproxDuration(totalMinutes: number) {
 
 /** Speed, e.g. "41 km/sa" / "41 km/h". */
 export function formatSpeed(kmh: number) {
-  return i18n.t('units.speed', { value: formatNumber(Math.round(kmh)) });
+  return i18n.t(getUnitSystem() === 'imperial' ? 'units.speedImperial' : 'units.speed', {
+    value: formatNumber(Math.round(toDisplaySpeed(kmh))),
+  });
+}
+
+/** Short unit labels for metric captions, e.g. "Mesafe (km)" / "Ort. hız (mph)". */
+export function unitLabels() {
+  const imperial = getUnitSystem() === 'imperial';
+  return {
+    distance: i18n.t(imperial ? 'units.milesShort' : 'units.kmShort'),
+    speed: i18n.t(imperial ? 'units.mphShort' : 'units.kmhShort'),
+  };
 }
 
 /** Signed elevation, e.g. "236 m", "-198 m". */
 export function formatElevation(meters: number) {
-  return i18n.t('units.meters', { value: formatNumber(Math.round(meters)) });
+  return i18n.t(getUnitSystem() === 'imperial' ? 'units.feet' : 'units.meters', {
+    value: formatNumber(Math.round(toDisplayElevation(meters))),
+  });
 }
 
 const TR_BACK_VOWELS = 'aıou';
@@ -122,7 +163,13 @@ export function turkishAccusativeSuffix(name: string) {
   const trimmed = name.trim();
   const last = trimmed.toLocaleLowerCase('tr').slice(-1);
   const lastVowel = lastTurkishVowel(trimmed);
-  const vowel = 'aı'.includes(lastVowel) ? 'ı' : 'ei'.includes(lastVowel) ? 'i' : 'ou'.includes(lastVowel) ? 'u' : 'ü';
+  const vowel = 'aı'.includes(lastVowel)
+    ? 'ı'
+    : 'ei'.includes(lastVowel)
+      ? 'i'
+      : 'ou'.includes(lastVowel)
+        ? 'u'
+        : 'ü';
   if (isTurkishCompoundPossessive(trimmed)) {
     return `’n${vowel}`;
   }

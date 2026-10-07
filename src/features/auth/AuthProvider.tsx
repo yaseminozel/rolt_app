@@ -1,6 +1,15 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
 import {
+  clearOnboardingSeen,
   loadAuthState,
   saveGuest,
   saveOnboardingSeen,
@@ -41,6 +50,8 @@ type AuthContextValue = {
   /** Re-reads the account (e.g. verification done in the mail app); keeps the session on failure. */
   refreshSession: () => Promise<void>;
   completeProfile: () => Promise<void>;
+  /** 10.03: throws `invalid-credentials` for a wrong current password. */
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -146,9 +157,21 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
     }
   }, [applySession, service, session]);
 
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      if (session) {
+        applySession(await service.changePassword(session, currentPassword, newPassword));
+      }
+    },
+    [applySession, service, session],
+  );
+
   const signOut = useCallback(async () => {
     await service.signOut();
     setPromptsPending(false);
+    // Signing out starts over from onboarding, like a fresh install.
+    setHasSeenOnboarding(false);
+    clearOnboardingSeen();
     applySession(null);
   }, [applySession, service, setPromptsPending]);
 
@@ -176,6 +199,7 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       verifyEmail,
       refreshSession,
       completeProfile,
+      changePassword,
       signOut,
     }),
     [
@@ -196,6 +220,7 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       verifyEmail,
       refreshSession,
       completeProfile,
+      changePassword,
       signOut,
     ],
   );

@@ -17,9 +17,9 @@
     "notificationBody": "Sürüşün kaydediliyor",
     "title": "Sürüş Kaydet",
     "metrics": {
-      "distance": "Mesafe (km)",
+      "distance": "Mesafe ({{unit}})",
       "duration": "Süre",
-      "averageSpeed": "Ort. hız (km/sa)"
+      "averageSpeed": "Ort. hız ({{unit}})"
     },
     "rideType": "Sürüş tipi",
     "start": "Başlat",
@@ -40,7 +40,7 @@
       "banner": "Yarım kalan sürüş bulundu",
       "description": "Sürüş cihazında güvende. Kaldığın yerden devam edebilir veya son geçerli noktada bitirebilirsin."
     },
-    "tooShort": "Sürüş çok kısa. Kaydetmek için en az 1 km sür.",
+    "tooShort": "Sürüş çok kısa. Kaydetmek için en az {{distance}} sür.",
     "permission": {
       "title": "Konum kapalı",
       "heading": "Sürüş kaydı için konum izni gerekli",

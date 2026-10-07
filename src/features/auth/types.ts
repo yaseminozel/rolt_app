@@ -11,6 +11,10 @@ export type Session = {
   emailVerified?: boolean;
   /** False until the registration flow (04.x) is finished or skipped. */
   profileCompleted: boolean;
+  /** How the account signs in (10.02 "Giriş yöntemi"); missing on older stored sessions = email. */
+  signInMethod?: 'email' | SocialProvider;
+  /** ISO time of the last password change, for "Son değişiklik: 3 ay önce" (email accounts). */
+  passwordChangedAt?: string;
 };
 
 /**
@@ -20,9 +24,7 @@ export type Session = {
  * - `provider`: account created with Google / Apple → "Hesap Google ile bağlı"
  */
 export type EmailLookupResult =
-  | { status: 'new' }
-  | { status: 'password' }
-  | { status: 'provider'; provider: SocialProvider };
+  { status: 'new' } | { status: 'password' } | { status: 'provider'; provider: SocialProvider };
 
 /** Extra data each error code carries; `undefined` means the code has none. */
 export type AuthErrorDetailsMap = {
@@ -59,7 +61,10 @@ export class AuthError<C extends AuthErrorCode = AuthErrorCode> extends Error {
 }
 
 /** Narrows an unknown error to an `AuthError` with the given code (and its typed `details`). */
-export function isAuthError<C extends AuthErrorCode>(error: unknown, code: C): error is AuthError<C> {
+export function isAuthError<C extends AuthErrorCode>(
+  error: unknown,
+  code: C,
+): error is AuthError<C> {
   return error instanceof AuthError && error.code === code;
 }
 
@@ -94,5 +99,7 @@ export interface AuthService {
   /** Re-reads the account, e.g. to see a verification done in another app or device. */
   refreshSession(session: Session): Promise<Session>;
   completeProfile(session: Session): Promise<Session>;
+  /** 10.03 Şifre değiştir. Throws `invalid-credentials` when `currentPassword` is wrong. */
+  changePassword(session: Session, currentPassword: string, newPassword: string): Promise<Session>;
   signOut(): Promise<void>;
 }

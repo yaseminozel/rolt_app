@@ -1,5 +1,6 @@
-import { ScreenPlaceholder } from '@/components/layout/ScreenPlaceholder';
+import { LegalDocument } from '@/components/settings/LegalDocument';
 
+/** 10.15 Kullanım koşulları, opened from sign-in, registration and route suggestion links. */
 export default function TermsScreen() {
-  return <ScreenPlaceholder title="03.15 Ayarlar / Kullanım Koşulları" />;
+  return <LegalDocument document="terms" />;
 }

@@ -1,5 +1,6 @@
-import { ScreenPlaceholder } from '@/components/layout/ScreenPlaceholder';
+import { LegalDocument } from '@/components/settings/LegalDocument';
 
+/** 10.14 Gizlilik politikası, opened from sign-in and registration links. */
 export default function PrivacyScreen() {
-  return <ScreenPlaceholder title="03.14 Ayarlar / Gizlilik Politikası" />;
+  return <LegalDocument document="privacy" />;
 }

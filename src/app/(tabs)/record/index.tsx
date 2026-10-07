@@ -20,8 +20,9 @@ import { Button } from '@/components/ui/Button';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { wasBackgroundPromptShown } from '@/features/navigation/backgroundPrompt';
 import { isSimulatedNavigation } from '@/features/navigation/location';
-import { useRideRecording } from '@/features/rides/RideRecordingProvider';
+import { MIN_SAVE_DISTANCE_M, useRideRecording } from '@/features/rides/RideRecordingProvider';
 import type { RideType } from '@/features/rides/rideTypes';
+import { formatDistance } from '@/i18n/format';
 import { useNow } from '@/lib/useNow';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
 
@@ -174,7 +175,10 @@ export default function RecordScreen() {
   // One banner at a time, most important first.
   let banner: { tone: MapStatusBannerTone; message: string; busy?: boolean } | null = null;
   if (tooShortUntil > now) {
-    banner = { tone: 'danger', message: t('record.tooShort') };
+    banner = {
+      tone: 'danger',
+      message: t('record.tooShort', { distance: formatDistance(MIN_SAVE_DISTANCE_M / 1000, 1) }),
+    };
   } else if (shownInterrupted) {
     banner = { tone: 'info', message: t('record.recovery.banner') };
   } else if (active && autoPaused) {

@@ -1,8 +1,9 @@
 import { Image } from 'expo-image';
-import { MediaImagePlus, Plus } from 'iconoir-react-native';
+import { Plus } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { UploadBox } from '@/components/media/UploadBox';
 import type { RidePhoto } from '@/features/rides/types';
 import { formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
@@ -51,18 +52,12 @@ export function RidePhotosField({
         <Text style={styles.counter}>{`${photos.length}/${max}`}</Text>
       </View>
       {photos.length === 0 ? (
-        <Pressable
+        <UploadBox
+          title={t('form.photos.upload')}
+          hint={t('form.photos.uploadHint')}
           onPress={onAdd}
           disabled={disabled}
-          accessibilityRole="button"
-          accessibilityLabel={t('form.photos.upload')}
-          style={({ pressed }) => [styles.uploadBox, pressed && styles.pressed]}>
-          <MediaImagePlus width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
-          <View style={styles.uploadText}>
-            <Text style={styles.uploadTitle}>{t('form.photos.upload')}</Text>
-            <Text style={styles.uploadHint}>{t('form.photos.uploadHint')}</Text>
-          </View>
-        </Pressable>
+        />
       ) : (
         <ScrollView
           horizontal
@@ -145,32 +140,8 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textTertiary,
   },
-  uploadBox: {
-    minHeight: 80,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.borderStrong,
-    borderRadius: radius.md,
-  },
   pressed: {
     backgroundColor: colors.surfacePressed,
-  },
-  uploadText: {
-    gap: spacing.xxs,
-  },
-  uploadTitle: {
-    ...typography.bodyMedium,
-    lineHeight: 20,
-    color: colors.textPrimary,
-  },
-  uploadHint: {
-    ...typography.caption,
-    lineHeight: 16,
-    color: colors.textTertiary,
   },
   stripScroll: {
     marginHorizontal: -spacing.lg,

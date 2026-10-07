@@ -96,6 +96,10 @@ export const ridesRepository = {
     return draft;
   },
 
+  /** "Ayarlar > Sürüş görünürlüğü" (10.04); the save form starts from it. */
+  setDefaultVisibility: (visibility: RideVisibility) =>
+    rideStorage.setPreference(LAST_VISIBILITY_KEY, visibility),
+
   async defaultVisibility(): Promise<RideVisibility> {
     const stored = await rideStorage.getPreference(LAST_VISIBILITY_KEY);
     return RIDE_VISIBILITIES.find((item) => item === stored) ?? FIRST_RIDE_VISIBILITY;

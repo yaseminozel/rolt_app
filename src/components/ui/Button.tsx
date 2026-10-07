@@ -12,7 +12,8 @@ import type { SvgProps } from 'react-native-svg';
 
 import { colors, radius, spacing, typography } from '@/theme';
 
-export type ButtonVariant = 'contained' | 'outlined' | 'text';
+/** `tonal`: muted grey fill (09.01 "Profili düzenle" / "Profili paylaş"). */
+export type ButtonVariant = 'contained' | 'outlined' | 'text' | 'tonal';
 /** Color family. `destructive` is equivalent to the `destructive` boolean prop. */
 export type ButtonTone = 'neutral' | 'brand' | 'destructive';
 /** `md` = 44 pt (Core Components), `lg` = 48 pt (Get Started "Hemen başla", sLkVv). */
@@ -77,6 +78,11 @@ const neutral: Record<ButtonVariant, Palette> = {
     pressedBackground: colors.surfacePressed,
     foreground: colors.textPrimary,
   },
+  tonal: {
+    background: colors.surfaceMuted,
+    pressedBackground: colors.surfacePressed,
+    foreground: colors.textPrimary,
+  },
 };
 
 const destructiveTone: Record<ButtonVariant, Palette> = {
@@ -98,6 +104,11 @@ const destructiveTone: Record<ButtonVariant, Palette> = {
     pressedBackground: colors.surfacePressed,
     foreground: colors.dangerText,
   },
+  tonal: {
+    background: colors.dangerSurface,
+    pressedBackground: colors.surfacePressed,
+    foreground: colors.dangerText,
+  },
 };
 
 // The design only draws the contained brand button; outlined/text follow the neutral pattern.
@@ -115,6 +126,11 @@ const brandTone: Record<ButtonVariant, Palette> = {
   },
   text: {
     background: colors.transparent,
+    pressedBackground: colors.surfacePressed,
+    foreground: colors.brand,
+  },
+  tonal: {
+    background: colors.surfaceMuted,
     pressedBackground: colors.surfacePressed,
     foreground: colors.brand,
   },
@@ -141,6 +157,11 @@ const disabledTone: Record<ButtonVariant, Palette> = {
   text: {
     background: colors.transparent,
     pressedBackground: colors.transparent,
+    foreground: colors.textDisabled,
+  },
+  tonal: {
+    background: colors.surfaceDisabled,
+    pressedBackground: colors.surfaceDisabled,
     foreground: colors.textDisabled,
   },
 };
@@ -194,6 +215,7 @@ export function Button({
         styles.base,
         { height: HEIGHT[size] },
         hasIconAndLabel && styles.withIcon,
+        variant === 'tonal' && styles.tonal,
         tone.border ? { borderColor: tone.border, borderWidth: 1 } : null,
         { backgroundColor: pressed ? tone.pressedBackground : tone.background },
         style,
@@ -251,6 +273,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxl,
     borderRadius: radius.md,
     overflow: 'hidden',
+  },
+  // The design's tonal buttons have the tighter 8 pt corner (09.01 "Profili düzenle").
+  tonal: {
+    borderRadius: radius.sm,
   },
   // "With icon": the icon + label group carries an extra 8 px inset on each side.
   withIcon: {

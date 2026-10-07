@@ -2,6 +2,13 @@
 const memory = new Map<string, string>();
 
 export const deviceStore = {
+  getSync(key: string) {
+    try {
+      return globalThis.localStorage?.getItem(key) ?? memory.get(key) ?? null;
+    } catch {
+      return memory.get(key) ?? null;
+    }
+  },
   async get(key: string) {
     try {
       return globalThis.localStorage?.getItem(key) ?? memory.get(key) ?? null;

@@ -72,5 +72,7 @@ export const saveSession = (session: Session | null) =>
   write(SESSION_KEY, session ? JSON.stringify(session) : null);
 export const saveGuest = (isGuest: boolean) => write(GUEST_KEY, isGuest ? 'true' : null);
 export const saveOnboardingSeen = () => write(ONBOARDING_SEEN_KEY, 'true');
+/** Signing out starts the app over from onboarding (01.01). */
+export const clearOnboardingSeen = () => write(ONBOARDING_SEEN_KEY, null);
 export const savePermissionPromptsPending = (pending: boolean) =>
   write(PERMISSION_PROMPTS_KEY, pending ? 'true' : null);

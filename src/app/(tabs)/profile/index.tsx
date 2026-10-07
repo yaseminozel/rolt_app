@@ -175,14 +175,14 @@ function ProfileContent({ profile }: { profile: OwnProfile }) {
           actions={
             <View style={styles.actions}>
               <Button
-                variant="outlined"
+                variant="tonal"
                 label={t('actions.editProfile')}
                 // "Profili düzenle" (09.05) comes with Akış 20.
                 onPress={() => undefined}
                 style={styles.action}
               />
               <Button
-                variant="outlined"
+                variant="tonal"
                 label={t('actions.share')}
                 onPress={() => router.push('/share-profile')}
                 style={styles.action}

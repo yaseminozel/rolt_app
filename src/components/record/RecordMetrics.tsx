@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { formatNumber, formatRideClock } from '@/i18n/format';
+import { formatNumber, formatRideClock, unitLabels } from '@/i18n/format';
+import { toDisplayDistance, toDisplaySpeed } from '@/i18n/units';
 import { colors, fontFamily, spacing, typography } from '@/theme';
 
 type RecordMetricsProps = {
@@ -23,17 +24,21 @@ export function RecordMetrics({
   muted = false,
 }: RecordMetricsProps) {
   const { t } = useTranslation('rides');
+  const units = unitLabels();
   const metrics = [
     {
       key: 'distance',
-      value: formatNumber(distanceM / 1000, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
-      label: t('record.metrics.distance'),
+      value: formatNumber(toDisplayDistance(distanceM / 1000), {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+      label: t('record.metrics.distance', { unit: units.distance }),
     },
     { key: 'duration', value: formatRideClock(durationS), label: t('record.metrics.duration') },
     {
       key: 'speed',
-      value: formatNumber(averageSpeedMps * 3.6, { maximumFractionDigits: 0 }),
-      label: t('record.metrics.averageSpeed'),
+      value: formatNumber(toDisplaySpeed(averageSpeedMps * 3.6), { maximumFractionDigits: 0 }),
+      label: t('record.metrics.averageSpeed', { unit: units.speed }),
     },
   ];
   const stacked = layout === 'stacked';

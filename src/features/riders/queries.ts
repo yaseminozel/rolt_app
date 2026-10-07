@@ -3,12 +3,13 @@ import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tansta
 import { ROUTE_FIXTURES } from '@/features/routes/fixtures/routes';
 
 import { mockRidersRepository } from './mockRidersRepository';
-import type { ReportTarget, RideSummary, Rider, RidersRepository } from './types';
+import type { BlockedRider, ReportTarget, RideSummary, Rider, RidersRepository } from './types';
 
 /** Swap for the Supabase implementation later; screens only use the hooks below. */
 export const ridersRepository: RidersRepository = mockRidersRepository;
 
 export const riderKeys = {
+  blocked: () => ['riders', 'blocked'] as const,
   all: ['riders'] as const,
   detail: (id: string) => ['riders', 'detail', id] as const,
   rides: (id: string) => ['riders', 'rides', id] as const,
@@ -46,7 +47,10 @@ export function useRiderRoutes(id: string | undefined) {
 }
 
 /** "Ortak noktalar" note; `null` when there is nothing in common to show. */
-export function useRiderMatch(id: string | undefined, { enabled = true }: { enabled?: boolean } = {}) {
+export function useRiderMatch(
+  id: string | undefined,
+  { enabled = true }: { enabled?: boolean } = {},
+) {
   return useQuery({
     queryKey: riderKeys.match(id ?? ''),
     queryFn: () => ridersRepository.getMatch(id ?? ''),
@@ -54,7 +58,11 @@ export function useRiderMatch(id: string | undefined, { enabled = true }: { enab
   });
 }
 
-function patchRides(queryClient: QueryClient, rideId: string, patch: (ride: RideSummary) => RideSummary) {
+function patchRides(
+  queryClient: QueryClient,
+  rideId: string,
+  patch: (ride: RideSummary) => RideSummary,
+) {
   queryClient.setQueriesData<RideSummary[]>({ queryKey: ['riders', 'rides'] }, (rides) =>
     rides?.map((ride) => (ride.id === rideId ? patch(ride) : ride)),
   );
@@ -73,11 +81,16 @@ export function useSetFollowing() {
     onMutate: ({ riderId, following }) => {
       queryClient.setQueryData<Rider | null>(riderKeys.detail(riderId), (rider) =>
         rider && rider.isFollowing !== following
-          ? { ...rider, isFollowing: following, followerCount: rider.followerCount + (following ? 1 : -1) }
+          ? {
+              ...rider,
+              isFollowing: following,
+              followerCount: rider.followerCount + (following ? 1 : -1),
+            }
           : rider,
       );
     },
-    onSettled: (_data, _error, { riderId }) => queryClient.invalidateQueries({ queryKey: riderKeys.detail(riderId) }),
+    onSettled: (_data, _error, { riderId }) =>
+      queryClient.invalidateQueries({ queryKey: riderKeys.detail(riderId) }),
   });
 }
 
@@ -85,10 +98,13 @@ export function useSetFollowing() {
 export function useSetRideLiked() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ rideId, liked }: { rideId: string; liked: boolean }) => ridersRepository.setRideLiked(rideId, liked),
+    mutationFn: ({ rideId, liked }: { rideId: string; liked: boolean }) =>
+      ridersRepository.setRideLiked(rideId, liked),
     onMutate: ({ rideId, liked }) =>
       patchRides(queryClient, rideId, (ride) =>
-        ride.isLiked === liked ? ride : { ...ride, isLiked: liked, likeCount: ride.likeCount + (liked ? 1 : -1) },
+        ride.isLiked === liked
+          ? ride
+          : { ...ride, isLiked: liked, likeCount: ride.likeCount + (liked ? 1 : -1) },
       ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['riders', 'rides'] }),
   });
@@ -98,10 +114,13 @@ export function useSetRideLiked() {
 export function useSetRideSaved() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ rideId, saved }: { rideId: string; saved: boolean }) => ridersRepository.setRideSaved(rideId, saved),
+    mutationFn: ({ rideId, saved }: { rideId: string; saved: boolean }) =>
+      ridersRepository.setRideSaved(rideId, saved),
     onMutate: ({ rideId, saved }) =>
       patchRides(queryClient, rideId, (ride) =>
-        ride.isSaved === saved ? ride : { ...ride, isSaved: saved, saveCount: ride.saveCount + (saved ? 1 : -1) },
+        ride.isSaved === saved
+          ? ride
+          : { ...ride, isSaved: saved, saveCount: ride.saveCount + (saved ? 1 : -1) },
       ),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['riders', 'rides'] }),
   });
@@ -117,6 +136,26 @@ export function useBlockRider() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (riderId: string) => ridersRepository.block(riderId),
-    onSuccess: (_data, riderId) => queryClient.removeQueries({ queryKey: riderKeys.detail(riderId) }),
+    onSuccess: (_data, riderId) => {
+      queryClient.removeQueries({ queryKey: riderKeys.detail(riderId) });
+      queryClient.invalidateQueries({ queryKey: riderKeys.blocked() });
+    },
+  });
+}
+
+export function useBlockedRiders() {
+  return useQuery({ queryKey: riderKeys.blocked(), queryFn: () => ridersRepository.listBlocked() });
+}
+
+export function useUnblockRider() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (riderId: string) => ridersRepository.unblock(riderId),
+    onSuccess: (_data, riderId) => {
+      queryClient.setQueryData(riderKeys.blocked(), (current: BlockedRider[] | undefined) =>
+        current?.filter((rider) => rider.id !== riderId),
+      );
+      queryClient.invalidateQueries({ queryKey: riderKeys.detail(riderId) });
+    },
   });
 }

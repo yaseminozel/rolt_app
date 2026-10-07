@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { useMemo, useState, type ReactNode } from 'react';
 import {
   StyleSheet,
+  Text,
   View,
   type LayoutChangeEvent,
   type StyleProp,
@@ -18,7 +19,8 @@ import {
 } from '@/components/route-builder/routeProjection';
 import { hasMapboxToken, mapboxToken } from '@/features/route-suggestion/services/mapboxConfig';
 import type { LngLat } from '@/features/routes/types';
-import { colors } from '@/theme';
+import { trimTrackEnds } from '@/features/rides/trimTrackEnds';
+import { colors, fontFamily, radius, shadows, spacing } from '@/theme';
 
 const TRACK_WIDTH = 4;
 const TRACK_CASING = 7;
@@ -29,6 +31,10 @@ const MAX_ZOOM = 16;
 /** Static Images API limit per side, in points (rendered @2x). */
 const MAX_SIDE = 1280;
 const DEFAULT_STYLE = 'mapbox/outdoors-v12';
+const METRES_PER_DEGREE_LAT = 111_320;
+/** Hidden areas stay visible even when the map is zoomed far out. */
+const ZONE_MIN_RADIUS = 14;
+const ZONE_TAG_WIDTH = 104;
 const DEFAULT_PADDING: BoxPadding = { top: 24, right: 24, bottom: 24, left: 24 };
 
 type RideMapPreviewProps = {
@@ -38,6 +44,13 @@ type RideMapPreviewProps = {
   /** Keep it stable (module-level or memoized). */
   padding?: BoxPadding;
   overlay?: ReactNode;
+  /**
+   * Privacy preview (10.05): the first and last metres are left out of the line and their areas
+   * shaded, with these tags at the start and finish.
+   */
+  hiddenEnds?: { metres: number; startLabel: string; finishLabel: string };
+  /** Line colour; recorded rides use the live-ride accent. */
+  trackColor?: string;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -58,6 +71,8 @@ export function RideMapPreview({
   track,
   padding = DEFAULT_PADDING,
   overlay,
+  hiddenEnds,
+  trackColor = colors.accentStrong,
   style,
 }: RideMapPreviewProps) {
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -117,11 +132,28 @@ export function RideMapPreview({
     );
   };
 
+  const visibleTrack = useMemo(
+    () => (hiddenEnds ? trimTrackEnds(track, hiddenEnds.metres) : track),
+    [hiddenEnds, track],
+  );
   const segments = view
-    ? track.filter((segment) => segment.length > 1).map((segment) => segment.map(view.project))
+    ? visibleTrack
+        .filter((segment) => segment.length > 1)
+        .map((segment) => segment.map(view.project))
     : [];
   const start = view && points.length > 0 ? view.project(points[0]) : null;
   const end = view && points.length > 1 ? view.project(points[points.length - 1]) : null;
+  // Radius of the hidden areas on screen: from the start to a point that many metres north.
+  const zoneRadius =
+    view && start && hiddenEnds
+      ? Math.max(
+          Math.abs(
+            view.project([points[0][0], points[0][1] + hiddenEnds.metres / METRES_PER_DEGREE_LAT])
+              .y - start.y,
+          ),
+          ZONE_MIN_RADIUS,
+        )
+      : 0;
 
   return (
     <View style={[styles.frame, style]} onLayout={onLayout}>
@@ -155,14 +187,30 @@ export function RideMapPreview({
               key={`line-${index}`}
               d={polylinePath(segment)}
               fill="none"
-              stroke={colors.accentStrong}
+              stroke={trackColor}
               strokeWidth={TRACK_WIDTH}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           ))}
+          {hiddenEnds
+            ? [start, end].map((point, index) =>
+                point ? (
+                  <Circle
+                    key={`zone-${index}`}
+                    cx={point.x}
+                    cy={point.y}
+                    r={zoneRadius}
+                    fill={colors.privacyZone}
+                    stroke={colors.brand}
+                    strokeOpacity={0.4}
+                    strokeWidth={1}
+                  />
+                ) : null,
+              )
+            : null}
           {[start, end].map((point, index) =>
-            point ? (
+            point && !hiddenEnds ? (
               <Circle
                 key={index}
                 cx={point.x}
@@ -176,12 +224,70 @@ export function RideMapPreview({
           )}
         </Svg>
       ) : null}
+      {hiddenEnds && start && end
+        ? zoneTags(start, end, zoneRadius, size.width, size.height).map(({ left, top }, index) => (
+            <View key={index} pointerEvents="none" style={[styles.zoneTag, { left, top }]}>
+              <Text style={styles.zoneTagLabel} numberOfLines={1}>
+                {index === 0 ? hiddenEnds.startLabel : hiddenEnds.finishLabel}
+              </Text>
+            </View>
+          ))
+        : null}
       {overlay}
     </View>
   );
 }
 
+const ZONE_TAG_HEIGHT = 24;
+
+/**
+ * Tag positions for the start and finish areas: above each area, or below it when that keeps the
+ * two tags apart or on the card; kept inside the card horizontally.
+ */
+function zoneTags(
+  start: ScreenPoint,
+  end: ScreenPoint,
+  radius: number,
+  width: number,
+  height: number,
+) {
+  const place = (point: ScreenPoint, below: boolean) => ({
+    left: Math.min(
+      Math.max(point.x - ZONE_TAG_WIDTH / 2, spacing.sm),
+      width - ZONE_TAG_WIDTH - spacing.sm,
+    ),
+    top: below
+      ? Math.min(point.y + radius + spacing.xs, height - ZONE_TAG_HEIGHT - spacing.xs)
+      : Math.max(point.y - radius - ZONE_TAG_HEIGHT - spacing.xs, spacing.xs),
+  });
+  const first = place(start, start.y - radius - ZONE_TAG_HEIGHT < 0);
+  let second = place(end, end.y - radius - ZONE_TAG_HEIGHT < 0);
+  const overlaps = (a: { left: number; top: number }, b: { left: number; top: number }) =>
+    Math.abs(a.left - b.left) < ZONE_TAG_WIDTH && Math.abs(a.top - b.top) < ZONE_TAG_HEIGHT;
+  if (overlaps(first, second)) {
+    second = place(end, second.top <= first.top);
+  }
+  return [first, second];
+}
+
 const styles = StyleSheet.create({
+  zoneTag: {
+    position: 'absolute',
+    width: ZONE_TAG_WIDTH,
+    height: ZONE_TAG_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.sm,
+    backgroundColor: colors.surface,
+    boxShadow: shadows.mapLabel,
+  },
+  zoneTagLabel: {
+    fontFamily: fontFamily.medium,
+    fontSize: 12,
+    lineHeight: 16,
+    color: colors.textPrimary,
+  },
   frame: {
     overflow: 'hidden',
     backgroundColor: colors.surfaceMuted,
