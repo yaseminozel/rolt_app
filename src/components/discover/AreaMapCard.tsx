@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { MapPin, MapsArrow, MapsArrowXmark, MapXmark } from 'iconoir-react-native';
+import { Enlarge, MapPin, MapXmark } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -10,10 +10,8 @@ import { colors, radius, shadows, spacing, typography } from '@/theme';
 type AreaMapCardProps = {
   /** Routes in the region; the pill is hidden while unknown (loading or failed). */
   routeCount: number | undefined;
-  /** Location permission granted: the locate button shows "maps-arrow", otherwise "locate-off". */
-  locationEnabled: boolean;
+  /** Opens "Haritada keşfet" (07.01); the card and its "Haritayı genişlet" button both do. */
   onPress: () => void;
-  onLocatePress: () => void;
   /** No connection: the map can't load, so a muted layer explains it (05.01 `INwLr`). */
   offline?: { title: string; description: string };
 };
@@ -27,11 +25,13 @@ const OFFLINE_ICON_SIZE = 28;
 /**
  * "Harita kartı / Bölgedeki rotalar" (p4CIJi `oxSGl`). A static preview on purpose: a live
  * map inside the scrolling feed would fight the scroll gesture (and can't run in Expo Go),
- * so the card shows the design's map artwork and opens "Haritada keşfet" (01.7) on tap.
+ * so the card shows the design's map artwork and opens "Haritada keşfet" (07.01) on tap; the
+ * corner button is "Haritayı genişlet" (05.01 `H8ChY`, maximize-2 → Iconoir `Enlarge`).
  */
-export function AreaMapCard({ routeCount, locationEnabled, onPress, onLocatePress, offline }: AreaMapCardProps) {
+export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) {
   const { t } = useTranslation('discover');
-  const countLabel = routeCount === undefined ? undefined : t('home.areaRouteCount', { count: routeCount });
+  const countLabel =
+    routeCount === undefined ? undefined : t('home.areaRouteCount', { count: routeCount });
 
   if (offline) {
     return (
@@ -52,7 +52,9 @@ export function AreaMapCard({ routeCount, locationEnabled, onPress, onLocatePres
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={countLabel ? `${t('home.exploreMapA11y')}, ${countLabel}` : t('home.exploreMapA11y')}
+      accessibilityLabel={
+        countLabel ? `${t('home.exploreMapA11y')}, ${countLabel}` : t('home.exploreMapA11y')
+      }
       style={styles.card}>
       <View style={styles.media}>
         <Image source={mapFallbacks.homeCard} contentFit="cover" style={StyleSheet.absoluteFill} />
@@ -61,16 +63,21 @@ export function AreaMapCard({ routeCount, locationEnabled, onPress, onLocatePres
       {countLabel ? (
         <View style={styles.pillRow}>
           <View style={styles.pill}>
-            <MapPin width={PILL_ICON_SIZE} height={PILL_ICON_SIZE} color={colors.brand} strokeWidth={1.5} />
+            <MapPin
+              width={PILL_ICON_SIZE}
+              height={PILL_ICON_SIZE}
+              color={colors.brand}
+              strokeWidth={1.5}
+            />
             <Text style={styles.pillLabel}>{countLabel}</Text>
           </View>
         </View>
       ) : null}
       <MapActionButton
         size="control"
-        icon={locationEnabled ? MapsArrow : MapsArrowXmark}
-        accessibilityLabel={t('home.goToMyLocation')}
-        onPress={onLocatePress}
+        icon={Enlarge}
+        accessibilityLabel={t('home.expandMap')}
+        onPress={onPress}
         style={styles.locate}
       />
     </Pressable>

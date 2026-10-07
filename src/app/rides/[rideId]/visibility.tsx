@@ -3,7 +3,6 @@ import { Globe, Group, InfoCircle, Lock } from 'iconoir-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { InfoNote } from '@/components/feedback/InfoNote';
 import { SheetHeader } from '@/components/feedback/SheetHeader';
@@ -13,6 +12,7 @@ import { useUpdateRide } from '@/features/rides/queries';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { RIDE_VISIBILITIES, type RideVisibility } from '@/features/rides/types';
 import { colors, layout, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 const ICONS = { public: Globe, followers: Group, private: Lock } as const;
 
@@ -23,7 +23,7 @@ const ICONS = { public: Globe, followers: Group, private: Lock } as const;
  */
 export default function VisibilitySheet() {
   const { t } = useTranslation('rides');
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.sm);
   const { apply } = useLocalSearchParams<{ apply?: 'ride' }>();
   const { ride, values, setValue } = useRideForm();
   const updateRide = useUpdateRide();
@@ -41,7 +41,7 @@ export default function VisibilitySheet() {
   return (
     <ScrollView
       style={styles.sheet}
-      contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.sm }]}
+      contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
       bounces={false}>
       <SheetHeader title={t('visibility.sheet.title')} subtitle={t('visibility.sheet.subtitle')} />
       <View style={styles.options} accessibilityRole="radiogroup">

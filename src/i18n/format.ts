@@ -42,7 +42,7 @@ export function formatTimeAgo(date: Date, now: number, justNow: string) {
     ['minute', 60],
   ];
   const [unit, size] = units.find(([, length]) => Math.abs(seconds) >= length) ?? ['minute', 60];
-  return new Intl.RelativeTimeFormat(activeDateLocale(), { numeric: 'auto' }).format(
+  return new Intl.RelativeTimeFormat(activeDateLocale(), { numeric: 'always' }).format(
     Math.round(seconds / size),
     unit,
   );

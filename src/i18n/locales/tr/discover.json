@@ -22,7 +22,8 @@
     "mapOfflineDescription": "Bağlantı gelince otomatik yenilenecek",
     "locationOffTitle": "Konum iznin kapalı",
     "locationOffDescription": "Yakınındaki rotaları haritada görmek için konum iznini aç ya da bir şehir seç.",
-    "locationOffAction": "İzin ver"
+    "locationOffAction": "İzin ver",
+    "expandMap": "Haritayı genişlet"
   },
   "search": {
     "placeholder": "Rota ara",

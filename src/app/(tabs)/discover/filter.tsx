@@ -2,7 +2,6 @@ import { useRouter } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { Button } from '@/components/ui/Button';
@@ -19,6 +18,7 @@ import {
 } from '@/features/routes/searchFilters';
 import type { RouteSearchFilters, RouteTag } from '@/features/routes/types';
 import { colors, layout, spacing, typography } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 /**
  * "Filtrele" sheet over the search results (01.2 Results · Filter sheet open, PXcQ0 `GBqN5`),
@@ -30,15 +30,20 @@ import { colors, layout, spacing, typography } from '@/theme';
 export default function RouteFilterScreen() {
   const { t } = useTranslation(['discover', 'routes']);
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => Math.max(bottom, spacing.lg));
   const { searchQuery, sort, city, searchFilters, setSearchFilters } = useDiscoverState();
   const [draft, setDraft] = useState<RouteSearchFilters>(searchFilters);
   const preview = useRouteSearchPreview(searchQuery, sort, city, draft);
   const count = preview.data?.length;
 
-  const update = (patch: Partial<RouteSearchFilters>) => setDraft((current) => ({ ...current, ...patch }));
+  const update = (patch: Partial<RouteSearchFilters>) =>
+    setDraft((current) => ({ ...current, ...patch }));
   const toggleTag = (tag: RouteTag) =>
-    update({ tags: draft.tags.includes(tag) ? draft.tags.filter((item) => item !== tag) : [...draft.tags, tag] });
+    update({
+      tags: draft.tags.includes(tag)
+        ? draft.tags.filter((item) => item !== tag)
+        : [...draft.tags, tag],
+    });
 
   return (
     <View style={styles.sheet}>
@@ -99,7 +104,9 @@ export default function RouteFilterScreen() {
                 showCheck={false}
                 label={t(`routes:difficulty.${difficulty}`)}
                 selected={draft.difficulty === difficulty}
-                onPress={() => update({ difficulty: draft.difficulty === difficulty ? null : difficulty })}
+                onPress={() =>
+                  update({ difficulty: draft.difficulty === difficulty ? null : difficulty })
+                }
                 style={styles.equalChip}
               />
             ))}
@@ -118,13 +125,20 @@ export default function RouteFilterScreen() {
             <Text style={styles.loopDescription}>{t('filterSheet.loopOnlyDescription')}</Text>
           </View>
           {/* The row owns the interaction; the switch only shows the state. */}
-          <View style={styles.decorative} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-            <Switch tone="accent" value={draft.loopOnly} onValueChange={(loopOnly) => update({ loopOnly })} />
+          <View
+            style={styles.decorative}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants">
+            <Switch
+              tone="accent"
+              value={draft.loopOnly}
+              onValueChange={(loopOnly) => update({ loopOnly })}
+            />
           </View>
         </Pressable>
       </View>
 
-      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+      <View style={[styles.footer, { paddingBottom: bottomPadding }]}>
         <Button
           variant="outlined"
           size="lg"

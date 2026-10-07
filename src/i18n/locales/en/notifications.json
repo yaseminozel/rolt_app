@@ -1,0 +1,40 @@
+{
+  "title": "Notifications",
+  "unread_one": "{{count}} unread",
+  "unread_other": "{{count}} unread",
+  "allRead": "All caught up",
+  "markAllRead": "Mark all as read",
+  "sections": {
+    "today": "TODAY",
+    "thisWeek": "THIS WEEK",
+    "earlier": "EARLIER"
+  },
+  "seenAll": "You've seen everything!",
+  "unreadA11y": "Unread",
+  "empty": {
+    "title": "No notifications yet",
+    "description": "Updates about likes, comments and new routes will show up here."
+  },
+  "mock": {
+    "comment": {
+      "title": "New ride comment",
+      "body": "Mert commented on your “Geyikbayırı Virajları” ride: “Great route!”"
+    },
+    "like": {
+      "title": "Your ride got likes",
+      "body": "Ayşe and 4 others liked your Kaş – Kalkan ride."
+    },
+    "routeSuggestion": {
+      "title": "New route suggestions",
+      "body": "There are 3 new routes for you around Antalya. Discover them now."
+    },
+    "follower": {
+      "title": "New follower",
+      "body": "Can Demir started following you."
+    },
+    "suggestionApproved": {
+      "title": "Your route suggestion was approved",
+      "body": "“Çıralı – Adrasan Rotası” is now live in Discover."
+    }
+  }
+}

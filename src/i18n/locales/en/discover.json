@@ -22,7 +22,8 @@
     "mapOfflineDescription": "It will refresh when you’re back online",
     "locationOffTitle": "Location access is off",
     "locationOffDescription": "Turn on location access or pick a city to see routes near you on the map.",
-    "locationOffAction": "Allow"
+    "locationOffAction": "Allow",
+    "expandMap": "Expand map"
   },
   "search": {
     "placeholder": "Search routes",

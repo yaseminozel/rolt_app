@@ -4,12 +4,12 @@ import { Camera, MediaImage } from 'iconoir-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { colors, layout, radius, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 const PICKER_QUALITY = 0.8;
 
@@ -19,7 +19,7 @@ const PICKER_QUALITY = 0.8;
  */
 export default function PhotoSourceSheet() {
   const { t } = useTranslation('rides');
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.lg);
   const { addPhotos, photoRoom } = useRideForm();
   const [busy, setBusy] = useState(false);
 
@@ -77,7 +77,7 @@ export default function PhotoSourceSheet() {
   const disabled = busy || photoRoom === 0;
 
   return (
-    <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <SheetHeader title={t('photoSource.title')} />
       <View style={styles.options}>
         <View style={styles.option}>

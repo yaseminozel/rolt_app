@@ -1,11 +1,11 @@
 import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { SvgProps } from 'react-native-svg';
 
 import { Button } from '@/components/ui/Button';
 import { colors, fontFamily, layout, radius, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 const ICON_TILE = 56;
 
@@ -23,9 +23,9 @@ type PermissionSheetProps = {
  */
 export function PermissionSheet({ icon: Icon, title, description, value }: PermissionSheetProps) {
   const { t } = useTranslation('settings');
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.sm);
   return (
-    <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.sm }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <View style={styles.tile}>
         <Icon width={24} height={24} color={colors.textPrimary} strokeWidth={1.5} />
       </View>

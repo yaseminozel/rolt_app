@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import type { RoadSurface, RouteDifficulty } from '@/features/routes/types';
 import { colors, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 import { ChoiceRow } from './ChoiceRow';
 
@@ -19,7 +19,7 @@ const SURFACES: readonly RoadSurface[] = ['asphalt', 'mixed', 'gravel'];
  */
 export function DetailChoiceSheet({ field }: { field: 'difficulty' | 'surface' }) {
   const { t } = useTranslation(['rides', 'routes']);
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.lg);
   const { values, setValue } = useRideForm();
 
   const options =
@@ -39,7 +39,7 @@ export function DetailChoiceSheet({ field }: { field: 'difficulty' | 'surface' }
   return (
     <ScrollView
       style={styles.sheet}
-      contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.lg }]}
+      contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
       bounces={false}>
       <SheetHeader
         title={field === 'difficulty' ? t('form.details.difficulty') : t('form.details.surface')}

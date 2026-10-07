@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRideSession } from '@/features/navigation/RideSessionProvider';
 import { colors, fontFamily, layout, radius, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 /**
  * 06.06 Rotayı sür / Navigasyon — Çıkış onayı (Pencil `VpgEM`): a form sheet over navigation.
@@ -12,11 +12,11 @@ import { colors, fontFamily, layout, radius, spacing } from '@/theme';
  */
 export default function ExitNavigationSheet() {
   const { t } = useTranslation('ride');
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.lg);
   const { requestEnd } = useRideSession();
 
   return (
-    <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <View style={styles.heading}>
         <Text style={styles.title} accessibilityRole="header">
           {t('exit.title')}

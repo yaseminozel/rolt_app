@@ -4,7 +4,6 @@ import { Camera, MediaImageList, ShieldCheck } from 'iconoir-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { PhotoSourceOptions } from '@/components/media/PhotoSourceOptions';
@@ -18,6 +17,7 @@ import {
 } from '@/features/route-suggestion/useRoutePhotoSuggestions';
 import type { LngLat } from '@/features/routes/types';
 import { colors, layout, spacing, typography } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 const PICKER_QUALITY = 0.8;
 const PRIVACY_ICON_SIZE = 14;
@@ -39,7 +39,9 @@ const addedSuggestionUris = new Map<string, string>();
 export default function SuggestRouteAddPhotosScreen() {
   const { t } = useTranslation('routeSuggestionDetails');
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) =>
+    Math.max(bottom + spacing.sm, spacing.xxl),
+  );
   const { draft, addPhotos } = useRouteSuggestion();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
@@ -49,7 +51,9 @@ export default function SuggestRouteAddPhotosScreen() {
     () =>
       draft.preview && draft.preview.geometry.length > 0
         ? draft.preview.geometry
-        : draft.waypoints.flatMap((waypoint) => (waypoint.place ? [waypoint.place.coordinates] : [])),
+        : draft.waypoints.flatMap((waypoint) =>
+            waypoint.place ? [waypoint.place.coordinates] : [],
+          ),
     [draft.preview, draft.waypoints],
   );
   const scan = useRoutePhotoSuggestions(line);
@@ -113,7 +117,10 @@ export default function SuggestRouteAddPhotosScreen() {
       return;
     }
     try {
-      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: PICKER_QUALITY });
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        quality: PICKER_QUALITY,
+      });
       const asset = result.canceled ? undefined : result.assets[0];
       if (asset) {
         await commit([asset.uri]);
@@ -140,7 +147,7 @@ export default function SuggestRouteAddPhotosScreen() {
   const sourcesDisabled = busy || slotsAfterSelection === 0;
 
   return (
-    <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom + spacing.sm, spacing.xxl) }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <SheetHeader
         title={t('addPhotos.title')}
         subtitle={t('addPhotos.description', { count: MAX_SUGGESTION_PHOTOS })}

@@ -41,7 +41,10 @@ import {
 } from '@/features/routes/queries';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import { countActiveSearchFilters, EMPTY_ROUTE_SEARCH_FILTERS } from '@/features/routes/searchFilters';
+import {
+  countActiveSearchFilters,
+  EMPTY_ROUTE_SEARCH_FILTERS,
+} from '@/features/routes/searchFilters';
 import { useIsOffline } from '@/features/network/useIsOffline';
 import type { Route } from '@/features/routes/types';
 import { formatApproxDuration, formatDistance } from '@/i18n/format';
@@ -176,13 +179,16 @@ export default function DiscoverHomeScreen() {
     }, [searchActive, cancelSearch]),
   );
 
-  const openRoute = (route: Route) => router.push({ pathname: '/route/[id]', params: { id: route.id } });
+  const openRoute = (route: Route) =>
+    router.push({ pathname: '/route/[id]', params: { id: route.id } });
 
   const header = (
     <View style={styles.header}>
       <DiscoverHeader
         locationLabel={t('home.locationLabel')}
-        locationValue={regionUnknown ? t('home.unknownLocation') : t('home.locationValue', { city })}
+        locationValue={
+          regionUnknown ? t('home.unknownLocation') : t('home.locationValue', { city })
+        }
         onLocationPress={() => router.push('/discover/location')}
         onNotificationsPress={() => router.push('/notifications')}
       />
@@ -229,12 +235,13 @@ export default function DiscoverHomeScreen() {
           ) : (
             <AreaMapCard
               routeCount={area.data?.length}
-              locationEnabled={locationGranted}
               onPress={openExplore}
-              onLocatePress={locationGranted ? openExplore : enableLocation}
               offline={
                 offline
-                  ? { title: t('home.mapOfflineTitle'), description: t('home.mapOfflineDescription') }
+                  ? {
+                      title: t('home.mapOfflineTitle'),
+                      description: t('home.mapOfflineDescription'),
+                    }
                   : undefined
               }
             />
@@ -279,7 +286,8 @@ export default function DiscoverHomeScreen() {
         />
       ) : null}
 
-      {mode === 'results' && (results.isPending || (results.data?.length ?? 0) > 0 || activeFilterCount > 0) ? (
+      {mode === 'results' &&
+      (results.isPending || (results.data?.length ?? 0) > 0 || activeFilterCount > 0) ? (
         <SearchResultsHeader
           count={results.data?.length}
           sort={sort}
@@ -295,7 +303,11 @@ export default function DiscoverHomeScreen() {
   if (mode === 'results') {
     if (results.isPending) {
       emptyResults = (
-        <ActivityIndicator color={colors.textSecondary} accessibilityLabel={t('search.loading')} style={styles.status} />
+        <ActivityIndicator
+          color={colors.textSecondary}
+          accessibilityLabel={t('search.loading')}
+          style={styles.status}
+        />
       );
     } else if (results.isError) {
       emptyResults = (
@@ -310,7 +322,10 @@ export default function DiscoverHomeScreen() {
           <EmptySearchResults
             title={t('search.emptyTitle')}
             description={t('search.emptyFilteredDescription')}
-            action={{ label: t('search.clearFilters'), onPress: () => setSearchFilters(EMPTY_ROUTE_SEARCH_FILTERS) }}
+            action={{
+              label: t('search.clearFilters'),
+              onPress: () => setSearchFilters(EMPTY_ROUTE_SEARCH_FILTERS),
+            }}
           />
         </View>
       );
@@ -320,7 +335,10 @@ export default function DiscoverHomeScreen() {
           <EmptySearchResults
             title={t('search.emptyTitle')}
             description={t('search.emptyDescription')}
-            action={{ label: t('search.suggestRoute'), onPress: () => requireAccount('suggestRoute', () => router.push('/suggest-route')) }}
+            action={{
+              label: t('search.suggestRoute'),
+              onPress: () => requireAccount('suggestRoute', () => router.push('/suggest-route')),
+            }}
           />
         </View>
       );

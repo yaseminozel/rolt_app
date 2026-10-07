@@ -2,13 +2,13 @@ import { router } from 'expo-router';
 import { EditPencil, Globe, ShareAndroid, Trash } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { shareRide } from '@/features/rides/shareRide';
 import { colors, layout, radius, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 /**
  * 09.06 Sürüş detayı — Seçenekler (Pencil `W8Hilq`): edit, visibility, share and delete. The
@@ -16,12 +16,12 @@ import { colors, layout, radius, spacing } from '@/theme';
  */
 export default function RideOptionsSheet() {
   const { t } = useTranslation('rides');
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.lg);
   const { ride } = useRideForm();
   const params = { rideId: ride.id };
 
   return (
-    <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <SheetHeader title={t('options.title')} />
       <View style={styles.card}>
         <SettingsRow

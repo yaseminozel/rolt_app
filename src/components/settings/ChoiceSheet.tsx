@@ -1,12 +1,12 @@
 import type { ComponentType, ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { SvgProps } from 'react-native-svg';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { ChoiceRow } from '@/components/ride-form/ChoiceRow';
 import { Button } from '@/components/ui/Button';
 import { colors, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 export type ChoiceOption<T extends string> = {
   value: T;
@@ -43,11 +43,11 @@ export function ChoiceSheet<T extends string>({
   onSave,
   saving,
 }: ChoiceSheetProps<T>) {
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.sm);
   return (
     <ScrollView
       style={styles.sheet}
-      contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.sm }]}
+      contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
       bounces={false}>
       <SheetHeader title={title} subtitle={subtitle} />
       <View style={styles.options} accessibilityRole="radiogroup">

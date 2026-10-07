@@ -4,11 +4,11 @@ import { useNavigation } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { colors, layout, spacing, typography } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 type PermissionStep = 'location' | 'notifications';
 
@@ -36,7 +36,7 @@ const BODY_LINE_HEIGHT = 23;
 export default function PermissionsSheet() {
   const { t } = useTranslation('permissions');
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.xs);
   const { height } = useWindowDimensions();
   const { finishPermissionPrompts } = useAuth();
   const [step, setStep] = useState<PermissionStep>('location');
@@ -76,7 +76,7 @@ export default function PermissionsSheet() {
   const illustrationHeight = Math.min(ILLUSTRATION_HEIGHT, height * ILLUSTRATION_MAX_SCREEN_SHARE);
 
   return (
-    <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.xs }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <View style={styles.copy}>
         <Text style={styles.title} accessibilityRole="header">
           {t(`${step}.title`)}

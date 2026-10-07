@@ -1,0 +1,40 @@
+{
+  "title": "Bildirimler",
+  "unread_one": "{{count}} okunmamış",
+  "unread_other": "{{count}} okunmamış",
+  "allRead": "Tüm bildirimler okundu",
+  "markAllRead": "Tümünü okundu işaretle",
+  "sections": {
+    "today": "BUGÜN",
+    "thisWeek": "BU HAFTA",
+    "earlier": "DAHA ÖNCE"
+  },
+  "seenAll": "Hepsini gördün!",
+  "unreadA11y": "Okunmadı",
+  "empty": {
+    "title": "Henüz bildirimin yok",
+    "description": "Beğeniler, yorumlar ve yeni rotalarla ilgili güncellemeler burada görünecek."
+  },
+  "mock": {
+    "comment": {
+      "title": "Yeni sürüş yorumu",
+      "body": "Mert, “Geyikbayırı Virajları” sürüşüne yorum yaptı: “Harika rota!”"
+    },
+    "like": {
+      "title": "Sürüşün beğenildi",
+      "body": "Ayşe ve 4 kişi daha Kaş – Kalkan sürüşünü beğendi."
+    },
+    "routeSuggestion": {
+      "title": "Yeni rota önerisi",
+      "body": "Antalya çevresinde senin için 3 yeni rota var. Hemen keşfet."
+    },
+    "follower": {
+      "title": "Yeni takipçi",
+      "body": "Can Demir seni takip etmeye başladı."
+    },
+    "suggestionApproved": {
+      "title": "Rota önerin onaylandı",
+      "body": "“Çıralı – Adrasan Rotası” artık Keşfet’te yayında."
+    }
+  }
+}

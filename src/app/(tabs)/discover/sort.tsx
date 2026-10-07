@@ -1,15 +1,21 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { RadioButton } from '@/components/ui/RadioButton';
 import { useDiscoverState } from '@/features/discover/DiscoverStateProvider';
 import type { RouteSort } from '@/features/routes/types';
 import { colors, spacing } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
-const SORT_OPTIONS: readonly RouteSort[] = ['recommended', 'nearest', 'shortest', 'longest', 'popular'];
+const SORT_OPTIONS: readonly RouteSort[] = [
+  'recommended',
+  'nearest',
+  'shortest',
+  'longest',
+  'popular',
+];
 
 /**
  * "Sırala" sheet (p9FVL → `zLNlt`) as a native form sheet sized to its content.
@@ -18,13 +24,16 @@ const SORT_OPTIONS: readonly RouteSort[] = ['recommended', 'nearest', 'shortest'
 export default function RouteSortScreen() {
   const { t } = useTranslation('routes');
   const router = useRouter();
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) => Math.max(bottom, spacing.lg));
   const { sort, setSort } = useDiscoverState();
 
   return (
-    <View style={[styles.sheet, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <SheetHeader title={t('sort.title')} style={styles.header} />
-      <View accessibilityRole="radiogroup" accessibilityLabel={t('sort.title')} style={styles.options}>
+      <View
+        accessibilityRole="radiogroup"
+        accessibilityLabel={t('sort.title')}
+        style={styles.options}>
         {SORT_OPTIONS.map((option) => (
           <RadioButton
             key={option}

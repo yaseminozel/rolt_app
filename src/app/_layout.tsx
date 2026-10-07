@@ -148,6 +148,7 @@ function RootNavigator() {
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
             sheetCornerRadius: 24,
+            contentStyle: { backgroundColor: colors.surface },
           }}
         />
       </Stack.Protected>
@@ -165,6 +166,7 @@ function RootNavigator() {
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
             sheetCornerRadius: 28,
+            contentStyle: { backgroundColor: colors.surface },
           }}
         />
       </Stack.Protected>

@@ -1,9 +1,17 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bookmark, ChatBubbleEmpty, Heart, LogIn, MapsArrowDiagonal, Prohibition, UserPlus, WarningTriangle } from 'iconoir-react-native';
+import {
+  Bookmark,
+  ChatBubbleEmpty,
+  Heart,
+  LogIn,
+  MapsArrowDiagonal,
+  Prohibition,
+  UserPlus,
+  WarningTriangle,
+} from 'iconoir-react-native';
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { SvgProps } from 'react-native-svg';
 
 import { AppleMark, GoogleMark } from '@/components/auth/SocialProviderMark';
@@ -17,6 +25,7 @@ import {
 } from '@/features/auth/signInPromptReasons';
 import type { SocialProvider } from '@/features/auth/types';
 import { colors, layout, radius, spacing, typography } from '@/theme';
+import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
 const reasonIcons: Record<SignInPromptReason, ComponentType<SvgProps>> = {
   saveRoute: Bookmark,
@@ -52,7 +61,9 @@ type PendingAction = SocialProvider | null;
  */
 export default function SignInPromptScreen() {
   const { t } = useTranslation('auth');
-  const insets = useSafeAreaInsets();
+  const bottomPadding = useSheetBottomPadding((bottom) =>
+    Math.max(bottom + spacing.sm, spacing.xxl),
+  );
   const { signInWithProvider, leaveGuestMode, markOnboardingSeen } = useAuth();
   const params = useLocalSearchParams<{ reason?: string | string[] }>();
   const reason = parseSignInPromptReason(params.reason);
@@ -72,7 +83,9 @@ export default function SignInPromptScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const Icon = reason ? reasonIcons[reason] : GenericIcon;
-  const title = reason ? t(`signInPrompt.reasons.${reason}.title`) : t('signInPrompt.generic.title');
+  const title = reason
+    ? t(`signInPrompt.reasons.${reason}.title`)
+    : t('signInPrompt.generic.title');
   const description = reason
     ? t(`signInPrompt.reasons.${reason}.description`)
     : t('signInPrompt.generic.description');
@@ -111,11 +124,7 @@ export default function SignInPromptScreen() {
   };
 
   return (
-    <View
-      style={[
-        styles.sheet,
-        { paddingBottom: Math.max(insets.bottom + spacing.sm, spacing.xxl) },
-      ]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
       <View style={styles.top}>
         <View
           style={styles.iconBadge}
