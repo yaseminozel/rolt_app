@@ -9,7 +9,7 @@ type RegistrationDraftContextValue = {
 
 const RegistrationDraftContext = createContext<RegistrationDraftContextValue | null>(null);
 
-const initialDraft: RegistrationDraft = { roadPreferences: [] };
+const initialDraft: RegistrationDraft = {};
 
 /** Holds registration answers while the user moves between steps; mounted by `register/_layout.tsx`. */
 export function RegistrationDraftProvider({ children }: { children: ReactNode }) {

@@ -1,25 +1,26 @@
-import { XmarkCircle } from 'iconoir-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { WarningTriangle } from 'iconoir-react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { TextField, type TextFieldProps } from '@/components/ui/TextField';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, fontFamily, radius, spacing, typography } from '@/theme';
 
 /** Height of the TextField box; the error icon is centred on it. */
 const FIELD_HEIGHT = 44;
 /** Same size as TextField's trailing success check, so both states share one slot. */
 const ERROR_ICON_SIZE = 20;
-/** Column gap between field, message and suggestion row, and between chips (eIU92). */
-const SUGGESTION_GAP = 6;
-/** Chip padding [5, 8] from eIU92 "Öneri / …". */
-const CHIP_PADDING_VERTICAL = 5;
-const CHIP_PADDING_HORIZONTAL = 8;
-/** Grows the ~25 pt chip to a 45 pt touch target without changing how it looks. */
-const CHIP_HIT_SLOP = { top: 10, bottom: 10, left: SUGGESTION_GAP / 2, right: SUGGESTION_GAP / 2 };
+/** Field → suggestions (04.01 `Citg6` "Fields" gap 20). */
+const SUGGESTIONS_TOP = spacing.xl;
+/** Chip row: 32 pt chips, 8 pt apart, 12 pt side padding ("Suggestion / …"). */
+const CHIP_HEIGHT = 32;
+/** Grows the 32 pt chip to a 44 pt touch target without changing how it looks. */
+const CHIP_HIT_SLOP = { top: 6, bottom: 6 };
 
 type UsernameFieldProps = Omit<TextFieldProps, 'label' | 'accessibilityLabel'> & {
   label: string;
   /** Free alternatives shown as chips under a taken username. */
   suggestions?: readonly string[];
+  /** Line above the chips ("Bunlardan birini seçebilirsin:"). */
+  suggestionsTitle: string;
   /** Visible chip text for a suggestion, e.g. "@yasemin.rides". */
   formatSuggestion: (username: string) => string;
   onSuggestionPress: (username: string) => void;
@@ -28,9 +29,10 @@ type UsernameFieldProps = Omit<TextFieldProps, 'label' | 'accessibilityLabel'> &
 };
 
 /**
- * "Kullanıcı adı" field of 00.8 (UZpFX, eIU92): TextField with an "@" prefix plus the taken
- * state — a trailing error icon in the field and a row of suggestion chips; tapping a chip
- * fills the field (the caller re-checks it).
+ * "Kullanıcı adı" field of 04.01 (`jmuyH` available, `Citg6` taken): TextField with an "@"
+ * prefix plus the taken state — a trailing warning icon in the field and a scrollable row of
+ * suggestion chips under "Bunlardan birini seçebilirsin:"; tapping a chip fills the field
+ * (the caller re-checks it).
  *
  * TextField only has a trailing slot for the success check, so the error icon is overlaid
  * here like SelectField's chevron. The label is rendered here so the overlay can be anchored
@@ -39,6 +41,7 @@ type UsernameFieldProps = Omit<TextFieldProps, 'label' | 'accessibilityLabel'> &
 export function UsernameField({
   label,
   suggestions = [],
+  suggestionsTitle,
   formatSuggestion,
   onSuggestionPress,
   suggestionsAccessibilityLabel,
@@ -55,7 +58,7 @@ export function UsernameField({
           <TextField {...fieldProps} errorText={errorText} accessibilityLabel={label} />
           {errorText ? (
             <View style={styles.errorIcon} accessibilityElementsHidden importantForAccessibility="no">
-              <XmarkCircle
+              <WarningTriangle
                 width={ERROR_ICON_SIZE}
                 height={ERROR_ICON_SIZE}
                 color={colors.dangerText}
@@ -66,20 +69,28 @@ export function UsernameField({
         </View>
       </View>
       {suggestions.length > 0 ? (
-        <View style={styles.suggestions} accessibilityLabel={suggestionsAccessibilityLabel}>
-          {suggestions.map((suggestion) => (
-            <Pressable
-              key={suggestion}
-              onPress={() => onSuggestionPress(suggestion)}
-              accessibilityRole="button"
-              accessibilityHint={suggestionAccessibilityHint}
-              hitSlop={CHIP_HIT_SLOP}
-              style={({ pressed }) => [styles.chip, pressed && styles.pressed]}>
-              <Text style={styles.chipLabel} numberOfLines={1}>
-                {formatSuggestion(suggestion)}
-              </Text>
-            </Pressable>
-          ))}
+        <View style={styles.suggestions}>
+          <Text style={styles.suggestionsTitle}>{suggestionsTitle}</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            accessibilityLabel={suggestionsAccessibilityLabel}
+            contentContainerStyle={styles.chips}>
+            {suggestions.map((suggestion) => (
+              <Pressable
+                key={suggestion}
+                onPress={() => onSuggestionPress(suggestion)}
+                accessibilityRole="button"
+                accessibilityHint={suggestionAccessibilityHint}
+                hitSlop={CHIP_HIT_SLOP}
+                style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}>
+                <Text style={styles.chipLabel} numberOfLines={1}>
+                  {formatSuggestion(suggestion)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
         </View>
       ) : null}
     </View>
@@ -88,7 +99,7 @@ export function UsernameField({
 
 const styles = StyleSheet.create({
   container: {
-    gap: SUGGESTION_GAP,
+    gap: SUGGESTIONS_TOP,
   },
   // Mirrors TextField's own label → field spacing.
   fieldBlock: {
@@ -107,21 +118,31 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
   },
   suggestions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SUGGESTION_GAP,
+    gap: spacing.sm,
+  },
+  suggestionsTitle: {
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: 16,
+    color: colors.textPrimary,
+  },
+  chips: {
+    gap: spacing.sm,
   },
   chip: {
-    paddingVertical: CHIP_PADDING_VERTICAL,
-    paddingHorizontal: CHIP_PADDING_HORIZONTAL,
-    borderRadius: radius.pill,
-    backgroundColor: colors.brandSubtle,
+    height: CHIP_HEIGHT,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.chip,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
-  pressed: {
-    opacity: 0.6,
+  chipPressed: {
+    backgroundColor: colors.surfacePressed,
   },
   chipLabel: {
-    ...typography.captionMedium,
-    color: colors.brand,
+    ...typography.bodyLarge,
+    color: colors.textPrimary,
   },
 });

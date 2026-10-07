@@ -12,7 +12,8 @@
     "skip": "Skip",
     "change": "Change",
     "undo": "Undo",
-    "view": "View"
+    "view": "View",
+    "clear": "Clear"
   },
   "a11y": {
     "showPassword": "Show password",

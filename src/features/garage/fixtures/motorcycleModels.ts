@@ -2,7 +2,7 @@ import type { MotorcycleModel } from '../types';
 
 /**
  * MOCK DATA until the Supabase motorcycle catalog exists.
- * Yamaha entries are taken from the design (00.10, g4Zy4); other brands are placeholder
+ * Yamaha (old 00.10) and Bajaj (04.05 `V4YviO`) entries are taken from the design; other brands are placeholder
  * fixtures with real model names so the flow can be exercised for every brand.
  */
 export const MOTORCYCLE_MODELS: readonly MotorcycleModel[] = [
@@ -54,7 +54,11 @@ export const MOTORCYCLE_MODELS: readonly MotorcycleModel[] = [
   { id: 'bajaj-pulsar-n250', brand: 'bajaj', name: 'Pulsar N250', displacementCc: 249, category: 'naked' },
   { id: 'bajaj-pulsar-ns200', brand: 'bajaj', name: 'Pulsar NS200', displacementCc: 199, category: 'naked' },
   { id: 'bajaj-pulsar-rs200', brand: 'bajaj', name: 'Pulsar RS200', displacementCc: 199, category: 'sport' },
+  { id: 'bajaj-pulsar-n160', brand: 'bajaj', name: 'Pulsar N160', displacementCc: 164, category: 'naked' },
+  { id: 'bajaj-dominar-250', brand: 'bajaj', name: 'Dominar 250', displacementCc: 248, category: 'sportTouring' },
   { id: 'bajaj-dominar-400', brand: 'bajaj', name: 'Dominar 400', displacementCc: 373, category: 'sportTouring' },
+  { id: 'bajaj-ct-125x', brand: 'bajaj', name: 'CT 125X', displacementCc: 124, category: 'naked' },
+  { id: 'bajaj-platina-110', brand: 'bajaj', name: 'Platina 110', displacementCc: 115, category: 'naked' },
 ];
 
 export const modelsForBrand = (brand: MotorcycleModel['brand']) =>

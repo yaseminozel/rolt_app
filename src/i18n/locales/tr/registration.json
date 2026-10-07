@@ -1,33 +1,12 @@
 {
-  "title": "Hesap oluştur",
-  "roadPreferences": {
-    "curvyRoads": "Virajlı yollar",
-    "coast": "Sahil",
-    "mountainRoads": "Dağ yolları",
-    "city": "Şehir içi",
-    "longTour": "Uzun tur",
-    "offRoad": "Off-road",
-    "weekendGetaway": "Hafta sonu kaçamağı",
-    "nightRiding": "Gece sürüşü"
-  },
-  "tempo": {
-    "relaxed": "Sakin",
-    "balanced": "Dengeli",
-    "sporty": "Sportif"
-  },
-  "experience": {
-    "zeroToTwo": "0–2 yıl",
-    "threeToFive": "3–5 yıl",
-    "fivePlus": "5+ yıl"
-  },
-  "listSeparator": " · ",
   "usernameHandle": "@{{username}}",
   "profile": {
     "heading": "Seni tanıyalım",
-    "description": "Diğer sürücüler seni profilinde bu bilgilerle görecek.",
+    "description": "Diğer sürücüler seni bu bilgilerle görecek.",
     "photoTitle": "Profil fotoğrafı ekle",
-    "photoTitleChange": "Profil fotoğrafını değiştir",
-    "photoDescription": "Kasklı fotoğraf da olur. Eşleşmelerde yüzün görünmesi güven verir.",
+    "photoDescription": "İsteğe bağlı. Kasklı fotoğraf da olur.",
+    "photoTitleSet": "Profil fotoğrafı",
+    "photoDescriptionSet": "İstersen değiştirebilirsin.",
     "photoPermissionTitle": "Fotoğraf izni gerekli",
     "photoPermissionMessage": "Profil fotoğrafı seçebilmen için Ayarlar’dan fotoğraflarına erişim izni ver.",
     "photoPermissionCancel": "Vazgeç",
@@ -35,74 +14,54 @@
     "fullNameLabel": "Ad Soyad",
     "usernameLabel": "Kullanıcı adı",
     "usernamePrefix": "@",
+    "usernamePlaceholder": "kullaniciadi",
+    "usernameHelper": "Harf, rakam, nokta ve alt çizgi kullanabilirsin.",
     "usernameChecking": "Kontrol ediliyor…",
-    "usernameAvailable": "Bu kullanıcı adı müsait",
-    "usernameTaken": "Bu kullanıcı adı alınmış",
+    "usernameAvailable": "Bu kullanıcı adı müsait.",
+    "usernameTaken": "Bu kullanıcı adı kullanımda.",
+    "usernameSuggestionsTitle": "Bunlardan birini seçebilirsin:",
     "usernameSuggestionsLabel": "Önerilen kullanıcı adları",
     "usernameSuggestionHint": "Bu kullanıcı adını seçer",
     "usernameCheckFailed": "Kontrol edilemedi. Bağlantını kontrol edip tekrar dene.",
     "usernameInvalidCharacters": "Yalnızca küçük harf, rakam, nokta ve alt çizgi kullanabilirsin.",
     "usernameTooShort": "En az {{min}} karakter olmalı.",
-    "usernameTooLong": "En fazla {{max}} karakter olabilir.",
-    "cityLabel": "Şehir",
-    "cityPlaceholder": "Şehrini seç",
-    "cityHelper": "Yakınındaki rotaları ve sürücüleri göstermek için kullanılır."
+    "usernameTooLong": "En fazla {{max}} karakter olabilir."
   },
-  "city": {
-    "title": "Şehir",
-    "searchPlaceholder": "Şehir ara",
-    "noResults": "Aramanla eşleşen şehir yok."
+  "location": {
+    "heading": "Doğru yerde miyiz?",
+    "description": "Yakınındaki rotaları ve sana uygun önerileri gösterebilmek için bulunduğun konumu kullanıyoruz.",
+    "fieldLabel": "Konumun",
+    "useCurrent": "Mevcut konumu kullan",
+    "deniedHeading": "Sana özel olarak keşfet",
+    "deniedDescription": "Daha iyi bir deneyim ve bulunduğun bölgeye özel öneriler için konum izni ver.",
+    "allow": "Konum izni ver",
+    "benefits": {
+      "nearbyRoutes": {
+        "title": "Yakındaki rotalar",
+        "text": "Bulunduğun yere yakın popüler rotaları gör."
+      },
+      "localPicks": {
+        "title": "Bölgene özel öneriler",
+        "text": "Konumuna göre kişiselleştirilmiş öneriler al."
+      },
+      "nearbyRiders": {
+        "title": "Yakındaki sürücüler",
+        "text": "Çevrendeki rota paylaşan sürücüleri keşfet."
+      }
+    }
   },
-  "brand": {
+  "bike": {
     "heading": "Hangi motoru sürüyorsun?",
-    "description": "Markanı seç, sonraki adımda modelini ve yılını ekleyelim.",
-    "searchPlaceholder": "Marka ara",
-    "manualTitle": "Listede yok mu?",
-    "manualSubtitle": "Markanı elle ekle",
-    "manualLabel": "Marka adı",
-    "manualPlaceholder": "Örn. Benelli"
+    "description": "Motorunu ekleyerek profilini tamamla ve sürüşlerini kullandığın motorla eşleştir.",
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "choose": "Seç",
+    "mainBikeNote": "Bu motor onboarding tamamlandığında ana motorun olarak kaydedilecek.",
+    "brandSearch": "Marka ara",
+    "modelSearch": "Model ara",
+    "modelsOf": "{{brand}} modelleri",
+    "displacement": "{{cc}} cc"
   },
-  "model": {
-    "heading": "Modelini seç",
-    "description": "Garajına ekleyeceğiz, profilinde ve eşleşmelerde görünecek.",
-    "brandLabel": "Marka",
-    "searchPlaceholder": "{{brand}} modeli ara",
-    "noResults": "Aramanla eşleşen model yok. Modelini aşağıya yazabilirsin.",
-    "manualLabel": "Model adı",
-    "manualPlaceholder": "Örn. Leoncino 500",
-    "yearLabel": "Model yılı",
-    "yearOther": "Diğer",
-    "yearOtherPlaceholder": "Örn. 2015",
-    "yearInvalid": "{{min}} ile {{max}} arasında bir yıl gir."
-  },
-  "ridingStyle": {
-    "heading": "Nasıl sürmeyi seversin?",
-    "description": "Sana uygun rotaları ve sürüş arkadaşlarını bu tercihlere göre önereceğiz.",
-    "roadsLabel": "Sevdiğin yollar",
-    "roadsHint": "Birden fazla seç",
-    "tempoLabel": "Tempon",
-    "experienceLabel": "Sürüş deneyimin",
-    "note": "Tercihlerini istediğin zaman Profil › Ayarlar’dan değiştirebilirsin.",
-    "submit": "Kaydı tamamla"
-  },
-  "complete": {
-    "heading": "Garajın hazır, {{name}}!",
-    "headingNoBike": "Profilin hazır, {{name}}!",
-    "description": "Profilin oluşturuldu. Artık rotaları keşfedebilir, sürüşlerini kaydedebilir ve yakınındaki sürücülerle eşleşebilirsin.",
-    "mainBike": "ANA MOTORUN",
-    "bikeTitle": "{{brand}} {{model}}",
-    "ridingStyleLabel": "Sürüş tarzın",
-    "tempoTag": "{{tempo}} tempo",
-    "roadTags": {
-      "curvyRoads": "Virajlı",
-      "coast": "Sahil",
-      "mountainRoads": "Dağ yolları",
-      "city": "Şehir içi",
-      "longTour": "Uzun tur",
-      "offRoad": "Off-road",
-      "weekendGetaway": "Hafta sonu",
-      "nightRiding": "Gece sürüşü"
-    },
-    "start": "Keşfetmeye başla"
-  }
+  "loading": "Yükleniyor…"
 }

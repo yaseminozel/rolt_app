@@ -12,7 +12,8 @@
     "skip": "Atla",
     "change": "Değiştir",
     "undo": "Geri al",
-    "view": "Görüntüle"
+    "view": "Görüntüle",
+    "clear": "Temizle"
   },
   "a11y": {
     "showPassword": "Şifreyi göster",

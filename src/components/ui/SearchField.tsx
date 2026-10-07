@@ -1,6 +1,8 @@
-import { Search } from 'iconoir-react-native';
+import { Search, Xmark } from 'iconoir-react-native';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
+  Pressable,
   StyleSheet,
   TextInput,
   View,
@@ -23,6 +25,11 @@ export type SearchFieldProps = Omit<
   placeholder?: string;
   variant?: SearchFieldVariant;
   disabled?: boolean;
+  /**
+   * Shows a trailing clear button while there is text (04.02 "Konumun" search, `R90P27`).
+   * Most searches in the design have none, so it is opt-in.
+   */
+  onClear?: () => void;
   /** Outer layout only (margins, flex). */
   containerStyle?: StyleProp<ViewStyle>;
 };
@@ -41,12 +48,14 @@ export function SearchField({
   placeholder,
   variant = 'outlined',
   disabled = false,
+  onClear,
   containerStyle,
   onFocus,
   onBlur,
   accessibilityLabel,
   ...inputProps
 }: SearchFieldProps) {
+  const { t } = useTranslation();
   const [focused, setFocused] = useState(false);
 
   const handleFocus: NonNullable<TextInputProps['onFocus']> = (event) => {
@@ -90,11 +99,24 @@ export function SearchField({
         accessibilityState={{ disabled }}
         style={[styles.input, { color: disabled ? colors.textDisabled : colors.textPrimary }]}
       />
+      {onClear && value.length > 0 && !disabled ? (
+        <Pressable
+          onPress={onClear}
+          accessibilityRole="button"
+          accessibilityLabel={t('actions.clear')}
+          hitSlop={spacing.md}
+          style={styles.clear}>
+          <Xmark width={ICON_SIZE} height={ICON_SIZE} color={colors.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  clear: {
+    paddingRight: spacing.md,
+  },
   field: {
     height: FIELD_HEIGHT,
     flexDirection: 'row',

@@ -72,7 +72,8 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 | 01 Onboarding (Akış 02) | 01.01 Keşfet, 01.02 Sür ve kaydet, 01.03 Paylaş (açık tema) |
 | 02 Auth (Akış 03–05) | 02.01 Giriş (boş/dolu/yükleniyor), 02.02 Şifre (mevcut/yeni hesap, yanlış şifre, çok fazla deneme), 02.03 Şifremi unuttum, 02.04 E-posta kontrol, 02.05 Yeni şifre, 02.06 Şifre güncellendi, 02.07 E-posta doğrulama (yeni hesap / süresi dolmuş bağlantı) |
 | 03 İzinler (Akış 06) | 03.01 Konum izni, 03.02 Bildirim izni (sheet) |
-| 04–13 (Akış 07–22) | Kayıt tamamlama, Discover, Rotayı sür, Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
+| 04 Kayıt tamamlama (Akış 07) | 04.01 Profil (boş / müsait / kullanımda), 04.02 Konum (izin verilmiş / şehir ara / izin verilmemiş), 04.03 Motor (boş / seçili), 04.04–04.06 Marka / Model / Yıl sheet'leri, 04.07 Yükleniyor |
+| 05–13 (Akış 08–22) | Discover, Rotayı sür, Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
 | 01 Discover | Home (harita odaklı: konum, arama, kategori chip'leri, bölgede N rota, "Senin için önerilenler"), Search (aktif/sonuç/sonuç yok/sıralama sheet), Önerilen rotalar — Tümü, Rota detayı (standart/uzun), Haritada keşfet — rota listesi |
 | 02 Record | Ready (rotalı/serbest, sürüş tipi şeridi alternatifi), Recording, Paused, Recovery, Sürüş modu full ekran, Durdurma onayı, Sürüşü kaydet (form), Sürüş tipi seçimi sheet |
 | 03 Profil / Ayarlar | Profil genel (Sürüşler/Performans/Kaydettiklerim sekmeleri), Profili paylaş (QR), Aktivite paylaşımı (karusel şablonlar), Kaydettiklerim (liste/kaydedildi/kaldırıldı/boş), Ayarlar ve alt sayfaları: hesap, sürüş görünürlüğü, başlangıç-bitiş gizleme, engellenenler, konum/fotoğraf izni, bildirimler, dil, ölçü birimleri, yardım/SSS, geri bildirim, gizlilik politikası, kullanım koşulları, çıkış |
@@ -185,12 +186,9 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Rota kartı metrikleri | Genel kural Mono, kartlar Inter | Kartlarda Inter; canlı kayıt/profil metrikleri JetBrains Mono |
 | Siyah metin | Ekranlarda `#000000` | `textPrimary` (#101318) |
 | Buton etiketi (auth/kayıt) | Ekranlar 12 semibold, pano 14 medium | 14 medium (pano) |
-| Alt sabit CTA | Kayıt ekranlarında 56 pt, auth 44 pt | Ekranın altına sabitlenen tam genişlik CTA `size="lg"` (48 pt); içerik içindeki butonlar 44 pt |
+| Alt sabit CTA | Eski kayıt 56 pt, yeni kayıt (04.x) ve auth 44 pt | Kayıt (04.x) ve izin sheet'i tasarım gibi 44 pt; diğer ekranların altına sabitlenen tam genişlik CTA `size="lg"` (48 pt) |
 | Kayıt alanları | Ekran 48 pt / 14 padding / 1.5 focus | TextField standardı 44 / 12 / 1 |
 | Arama alanı | Ekran 18 pt ikon, 15 pt yazı, `#F6F7F7` | `SearchField`: 20 pt ikon, 16 pt yazı, `surfaceMuted` |
-| Tempo / Deneyim kontrolleri | Ekranda 44 pt, farklı yazı ve gölge | Standart `SegmentedControl` |
-| Model yılı | 5 ayrı hap | `SelectableChip role="radio"`, eşit genişlik |
-| Yol tercihi ikonları | Iconoir'da dağ/çadır yok; seçili çipler ikon göstermiyor | Dağ yolları ve Off-road ikonları tasarımdaki çizimden SVG; Virajlı `PathArrow`, Sahil `SeaAndSun`, Uzun tur `RideTypeIcon longRide`, Hafta sonu `Calendar`, Şehir içi `City`, Gece `HalfMoon` |
 | "e-Posta" etiketi | Etiket "e-Posta", buton "E-posta ile devam et" | "E-posta" (TDK yazımı, butonla tutarlı) |
 | Auth alt ekran başlığı | Tasarımda geri butonu yok, e-posta alanı salt okunur | Şeffaf native header, yalnız geri butonu; akış sonu ekranlarında (yeni şifre, güncellendi) geri yok |
 | Fotoğraf görselleri | Tasarımda fotoğraflar "stretch" ile oranı bozularak frame'e çekilebiliyor | Fotoğraflarda orijinal dosya (`<pencil klasörü>/images/…`) `cover` ile; frame export'u değil |
@@ -207,9 +205,8 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | İzin sheet'i (03.01 `ylGJA`, 03.02 `KvKqT`) | Tasarımda arka planda rastgele bir auth ekranı | Tek native `formSheet` (`/permissions`, `fitToContents`, köşe 28), içinde konum → bildirim adımı. Yeni hesap (profili bitmemiş hesaba giriş) için bir kez, kayıt akışının ilk ekranının üstünde (`usePermissionPromptSheet`); yani izinler kayıttan önce (03 → 04 sırası, 04.02 izin durumlarına göre). Her iki cevapta ilerler; sheet'i kaydırıp kapatmak iki adım için de "Şimdi değil" sayılır. İllüstrasyonlar frame export'u (361 × 384), kısa ekranda küçülür. Açıklama 16 pt `textSecondary` |
 | Bildirim izni metni | "…etkileşimler ve … gelişmelerden" | "…etkileşimlerden ve …" (hâl eki uyumu) |
 | Konum izni | Tasarım yalnız "izin ver" diyor | Yalnız ön plan izni; arka plan izni Kayıt akışında istenir |
-| Kullanıcı adı önerileri | Tasarımda örnek 3 çip | `.rides`, `_<plaka kodu>`, `<motor modeli>` sırasıyla; kurallara uyan, müsait en fazla 3 öneri. Çip dokunma alanı 45 pt'ye genişletildi |
-| Kullanıcı adı hata ikonu | Yalnız "alınmış" durumunda çizilmiş | Tüm kullanıcı adı hatalarında 20 pt ikon (başarı ikonuyla aynı yer) |
-| Şehir sheet'i | Tam ekran açılıyordu | %60 yükseklikte açılır, tam ekrana çekilebilir; başlık ve arama sabit, liste sheet içinde kayar |
+| Kullanıcı adı önerileri | Tasarımda örnek 3 çip | `.rides`, `_<plaka kodu>`, `<motor modeli>` sırasıyla; kurallara uyan, müsait en fazla 3 öneri. "Bunlardan birini seçebilirsin:" altında yatay kayan 32 pt çipler (dokunma alanı 44). Plaka kodu 04.02 yerinden gelir; profil önce olduğu için ilk geçişte genelde yok |
+| Kullanıcı adı hata ikonu | Yalnız "kullanımda" durumunda çizilmiş (üçgen) | Tüm kullanıcı adı hatalarında 20 pt `WarningTriangle` (başarı ikonuyla aynı yer) |
 | Keşfet ana sayfa bölümleri | "Senin için önerilenler" iki kez çizilmiş | Tek bölüm |
 | Aramadan çıkış | Tasarımda çıkış yolu yok | Arama kutusunun yanında "Vazgeç"; sorgu ve filtreler temizlenir, sıralama korunur |
 | Arama durumlarında kategori çipleri | 01.2'de gizli, 01.3'te görünür | Tüm arama durumlarında gizli; aramada filtre sheet'i kullanılır |
@@ -240,20 +237,21 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Auth alt başlıkları | 14/20 ve farklı boşluklar | 14/20, başlık-alt başlık arası 8 |
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
 | Yasal linkler | Metinden ayırt edilmiyor | `textSecondary` + altı çizili (link olduğu anlaşılsın) |
+| Kayıt adımları (04.x) | Eski 5 adım (profil, marka, model, sürüş tarzı, tamamlandı) | 3 adım: Profil → Konum → Motor → 04.07 Yükleniyor → uygulama. Sürüş tarzı ve tamamlandı ekranı kalktı; özel marka/model girişi ("Listede yok mu?") yok |
+| Kayıt üst çubuğu | "Üst çubuk / Profil" yalnız geri | Native header, başlıksız; ilk adımda native geri yok (altında ekran yok) |
+| Kayıt "Atla" | Tüm adımlarda CTA altında metin butonu | Her adımda: kaydetmeden sonraki adıma; motor adımında motorsuz bitirir |
+| Kayıt CTA'sı | Profil boşken tasarım aktif çizmiş, motor boşken pasif | Tutarlılık için geçerli veri olana kadar pasif: profil ad + müsait kullanıcı adı, konum seçili yer, motor marka + model + yıl |
+| Kayıt metinleri | Açıklama ve ipuçları #000 | Açıklama `textPrimary` (siyah kuralı); fotoğraf ipucu `textSecondary` (ikincil bilgi) |
+| Profil fotoğrafı | "Google hesabından eklendi" metni sağlayıcı fotoğrafı ister | Mock'ta sağlayıcı fotoğrafı yok: boşken "Profil fotoğrafı ekle / İsteğe bağlı…", seçilince "Profil fotoğrafı / İstersen değiştirebilirsin." |
+| Konum adımı (04.02) | İzin durumu | İzin varsa cihaz konumundan il ("Konumun: Antalya"); alana dokununca arama: "Mevcut konumu kullan" + Mapbox yer arama (`placeSearch`, mock'ta örnek yerler). İzin yoksa fayda kartları + "Konum izni ver" (sistem izni, sorulamıyorsa Ayarlar). Fayda kartı fotoğrafları orijinallerden kırpıldı. Sonuç yokken boş liste (tasarımda metin yok) |
+| Motor adımı başlığı | Boş durumda "Motorunu ekle", diğer 4 karede "Hangi motoru sürüyorsun?" | "Hangi motoru sürüyorsun?" + uzun açıklama; "ana motorun olarak kaydedilecek" notu her durumda |
+| Motor seçim satırları | Seçili değer bazen siyah bazen gri | `SettingsRow valueChevron`; seçilen değer `textPrimary` (`valueEmphasis`), "Seç" `textSecondary`; Model/Yıl önceki seçim yokken %40 opak ve pasif. İkonlar `Motorcycle`, `DashboardSpeed`, `Clock` |
+| Marka / Model / Yıl sheet'leri | 650 / 617 / 557 pt | Native `formSheet` (detent 0.76 / 0.72 / 0.65 + tam ekran), `OptionSheetList`: `SheetHeader` + çerçeveli arama + satırlar. Marka değişince model ve yıl, model değişince yıl temizlenir. Yıllar bu yıldan 1950'ye |
 | E-posta maskeleme | "yas••••@gmail.com" | İlk 3 karakter + sabit `••••` (uzunluk sızmaz); 3 karakter veya daha kısa yerel kısımda yalnız ilk harf |
 | Tekrar gönder (02.04, 02.07) | Tasarımda yalnız metin butonu | `ResendEmailForm`: salt okunur e-posta + "E-postayı tekrar gönder"; her gönderimden sonra 60 sn geri sayım (pasif standart renk). Mail uygulamasını aç / e-postayı değiştir / ipucu kaldırıldı (geri butonu 02.03'e döner) |
 | Yasal alt bilgi | Yalnız 02.01–02.02'de çizili | `AuthScreen showLegalFooter` yalnız giriş ve şifre adımlarında |
 | E-posta doğrulama (02.07) | Yeni | Yeni e-posta hesabı şifreden sonra `/email-verification`'da bekler (geri yok); bağlantı `rolt://email-verification/confirm?token=…`. Uygulamaya dönünce hesap yeniden okunur (mock bunu bağlantıya dokunmak sayar). Süresi dolmuş/geçersiz bağlantı → `expired` (24 saat, "Giriş ekranına dön" çıkış yapar) |
 | Süresi dolmuş sıfırlama linki | Tasarımda artık yalnız doğrulama için süresi dolmuş ekranı var | `reset-link-expired` aynı düzeni kullanır (illüstrasyon, salt okunur e-posta, "Yeni bağlantı gönder", "Giriş ekranına dön") ve kendi 30 dk metnini; geçersiz linkte e-posta alanı gizlenir ve gönder 02.03'ü açar |
-| Kayıt içerik boşluğu | Auth 16 pt, kayıt 32 pt | Kayıt içeriği 32 pt, alt CTA çubuğu 16 pt (tasarım) |
-| Kayıt "Atla" | Tasarımda yalnız marka ve sürüş tarzı adımlarında | Profil ve model adımında yok; markada atla → sürüş tarzına geçer (model adımı marka ister) |
-| Model yılı hapları | Tasarım 2024–2021 | İçinde bulunulan yıl ve önceki 3 yıl + "Diğer" (1950…gelecek yıl) |
-| Tempo / Deneyim varsayılanı | Segmented control boş gösteremez | Ortadaki seçenek seçili gelir (Dengeli, 3–5 yıl); görünür olduğu için örtük onay sayılır |
-| Listede olmayan marka/model | Tasarımı yok | Kart seçilince yerinde "Marka adı" / "Model adı" alanı açılır; logosuz markada baş harf gösterilir |
-| Model satırı radio'su | 22 pt mavi halka | Standart `RadioButton` (tek radio sistemi); seçili satırın mavi zemini korunur |
-| Tamamlandı kartı etiketleri | Tek seferlik hap etiketler | Küçük nötr `Badge`, kısa etiketler, satıra sarılır; eksik veride ilgili bölüm gizlenir |
-| Şehir seçimi | Tasarımı yok | "Dil" sheet deseninde form sheet: `SheetHeader` + arama (Türkçe harf duyarsız) + işaretli satırlar |
-| Zorunlu kayıt alanları | Tasarımda belirtilmemiş | Profil: ad + müsait kullanıcı adı; fotoğraf ve şehir opsiyonel. Marka ve model zorunlu (atlanabilir adımlar hariç); yıl opsiyonel |
 
 ## Marka ve uygulama ikonu
 
@@ -283,6 +281,7 @@ src/
     onboarding.tsx        # 01.01–01.03 onboarding sayfaları
     (auth)/               # 02.01–02.06 giriş / şifre akışı
     email-verification/   # 02.07 e-posta doğrulama
+    register/             # 04.01–04.07 kayıt tamamlama (profil, konum, motor + sheet'ler, yükleniyor)
     permissions.tsx       # 03.01–03.02 izin sheet'i
     (tabs)/_layout.tsx    # NativeTabs: discover / record / profile
     (tabs)/<tab>/         # her sekmede native Stack (_layout.tsx) + index.tsx

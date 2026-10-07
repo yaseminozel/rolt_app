@@ -44,7 +44,13 @@ type SettingsRowBaseProps = {
 };
 
 type ChevronRowProps = { trailing: 'chevron'; onPress: () => void };
-type ValueChevronRowProps = { trailing: 'valueChevron'; value: string; onPress: () => void };
+type ValueChevronRowProps = {
+  trailing: 'valueChevron';
+  value: string;
+  /** Draws a chosen value in the primary colour instead of the muted one (04.03 `FuSKr`). */
+  valueEmphasis?: boolean;
+  onPress: () => void;
+};
 type ValueRowProps = { trailing: 'value'; value: string; onPress?: () => void };
 type SwitchRowProps = {
   trailing: 'switch';
@@ -88,7 +94,7 @@ export function SettingsRow(props: SettingsRowProps) {
     case 'valueChevron':
       trailing = (
         <>
-          <Value text={props.value} />
+          <Value text={props.value} emphasis={props.valueEmphasis} />
           <Chevron />
         </>
       );
@@ -182,9 +188,9 @@ function Chevron() {
   return <NavArrowRight width={ICON_SIZE} height={ICON_SIZE} color={colors.textPrimary} />;
 }
 
-function Value({ text }: { text: string }) {
+function Value({ text, emphasis = false }: { text: string; emphasis?: boolean }) {
   return (
-    <Text style={styles.value} numberOfLines={1}>
+    <Text style={[styles.value, emphasis && styles.valueEmphasis]} numberOfLines={1}>
       {text}
     </Text>
   );
@@ -243,6 +249,9 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: colors.textSecondary,
     textAlign: 'right',
+  },
+  valueEmphasis: {
+    color: colors.textPrimary,
   },
   switch: {
     alignSelf: 'center',

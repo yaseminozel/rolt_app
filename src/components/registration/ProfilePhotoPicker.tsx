@@ -4,9 +4,14 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, fontFamily, spacing, typography } from '@/theme';
 
 const AVATAR_SIZE = 80;
-const BADGE_SIZE = 26;
-/** Badge sits flush with the avatar's bottom-right corner (UZpFX `X6yUw` at 54, 54). */
-const BADGE_OFFSET = AVATAR_SIZE - BADGE_SIZE;
+const BADGE_SIZE = 28;
+/** Badge corner ("Badge / Fotoğraf ekle" at 54, 54 on the 80 pt avatar). */
+const BADGE_OFFSET = 54;
+const EMPTY_CAMERA_SIZE = 28;
+const BADGE_ICON_SIZE = 16;
+const BADGE_CAMERA_SIZE = 14;
+/** Hint text: 13 pt at 1.25. */
+const DESCRIPTION_LINE_HEIGHT = 16;
 
 type ProfilePhotoPickerProps = {
   photoUri?: string;
@@ -16,8 +21,9 @@ type ProfilePhotoPickerProps = {
 };
 
 /**
- * "Profil fotoğrafı" block on 00.8 (UZpFX `N3y93`): 80 pt avatar with a camera glyph (or the
- * picked photo) and a brand "+" badge, next to a title and hint. The whole block is one button.
+ * "Profile photo" block of 04.01 (Pencil `R9JExd` empty, `mFKFe` with a photo): 80 pt avatar
+ * next to a title and hint. Empty: muted disc with a brand camera and a "+" badge; with a
+ * photo: the photo and a camera badge for changing it. The whole block is one button.
  */
 export function ProfilePhotoPicker({ photoUri, title, description, onPress }: ProfilePhotoPickerProps) {
   return (
@@ -32,11 +38,30 @@ export function ProfilePhotoPicker({ photoUri, title, description, onPress }: Pr
           {photoUri ? (
             <Image source={{ uri: photoUri }} style={styles.photo} accessibilityIgnoresInvertColors />
           ) : (
-            <Camera width={26} height={26} color={colors.textSecondary} strokeWidth={1.5} />
+            <Camera
+              width={EMPTY_CAMERA_SIZE}
+              height={EMPTY_CAMERA_SIZE}
+              color={colors.brand}
+              strokeWidth={1.5}
+            />
           )}
         </View>
         <View style={styles.badge}>
-          <Plus width={14} height={14} color={colors.textInverse} strokeWidth={2} />
+          {photoUri ? (
+            <Camera
+              width={BADGE_CAMERA_SIZE}
+              height={BADGE_CAMERA_SIZE}
+              color={colors.textInverse}
+              strokeWidth={1.8}
+            />
+          ) : (
+            <Plus
+              width={BADGE_ICON_SIZE}
+              height={BADGE_ICON_SIZE}
+              color={colors.textInverse}
+              strokeWidth={2}
+            />
+          )}
         </View>
       </View>
       <View style={styles.text}>
@@ -52,7 +77,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.lg,
-    paddingVertical: spacing.xs,
   },
   pressed: {
     opacity: 0.7,
@@ -65,8 +89,6 @@ const styles = StyleSheet.create({
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
-    borderWidth: 1.5,
-    borderColor: colors.borderStrong,
     backgroundColor: colors.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
@@ -83,7 +105,7 @@ const styles = StyleSheet.create({
     width: BADGE_SIZE,
     height: BADGE_SIZE,
     borderRadius: BADGE_SIZE / 2,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.surface,
     backgroundColor: colors.brand,
     alignItems: 'center',
@@ -94,13 +116,13 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   title: {
-    fontFamily: fontFamily.semibold,
-    fontSize: 15,
-    lineHeight: 20,
+    ...typography.bodyLargeSemibold,
     color: colors.textPrimary,
   },
   description: {
-    ...typography.captionRelaxed,
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: DESCRIPTION_LINE_HEIGHT,
     color: colors.textSecondary,
   },
 });

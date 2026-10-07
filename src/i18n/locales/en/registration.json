@@ -1,33 +1,12 @@
 {
-  "title": "Create account",
-  "roadPreferences": {
-    "curvyRoads": "Curvy roads",
-    "coast": "Coast",
-    "mountainRoads": "Mountain roads",
-    "city": "City",
-    "longTour": "Long tour",
-    "offRoad": "Off-road",
-    "weekendGetaway": "Weekend getaway",
-    "nightRiding": "Night riding"
-  },
-  "tempo": {
-    "relaxed": "Relaxed",
-    "balanced": "Balanced",
-    "sporty": "Sporty"
-  },
-  "experience": {
-    "zeroToTwo": "0–2 years",
-    "threeToFive": "3–5 years",
-    "fivePlus": "5+ years"
-  },
-  "listSeparator": " · ",
   "usernameHandle": "@{{username}}",
   "profile": {
-    "heading": "Let's get to know you",
-    "description": "Other riders will see this on your profile.",
+    "heading": "Let’s get to know you",
+    "description": "Other riders will see you with these details.",
     "photoTitle": "Add a profile photo",
-    "photoTitleChange": "Change profile photo",
-    "photoDescription": "A helmet photo works too. Showing your face builds trust in matches.",
+    "photoDescription": "Optional. A helmet photo works too.",
+    "photoTitleSet": "Profile photo",
+    "photoDescriptionSet": "You can change it any time.",
     "photoPermissionTitle": "Photo access needed",
     "photoPermissionMessage": "Allow access to your photos in Settings to choose a profile photo.",
     "photoPermissionCancel": "Not now",
@@ -35,74 +14,54 @@
     "fullNameLabel": "Full name",
     "usernameLabel": "Username",
     "usernamePrefix": "@",
+    "usernamePlaceholder": "username",
+    "usernameHelper": "You can use letters, numbers, dots and underscores.",
     "usernameChecking": "Checking…",
-    "usernameAvailable": "This username is available",
-    "usernameTaken": "This username is taken",
+    "usernameAvailable": "This username is available.",
+    "usernameTaken": "This username is taken.",
+    "usernameSuggestionsTitle": "You can pick one of these:",
     "usernameSuggestionsLabel": "Suggested usernames",
     "usernameSuggestionHint": "Picks this username",
     "usernameCheckFailed": "Couldn't check. Check your connection and try again.",
     "usernameInvalidCharacters": "Use only lowercase letters, numbers, dots and underscores.",
     "usernameTooShort": "Must be at least {{min}} characters.",
-    "usernameTooLong": "Can be at most {{max}} characters.",
-    "cityLabel": "City",
-    "cityPlaceholder": "Choose your city",
-    "cityHelper": "Used to show routes and riders near you."
+    "usernameTooLong": "Can be at most {{max}} characters."
   },
-  "city": {
-    "title": "City",
-    "searchPlaceholder": "Search cities",
-    "noResults": "No cities match your search."
+  "location": {
+    "heading": "Are we in the right place?",
+    "description": "We use your location to show routes near you and suggestions that suit you.",
+    "fieldLabel": "Your location",
+    "useCurrent": "Use current location",
+    "deniedHeading": "Discover what’s around you",
+    "deniedDescription": "Allow location access for a better experience and suggestions for your area.",
+    "allow": "Allow location access",
+    "benefits": {
+      "nearbyRoutes": {
+        "title": "Nearby routes",
+        "text": "See popular routes close to where you are."
+      },
+      "localPicks": {
+        "title": "Picks for your area",
+        "text": "Get suggestions tailored to your location."
+      },
+      "nearbyRiders": {
+        "title": "Nearby riders",
+        "text": "Discover riders around you who share routes."
+      }
+    }
   },
-  "brand": {
-    "heading": "What do you ride?",
-    "description": "Pick your brand; next we'll add the model and year.",
-    "searchPlaceholder": "Search brands",
-    "manualTitle": "Not on the list?",
-    "manualSubtitle": "Add your brand",
-    "manualLabel": "Brand name",
-    "manualPlaceholder": "e.g. Benelli"
+  "bike": {
+    "heading": "Which motorcycle do you ride?",
+    "description": "Add your motorcycle to complete your profile and match your rides to the bike you ride.",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "choose": "Choose",
+    "mainBikeNote": "This motorcycle will be saved as your main bike once onboarding is complete.",
+    "brandSearch": "Search brands",
+    "modelSearch": "Search models",
+    "modelsOf": "{{brand}} models",
+    "displacement": "{{cc}} cc"
   },
-  "model": {
-    "heading": "Choose your model",
-    "description": "We'll add it to your garage; it shows on your profile and in matches.",
-    "brandLabel": "Brand",
-    "searchPlaceholder": "Search {{brand}} models",
-    "noResults": "No models match your search. You can type your model below.",
-    "manualLabel": "Model name",
-    "manualPlaceholder": "e.g. Leoncino 500",
-    "yearLabel": "Model year",
-    "yearOther": "Other",
-    "yearOtherPlaceholder": "e.g. 2015",
-    "yearInvalid": "Enter a year between {{min}} and {{max}}."
-  },
-  "ridingStyle": {
-    "heading": "How do you like to ride?",
-    "description": "We'll suggest routes and riding buddies based on these preferences.",
-    "roadsLabel": "Favourite roads",
-    "roadsHint": "Pick as many as you like",
-    "tempoLabel": "Your pace",
-    "experienceLabel": "Riding experience",
-    "note": "You can change your preferences anytime in Profile › Settings.",
-    "submit": "Finish sign-up"
-  },
-  "complete": {
-    "heading": "Your garage is ready, {{name}}!",
-    "headingNoBike": "Your profile is ready, {{name}}!",
-    "description": "Your profile is set up. You can now discover routes, record your rides and match with riders nearby.",
-    "mainBike": "YOUR MAIN BIKE",
-    "bikeTitle": "{{brand}} {{model}}",
-    "ridingStyleLabel": "Your riding style",
-    "tempoTag": "{{tempo}} pace",
-    "roadTags": {
-      "curvyRoads": "Curvy",
-      "coast": "Coast",
-      "mountainRoads": "Mountain roads",
-      "city": "City",
-      "longTour": "Long tour",
-      "offRoad": "Off-road",
-      "weekendGetaway": "Weekend",
-      "nightRiding": "Night riding"
-    },
-    "start": "Start exploring"
-  }
+  "loading": "Loading…"
 }

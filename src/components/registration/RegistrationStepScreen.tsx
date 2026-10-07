@@ -1,6 +1,6 @@
-import { Stack } from 'expo-router';
 import { useHeaderHeight } from 'expo-router/react-navigation';
 import { useEffect, useState, type ComponentRef, type ReactNode, type Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -16,21 +16,16 @@ import { Button } from '@/components/ui/Button';
 import { StepProgress } from '@/components/ui/StepProgress';
 import { colors, layout, spacing, typography } from '@/theme';
 
-import { HeaderSkipButton } from './HeaderSkipButton';
+/** Segments in the registration step indicator ("Progress / 1 / 3", 04.01–04.03). */
+export const REGISTRATION_STEP_COUNT = 3;
 
-/** Number of segments in the registration step indicator (00.8–00.11). */
-export const REGISTRATION_STEP_COUNT = 4;
-
-/**
- * Content column of the registration frames ("İçerik", padding [20, 32]): the flow uses a
- * 32 pt inset while the pinned CTA keeps the 16 pt screen gutter (see CLAUDE.md decisions).
- */
-const CONTENT_INSET = spacing.xxxl;
-/** Vertical rhythm between content blocks in UZpFX / QKDo5 / Fv4ol / LreVd (g4Zy4 uses 16). */
-const DEFAULT_CONTENT_GAP = 18;
+/** Gap between the indicator, the copy and the step body ("Kayıt tamamlama içeriği" gap 32). */
+const SECTION_GAP = spacing.xxxl;
+/** Description: 14 pt at 1.43. */
+const DESCRIPTION_LINE_HEIGHT = 20;
 
 type RegistrationStepScreenProps = {
-  /** Filled segments in the step indicator (1–4; 4 on the completion screen). */
+  /** Filled segments in the step indicator (1–3). */
   step: number;
   heading: string;
   description: string;
@@ -39,16 +34,15 @@ type RegistrationStepScreenProps = {
   onCtaPress: () => void;
   ctaDisabled?: boolean;
   ctaLoading?: boolean;
-  /** Shows the "Atla" header action (only on steps where the design enables it). */
-  onSkip?: () => void;
-  contentGap?: number;
+  /** "Atla" under the CTA: leaves the step without saving it. */
+  onSkip: () => void;
   scrollRef?: Ref<ComponentRef<typeof ScrollView>>;
 };
 
 /**
- * Shared scaffold for the registration screens: step indicator, heading and description,
- * scrollable body and a bottom-pinned full-width CTA that stays above the keyboard.
- * The native Stack header ("Hesap oluştur", back) comes from `register/_layout.tsx`.
+ * Shared scaffold of the registration steps (Pencil 04.01–04.03): step indicator, heading
+ * and description, a scrollable body, and the CTA with "Atla" pinned to the bottom above the
+ * keyboard. The native Stack header (back only, no title) comes from `register/_layout.tsx`.
  */
 export function RegistrationStepScreen({
   step,
@@ -60,54 +54,51 @@ export function RegistrationStepScreen({
   ctaDisabled,
   ctaLoading,
   onSkip,
-  contentGap = DEFAULT_CONTENT_GAP,
   scrollRef,
 }: RegistrationStepScreenProps) {
+  const { t } = useTranslation('common');
   const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
   const keyboardVisible = useKeyboardVisible();
 
   return (
-    <>
-      {onSkip ? (
-        <Stack.Screen options={{ headerRight: () => <HeaderSkipButton onPress={onSkip} /> }} />
-      ) : null}
-      <KeyboardAvoidingView
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior="padding"
+      keyboardVerticalOffset={headerHeight}>
+      <ScrollView
+        ref={scrollRef}
         style={styles.flex}
-        behavior="padding"
-        keyboardVerticalOffset={headerHeight}>
-        <ScrollView
-          ref={scrollRef}
-          style={styles.flex}
-          contentContainerStyle={[styles.content, { gap: contentGap }]}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="interactive">
-          <StepProgress total={REGISTRATION_STEP_COUNT} current={step} />
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive">
+        <StepProgress total={REGISTRATION_STEP_COUNT} current={step} tone="brand" />
+        <View style={styles.copy}>
           <Text style={styles.heading} accessibilityRole="header">
             {heading}
           </Text>
           <Text style={styles.description}>{description}</Text>
-          {children}
-        </ScrollView>
-        <View
-          style={[
-            styles.footer,
-            { paddingBottom: spacing.md + (keyboardVisible ? 0 : insets.bottom) },
-          ]}>
-          <Button
-            label={ctaLabel}
-            onPress={onCtaPress}
-            disabled={ctaDisabled}
-            loading={ctaLoading}
-            size="lg"
-          />
         </View>
-      </KeyboardAvoidingView>
-    </>
+        {children}
+      </ScrollView>
+      <View
+        style={[
+          styles.footer,
+          { paddingBottom: spacing.sm + (keyboardVisible ? 0 : insets.bottom) },
+        ]}>
+        <Button
+          label={ctaLabel}
+          onPress={onCtaPress}
+          disabled={ctaDisabled}
+          loading={ctaLoading}
+        />
+        <Button variant="text" label={t('actions.skip')} onPress={onSkip} disabled={ctaLoading} />
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
-/** Drops the home-indicator inset under the CTA while the keyboard covers it. */
+/** Drops the home-indicator inset under the actions while the keyboard covers it. */
 function useKeyboardVisible() {
   const [visible, setVisible] = useState(false);
 
@@ -130,21 +121,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: CONTENT_INSET,
-    paddingTop: spacing.xl,
+    gap: SECTION_GAP,
+    paddingHorizontal: layout.screenGutter,
+    paddingTop: spacing.lg,
     paddingBottom: spacing.xxl,
   },
+  copy: {
+    gap: spacing.sm,
+  },
   heading: {
-    ...typography.headlineMedium,
+    ...typography.title,
     color: colors.textPrimary,
   },
-  // 14 pt at 1.4 line height.
   description: {
     ...typography.body,
-    lineHeight: 20,
-    color: colors.textBody,
+    lineHeight: DESCRIPTION_LINE_HEIGHT,
+    color: colors.textPrimary,
   },
   footer: {
+    gap: spacing.sm,
     paddingTop: spacing.md,
     paddingHorizontal: layout.screenGutter,
     backgroundColor: colors.surface,
