@@ -14,12 +14,12 @@ Temel döngü: **rota bul → sürüşü kaydet → isterse paylaş.** Her ekran
 
 ## Tasarım kaynağı (Pencil)
 
-Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/5d001c98-ecd1-4fee-823a-30f1c54e8880/pencil-new.pen`
+Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8ce9826-8c65-45dd-ba42-64f18ffaaa58/pencil-new.pen` (2026-10-07'den itibaren; eski kopya `5d001c98-…` artık kullanılmaz)
 
 - `.pen` dosyasını **yalnızca Pencil MCP araçlarıyla** oku (`mcp__pencil__execute` içinde `Get`, `TakeScreenshot`); Read/Grep ile açma.
 - Ekran frame'leri 393 × 852 (iPhone 15/16 boyutu), yan boşluk 16 px, içerik genişliği 361 px.
-- Frame adları `NN.N Alan / Ekran — Durum` biçiminde numaralı (ör. `02.2 Record / Paused`).
-- Kanvas bölgeleri: ekranlar (y ≈ -6100 … 6700), Core Components panoları (y ≈ -14193), App Icon (y ≈ -9571), UX araştırma panoları (y ≈ 9266 … 12000).
+- Frame adları `NN.NN Alan / Ekran — Durum` biçiminde numaralı (ör. `02.02 Auth / Şifre — Yeni hesap`). Ekranlar soldaki `Etiket / Akış NN — …` panolarıyla akışlara gruplanır (Akış 01 Splash … Akış 22 Topluluk); her akışın yanında `Not / Tasarım notu` kartları kural ve ölçüm notlarını taşır.
+- Kanvas: akış satırları yukarıdan aşağı (Akış 01 y ≈ -29700 … Akış 22 y ≈ -2000), etiket panoları x ≈ -12800.
 
 ## MVP kapsamı ve ürün kuralları
 
@@ -68,7 +68,11 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/5d
 
 | Alan | Ekranlar |
 |---|---|
-| 00 Launch / Onboarding / Auth | Splash, Get Started, Giriş (boş/dolu, e-posta + Google/Apple), Şifre (mevcut/yeni hesap), Şifremi unuttum, E-posta kontrol, Yeni şifre, Şifre güncellendi |
+| 00 Launch (Akış 01) | 00.01 Splash (00.02 "Başlarken · Alt. Grup görseli" onboarding'le değişti, uygulanmaz) |
+| 01 Onboarding (Akış 02) | 01.01 Keşfet, 01.02 Sür ve kaydet, 01.03 Paylaş (açık tema) |
+| 02 Auth (Akış 03–05) | 02.01 Giriş (boş/dolu/yükleniyor), 02.02 Şifre (mevcut/yeni hesap, yanlış şifre, çok fazla deneme), 02.03 Şifremi unuttum, 02.04 E-posta kontrol, 02.05 Yeni şifre, 02.06 Şifre güncellendi, 02.07 E-posta doğrulama (yeni hesap / süresi dolmuş bağlantı) |
+| 03 İzinler (Akış 06) | 03.01 Konum izni, 03.02 Bildirim izni (sheet) |
+| 04–13 (Akış 07–22) | Kayıt tamamlama, Discover, Rotayı sür, Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
 | 01 Discover | Home (harita odaklı: konum, arama, kategori chip'leri, bölgede N rota, "Senin için önerilenler"), Search (aktif/sonuç/sonuç yok/sıralama sheet), Önerilen rotalar — Tümü, Rota detayı (standart/uzun), Haritada keşfet — rota listesi |
 | 02 Record | Ready (rotalı/serbest, sürüş tipi şeridi alternatifi), Recording, Paused, Recovery, Sürüş modu full ekran, Durdurma onayı, Sürüşü kaydet (form), Sürüş tipi seçimi sheet |
 | 03 Profil / Ayarlar | Profil genel (Sürüşler/Performans/Kaydettiklerim sekmeleri), Profili paylaş (QR), Aktivite paylaşımı (karusel şablonlar), Kaydettiklerim (liste/kaydedildi/kaldırıldı/boş), Ayarlar ve alt sayfaları: hesap, sürüş görünürlüğü, başlangıç-bitiş gizleme, engellenenler, konum/fotoğraf izni, bildirimler, dil, ölçü birimleri, yardım/SSS, geri bildirim, gizlilik politikası, kullanım koşulları, çıkış |
@@ -181,8 +185,7 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Rota kartı metrikleri | Genel kural Mono, kartlar Inter | Kartlarda Inter; canlı kayıt/profil metrikleri JetBrains Mono |
 | Siyah metin | Ekranlarda `#000000` | `textPrimary` (#101318) |
 | Buton etiketi (auth/kayıt) | Ekranlar 12 semibold, pano 14 medium | 14 medium (pano) |
-| Alt sabit CTA | Kayıt ekranlarında 56 pt, Get Started 48 pt, auth 44 pt | Ekranın altına sabitlenen tam genişlik CTA `size="lg"` (48 pt); içerik içindeki butonlar 44 pt |
-| Get Started butonu | Marka mavisi, panoda yok | `Button tone="brand"`; basılı `#1111D9` |
+| Alt sabit CTA | Kayıt ekranlarında 56 pt, auth 44 pt | Ekranın altına sabitlenen tam genişlik CTA `size="lg"` (48 pt); içerik içindeki butonlar 44 pt |
 | Kayıt alanları | Ekran 48 pt / 14 padding / 1.5 focus | TextField standardı 44 / 12 / 1 |
 | Arama alanı | Ekran 18 pt ikon, 15 pt yazı, `#F6F7F7` | `SearchField`: 20 pt ikon, 16 pt yazı, `surfaceMuted` |
 | Tempo / Deneyim kontrolleri | Ekranda 44 pt, farklı yazı ve gölge | Standart `SegmentedControl` |
@@ -190,15 +193,19 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Yol tercihi ikonları | Iconoir'da dağ/çadır yok; seçili çipler ikon göstermiyor | Dağ yolları ve Off-road ikonları tasarımdaki çizimden SVG; Virajlı `PathArrow`, Sahil `SeaAndSun`, Uzun tur `RideTypeIcon longRide`, Hafta sonu `Calendar`, Şehir içi `City`, Gece `HalfMoon` |
 | "e-Posta" etiketi | Etiket "e-Posta", buton "E-posta ile devam et" | "E-posta" (TDK yazımı, butonla tutarlı) |
 | Auth alt ekran başlığı | Tasarımda geri butonu yok, e-posta alanı salt okunur | Şeffaf native header, yalnız geri butonu; akış sonu ekranlarında (yeni şifre, güncellendi) geri yok |
-| Onboarding fotoğrafı (`sLkVv`) | Tasarımda görsel "stretch" ile oranı bozularak frame'e çekilmiş (motorlar yatayda ~%35 sıkışık) | Orijinal görsel (`images/image-import-3.png`, 1015×1421) `cover` ile; oran korunur, her ekran boyutunda ortadan kırpılır. Tasarımdan görsel alırken frame export'u değil orijinal dosyayı kullan |
-| Kilit geri sayımı | Tasarımda Inter 700 22 | JetBrains Mono (`metricLarge`); sayaç rakamları titremesin. Süre dolunca kart yeşile döner, "Tekrar dene" ana eylem olur |
-| Deneme hakkı | Tasarım "2 deneme hakkın kaldı" | 3 deneme; 3. hatada doğrudan kilit ekranı (mesaj yalnız 2 ve 1 için görünür); metin i18n çoğul formuyla |
-| Bağlı hesap ekranı | Brief "birincil buton" diyordu | Tasarım (`EV75c`): resmi logolu outlined buton; Google ve Apple aynı yerleşim |
-| Turuncu uyarı notu | Amber warning token'larından farklı tonlar | Ayrı `caution*` token'ları + yerel `CautionNote` |
-| Türkçe saat eki | "14:05’te" sabit | Saate göre çalışma zamanında hesaplanır (’te/’da…); İngilizce tarih `en-GB` biçimi |
+| Fotoğraf görselleri | Tasarımda fotoğraflar "stretch" ile oranı bozularak frame'e çekilebiliyor | Fotoğraflarda orijinal dosya (`<pencil klasörü>/images/…`) `cover` ile; frame export'u değil |
+| Onboarding illüstrasyonları (01.01–01.03) | Kolaj / harita / yörünge çizimleri onlarca katman, minik metinler | Her sayfanın "Görsel" frame'i (393 × 520) 3x JPEG export (`assets/images/onboarding/`); 01.03'teki dışarıda kalan poster kartı geçici kopyayla birlikte export edildi. Görseldeki örnek Türkçe metinler (rota adları, "Kayıt") i18n istisnasıdır. Kısa ekranda görsel yüksekliği küçülür, `cover` ile kırpılır |
+| Onboarding metinleri | Başlık 26/700, açıklama #9EA0A4 | Başlık `typography.onboardingTitle` (Inter 700); açıklama `textSecondary` (AA kontrast). "Zaten hesabın var mı? Giriş yap" satırı 44 pt dokunma alanı, "Giriş yap" `textPrimary` medium (link anlaşılsın) |
+| Onboarding ölçümü | Not `xx2W7` 4 olay tanımlıyor | `trackEvent` (`src/features/analytics/track.ts`) üzerinden; sağlayıcı seçilene kadar yalnız geliştirmede log |
+| Yeni hesap başlığı | "Hoşgeldin!" | TDK yazımı "Hoş geldin!" |
+| Yanlış şifre | Tasarım deneme sayısı göstermiyor | Her yanlış şifrede "Şifre hatalı. Tekrar dene ya da şifreni sıfırla." (3. hatada kilit) |
+| Çok fazla deneme (`rjPx3`) | Ayrı kilit ekranı yerine şifre ekranında banner | Ekran içi `AlertBanner` + pasif CTA "MM:SS sonra tekrar dene" (pasif buton standart rengi, tasarımdaki #898989 değil) + "Şifremi sıfırla"; süre dolunca CTA "Devam et"e döner. Banner renkleri `dangerBanner*` token'ları |
+| Bağlı hesap ekranı | Yeni Pencil dosyasında karşılığı yok (eski `EV75c`) | Akış gerekli olduğu için korunur: resmi logolu outlined buton; Google ve Apple aynı yerleşim |
+| Turuncu uyarı tonu | Amber warning token'larından farklı tonlar | Ayrı `caution*` token'ları (Discover konum izni banner'ı) |
 | Misafir giriş sheet'i | "Şimdi değil" 40 pt / 13 semibold gri | Standart metin `Button` (44 pt); başlık 20 semibold; sebep (`reason`) parametresiyle başlık/ikon değişir |
-| Lucide → Iconoir | Tasarımda lock, link-2, clock-alert | `Lock`, `Link`, `Clock`; açık kilit olmadığı için süre dolunca `CheckCircle` |
-| İzin ekranları (`TJtI6`, `RzQd4`) | "Atla", rota sayısı hapı, rota çizgisi tasarımda gizli | Gizli öğeler uygulanmaz (konum bilinmeden rota sayısı göstermek yanıltıcı); boş 64 pt üst alan korunur; "Şimdi değil" standart metin butonu, ana CTA 48 pt. Her iki cevapta da sonraki adıma geçilir, geri dönüş yok |
+| Lucide → Iconoir | Tasarımda link-2, alert-circle | `Link`, `WarningCircle` |
+| İzin sheet'i (03.01 `ylGJA`, 03.02 `KvKqT`) | Tasarımda arka planda rastgele bir auth ekranı | Tek native `formSheet` (`/permissions`, `fitToContents`, köşe 28), içinde konum → bildirim adımı. Yeni hesap (profili bitmemiş hesaba giriş) için bir kez, kayıt akışının ilk ekranının üstünde (`usePermissionPromptSheet`); yani izinler kayıttan önce (03 → 04 sırası, 04.02 izin durumlarına göre). Her iki cevapta ilerler; sheet'i kaydırıp kapatmak iki adım için de "Şimdi değil" sayılır. İllüstrasyonlar frame export'u (361 × 384), kısa ekranda küçülür. Açıklama 16 pt `textSecondary` |
+| Bildirim izni metni | "…etkileşimler ve … gelişmelerden" | "…etkileşimlerden ve …" (hâl eki uyumu) |
 | Konum izni | Tasarım yalnız "izin ver" diyor | Yalnız ön plan izni; arka plan izni Kayıt akışında istenir |
 | Kullanıcı adı önerileri | Tasarımda örnek 3 çip | `.rides`, `_<plaka kodu>`, `<motor modeli>` sırasıyla; kurallara uyan, müsait en fazla 3 öneri. Çip dokunma alanı 45 pt'ye genişletildi |
 | Kullanıcı adı hata ikonu | Yalnız "alınmış" durumunda çizilmiş | Tüm kullanıcı adı hatalarında 20 pt ikon (başarı ikonuyla aynı yer) |
@@ -234,8 +241,10 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Alana ait olmayan hatalar | Tasarımda yok | Alt başlık ile form arasında satır içi failure `Toast` |
 | Yasal linkler | Metinden ayırt edilmiyor | `textSecondary` + altı çizili (link olduğu anlaşılsın) |
 | E-posta maskeleme | "yas••••@gmail.com" | İlk 3 karakter + sabit `••••` (uzunluk sızmaz); 3 karakter veya daha kısa yerel kısımda yalnız ilk harf |
-| Tekrar gönder (sayaç) | Pasif hâli #6B6E73 | Standart pasif buton rengi |
-| Süresi dolmuş / geçersiz sıfırlama linki | Tasarım artık `b1m1YP` ekranını veriyor | Her ikisi de `reset-link-expired` ekranına gider; geçersiz linkte e-posta bilinmediği için gönderim notu gizlenir ve "Yeni bağlantı gönder" şifremi unuttum ekranını açar |
+| Tekrar gönder (02.04, 02.07) | Tasarımda yalnız metin butonu | `ResendEmailForm`: salt okunur e-posta + "E-postayı tekrar gönder"; her gönderimden sonra 60 sn geri sayım (pasif standart renk). Mail uygulamasını aç / e-postayı değiştir / ipucu kaldırıldı (geri butonu 02.03'e döner) |
+| Yasal alt bilgi | Yalnız 02.01–02.02'de çizili | `AuthScreen showLegalFooter` yalnız giriş ve şifre adımlarında |
+| E-posta doğrulama (02.07) | Yeni | Yeni e-posta hesabı şifreden sonra `/email-verification`'da bekler (geri yok); bağlantı `rolt://email-verification/confirm?token=…`. Uygulamaya dönünce hesap yeniden okunur (mock bunu bağlantıya dokunmak sayar). Süresi dolmuş/geçersiz bağlantı → `expired` (24 saat, "Giriş ekranına dön" çıkış yapar) |
+| Süresi dolmuş sıfırlama linki | Tasarımda artık yalnız doğrulama için süresi dolmuş ekranı var | `reset-link-expired` aynı düzeni kullanır (illüstrasyon, salt okunur e-posta, "Yeni bağlantı gönder", "Giriş ekranına dön") ve kendi 30 dk metnini; geçersiz linkte e-posta alanı gizlenir ve gönder 02.03'ü açar |
 | Kayıt içerik boşluğu | Auth 16 pt, kayıt 32 pt | Kayıt içeriği 32 pt, alt CTA çubuğu 16 pt (tasarım) |
 | Kayıt "Atla" | Tasarımda yalnız marka ve sürüş tarzı adımlarında | Profil ve model adımında yok; markada atla → sürüş tarzına geçer (model adımı marka ister) |
 | Model yılı hapları | Tasarım 2024–2021 | İçinde bulunulan yıl ve önceki 3 yıl + "Diğer" (1950…gelecek yıl) |
@@ -251,7 +260,7 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 - Logo kaynakları (Pencil, 1024 px, mavi gradient `#0044FF → #0000FE` + nokta deseni): `qS2Np` (kırpılmış büyük "R"), `HgIhd` (taşan "ROLT"), `e9xZmO` (ortalanmış "ROLT" — **aktif uygulama ikonu**). Wordmark fontu Bakbak One.
 - Üç varyantın export'u: `assets/brand/rolt-icon-{r-mark,wordmark-bleed,wordmark}.png`.
 - `assets/icon.png` (iOS, köşesiz ve alfasız), `android-icon-{background,foreground,monochrome}.png` (foreground wordmark'ı 66 dp güvenli alanda), `splash-icon.png` (saydam zeminde beyaz wordmark), `favicon.png` hepsi `e9xZmO`'dan türetildi.
-- Splash `expo-splash-screen` config plugin ile: zemin `#1515FF` (Pencil `00.0 Launch / Splash`, `RBNTd`), `imageWidth: 200`.
+- Splash `expo-splash-screen` config plugin ile: zemin `#1515FF` (Pencil `00.01 Launch / Splash`, `f1H2n6`; görünür wordmark ~100 pt), `imageWidth: 200`.
 - İkonu değiştirmek için: Pencil'de node'u köşesiz (`cornerRadius: 0`) geçici bir kopyayla `Export` et, kopyayı sil, yukarıdaki dosyaları yeniden üret.
 
 ## Web sitesi (roltapp.com)
@@ -271,8 +280,10 @@ src/
   app/                    # Expo Router rotaları (yalnızca ekranlar ve _layout'lar)
     _layout.tsx           # root Stack + ThemeProvider + font yükleme + splash
     index.tsx             # → /discover yönlendirmesi
-    onboarding.tsx        # 00.0 Get Started
-    (auth)/               # 00.x giriş / şifre akışı
+    onboarding.tsx        # 01.01–01.03 onboarding sayfaları
+    (auth)/               # 02.01–02.06 giriş / şifre akışı
+    email-verification/   # 02.07 e-posta doğrulama
+    permissions.tsx       # 03.01–03.02 izin sheet'i
     (tabs)/_layout.tsx    # NativeTabs: discover / record / profile
     (tabs)/<tab>/         # her sekmede native Stack (_layout.tsx) + index.tsx
   components/
