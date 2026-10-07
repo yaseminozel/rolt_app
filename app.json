@@ -78,7 +78,7 @@
         "expo-media-library",
         {
           "photosPermission": "ROLT, profiline, sürüşlerine ve önerdiğin rotalara fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
-          "savePhotosPermission": false,
+          "savePhotosPermission": "ROLT, profil kartını fotoğraflarına kaydedebilmen için galeriye görsel ekler.",
           "isAccessMediaLocationEnabled": true
         }
       ],

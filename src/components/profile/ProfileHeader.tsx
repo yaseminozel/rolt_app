@@ -23,6 +23,8 @@ type ProfileHeaderProps = {
   /** Username without "@". */
   handle: string;
   avatar?: ImageSourcePropType;
+  /** Shown instead of a photo when there is none (own profile, 09.01 new rider). */
+  avatarInitials?: string;
   bio?: string;
   /** Location line, e.g. "İstanbul, Türkiye". */
   city?: string;
@@ -44,6 +46,7 @@ export function ProfileHeader({
   name,
   handle,
   avatar,
+  avatarInitials,
   bio,
   city,
   bike,
@@ -67,7 +70,7 @@ export function ProfileHeader({
               {t('handle', { handle })}
             </Text>
           </View>
-          <ProfileAvatar source={avatar} size={AVATAR_SIZE} />
+          <ProfileAvatar source={avatar} size={AVATAR_SIZE} initials={avatarInitials} />
         </View>
 
         {bio || hasMeta ? (
@@ -77,7 +80,11 @@ export function ProfileHeader({
               <View style={styles.metaRow}>
                 {city ? (
                   <View style={styles.metaItem}>
-                    <MapPin width={META_ICON_SIZE} height={META_ICON_SIZE} color={colors.textSecondary} />
+                    <MapPin
+                      width={META_ICON_SIZE}
+                      height={META_ICON_SIZE}
+                      color={colors.textSecondary}
+                    />
                     <Text style={styles.metaText} numberOfLines={1}>
                       {city}
                     </Text>

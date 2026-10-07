@@ -27,13 +27,17 @@
     "following": "Takip ediliyor",
     "rideTogether": "Birlikte sür",
     "share": "Profili paylaş",
-    "more": "Diğer seçenekler"
+    "more": "Diğer seçenekler",
+    "editProfile": "Profili düzenle",
+    "changePhoto": "Profil fotoğrafını değiştir",
+    "settings": "Ayarlar"
   },
   "tabs": {
     "label": "Profil bölümleri",
     "rides": "Sürüşler",
     "routes": "Rotalar",
-    "garage": "Garaj"
+    "garage": "Garaj",
+    "saved": "Kaydettiklerim"
   },
   "menu": {
     "report": "Şikâyet et",
@@ -95,5 +99,51 @@
     "title": "Profil yüklenemedi",
     "description": "Bağlantını kontrol edip tekrar dene.",
     "retry": "Tekrar dene"
+  },
+  "photo": {
+    "title": "Profil fotoğrafı",
+    "camera": "Fotoğraf çek",
+    "library": "Galeriden seç",
+    "openSettings": "Ayarlar'ı aç",
+    "cameraPermission": {
+      "title": "Kamera izni gerekli",
+      "message": "Fotoğraf çekmek için Ayarlar'dan kamera iznini aç."
+    }
+  },
+  "own": {
+    "empty": {
+      "title": "Henüz sürüşün yok",
+      "description": "İlk sürüşünü kaydettiğinde rotan, mesafen ve fotoğrafların burada görünür.",
+      "action": "İlk sürüşünü kaydet"
+    }
+  },
+  "saved": {
+    "empty": {
+      "title": "Henüz kaydettiğin rota yok",
+      "description": "Beğendiğin rotaları yer imiyle kaydet, burada bulursun."
+    }
+  },
+  "shareSheet": {
+    "cardLabel": "ROLT — Sürüş Paylaşımı",
+    "title": "Profilimi paylaş",
+    "close": "Kapat",
+    "qrA11y": "@{{handle}} profilinin karekodu",
+    "targets": {
+      "airdrop": "AirDrop",
+      "messages": "Mesajlar",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "more": "Daha fazla"
+    },
+    "copyLink": "Bağlantıyı kopyala",
+    "saveImage": "Görseli kaydet",
+    "linkCopied": "Bağlantı kopyalandı",
+    "imageSaved": "Görsel fotoğraflarına kaydedildi",
+    "imageFailed": "Görsel kaydedilemedi",
+    "photosPermission": {
+      "title": "Fotoğraflara erişim gerekli",
+      "message": "Görseli kaydetmek için Ayarlar'dan fotoğraflara ekleme iznini aç."
+    },
+    "message": "ROLT'ta beni takip et: {{link}}"
   }
 }

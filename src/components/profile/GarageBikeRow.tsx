@@ -25,7 +25,14 @@ type GarageBikeRowProps = {
  * registration brand tiles), model and detail line, optional main-bike tag and a divider
  * following the route row rhythm.
  */
-export function GarageBikeRow({ brand, title, detail, badgeLabel, divider = false, style }: GarageBikeRowProps) {
+export function GarageBikeRow({
+  brand,
+  title,
+  detail,
+  badgeLabel,
+  divider = false,
+  style,
+}: GarageBikeRowProps) {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.content} accessible>
@@ -40,7 +47,9 @@ export function GarageBikeRow({ brand, title, detail, badgeLabel, divider = fals
             </Text>
           ) : null}
         </View>
-        {badgeLabel ? <Badge label={badgeLabel} tone="neutral" size="small" showIcon={false} /> : null}
+        {badgeLabel ? (
+          <Badge label={badgeLabel} tone="neutral" size="small" showIcon={false} />
+        ) : null}
       </View>
       {divider ? <View style={styles.divider} /> : null}
     </View>

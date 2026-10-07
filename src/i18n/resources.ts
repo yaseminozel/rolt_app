@@ -10,6 +10,7 @@ import enRide from './locales/en/ride.json';
 import enRides from './locales/en/rides.json';
 import enRouteDetail from './locales/en/routeDetail.json';
 import enRoutes from './locales/en/routes.json';
+import enSettings from './locales/en/settings.json';
 import enRouteSuggestion from './locales/en/routeSuggestion.json';
 import enRouteSuggestionReview from './locales/en/routeSuggestionReview.json';
 import enRouteSuggestionDetails from './locales/en/routeSuggestionDetails.json';
@@ -25,6 +26,7 @@ import trRide from './locales/tr/ride.json';
 import trRides from './locales/tr/rides.json';
 import trRouteDetail from './locales/tr/routeDetail.json';
 import trRoutes from './locales/tr/routes.json';
+import trSettings from './locales/tr/settings.json';
 import trRouteSuggestion from './locales/tr/routeSuggestion.json';
 import trRouteSuggestionReview from './locales/tr/routeSuggestionReview.json';
 import trRouteSuggestionDetails from './locales/tr/routeSuggestionDetails.json';
@@ -48,6 +50,7 @@ export const trResources = {
   explore: trExplore,
   garage: trGarage,
   profile: trProfile,
+  settings: trSettings,
 };
 
 type LocaleResources = typeof trResources;
@@ -68,6 +71,7 @@ const enResources: LocaleResources = {
   explore: enExplore,
   garage: enGarage,
   profile: enProfile,
+  settings: enSettings,
 };
 
 export const resources: Record<AppLanguage, LocaleResources> = {

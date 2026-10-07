@@ -128,6 +128,13 @@ function RootNavigator() {
         <Stack.Screen name="ride/[routeId]" options={{ gestureEnabled: false }} />
         {/* A recorded ride (08.05–08.11, 09.06–09.07): save form, detail, edit and their sheets. */}
         <Stack.Screen name="rides/[rideId]" />
+        {/* 09.02 Profili paylaş: QR card over the dimmed profile. */}
+        <Stack.Screen
+          name="share-profile"
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
+        />
+        {/* 10.x Ayarlar: modal stack closed with × (sub pages push inside it). */}
+        <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
         <Stack.Screen
           name="notifications"
           options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal' }}

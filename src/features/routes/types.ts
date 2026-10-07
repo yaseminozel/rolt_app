@@ -138,4 +138,6 @@ export interface RoutesRepository {
   /** Routes in the visible map area; `query` narrows by name, summary or city ("Bu bölgede ara"). */
   listInArea(params: { bounds: Bounds; filter: RouteFilter; query?: string }): Promise<Route[]>;
   getById(id: string): Promise<Route | null>;
+  /** Routes in the order of `ids`; missing ones are skipped ("Kaydettiklerim"). */
+  listByIds(ids: readonly string[]): Promise<Route[]>;
 }

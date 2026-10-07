@@ -22,8 +22,11 @@ import {
 } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
+import { RideMapPreview } from '@/components/record/RideMapPreview';
 import { RideTypeBadge } from '@/components/ride/RideTypeBadge';
+import type { BoxPadding } from '@/components/route-builder/routeProjection';
 import type { RideType } from '@/features/rides/rideTypes';
+import type { LngLat } from '@/features/routes/types';
 import { formatNumber } from '@/i18n/format';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
 
@@ -37,6 +40,7 @@ const MAP_WIDTH = 240;
 const PHOTO_WIDTH = 86;
 const MEDIA_HEIGHT = 100;
 const MEDIA_STROKE_WIDTH = 1.5;
+const THUMBNAIL_PADDING: BoxPadding = { top: 16, right: 16, bottom: 16, left: 16 };
 /** Icon → count gap in the action row ("Aksiyon / Beğen" gap 6). */
 const COUNT_GAP = 6;
 /** Grows the 28 pt action rows to a 44 pt touch target. */
@@ -57,7 +61,9 @@ type RideActivityCardProps = {
   title: string;
   rideType: RideType;
   metrics: RideActivityMetrics;
-  mapImage: ImageSourcePropType;
+  /** Static map thumbnail; or pass `track` to draw a recorded ride (own rides). */
+  mapImage?: ImageSourcePropType;
+  track?: LngLat[][];
   photos: ImageSourcePropType[];
   likeCount: number;
   commentCount: number;
@@ -70,6 +76,8 @@ type RideActivityCardProps = {
   onSharePress: () => void;
   /** "⋮" menu; hidden when omitted. */
   onMorePress?: () => void;
+  /** Opens the ride (own rides → 09.06). */
+  onPress?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -86,6 +94,7 @@ export function RideActivityCard({
   rideType,
   metrics,
   mapImage,
+  track,
   photos,
   likeCount,
   commentCount,
@@ -97,6 +106,7 @@ export function RideActivityCard({
   onSavePress,
   onSharePress,
   onMorePress,
+  onPress,
   style,
 }: RideActivityCardProps) {
   const { t } = useTranslation('profile');
@@ -121,12 +131,21 @@ export function RideActivityCard({
             accessibilityRole="button"
             accessibilityLabel={t('activity.more')}
             style={({ pressed }) => [styles.moreButton, pressed && styles.pressed]}>
-            <MoreVert width={ACTION_ICON_SIZE} height={ACTION_ICON_SIZE} color={colors.textPrimary} />
+            <MoreVert
+              width={ACTION_ICON_SIZE}
+              height={ACTION_ICON_SIZE}
+              color={colors.textPrimary}
+            />
           </Pressable>
         ) : null}
       </View>
 
-      <View style={styles.details}>
+      <Pressable
+        onPress={onPress}
+        disabled={!onPress}
+        accessibilityRole={onPress ? 'button' : undefined}
+        accessibilityLabel={onPress ? title : undefined}
+        style={styles.details}>
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
@@ -141,7 +160,18 @@ export function RideActivityCard({
           showsHorizontalScrollIndicator={false}
           style={styles.mediaStrip}
           contentContainerStyle={styles.mediaContent}>
-          <Media source={mapImage} width={MAP_WIDTH} accessibilityLabel={t('activity.map')} />
+          {track ? (
+            <View
+              style={[styles.media, { width: MAP_WIDTH }]}
+              accessible
+              accessibilityRole="image"
+              accessibilityLabel={t('activity.map')}>
+              <RideMapPreview track={track} padding={THUMBNAIL_PADDING} style={styles.mediaImage} />
+              <View style={styles.mediaStroke} />
+            </View>
+          ) : mapImage ? (
+            <Media source={mapImage} width={MAP_WIDTH} accessibilityLabel={t('activity.map')} />
+          ) : null}
           {photos.map((photo, index) => (
             <Media
               // Photos have no ids yet; their order is stable for a ride.
@@ -152,7 +182,7 @@ export function RideActivityCard({
             />
           ))}
         </ScrollView>
-      </View>
+      </Pressable>
 
       <View style={styles.actions}>
         <View style={styles.interactions}>
@@ -213,7 +243,11 @@ function Media({
   accessibilityLabel: string;
 }) {
   return (
-    <View style={[styles.media, { width }]} accessible accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
+    <View
+      style={[styles.media, { width }]}
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={accessibilityLabel}>
       <Image source={source} contentFit="cover" style={styles.mediaImage} />
       <View style={styles.mediaStroke} />
     </View>

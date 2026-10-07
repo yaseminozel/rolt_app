@@ -1,0 +1,85 @@
+{
+  "title": "Settings",
+  "close": "Close",
+  "searchPlaceholder": "Search settings",
+  "sections": {
+    "account": "ACCOUNT",
+    "privacy": "PRIVACY",
+    "permissions": "PERMISSIONS",
+    "app": "APP",
+    "support": "SUPPORT",
+    "community": "COMMUNITY"
+  },
+  "items": {
+    "account": "Account details",
+    "bike": "My bike",
+    "rideVisibility": "Ride visibility",
+    "endpoints": "Start/finish points",
+    "blocked": "Blocked users",
+    "location": "Location",
+    "photos": "Photos",
+    "notifications": "Notifications",
+    "language": "Language",
+    "units": "Units",
+    "help": "Help & FAQ",
+    "feedback": "Send feedback",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "rate": "Rate ROLT",
+    "recommend": "Recommend to a friend",
+    "instagram": "Instagram",
+    "signOut": "Sign out"
+  },
+  "values": {
+    "visibility": {
+      "public": "Everyone",
+      "followers": "Followers",
+      "private": "Only me"
+    },
+    "endpoints": {
+      "hidden": "Hidden",
+      "visible": "Visible"
+    },
+    "location": {
+      "always": "Always on",
+      "whileUsing": "While using",
+      "off": "Off"
+    },
+    "photos": {
+      "all": "Full access",
+      "limited": "Limited access",
+      "off": "Off"
+    },
+    "notifications": {
+      "on": "On",
+      "off": "Off"
+    },
+    "language": {
+      "tr": "Türkçe",
+      "en": "English"
+    },
+    "units": "Metric (km, km/h)",
+    "instagram": "@roltapp",
+    "noBike": "Add"
+  },
+  "rateHint": {
+    "ios": "Rate us on the App Store",
+    "android": "Rate us on Google Play"
+  },
+  "recommendMessage": "Discover routes and record your rides with ROLT: {{link}}",
+  "version": "Version {{version}}",
+  "search": {
+    "results_one": "{{count}} RESULT",
+    "results_other": "{{count}} RESULTS",
+    "noResults": "No results for “{{query}}”",
+    "noResultsHint": "Check the spelling or try another word.",
+    "goToHelp": "Go to Help & FAQ",
+    "frequent": "FREQUENTLY USED"
+  },
+  "signOutDialog": {
+    "title": "Sign out?",
+    "description": "Unsaved rides stay on your device and come back when you sign in again.",
+    "confirm": "Sign out",
+    "cancel": "Cancel"
+  }
+}

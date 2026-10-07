@@ -1,0 +1,85 @@
+{
+  "title": "Ayarlar",
+  "close": "Kapat",
+  "searchPlaceholder": "Ayarlarda ara",
+  "sections": {
+    "account": "HESAP",
+    "privacy": "GİZLİLİK",
+    "permissions": "İZİNLER",
+    "app": "UYGULAMA",
+    "support": "DESTEK",
+    "community": "TOPLULUK"
+  },
+  "items": {
+    "account": "Hesap bilgileri",
+    "bike": "Motorum",
+    "rideVisibility": "Sürüş görünürlüğü",
+    "endpoints": "Başlangıç/bitiş noktası",
+    "blocked": "Engellenen kullanıcılar",
+    "location": "Konum",
+    "photos": "Fotoğraflar",
+    "notifications": "Bildirimler",
+    "language": "Dil",
+    "units": "Ölçü birimleri",
+    "help": "Yardım ve SSS",
+    "feedback": "Geri bildirim gönder",
+    "privacyPolicy": "Gizlilik Politikası",
+    "terms": "Kullanım Koşulları",
+    "rate": "ROLT’u değerlendir",
+    "recommend": "Arkadaşına öner",
+    "instagram": "Instagram",
+    "signOut": "Çıkış yap"
+  },
+  "values": {
+    "visibility": {
+      "public": "Herkese açık",
+      "followers": "Takipçilere açık",
+      "private": "Sadece ben"
+    },
+    "endpoints": {
+      "hidden": "Gizli",
+      "visible": "Görünür"
+    },
+    "location": {
+      "always": "Her zaman açık",
+      "whileUsing": "Kullanırken açık",
+      "off": "Kapalı"
+    },
+    "photos": {
+      "all": "Tam erişim",
+      "limited": "Sınırlı erişim",
+      "off": "Kapalı"
+    },
+    "notifications": {
+      "on": "Açık",
+      "off": "Kapalı"
+    },
+    "language": {
+      "tr": "Türkçe",
+      "en": "English"
+    },
+    "units": "Metrik (km, km/sa)",
+    "instagram": "@roltapp",
+    "noBike": "Ekle"
+  },
+  "rateHint": {
+    "ios": "App Store’da puan ver",
+    "android": "Google Play’de puan ver"
+  },
+  "recommendMessage": "ROLT ile rotaları keşfet, sürüşlerini kaydet: {{link}}",
+  "version": "Version {{version}}",
+  "search": {
+    "results_one": "{{count}} SONUÇ",
+    "results_other": "{{count}} SONUÇ",
+    "noResults": "“{{query}}” için sonuç bulunamadı",
+    "noResultsHint": "Kontrol et ya da farklı bir kelimeyle tekrar dene.",
+    "goToHelp": "Yardım ve SSS’ye git",
+    "frequent": "SIK KULLANILANLAR"
+  },
+  "signOutDialog": {
+    "title": "Çıkış yapmak istediğine emin misin?",
+    "description": "Kaydedilmemiş sürüşün cihazında kalır; yeniden giriş yaptığında geri gelir.",
+    "confirm": "Çıkış yap",
+    "cancel": "Vazgeç"
+  }
+}

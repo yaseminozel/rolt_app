@@ -77,6 +77,8 @@ export const shadows = {
   mapLabel: '0px 2px 5.25px rgba(0, 0, 0, 0.2)',
   /** Status line over the record map (08.01–08.04 "Badge / Tag"). */
   statusBanner: '0px 4px 3.5px rgba(167, 167, 167, 0.25)',
+  /** QR profile card (09.02 "Kart / Karekod"). */
+  qrCard: '0px 12px 28px rgba(16, 19, 24, 0.12), 2px 2px 7.7px rgba(16, 19, 24, 0.06)',
   /** Centered dialog card over a scrim ("Diyalog / Taslak kaydet", `zMCLP`). */
   dialog: '0px 12px 32px rgba(16, 19, 24, 0.25)',
 } as const;

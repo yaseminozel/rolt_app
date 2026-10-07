@@ -23,17 +23,11 @@ const CHECK_STROKE = (1.8 * 24) / ICON_SIZE;
 
 /** Trailing element of the row ("Son" property in the design). */
 export type SettingsRowTrailing =
-  | 'chevron'
-  | 'valueChevron'
-  | 'value'
-  | 'switch'
-  | 'check'
-  | 'none'
-  | 'radio';
+  'chevron' | 'valueChevron' | 'value' | 'switch' | 'check' | 'none' | 'radio';
 
 type SettingsRowBaseProps = {
-  /** Leading 20 pt Iconoir glyph, e.g. `User`. */
-  icon: ComponentType<SvgProps>;
+  /** Leading 20 pt Iconoir glyph, e.g. `User`; omitted on text-only rows (10.01 "Topluluk"). */
+  icon?: ComponentType<SvgProps>;
   label: string;
   /** Secondary line under the label; hidden in every design instance, so optional. */
   description?: string;
@@ -155,7 +149,13 @@ export function SettingsRow(props: SettingsRowProps) {
 
   const content = (
     <>
-      <Icon width={ICON_SIZE} height={ICON_SIZE} color={colors.textPrimary} />
+      {Icon ? (
+        <Icon
+          width={ICON_SIZE}
+          height={ICON_SIZE}
+          color={destructive ? colors.dangerText : colors.textPrimary}
+        />
+      ) : null}
       <View style={styles.content}>
         <Text style={[styles.label, destructive && styles.labelDestructive]}>{label}</Text>
         {description ? <Text style={styles.description}>{description}</Text> : null}

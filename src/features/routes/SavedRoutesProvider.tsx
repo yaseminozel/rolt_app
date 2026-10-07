@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 type SavedRoutesContextValue = {
+  /** Saved route ids, most recently saved first ("Kaydettiklerim" order). */
+  savedIds: readonly string[];
   isSaved: (routeId: string) => boolean;
   /** Returns the new saved state. */
   toggleSaved: (routeId: string) => boolean;
@@ -14,32 +16,30 @@ const SavedRoutesContext = createContext<SavedRoutesContextValue | null>(null);
  * saving behind `useRequireAccount('saveRoute', …)` so guests get the sign-in prompt.
  */
 export function SavedRoutesProvider({ children }: { children: ReactNode }) {
-  const [savedIds, setSavedIds] = useState<ReadonlySet<string>>(() => new Set());
+  const [savedIds, setSavedIds] = useState<readonly string[]>([]);
 
   const setSaved = useCallback((routeId: string, saved: boolean) => {
     setSavedIds((current) => {
-      const next = new Set(current);
-      if (saved) {
-        next.add(routeId);
-      } else {
-        next.delete(routeId);
-      }
-      return next;
+      const rest = current.filter((id) => id !== routeId);
+      return saved ? [routeId, ...rest] : rest;
     });
   }, []);
 
-  const isSaved = useCallback((routeId: string) => savedIds.has(routeId), [savedIds]);
+  const isSaved = useCallback((routeId: string) => savedIds.includes(routeId), [savedIds]);
 
   const toggleSaved = useCallback(
     (routeId: string) => {
-      const next = !savedIds.has(routeId);
+      const next = !savedIds.includes(routeId);
       setSaved(routeId, next);
       return next;
     },
     [savedIds, setSaved],
   );
 
-  const value = useMemo(() => ({ isSaved, toggleSaved, setSaved }), [isSaved, toggleSaved, setSaved]);
+  const value = useMemo(
+    () => ({ savedIds, isSaved, toggleSaved, setSaved }),
+    [isSaved, savedIds, setSaved, toggleSaved],
+  );
 
   return <SavedRoutesContext.Provider value={value}>{children}</SavedRoutesContext.Provider>;
 }

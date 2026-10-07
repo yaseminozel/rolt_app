@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
 import { User } from 'iconoir-react-native';
-import { StyleSheet, View, type ImageSourcePropType } from 'react-native';
+import { StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
 
-import { colors, shadows } from '@/theme';
+import { colors, fontFamily, shadows } from '@/theme';
 
 type ProfileAvatarProps = {
   source?: ImageSourcePropType;
@@ -10,15 +10,18 @@ type ProfileAvatarProps = {
   size: number;
   /** Omit for decorative avatars next to a visible name. */
   accessibilityLabel?: string;
+  /** Shown on a teal disc when there is no photo ("Baş harfler", 09.01 new rider "YA"). */
+  initials?: string;
 };
 
 const STROKE_WIDTH = 1.5;
 
 /**
  * Round rider photo with the design's white 1.5 pt inner stroke and raised shadow
- * (gKG8D "Avatar"). Falls back to a muted disc with a user glyph.
+ * (gKG8D "Avatar"). Without a photo: the rider's initials on teal, or a muted disc with a user
+ * glyph.
  */
-export function ProfileAvatar({ source, size, accessibilityLabel }: ProfileAvatarProps) {
+export function ProfileAvatar({ source, size, accessibilityLabel, initials }: ProfileAvatarProps) {
   const round = { width: size, height: size, borderRadius: size / 2 };
 
   return (
@@ -30,6 +33,12 @@ export function ProfileAvatar({ source, size, accessibilityLabel }: ProfileAvata
       importantForAccessibility={accessibilityLabel ? 'yes' : 'no-hide-descendants'}>
       {source ? (
         <Image source={source} contentFit="cover" style={[StyleSheet.absoluteFill, round]} />
+      ) : initials ? (
+        <View style={[styles.fallback, styles.initialsDisc, round]}>
+          <Text style={[styles.initials, { fontSize: Math.round(size * 0.35) }]} numberOfLines={1}>
+            {initials}
+          </Text>
+        </View>
       ) : (
         <View style={[styles.fallback, round]}>
           <User width={size / 2} height={size / 2} color={colors.textTertiary} />
@@ -48,6 +57,13 @@ const styles = StyleSheet.create({
   fallback: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  initialsDisc: {
+    backgroundColor: colors.accentSubtle,
+  },
+  initials: {
+    fontFamily: fontFamily.semibold,
+    color: colors.accentVivid,
   },
   stroke: {
     ...StyleSheet.absoluteFill,

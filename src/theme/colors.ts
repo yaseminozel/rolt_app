@@ -271,6 +271,8 @@ export const colors = {
   /** Behind centered dialogs over a screen ("04.x Çıkış — Taslak kaydet", `zMCLP`). */
   dialogScrim: 'rgba(16, 19, 24, 0.6)',
   glass: 'rgba(255, 255, 255, 0.64)',
+  /** Over the blurred profile behind the QR card (09.02). */
+  shareVeil: 'rgba(16, 19, 24, 0.12)',
   transparent: 'transparent',
 } as const;
 

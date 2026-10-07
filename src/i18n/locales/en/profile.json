@@ -27,13 +27,17 @@
     "following": "Following",
     "rideTogether": "Ride together",
     "share": "Share profile",
-    "more": "More options"
+    "more": "More options",
+    "editProfile": "Edit profile",
+    "changePhoto": "Change profile photo",
+    "settings": "Settings"
   },
   "tabs": {
     "label": "Profile sections",
     "rides": "Rides",
     "routes": "Routes",
-    "garage": "Garage"
+    "garage": "Garage",
+    "saved": "Saved"
   },
   "menu": {
     "report": "Report",
@@ -95,5 +99,51 @@
     "title": "Couldn't load profile",
     "description": "Check your connection and try again.",
     "retry": "Try again"
+  },
+  "photo": {
+    "title": "Profile photo",
+    "camera": "Take a photo",
+    "library": "Choose from library",
+    "openSettings": "Open Settings",
+    "cameraPermission": {
+      "title": "Camera access needed",
+      "message": "Allow camera access in Settings to take a photo."
+    }
+  },
+  "own": {
+    "empty": {
+      "title": "No rides yet",
+      "description": "Once you record your first ride, your route, distance and photos show up here.",
+      "action": "Record your first ride"
+    }
+  },
+  "saved": {
+    "empty": {
+      "title": "No saved routes yet",
+      "description": "Bookmark routes you like and find them here."
+    }
+  },
+  "shareSheet": {
+    "cardLabel": "ROLT — Ride sharing",
+    "title": "Share my profile",
+    "close": "Close",
+    "qrA11y": "QR code of @{{handle}}'s profile",
+    "targets": {
+      "airdrop": "AirDrop",
+      "messages": "Messages",
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "more": "More"
+    },
+    "copyLink": "Copy link",
+    "saveImage": "Save image",
+    "linkCopied": "Link copied",
+    "imageSaved": "Image saved to your photos",
+    "imageFailed": "Couldn't save the image",
+    "photosPermission": {
+      "title": "Photo access needed",
+      "message": "Allow adding to Photos in Settings to save the image."
+    },
+    "message": "Follow me on ROLT: {{link}}"
   }
 }

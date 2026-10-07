@@ -100,6 +100,15 @@ export function useRoutesInArea(bounds: Bounds, filter: RouteFilter, query = '')
   });
 }
 
+/** "Kaydettiklerim" (09.01 tab): the bookmarked routes, most recent first. */
+export function useRoutesByIds(ids: readonly string[]) {
+  return useQuery({
+    queryKey: ['routes', 'byIds', ids] as const,
+    queryFn: () => routesRepository.listByIds(ids),
+    placeholderData: keepPreviousData,
+  });
+}
+
 export function useRoute(id: string | undefined) {
   return useQuery({
     queryKey: routeKeys.detail(id ?? ''),

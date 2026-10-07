@@ -70,7 +70,9 @@ const placeNames: Record<PlaceKey, string> = {
 };
 
 const nameOf = (coordinates: LngLat) =>
-  placeNames[(Object.keys(place) as PlaceKey[]).find((key) => place[key] === coordinates) ?? 'antalya'];
+  placeNames[
+    (Object.keys(place) as PlaceKey[]).find((key) => place[key] === coordinates) ?? 'antalya'
+  ];
 
 /** Straight-ish line through the given places with a gentle bend between each pair. */
 function line(...points: LngLat[]): LngLat[] {
@@ -86,7 +88,10 @@ function line(...points: LngLat[]): LngLat[] {
   return result;
 }
 
-type RouteSeed = Pick<Route, 'id' | 'name' | 'summary' | 'tag' | 'distanceKm' | 'durationMinutes' | 'averageSpeedKmh'> &
+type RouteSeed = Pick<
+  Route,
+  'id' | 'name' | 'summary' | 'tag' | 'distanceKm' | 'durationMinutes' | 'averageSpeedKmh'
+> &
   Partial<Route> & { from: LngLat; via?: LngLat[]; to: LngLat };
 
 const coverByTag: Record<RouteTag, Route['coverImage']> = {
@@ -126,7 +131,17 @@ function route({ from, via = [], to, ...seed }: RouteSeed, index: number): Route
 
 const seeds: RouteSeed[] = [
   // "Senin için önerilenler" (01.5) and map sheet (01.7)
-  { id: 'adrasan', name: 'Adrasan Rotası', summary: 'Sakin ve manzaralı', tag: 'coast', distanceKm: 72, durationMinutes: 85, averageSpeedKmh: 51, from: place.kumluca, to: place.adrasan },
+  {
+    id: 'adrasan',
+    name: 'Adrasan Rotası',
+    summary: 'Sakin ve manzaralı',
+    tag: 'coast',
+    distanceKm: 72,
+    durationMinutes: 85,
+    averageSpeedKmh: 51,
+    from: place.kumluca,
+    to: place.adrasan,
+  },
   {
     id: 'geyikbayiri',
     name: 'Geyikbayırı Rotası',
@@ -138,7 +153,8 @@ const seeds: RouteSeed[] = [
     maxSpeedKmh: 72,
     elevationGainM: 236,
     elevationLossM: -198,
-    notes: "Antalya'nın doğasında, dağ manzaraları eşliğinde keyifli bir sürüş. Virajlar akıcı, manzara harika.",
+    notes:
+      "Antalya'nın doğasında, dağ manzaraları eşliğinde keyifli bir sürüş. Virajlar akıcı, manzara harika.",
     curveCount: 34,
     breakCount: 2,
     // "Rota durakları" of 05.04 Uzun içerik (`w7AvU`).
@@ -152,31 +168,222 @@ const seeds: RouteSeed[] = [
     via: [place.dosemealti],
     to: place.geyikbayiri,
   },
-  { id: 'cirali', name: 'Çıralı Rotası', summary: 'Gün batımı keyfi', tag: 'scenic', distanceKm: 46, durationMinutes: 65, averageSpeedKmh: 42, from: place.tekirova, to: place.cirali },
-  { id: 'kas-kalkan', author: deniz, name: 'Kaş – Kalkan Rotası', summary: 'Koydan koya sahil', tag: 'coast', distanceKm: 68, durationMinutes: 100, averageSpeedKmh: 41, city: 'Antalya', from: place.kas, to: place.kalkan },
+  {
+    id: 'cirali',
+    name: 'Çıralı Rotası',
+    summary: 'Gün batımı keyfi',
+    tag: 'scenic',
+    distanceKm: 46,
+    durationMinutes: 65,
+    averageSpeedKmh: 42,
+    from: place.tekirova,
+    to: place.cirali,
+  },
+  {
+    id: 'kas-kalkan',
+    author: deniz,
+    name: 'Kaş – Kalkan Rotası',
+    summary: 'Koydan koya sahil',
+    tag: 'coast',
+    distanceKm: 68,
+    durationMinutes: 100,
+    averageSpeedKmh: 41,
+    city: 'Antalya',
+    from: place.kas,
+    to: place.kalkan,
+  },
   // Search results for "adrasan" (01.2)
-  { id: 'adrasan-cirali', name: 'Adrasan – Çıralı Rotası', summary: 'Doğa ve deniz bir arada', tag: 'nature', distanceKm: 46, durationMinutes: 70, averageSpeedKmh: 39, from: place.adrasan, to: place.cirali },
-  { id: 'adrasan-mountain', name: 'Adrasan Dağ Yolu', summary: 'Virajlı ve manzaralı', tag: 'curvy', distanceKm: 58, durationMinutes: 80, averageSpeedKmh: 44, from: place.adrasan, via: [place.kumluca], to: place.tahtali },
-  { id: 'gelidonya', name: 'Gelidonya Feneri Rotası', summary: 'Tarihi ve doğal güzellikler', tag: 'scenic', distanceKm: 34, durationMinutes: 65, averageSpeedKmh: 31, from: place.adrasan, to: place.gelidonya },
-  { id: 'suluada', name: 'Suluada Tekne Rotası', summary: 'Mavi yolculuk', tag: 'coast', distanceKm: 28, durationMinutes: 50, averageSpeedKmh: 34, isLoop: true, from: place.adrasan, via: [place.suluada], to: place.adrasan },
-  { id: 'adrasan-olympos', name: 'Adrasan – Olympos Rotası', summary: 'Antik kent ve doğa', tag: 'nature', distanceKm: 62, durationMinutes: 100, averageSpeedKmh: 37, from: place.adrasan, to: place.olympos },
-  { id: 'adrasan-mavikent', name: 'Adrasan – Mavikent Rotası', summary: 'Sahil boyunca keyifli sürüş', tag: 'coast', distanceKm: 39, durationMinutes: 60, averageSpeedKmh: 39, from: place.adrasan, to: place.mavikent },
-  { id: 'adrasan-sunset', name: 'Adrasan Gün Batımı Rotası', summary: 'En güzel manzara noktaları', tag: 'scenic', distanceKm: 48, durationMinutes: 90, averageSpeedKmh: 32, from: place.adrasan, via: [place.suluada], to: place.gelidonya },
+  {
+    id: 'adrasan-cirali',
+    name: 'Adrasan – Çıralı Rotası',
+    summary: 'Doğa ve deniz bir arada',
+    tag: 'nature',
+    distanceKm: 46,
+    durationMinutes: 70,
+    averageSpeedKmh: 39,
+    from: place.adrasan,
+    to: place.cirali,
+  },
+  {
+    id: 'adrasan-mountain',
+    name: 'Adrasan Dağ Yolu',
+    summary: 'Virajlı ve manzaralı',
+    tag: 'curvy',
+    distanceKm: 58,
+    durationMinutes: 80,
+    averageSpeedKmh: 44,
+    from: place.adrasan,
+    via: [place.kumluca],
+    to: place.tahtali,
+  },
+  {
+    id: 'gelidonya',
+    name: 'Gelidonya Feneri Rotası',
+    summary: 'Tarihi ve doğal güzellikler',
+    tag: 'scenic',
+    distanceKm: 34,
+    durationMinutes: 65,
+    averageSpeedKmh: 31,
+    from: place.adrasan,
+    to: place.gelidonya,
+  },
+  {
+    id: 'suluada',
+    name: 'Suluada Tekne Rotası',
+    summary: 'Mavi yolculuk',
+    tag: 'coast',
+    distanceKm: 28,
+    durationMinutes: 50,
+    averageSpeedKmh: 34,
+    isLoop: true,
+    from: place.adrasan,
+    via: [place.suluada],
+    to: place.adrasan,
+  },
+  {
+    id: 'adrasan-olympos',
+    name: 'Adrasan – Olympos Rotası',
+    summary: 'Antik kent ve doğa',
+    tag: 'nature',
+    distanceKm: 62,
+    durationMinutes: 100,
+    averageSpeedKmh: 37,
+    from: place.adrasan,
+    to: place.olympos,
+  },
+  {
+    id: 'adrasan-mavikent',
+    name: 'Adrasan – Mavikent Rotası',
+    summary: 'Sahil boyunca keyifli sürüş',
+    tag: 'coast',
+    distanceKm: 39,
+    durationMinutes: 60,
+    averageSpeedKmh: 39,
+    from: place.adrasan,
+    to: place.mavikent,
+  },
+  {
+    id: 'adrasan-sunset',
+    name: 'Adrasan Gün Batımı Rotası',
+    summary: 'En güzel manzara noktaları',
+    tag: 'scenic',
+    distanceKm: 48,
+    durationMinutes: 90,
+    averageSpeedKmh: 32,
+    from: place.adrasan,
+    via: [place.suluada],
+    to: place.gelidonya,
+  },
   // "Önerilen Rotalar" (01.4)
-  { id: 'coastal-cruise', author: deniz, name: 'Sahil yolu keyfi', summary: 'Deniz kenarında sakin sürüş', tag: 'coast', distanceKm: 82, durationMinutes: 100, averageSpeedKmh: 49, difficulty: 'easy', from: place.antalya, to: place.kemer },
-  { id: 'pine-forest', name: 'Çam ormanı turu', summary: 'Gölgeli orman yolları', tag: 'nature', distanceKm: 56, durationMinutes: 75, averageSpeedKmh: 45, from: place.antalya, to: place.termessos },
-  { id: 'tahtali-foothills', name: 'Tahtalı etekleri', summary: 'Virajlı ve yüksek rakım', tag: 'curvy', distanceKm: 64, durationMinutes: 90, averageSpeedKmh: 43, from: place.kemer, to: place.tahtali },
-  { id: 'korkuteli-curves', name: 'Korkuteli virajları', summary: 'Ardı ardına viraj', tag: 'curvy', distanceKm: 71, durationMinutes: 105, averageSpeedKmh: 41, difficulty: 'hard', isLoop: true, from: place.antalya, via: [place.korkuteli], to: place.antalya },
-  { id: 'olympos-cirali', name: 'Olympos – Çıralı Rotası', summary: 'Antik kent ve deniz', tag: 'scenic', distanceKm: 38, durationMinutes: 55, averageSpeedKmh: 41, from: place.olympos, to: place.cirali },
-  { id: 'saklikent', name: 'Saklıkent Yaylası', summary: 'Yükseklerde serin sürüş', tag: 'offRoad', distanceKm: 45, durationMinutes: 70, averageSpeedKmh: 39, difficulty: 'hard', surface: 'gravel', from: place.antalya, to: place.saklikent },
-  { id: 'kemer-tekirova', author: deniz, name: 'Kemer – Tekirova Sahili', summary: 'Deniz kenarında kısa kaçamak', tag: 'coast', distanceKm: 33, durationMinutes: 50, averageSpeedKmh: 40, from: place.kemer, to: place.tekirova },
-  { id: 'termessos', name: 'Termessos Antik Yolu', summary: 'Tarih ve orman bir arada', tag: 'city', distanceKm: 52, durationMinutes: 80, averageSpeedKmh: 39, from: place.antalya, to: place.termessos },
+  {
+    id: 'coastal-cruise',
+    author: deniz,
+    name: 'Sahil yolu keyfi',
+    summary: 'Deniz kenarında sakin sürüş',
+    tag: 'coast',
+    distanceKm: 82,
+    durationMinutes: 100,
+    averageSpeedKmh: 49,
+    difficulty: 'easy',
+    from: place.antalya,
+    to: place.kemer,
+  },
+  {
+    id: 'pine-forest',
+    name: 'Çam ormanı turu',
+    summary: 'Gölgeli orman yolları',
+    tag: 'nature',
+    distanceKm: 56,
+    durationMinutes: 75,
+    averageSpeedKmh: 45,
+    from: place.antalya,
+    to: place.termessos,
+  },
+  {
+    id: 'tahtali-foothills',
+    name: 'Tahtalı etekleri',
+    summary: 'Virajlı ve yüksek rakım',
+    tag: 'curvy',
+    distanceKm: 64,
+    durationMinutes: 90,
+    averageSpeedKmh: 43,
+    from: place.kemer,
+    to: place.tahtali,
+  },
+  {
+    id: 'korkuteli-curves',
+    name: 'Korkuteli virajları',
+    summary: 'Ardı ardına viraj',
+    tag: 'curvy',
+    distanceKm: 71,
+    durationMinutes: 105,
+    averageSpeedKmh: 41,
+    difficulty: 'hard',
+    isLoop: true,
+    from: place.antalya,
+    via: [place.korkuteli],
+    to: place.antalya,
+  },
+  {
+    id: 'olympos-cirali',
+    name: 'Olympos – Çıralı Rotası',
+    summary: 'Antik kent ve deniz',
+    tag: 'scenic',
+    distanceKm: 38,
+    durationMinutes: 55,
+    averageSpeedKmh: 41,
+    from: place.olympos,
+    to: place.cirali,
+  },
+  {
+    id: 'saklikent',
+    name: 'Saklıkent Yaylası',
+    summary: 'Yükseklerde serin sürüş',
+    tag: 'offRoad',
+    distanceKm: 45,
+    durationMinutes: 70,
+    averageSpeedKmh: 39,
+    difficulty: 'hard',
+    surface: 'gravel',
+    from: place.antalya,
+    to: place.saklikent,
+  },
+  {
+    id: 'kemer-tekirova',
+    author: deniz,
+    name: 'Kemer – Tekirova Sahili',
+    summary: 'Deniz kenarında kısa kaçamak',
+    tag: 'coast',
+    distanceKm: 33,
+    durationMinutes: 50,
+    averageSpeedKmh: 40,
+    from: place.kemer,
+    to: place.tekirova,
+  },
+  {
+    id: 'termessos',
+    name: 'Termessos Antik Yolu',
+    summary: 'Tarih ve orman bir arada',
+    tag: 'city',
+    distanceKm: 52,
+    durationMinutes: 80,
+    averageSpeedKmh: 39,
+    from: place.antalya,
+    to: place.termessos,
+  },
 ];
 
 export const ROUTE_FIXTURES: readonly Route[] = seeds.map(route);
 
 /** Order of "Senin için önerilenler" on Discover Home. */
-export const RECOMMENDED_ROUTE_IDS = ['adrasan', 'geyikbayiri', 'cirali', 'kas-kalkan', 'coastal-cruise', 'pine-forest'];
+export const RECOMMENDED_ROUTE_IDS = [
+  'adrasan',
+  'geyikbayiri',
+  'cirali',
+  'kas-kalkan',
+  'coastal-cruise',
+  'pine-forest',
+];
 
 /** "Önerilen Rotalar — Tümü" (01.4) list order. */
 export const RECOMMENDED_LIST_IDS = [

@@ -26,9 +26,17 @@ const INDICATOR_HEIGHT = 1.5;
  * equal columns with a 20 pt icon over a 12 pt label, a 1 pt bottom divider and a 1.5 pt
  * indicator under the selected tab. Not the Segmented Control: these switch page sections.
  */
-export function ProfileTabs<T extends string>({ tabs, value, onChange, accessibilityLabel }: ProfileTabsProps<T>) {
+export function ProfileTabs<T extends string>({
+  tabs,
+  value,
+  onChange,
+  accessibilityLabel,
+}: ProfileTabsProps<T>) {
   return (
-    <View style={styles.container} accessibilityRole="tablist" accessibilityLabel={accessibilityLabel}>
+    <View
+      style={styles.container}
+      accessibilityRole="tablist"
+      accessibilityLabel={accessibilityLabel}>
       <View style={styles.divider} />
       {tabs.map(({ value: tabValue, label, icon: Icon }) => {
         const selected = tabValue === value;
@@ -45,7 +53,9 @@ export function ProfileTabs<T extends string>({ tabs, value, onChange, accessibi
             style={styles.tab}>
             <View style={styles.content}>
               <Icon width={ICON_SIZE} height={ICON_SIZE} color={tint} />
-              <Text style={[styles.label, selected ? styles.labelSelected : null]} numberOfLines={1}>
+              <Text
+                style={[styles.label, selected ? styles.labelSelected : null]}
+                numberOfLines={1}>
                 {label}
               </Text>
             </View>

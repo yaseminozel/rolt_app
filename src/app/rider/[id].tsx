@@ -12,7 +12,7 @@ import { GarageBikeRow } from '@/components/profile/GarageBikeRow';
 import { ProfileHeader, type ProfileHeaderBike } from '@/components/profile/ProfileHeader';
 import { ProfileTabs, type ProfileTab } from '@/components/profile/ProfileTabs';
 import { ProfileTopBar } from '@/components/profile/ProfileTopBar';
-import { RideActivityCard } from '@/components/profile/RideActivityCard';
+import { RiderRidesFeed } from '@/components/profile/RiderRidesFeed';
 import { RiderMatchNote } from '@/components/profile/RiderMatchNote';
 import { RouteCard } from '@/components/route/RouteCard';
 import { Button } from '@/components/ui/Button';
@@ -24,15 +24,12 @@ import {
   useReport,
   useRider,
   useRiderMatch,
-  useRiderRides,
   useRiderRoutes,
   useSetFollowing,
-  useSetRideLiked,
-  useSetRideSaved,
 } from '@/features/riders/queries';
-import type { RideSummary, Rider, RiderBike } from '@/features/riders/types';
+import type { Rider, RiderBike } from '@/features/riders/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import { formatApproxDuration, formatDateTime, formatDistance, formatDuration, formatNumber, formatSpeed } from '@/i18n/format';
+import { formatApproxDuration, formatDistance, formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
 
@@ -99,9 +96,15 @@ export default function RiderProfileScreen() {
           label: t('menu.report'),
           onPress: () =>
             requireAccount('reportContent', () => {
-              report.mutateAsync({ type: 'rider', riderId: profile.id }).then(() =>
-                showToast({ variant: 'success', message: t('report.done'), bottomOffset: TOAST_BOTTOM_OFFSET }),
-              );
+              report
+                .mutateAsync({ type: 'rider', riderId: profile.id })
+                .then(() =>
+                  showToast({
+                    variant: 'success',
+                    message: t('report.done'),
+                    bottomOffset: TOAST_BOTTOM_OFFSET,
+                  }),
+                );
             }),
         },
         {
@@ -120,8 +123,16 @@ export default function RiderProfileScreen() {
         actions={
           rider
             ? [
-                { icon: ShareIos, accessibilityLabel: t('actions.share'), onPress: () => shareProfile(rider) },
-                { icon: MoreHoriz, accessibilityLabel: t('actions.more'), onPress: () => openMenu(rider) },
+                {
+                  icon: ShareIos,
+                  accessibilityLabel: t('actions.share'),
+                  onPress: () => shareProfile(rider),
+                },
+                {
+                  icon: MoreHoriz,
+                  accessibilityLabel: t('actions.more'),
+                  onPress: () => openMenu(rider),
+                },
               ]
             : []
         }
@@ -217,7 +228,9 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
               <Button
                 label={t('actions.rideTogether')}
                 variant="outlined"
-                onPress={() => router.push({ pathname: '/ride-together/[id]', params: { id: rider.id } })}
+                onPress={() =>
+                  router.push({ pathname: '/ride-together/[id]', params: { id: rider.id } })
+                }
                 style={styles.action}
               />
             </View>
@@ -225,10 +238,17 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
         />
       </View>
 
-      <ProfileTabs tabs={tabs} value={section} onChange={setSection} accessibilityLabel={t('tabs.label')} />
+      <ProfileTabs
+        tabs={tabs}
+        value={section}
+        onChange={setSection}
+        accessibilityLabel={t('tabs.label')}
+      />
 
       <View style={styles.section}>
-        {section === 'rides' ? <RidesFeed rider={rider} /> : null}
+        {section === 'rides' ? (
+          <RiderRidesFeed riderId={rider.id} riderName={rider.name} riderAvatar={rider.avatar} />
+        ) : null}
         {section === 'routes' ? <RoutesList riderId={rider.id} /> : null}
         {section === 'garage' ? <GarageList bikes={rider.bikes} /> : null}
       </View>
@@ -251,112 +271,6 @@ function primaryBikeLine(
   };
 }
 
-function RidesFeed({ rider }: { rider: Rider }) {
-  const { t } = useTranslation(['profile', 'common']);
-  const requireAccount = useRequireAccount();
-  const { showToast } = useToast();
-  const ridesQuery = useRiderRides(rider.id);
-  const setLiked = useSetRideLiked();
-  const setSaved = useSetRideSaved();
-  const report = useReport();
-
-  if (ridesQuery.isPending) {
-    return <SectionLoading />;
-  }
-  const rides = ridesQuery.data ?? [];
-  if (rides.length === 0) {
-    return <EmptyState title={t('empty.rides.title')} description={t('empty.rides.description')} />;
-  }
-
-  const toggleLike = (ride: RideSummary) => {
-    const liked = !ride.isLiked;
-    requireAccount('likeRide', () => setLiked.mutate({ rideId: ride.id, liked }));
-  };
-
-  const toggleSave = (ride: RideSummary) => {
-    const saved = !ride.isSaved;
-    requireAccount('saveRide', () => {
-      setSaved.mutate({ rideId: ride.id, saved });
-      showToast(
-        saved
-          ? { variant: 'saved', message: t('activity.saved'), bottomOffset: TOAST_BOTTOM_OFFSET }
-          : {
-              variant: 'removed',
-              message: t('activity.removed'),
-              actionLabel: t('common:actions.undo'),
-              onActionPress: () => setSaved.mutate({ rideId: ride.id, saved: true }),
-              bottomOffset: TOAST_BOTTOM_OFFSET,
-            },
-      );
-    });
-  };
-
-  // Comments have no screen yet (ride detail is not designed); the gate still applies so guests
-  // see the sign-in prompt. Signed-in riders get the comment thread once it exists.
-  const openComments = () => requireAccount('commentRide', () => undefined);
-
-  const shareRide = (ride: RideSummary) => {
-    Share.share({
-      message: t('share.rideMessage', {
-        title: ride.title,
-        distance: formatDistance(ride.distanceKm, 1),
-        duration: formatDuration(ride.durationMinutes),
-      }),
-    });
-  };
-
-  const openRideMenu = (ride: RideSummary) => {
-    showActionSheet({
-      cancelLabel: t('menu.cancel'),
-      options: [
-        {
-          label: t('menu.report'),
-          onPress: () =>
-            requireAccount('reportContent', () => {
-              report.mutateAsync({ type: 'ride', rideId: ride.id }).then(() =>
-                showToast({ variant: 'success', message: t('report.done'), bottomOffset: TOAST_BOTTOM_OFFSET }),
-              );
-            }),
-        },
-      ],
-    });
-  };
-
-  return (
-    <View style={styles.feed}>
-      {rides.map((ride, index) => (
-        <View key={ride.id} style={styles.feed}>
-          {index > 0 ? <View style={styles.divider} /> : null}
-          <RideActivityCard
-            riderName={rider.name}
-            riderAvatar={rider.avatar}
-            date={formatDateTime(new Date(ride.startedAt))}
-            title={ride.title}
-            rideType={ride.rideType}
-            metrics={{
-              distance: formatDistance(ride.distanceKm, 1),
-              duration: formatDuration(ride.durationMinutes),
-              averageSpeed: formatSpeed(ride.averageSpeedKmh),
-            }}
-            mapImage={ride.mapImage}
-            photos={ride.photos}
-            likeCount={ride.likeCount}
-            commentCount={ride.commentCount}
-            saveCount={ride.saveCount}
-            liked={ride.isLiked}
-            saved={ride.isSaved}
-            onLikePress={() => toggleLike(ride)}
-            onCommentPress={openComments}
-            onSavePress={() => toggleSave(ride)}
-            onSharePress={() => shareRide(ride)}
-            onMorePress={() => openRideMenu(ride)}
-          />
-        </View>
-      ))}
-    </View>
-  );
-}
-
 function RoutesList({ riderId }: { riderId: string }) {
   const { t } = useTranslation(['profile', 'routes']);
   const routesQuery = useRiderRoutes(riderId);
@@ -367,7 +281,9 @@ function RoutesList({ riderId }: { riderId: string }) {
   }
   const routes = routesQuery.data ?? [];
   if (routes.length === 0) {
-    return <EmptyState title={t('empty.routes.title')} description={t('empty.routes.description')} />;
+    return (
+      <EmptyState title={t('empty.routes.title')} description={t('empty.routes.description')} />
+    );
   }
 
   return (
@@ -395,7 +311,9 @@ function GarageList({ bikes }: { bikes: RiderBike[] }) {
   const { t } = useTranslation(['profile', 'common', 'garage']);
 
   if (bikes.length === 0) {
-    return <EmptyState title={t('empty.garage.title')} description={t('empty.garage.description')} />;
+    return (
+      <EmptyState title={t('empty.garage.title')} description={t('empty.garage.description')} />
+    );
   }
 
   const ordered = [...bikes].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
@@ -408,7 +326,9 @@ function GarageList({ bikes }: { bikes: RiderBike[] }) {
           title={`${motorcycleBrandNames[bike.brand]} ${bike.model}`}
           detail={[
             bike.year ? String(bike.year) : null,
-            bike.displacementCc ? t('common:units.cc', { value: formatNumber(bike.displacementCc) }) : null,
+            bike.displacementCc
+              ? t('common:units.cc', { value: formatNumber(bike.displacementCc) })
+              : null,
             bike.category ? t(`garage:categories.${bike.category}`) : null,
           ]
             .filter(Boolean)

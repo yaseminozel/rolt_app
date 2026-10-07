@@ -3,7 +3,12 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
+import { useQueryClient } from '@tanstack/react-query';
+
 import { useAuth } from '@/features/auth/AuthProvider';
+import { ownProfileRepository } from '@/features/profile/ownProfileRepository';
+import { ownProfileKeys } from '@/features/profile/queries';
+import { useRegistrationDraft } from '@/features/registration/RegistrationDraftProvider';
 import { colors, spacing, typography } from '@/theme';
 
 /**
@@ -14,11 +19,23 @@ import { colors, spacing, typography } from '@/theme';
 export default function RegisterLoadingScreen() {
   const { t } = useTranslation('registration');
   const router = useRouter();
-  const { completeProfile } = useAuth();
+  const { completeProfile, session } = useAuth();
+  const { draft } = useRegistrationDraft();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    completeProfile().catch(() => router.replace('/register/bike'));
-  }, [completeProfile, router]);
+    if (!session) {
+      return;
+    }
+    // The profile (09.01) is built from the registration steps, then the account is completed.
+    ownProfileRepository
+      .saveFromRegistration(session, draft)
+      .then((profile) => queryClient.setQueryData(ownProfileKeys.detail(profile.userId), profile))
+      .then(() => completeProfile())
+      .catch(() => router.replace('/register/bike'));
+    // Runs once when the screen opens; the draft is final by then.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={styles.screen} accessibilityLiveRegion="polite">
