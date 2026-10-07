@@ -24,10 +24,12 @@ import { ROUTE_DETAIL_CTA_HEIGHT, RouteDetailCta } from '@/components/route-deta
 import { RouteFactsCard } from '@/components/route-detail/RouteFactsCard';
 import { RouteMetricsCard } from '@/components/route-detail/RouteMetricsCard';
 import { RoutePhotoStrip } from '@/components/route-detail/RoutePhotoStrip';
+import { RouteStopsCard } from '@/components/route-detail/RouteStopsCard';
 import { useDeviceLocation } from '@/features/location/useDeviceLocation';
 import { useRoute } from '@/features/routes/queries';
 import type { Route } from '@/features/routes/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
+import { formatDistance } from '@/i18n/format';
 import { colors, fontFamily, layout, radius, spacing } from '@/theme';
 
 type CameraRef = ComponentRef<MapboxModule['Camera']>;
@@ -43,12 +45,12 @@ const MAP_BUTTON_GAP = 12;
 const MAP_BUTTON_FADE_DISTANCE = 80;
 const ROUTE_EDGE_PADDING = 32;
 /** Toast sits 16 pt above the pinned CTA button. */
-const TOAST_BOTTOM_OFFSET = 48 + spacing.lg;
+const TOAST_BOTTOM_OFFSET = 44 + spacing.lg;
 
 /**
- * 01.6 Rota Detayı (Pencil `pEHIv` "Standart", `DBllN` "Uzun İçerik"): the route on a map
- * behind a draggable sheet with its stats, notes, photos and facts, and a pinned
- * "Rotayı sürmeye başla". Snap points: collapsed (Uzun İçerik), default (Standart), full.
+ * 05.04 Rota detayı (Pencil `r1GmqA` / `e2MTEb` "Standart", `dUOP6` "Uzun içerik"): the route on
+ * a map behind a draggable sheet with its metrics, stops, photos, details and notes, and a
+ * pinned "Rotayı sürmeye başla". Snap points: collapsed, default (Standart), full.
  */
 export default function RouteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -245,12 +247,20 @@ function RouteDetail({ route }: { route: Route }) {
 
           <RouteMetricsCard route={route} />
 
-          {route.notes ? (
-            <View style={styles.notes}>
-              <Text style={styles.sectionTitle} accessibilityRole="header">
-                {t('sections.notes')}
-              </Text>
-              <Text style={styles.notesBody}>{route.notes}</Text>
+          {route.stops && route.stops.length > 0 ? (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle} accessibilityRole="header">
+                  {t('sections.stops')}
+                </Text>
+                <Text style={styles.sectionMeta}>
+                  {t('stops.summary', {
+                    count: route.stops.filter((stop) => stop.kind === 'stop').length,
+                    distance: formatDistance(route.distanceKm),
+                  })}
+                </Text>
+              </View>
+              <RouteStopsCard stops={route.stops} />
             </View>
           ) : null}
 
@@ -269,6 +279,15 @@ function RouteDetail({ route }: { route: Route }) {
             </Text>
             <RouteFactsCard facts={facts} />
           </View>
+
+          {route.notes ? (
+            <View style={styles.notes}>
+              <Text style={styles.sectionTitle} accessibilityRole="header">
+                {t('sections.notes')}
+              </Text>
+              <Text style={styles.notesBody}>{route.notes}</Text>
+            </View>
+          ) : null}
         </BottomSheetScrollView>
       </BottomSheet>
     </View>
@@ -348,6 +367,22 @@ const styles = StyleSheet.create({
   },
   notes: {
     gap: spacing.xs,
+  },
+  // "Rota ve duraklar": title row 8 pt above the stop card.
+  section: {
+    gap: spacing.sm,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+  sectionMeta: {
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.textSecondary,
   },
   sectionTitle: {
     fontFamily: fontFamily.semibold,

@@ -4,17 +4,14 @@
     "duration": "Süre",
     "averageSpeed": "Ort. hız",
     "maxSpeed": "Maks. hız",
-    "elevationGain": "Yükselti",
-    "elevationLoss": "İniş"
-  },
-  "moreDetails": {
-    "show": "Detay bilgileri göster",
-    "hide": "Detay bilgileri gizle"
+    "curves": "Viraj",
+    "breaks": "Mola"
   },
   "sections": {
-    "notes": "Notlar",
-    "photos": "Sürüş görselleri",
-    "facts": "Sürüş detayları"
+    "stops": "Rota durakları",
+    "photos": "Rota görselleri",
+    "facts": "Rota detayları",
+    "notes": "Notlar"
   },
   "facts": {
     "difficulty": "Zorluk seviyesi",
@@ -24,7 +21,7 @@
   "morePhotos": "+{{count}}",
   "a11y": {
     "authorProfile": "{{name}}, profili aç",
-    "photo": "Sürüş görseli {{index}} / {{total}}",
+    "photo": "Rota görseli {{index}} / {{total}}",
     "morePhotos_one": "{{count}} görsel daha",
     "morePhotos_other": "{{count}} görsel daha",
     "loading": "Rota yükleniyor"
@@ -33,5 +30,15 @@
     "title": "Rota bulunamadı",
     "description": "Bu rota kaldırılmış ya da bağlantı hatalı olabilir.",
     "action": "Keşfet'e dön"
+  },
+  "stops": {
+    "summary_one": "{{count}} ara durak · {{distance}}",
+    "summary_other": "{{count}} ara durak · {{distance}}",
+    "progress": "{{distance}} · {{duration}}",
+    "kind": {
+      "start": "Başlangıç",
+      "stop": "Durak",
+      "end": "Bitiş"
+    }
   }
 }

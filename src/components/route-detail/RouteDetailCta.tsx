@@ -6,8 +6,8 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import { Button } from '@/components/ui/Button';
 import { colors, spacing } from '@/theme';
 
-/** Button (48, `size="lg"`) plus the 16 pt top padding of the bar (01.6 `e2l5J`). */
-export const ROUTE_DETAIL_CTA_HEIGHT = 48 + spacing.lg;
+/** Button (44) plus the 16 pt top padding of the bar (05.04 `TboYF`). */
+export const ROUTE_DETAIL_CTA_HEIGHT = 44 + spacing.lg;
 
 type RouteDetailCtaProps = {
   label: string;
@@ -15,7 +15,7 @@ type RouteDetailCtaProps = {
 };
 
 /**
- * Bottom-pinned "Rotayı sürmeye başla" (01.6 `WXrjR`): full-width contained button over a
+ * Bottom-pinned "Rotayı sürmeye başla" (05.04 `dri86`): full-width contained button over a
  * white fade so sheet content scrolling underneath stays legible.
  */
 export function RouteDetailCta({ label, onPress }: RouteDetailCtaProps) {
@@ -33,7 +33,7 @@ export function RouteDetailCta({ label, onPress }: RouteDetailCtaProps) {
         </Defs>
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#ctaFade)" />
       </Svg>
-      <Button label={label} icon={Play} size="lg" onPress={onPress} />
+      <Button label={label} icon={Play} onPress={onPress} />
     </View>
   );
 }

@@ -23,7 +23,7 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 
 ## MVP kapsamı ve ürün kuralları
 
-**Navigasyon:** Alt tarafta yüzen (floating) 3 sekmeli bar: **Keşfet / Kaydet / Profil** (Discover / Record / Profile).
+**Navigasyon:** Alt tarafta yüzen (floating) 4 sekmeli bar: **Keşfet / Kaydet / Topluluk / Profil** (Discover / Record / Community / Profile; Pencil `c2uK3c`).
 - Saved Routes (Kaydettiklerim) → Profil içinde sekme; My Rides (Sürüşler) → Profil içinde.
 
 **Route ≠ Ride (kritik ayrım):**
@@ -73,8 +73,8 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 | 02 Auth (Akış 03–05) | 02.01 Giriş (boş/dolu/yükleniyor), 02.02 Şifre (mevcut/yeni hesap, yanlış şifre, çok fazla deneme), 02.03 Şifremi unuttum, 02.04 E-posta kontrol, 02.05 Yeni şifre, 02.06 Şifre güncellendi, 02.07 E-posta doğrulama (yeni hesap / süresi dolmuş bağlantı) |
 | 03 İzinler (Akış 06) | 03.01 Konum izni, 03.02 Bildirim izni (sheet) |
 | 04 Kayıt tamamlama (Akış 07) | 04.01 Profil (boş / müsait / kullanımda), 04.02 Konum (izin verilmiş / şehir ara / izin verilmemiş), 04.03 Motor (boş / seçili), 04.04–04.06 Marka / Model / Yıl sheet'leri, 04.07 Yükleniyor |
-| 05–13 (Akış 08–22) | Discover, Rotayı sür, Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
-| 01 Discover | Home (harita odaklı: konum, arama, kategori chip'leri, bölgede N rota, "Senin için önerilenler"), Search (aktif/sonuç/sonuç yok/sıralama sheet), Önerilen rotalar — Tümü, Rota detayı (standart/uzun), Haritada keşfet — rota listesi |
+| 05 Discover (Akış 08) | 05.01 Ana sayfa (harita odaklı / konum izni yok / çevrimdışı / iskelet), 05.02 Arama (aktif / sonuçlar / sıralama / sonuç yok), 05.03 Önerilen rotalar — Tümü, 05.04 Rota detayı (standart sokak / topografik, uzun içerik) |
+| 06–13 (Akış 09–22) | Rotayı sür, Map Explore, Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
 | 02 Record | Ready (rotalı/serbest, sürüş tipi şeridi alternatifi), Recording, Paused, Recovery, Sürüş modu full ekran, Durdurma onayı, Sürüşü kaydet (form), Sürüş tipi seçimi sheet |
 | 03 Profil / Ayarlar | Profil genel (Sürüşler/Performans/Kaydettiklerim sekmeleri), Profili paylaş (QR), Aktivite paylaşımı (karusel şablonlar), Kaydettiklerim (liste/kaydedildi/kaldırıldı/boş), Ayarlar ve alt sayfaları: hesap, sürüş görünürlüğü, başlangıç-bitiş gizleme, engellenenler, konum/fotoğraf izni, bildirimler, dil, ölçü birimleri, yardım/SSS, geri bildirim, gizlilik politikası, kullanım koşulları, çıkış |
 | 04 Motorum | Boş durum, Motor ekle (marka → model, bottom sheet), Eklendi, Motoru değiştir |
@@ -157,7 +157,7 @@ Pencil'de "ROLT UI Library" olarak belgelenmiş Core Components panoları (Light
 
 Tab bar ve ekran başlıkları **native** bileşenlerle yazılır; sistem iOS 26'da Liquid Glass olarak çizer. Bunları özel JS view, blur veya yarı saydam `View` ile **yeniden çizme**. Pencil'deki görünüm yalnızca içerik (etiket, ikon, sıra, eylemler) referansıdır; stil işletim sisteminden gelir.
 
-- **Tab bar** — Pencil'de `Navigation Bar / Floating` (ör. node `Hk8Qh`; Keşfet / Kaydet / Profil) → Expo Router **NativeTabs**.
+- **Tab bar** — Pencil'de `Navigation Bar / Floating — MVP` (`c2uK3c`; Keşfet / Kaydet / Topluluk / Profil) → Expo Router **NativeTabs**. İçerik (sıra, etiket, ikon) tasarımla birebir; ikonlar tasarımdaki Iconoir glifleri (map, play, path-arrow, motorcycle) 24 pt @1x–3x PNG export'u olarak `NativeTabs.Trigger.Icon src` ile (iOS template image). Cam görünüm ve seçili hâl sistemden gelir.
   - SDK 57 import: `import { NativeTabs } from 'expo-router/unstable-native-tabs'` (SDK 58+ ile `expo-router/native-tabs` olur).
   - Yapı: `<NativeTabs.Trigger name="…">` + `NativeTabs.Trigger.Icon` (`sf` iOS SF Symbol, `md` Android Material Symbol) + `NativeTabs.Trigger.Label`.
   - iOS 26'da `backgroundColor` / `blurEffect` / `shadowColor` etkisiz; renkler için `tintColor` / `labelStyle` + `DynamicColorIOS`. Beyaz flaş olmaması için root layout `ThemeProvider` ile sarılır.
@@ -207,19 +207,22 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Konum izni | Tasarım yalnız "izin ver" diyor | Yalnız ön plan izni; arka plan izni Kayıt akışında istenir |
 | Kullanıcı adı önerileri | Tasarımda örnek 3 çip | `.rides`, `_<plaka kodu>`, `<motor modeli>` sırasıyla; kurallara uyan, müsait en fazla 3 öneri. "Bunlardan birini seçebilirsin:" altında yatay kayan 32 pt çipler (dokunma alanı 44). Plaka kodu 04.02 yerinden gelir; profil önce olduğu için ilk geçişte genelde yok |
 | Kullanıcı adı hata ikonu | Yalnız "kullanımda" durumunda çizilmiş (üçgen) | Tüm kullanıcı adı hatalarında 20 pt `WarningTriangle` (başarı ikonuyla aynı yer) |
-| Keşfet ana sayfa bölümleri | "Senin için önerilenler" iki kez çizilmiş | Tek bölüm |
+| Keşfet ana sayfa (05.01) | Yeni düzen | Başlık → (çevrimdışı bandı) → arama → harita kartı ya da konum izni kartı → tek bölüm "Önerilen rotalar" (kategori çipleri bölüm başlığının altında, "Tümünü gör" marka mavisi). İkinci şerit kaldırıldı. Çiplerin hepsi 14 pt; son çipteki filtre ikonu çizim kalıntısı sayıldı (ikon yok) |
+| Çevrimdışı (05.01 `INwLr`) | "İndirdiğin rotalar" başlığı | NetInfo ile koyu bant + "Tekrar dene" (yeniden yükler) ve harita kartında çevrimdışı katmanı; bölüm başlığı normal kalır, indirme özelliği olmadığı için "İndirdiğin rotalar" uygulanmadı (açık soru). "Tümünü gör" çevrimdışında gizli |
+| Yükleniyor (05.01 `CImMS`) | İskelet | Önerilen ve bölge rotaları ilk kez yüklenirken arama/harita/bölüm yerine statik `DiscoverHomeSkeleton` (`skeleton` token) |
 | Aramadan çıkış | Tasarımda çıkış yolu yok | Arama kutusunun yanında "Vazgeç"; sorgu ve filtreler temizlenir, sıralama korunur |
-| Arama durumlarında kategori çipleri | 01.2'de gizli, 01.3'te görünür | Tüm arama durumlarında gizli; aramada filtre sheet'i kullanılır |
-| Bölge etiketi | "Konumun:" / "Seçili bölge:" | Cihaz konumu → "Konumun: X"; elle seçilen → "Seçili bölge: X"; bilinmiyorsa "Seçili bölge: Antalya (varsayılan)". Konum izni açılışta istenmez, yalnız durumu okunur |
-| Filtre sheet'i | Başlıkta "Sıfırla" ve altta "Temizle" aynı işi yapıyor | Yalnız alttaki "Temizle"; seçimler "N rotayı göster" ile uygulanır. Zorluk tekrar dokununca kalkan çip ("tercih yok" mümkün) |
+| Arama durumlarında kategori çipleri | 05.02 Aktif/Sonuçlar'da gizli, Sonuç yok'ta görünür | Tüm arama durumlarında gizli; aramada filtre sheet'i kullanılır |
+| Bölge etiketi | Yeni tasarım tek etiket | Her zaman "Konumun:"; cihaz ya da seçilen bölge → "X, Türkiye"; ikisi de yoksa "Konum belirlenmedi", harita yerine "Konum iznin kapalı" kartı ve bölüm "Türkiye'de popüler rotalar". Konum izni açılışta istenmez, yalnız durumu okunur |
+| Filtre sheet'i | 05.02 sonuç başlığında "Filtrele" yok | "Filtrele" korunur (filtrelere tek giriş). Başlıkta "Sıfırla" ve altta "Temizle" aynı işi yapıyordu | Yalnız alttaki "Temizle"; seçimler "N rotayı göster" ile uygulanır. Zorluk tekrar dokununca kalkan çip ("tercih yok" mümkün) |
 | "Manzara" / "Manzaralı", "Şehir içi" / "Şehir İçi" | Ekranlara göre farklı | Tek sözlük: `routes:tags.*` ("Manzara", "Şehir İçi") |
 | Sonuç yok görseli | Tasarımdaki fotoğraflardan biri Google logolu harita ekran görüntüsü | Kullanılamaz; rota fotoğrafıyla değiştirildi |
 | Rota detayı başlık/metrikler | "Geyikbayırı Sürüşü", 12,8 km, 18:42 (sürüş verisi) | Rotanın kendi verisi (ad, 1 ondalıklı mesafe, `formatDuration`) |
-| Rota detayı metrikleri | Standart 6, uzun içerik 3 + "göster" | Varsayılan kapalı, "Detay bilgileri göster/gizle" ile açılır |
+| Rota detayı metrikleri | Yeni tasarımda 6 metrik her zaman açık | Mesafe, Süre, Ort. hız / Maks. hız, Viraj, Mola (JetBrains Mono 16). Viraj ve mola sürüş metriği gibi ama tasarım rotada gösteriyor → `Route.curveCount`, `breakCount` eklendi |
+| Rota detayı bölümleri | Standart ve uzun içerik sırası farklı | Uzun içerik sırası: Rota durakları (varsa) → Rota görselleri → Rota detayları → Notlar. "Sürüş görselleri" yerine "Rota görselleri" (Route ≠ Ride). Duraklar `Route.stops`; başlangıçta saat yerine yalnız "0 km" (rotanın saati yok). CTA 44 pt |
 | Harita üzerindeki yuvarlak buton | "Konumuma git" adlı ama oynat ikonu çizilmiş | Konumuma git (`MapsArrow`); oynat ikonu CTA'ya ait |
-| Katman butonu | Katman seçici tasarlanmamış | Outdoors ↔ Uydu arasında geçiş |
+| Katman butonu | Katman seçici tasarlanmamış; 05.04 sokak ve topografik iki ayrı kare | Haritada keşfet'te Outdoors ↔ Uydu; rota detayında buton yok (tasarımda yok), harita Outdoors |
 | Sürüş detayları satırları | Chevron var ama gidilecek yer yok | Salt okunur, chevron yok |
-| Sürüş görselleri | Galeri tasarlanmamış | 5 sabit kutu, fazlası "+N"; kutular dokunulamaz |
+| Rota görselleri | Galeri tasarlanmamış | 5 sabit kutu, fazlası "+N"; kutular dokunulamaz |
 | Harita rota renkleri | Tasarım yalnız sahil/virajlı/manzara renklerini çiziyor | Şehir, Doğa, Off-road için sistem içi tonlar; önizleme kartı etiketi çizgi rengiyle aynı |
 | "N km uzakta" | Neyin uzaklığı belirsiz | Cihaz konumundan (izin varsa), yoksa seçili şehrin merkezinden rotanın en yakın noktasına |
 | Sürücü profili (01.8) | Tasarımda alt menü görünüyor | Root stack ekranı, alt menüsüz (rota detayından gelindiğinde geri dönüş bozulmasın) |
@@ -297,7 +300,7 @@ src/
 - Import alias'ı: `@/` → `src/`.
 - Fontlar `useFonts` ile ağırlık başına ayrı family olarak yüklenir (`fontFamily.medium` vb.); `fontWeight` kullanma. Kayıt/profil ekranlarındaki sürüş metrikleri `typography.metric*` (JetBrains Mono); rota kartlarındaki mesafe/süre tasarım gereği Inter.
 - Renk, boşluk, radius, gölge değerlerini yalnızca `@/theme` token'larından al; ekranlarda ham hex yazma. Tasarımda olup token'ı olmayan bir değer gerekiyorsa önce `src/theme`'e ekle.
-- İkonlar: `iconoir-react-native` (tasarım Iconoir kullanıyor). Tab bar ikonları istisna: NativeTabs sistem sembolü ister → Iconoir map/play/user yerine SF `map`/`play`/`person`, Material `map`/`play_arrow`/`person`.
+- İkonlar: `iconoir-react-native` (tasarım Iconoir kullanıyor). Tab bar ikonları istisna: NativeTabs görsel ister → `assets/images/tabs/*.png` (tasarımdan export edilmiş Iconoir glifleri).
 - Doğrulama: `npm run typecheck`, `npm run lint`, `npx expo-doctor`.
 
 ## Çoklu dil (i18n)

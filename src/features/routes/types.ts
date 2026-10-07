@@ -19,6 +19,16 @@ export type RouteSort = 'recommended' | 'nearest' | 'shortest' | 'longest' | 'po
 export type RouteDifficulty = 'easy' | 'moderate' | 'hard';
 export type RoadSurface = 'asphalt' | 'mixed' | 'gravel';
 
+/** One point of "Rota durakları" (05.04 `Q9Cbe`): start, intermediate stops and finish. */
+export type RouteStop = {
+  kind: 'start' | 'stop' | 'end';
+  /** Place name, shown as-is. */
+  name: string;
+  /** Distance and expected riding time from the start ("24 km · ~30 dk"). */
+  distanceKm: number;
+  durationMinutes: number;
+};
+
 export type RouteAuthor = {
   /** Rider id for the rider profile (01.8, `/rider/[id]`). */
   id: string;
@@ -42,6 +52,9 @@ export type Route = {
   durationMinutes: number;
   averageSpeedKmh: number;
   maxSpeedKmh: number;
+  /** Notable bends and planned breaks along the route ("Viraj", "Mola" on 05.04). */
+  curveCount: number;
+  breakCount: number;
   elevationGainM: number;
   elevationLossM: number;
   difficulty: RouteDifficulty;
@@ -50,6 +63,8 @@ export type Route = {
   /** ISO date the route was published. */
   publishedAt: string;
   notes?: string;
+  /** Ordered stops from start to finish; routes without intermediate stops have none. */
+  stops?: RouteStop[];
   coverImage: ImageSourcePropType;
   photos: ImageSourcePropType[];
   /** Route line from start to finish. */

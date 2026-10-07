@@ -76,6 +76,8 @@ function route({ from, via = [], to, ...seed }: RouteSeed, index: number): Route
   return {
     city: 'Antalya',
     maxSpeedKmh: Math.round(seed.averageSpeedKmh * 1.7),
+    curveCount: Math.round(seed.distanceKm * (seed.tag === 'curvy' ? 0.6 : 0.3)),
+    breakCount: Math.max(1, Math.round(seed.durationMinutes / 60)),
     elevationGainM: 120 + ((index * 37) % 400),
     elevationLossM: -(100 + ((index * 29) % 380)),
     difficulty: 'moderate',
@@ -108,6 +110,15 @@ const seeds: RouteSeed[] = [
     elevationGainM: 236,
     elevationLossM: -198,
     notes: "Antalya'nın doğasında, dağ manzaraları eşliğinde keyifli bir sürüş. Virajlar akıcı, manzara harika.",
+    curveCount: 34,
+    breakCount: 2,
+    // "Rota durakları" of 05.04 Uzun içerik (`w7AvU`).
+    stops: [
+      { kind: 'start', name: 'Geyikbayırı', distanceKm: 0, durationMinutes: 0 },
+      { kind: 'stop', name: 'Trebenna Seyir Noktası', distanceKm: 24, durationMinutes: 30 },
+      { kind: 'stop', name: 'Dağ Kahvesi', distanceKm: 42, durationMinutes: 65 },
+      { kind: 'end', name: 'Tahtalı Dağı', distanceKm: 58, durationMinutes: 80 },
+    ],
     from: place.antalya,
     via: [place.dosemealti],
     to: place.geyikbayiri,
