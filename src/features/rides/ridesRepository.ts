@@ -1,5 +1,21 @@
+import type { CompletedRide } from './completedRide';
+import { countCurves } from './rideRecorder';
+import { nearestCityName } from './rideTitle';
+import type { RideType } from './rideTypes';
 import { rideStorage } from './storage';
 import { RIDE_VISIBILITIES, type RideRecord, type RideVisibility } from './types';
+import type { Route, RouteTag } from '@/features/routes/types';
+
+/** Ride type a route ride starts with; the rider can change it on the form. */
+const RIDE_TYPE_FOR_TAG: Record<RouteTag, RideType> = {
+  coast: 'coast',
+  curvy: 'curves',
+  scenic: 'nature',
+  nature: 'nature',
+  city: 'city',
+  offRoad: 'offRoad',
+  longTour: 'longRide',
+};
 
 const LAST_VISIBILITY_KEY = 'lastVisibility';
 /** First ride is private; afterwards the last choice is remembered (decision 2026-10-07). */
@@ -44,6 +60,41 @@ export const ridesRepository = {
   },
 
   remove: (id: string) => rideStorage.remove(id),
+
+  /** A ride that ended in navigation (06.07 / "Bitir") becomes a draft for "Sürüşü kaydet". */
+  async createDraftFromNavigation(ride: CompletedRide, route: Route) {
+    const track = ride.track.length > 1 ? [ride.track] : [];
+    const draft: RideRecord = {
+      id: `ride-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      status: 'draft',
+      rideType: RIDE_TYPE_FOR_TAG[route.tag],
+      routeId: route.id,
+      routeName: route.name,
+      title: '',
+      notes: '',
+      difficulty: route.difficulty,
+      surface: route.surface,
+      visibility: await ridesRepository.defaultVisibility(),
+      photos: [],
+      city: ride.track[0] ? nearestCityName(ride.track[0]) : undefined,
+      startedAt: ride.startedAt,
+      endedAt: ride.endedAt,
+      updatedAt: Date.now(),
+      stats: {
+        distanceM: ride.distanceM,
+        // Recorded time as in the Record tab: riding plus breaks.
+        durationS: ride.movingS + ride.breakS,
+        breakS: ride.breakS,
+        breakCount: ride.breakCount,
+        maxSpeedMps: ride.maxSpeedMps,
+        curveCount: countCurves(track),
+      },
+      track,
+      synced: false,
+    };
+    await rideStorage.put(draft);
+    return draft;
+  },
 
   async defaultVisibility(): Promise<RideVisibility> {
     const stored = await rideStorage.getPreference(LAST_VISIBILITY_KEY);

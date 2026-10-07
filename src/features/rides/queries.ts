@@ -48,6 +48,16 @@ export function useSaveRide() {
   });
 }
 
+/** A single change to a saved ride, e.g. visibility from the ride options (09.06). */
+export function useUpdateRide() {
+  const updateCache = useRideCacheUpdate();
+  return useMutation({
+    mutationFn: ({ id, patch }: { id: string; patch: Partial<RideRecord> }) =>
+      ridesRepository.update(id, patch),
+    onSuccess: (ride) => updateCache(ride, ride.id),
+  });
+}
+
 /** "Sürüşü sil" (08.09, 09.06): irreversible, confirmed before. */
 export function useDeleteRide() {
   const updateCache = useRideCacheUpdate();

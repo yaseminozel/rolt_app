@@ -221,6 +221,8 @@ export const colors = {
   // Photo tiles on "Rota bilgileri" (04.2 `fGq4D`, `ldcdM`): upload veil, failed veil, "Kapak" badge.
   mediaUploadingVeil: 'rgba(16, 19, 24, 0.5)',
   mediaFailedVeil: 'rgba(185, 28, 28, 0.8)',
+  /** Unfilled part of a photo's upload bar (08.07 "Progress track"). */
+  mediaProgressTrack: 'rgba(255, 255, 255, 0.35)',
   mediaBadge: 'rgba(16, 19, 24, 0.8)',
 
   // Turn-by-turn navigation (06.06): status banners, deviation badges, route line.

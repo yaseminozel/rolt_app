@@ -56,6 +56,82 @@ export type RecorderResumeState = {
 const normalizeTurn = (deg: number) => ((((deg + 180) % 360) + 360) % 360) - 180;
 
 /**
+ * Counts bends ("Viraj") along a track: points are resampled every `curveSampleM`, and turning
+ * the same way by at least `curveMinTurnDeg` within `curveWindowM` is one bend.
+ */
+export class CurveCounter {
+  private anchor: LngLat | null = null;
+  private prevBearing: number | null = null;
+  private turn = 0;
+  private run = 0;
+  private counted = false;
+
+  /** A gap in the track (pause, GPS loss): don't measure across it. */
+  breakTrack() {
+    this.anchor = null;
+    this.prevBearing = null;
+    this.turn = 0;
+    this.run = 0;
+    this.counted = false;
+  }
+
+  /** Adds a track point; true when it completes a new bend. */
+  add(point: LngLat): boolean {
+    if (!this.anchor) {
+      this.anchor = point;
+      return false;
+    }
+    if (distanceM(this.anchor, point) < RECORDER_RULES.curveSampleM) {
+      return false;
+    }
+    const bearing = bearingDeg(this.anchor, point);
+    this.anchor = point;
+    if (this.prevBearing === null) {
+      this.prevBearing = bearing;
+      return false;
+    }
+    const turn = normalizeTurn(bearing - this.prevBearing);
+    this.prevBearing = bearing;
+    const straight = Math.abs(turn) < RECORDER_RULES.curveStraightDeg;
+    const sameDirection = Math.sign(turn) === Math.sign(this.turn) || this.turn === 0;
+    if (straight || !sameDirection) {
+      // Straight again or turning the other way: a new bend may start.
+      this.turn = straight ? 0 : turn;
+      this.run = 0;
+      this.counted = false;
+      return false;
+    }
+    this.turn += turn;
+    this.run += RECORDER_RULES.curveSampleM;
+    if (this.run > RECORDER_RULES.curveWindowM) {
+      // A long, gentle arc: keep only the recent turning.
+      this.turn = turn;
+      this.run = RECORDER_RULES.curveSampleM;
+    }
+    if (!this.counted && Math.abs(this.turn) >= RECORDER_RULES.curveMinTurnDeg) {
+      this.counted = true;
+      return true;
+    }
+    return false;
+  }
+}
+
+/** Bends of a finished track (rides that come from navigation). */
+export function countCurves(track: LngLat[][]) {
+  const counter = new CurveCounter();
+  let count = 0;
+  for (const segment of track) {
+    counter.breakTrack();
+    for (const point of segment) {
+      if (counter.add(point)) {
+        count += 1;
+      }
+    }
+  }
+  return count;
+}
+
+/**
  * Pure ride recorder: feed it location fixes and clock ticks, read totals. No timers or I/O, so
  * it runs the same on a device, in the simulator and in headless tests.
  */
@@ -71,12 +147,7 @@ export class RideRecorder {
   private headingDeg: number | null = null;
   private standingSince: number | null = null;
   private breakCounted = false;
-  // Bend detection on resampled points.
-  private curveAnchor: LngLat | null = null;
-  private curvePrevBearing: number | null = null;
-  private curveTurn = 0;
-  private curveRun = 0;
-  private curveCounted = false;
+  private curves = new CurveCounter();
 
   constructor(now: number, resume?: RecorderResumeState) {
     this.stats = resume ? { ...resume.stats } : { ...EMPTY_RIDE_STATS };
@@ -111,10 +182,7 @@ export class RideRecorder {
   private startSegment() {
     this.track.push([]);
     this.lastGood = null;
-    this.curveAnchor = null;
-    this.curvePrevBearing = null;
-    this.curveTurn = 0;
-    this.curveRun = 0;
+    this.curves.breakTrack();
     this.standingSince = null;
   }
 
@@ -186,7 +254,9 @@ export class RideRecorder {
     this.stats.distanceM += step;
     segment.push(fix.coordinates);
     this.lastGood = { coordinates: fix.coordinates, timestamp: fix.timestamp };
-    this.measureCurve(fix.coordinates);
+    if (this.curves.add(fix.coordinates)) {
+      this.stats.curveCount += 1;
+    }
   }
 
   private trackStanding(fix: LocationFix, speed: number) {
@@ -204,43 +274,6 @@ export class RideRecorder {
     } else {
       this.standingSince = null;
       this.breakCounted = false;
-    }
-  }
-
-  private measureCurve(point: LngLat) {
-    if (!this.curveAnchor) {
-      this.curveAnchor = point;
-      return;
-    }
-    if (distanceM(this.curveAnchor, point) < RECORDER_RULES.curveSampleM) {
-      return;
-    }
-    const bearing = bearingDeg(this.curveAnchor, point);
-    this.curveAnchor = point;
-    if (this.curvePrevBearing === null) {
-      this.curvePrevBearing = bearing;
-      return;
-    }
-    const turn = normalizeTurn(bearing - this.curvePrevBearing);
-    this.curvePrevBearing = bearing;
-    const sameDirection = Math.sign(turn) === Math.sign(this.curveTurn) || this.curveTurn === 0;
-    if (Math.abs(turn) < RECORDER_RULES.curveStraightDeg || !sameDirection) {
-      // Straight again or turning the other way: a new bend may start.
-      this.curveTurn = Math.abs(turn) < RECORDER_RULES.curveStraightDeg ? 0 : turn;
-      this.curveRun = 0;
-      this.curveCounted = false;
-      return;
-    }
-    this.curveTurn += turn;
-    this.curveRun += RECORDER_RULES.curveSampleM;
-    if (this.curveRun > RECORDER_RULES.curveWindowM) {
-      // A long, gentle arc: keep only the recent turning.
-      this.curveTurn = turn;
-      this.curveRun = RECORDER_RULES.curveSampleM;
-    }
-    if (!this.curveCounted && Math.abs(this.curveTurn) >= RECORDER_RULES.curveMinTurnDeg) {
-      this.stats.curveCount += 1;
-      this.curveCounted = true;
     }
   }
 

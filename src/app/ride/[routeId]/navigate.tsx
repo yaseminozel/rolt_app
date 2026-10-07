@@ -1,6 +1,13 @@
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { Bookmark, BookmarkSolid, Compass, NavArrowLeft, SoundHigh, SoundOff } from 'iconoir-react-native';
+import {
+  Bookmark,
+  BookmarkSolid,
+  Compass,
+  NavArrowLeft,
+  SoundHigh,
+  SoundOff,
+} from 'iconoir-react-native';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
@@ -14,6 +21,7 @@ import { NavigationBanner } from '@/components/navigation/NavigationBanner';
 import { NavigationChip } from '@/components/navigation/NavigationChip';
 import { NavigationMapView } from '@/components/navigation/NavigationMapView';
 import { NavigationSummary } from '@/components/navigation/NavigationSummary';
+import { useToast } from '@/components/feedback/ToastProvider';
 import { Button } from '@/components/ui/Button';
 import {
   formatStopDistance,
@@ -21,21 +29,37 @@ import {
   maneuverSubtitle,
   maneuverTitle,
 } from '@/features/navigation/instructions';
-import { createNavigationLocationSource, type SimulationScenario } from '@/features/navigation/location';
+import {
+  createNavigationLocationSource,
+  type SimulationScenario,
+} from '@/features/navigation/location';
 import type { NavigationSnapshot } from '@/features/navigation/navigationTracker';
 import { useRideSession } from '@/features/navigation/RideSessionProvider';
 import type { NavigationPlan } from '@/features/navigation/types';
 import { useNavigationSession } from '@/features/navigation/useNavigationSession';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import { setCompletedRide } from '@/features/rides/completedRideStore';
-import { formatClockTime, formatDistance, formatDuration, formatRideClock, formatSpeed } from '@/i18n/format';
+import type { CompletedRide } from '@/features/rides/completedRide';
+import { ridesRepository } from '@/features/rides/ridesRepository';
+import {
+  formatClockTime,
+  formatDistance,
+  formatDuration,
+  formatRideClock,
+  formatSpeed,
+} from '@/i18n/format';
 import { useNow } from '@/lib/useNow';
 import { colors, layout, radius, spacing } from '@/theme';
 
 const KEEP_AWAKE_TAG = 'rolt-navigation';
 /** Guidance sits 7 pt under the status bar (06.06 "Yönlendirme" at y 56). */
 const GUIDANCE_TOP = 7;
-const SCENARIOS: readonly SimulationScenario[] = ['normal', 'offRoute', 'weakGps', 'lostGps', 'break'];
+const SCENARIOS: readonly SimulationScenario[] = [
+  'normal',
+  'offRoute',
+  'weakGps',
+  'lostGps',
+  'break',
+];
 
 /**
  * 06.06 Rotayı sür / Navigasyon — Pencil `U8tb82` (turn ahead), `kBA4X` (rotadan çıktın),
@@ -50,7 +74,11 @@ export default function NavigateScreen() {
   // The plan is fixed when navigation starts; Hazırlık (still mounted underneath) may re-plan later.
   const [plan] = useState(session.plan);
   if (!plan) {
-    return <Redirect href={{ pathname: '/ride/[routeId]/prepare', params: { routeId: session.route.id } }} />;
+    return (
+      <Redirect
+        href={{ pathname: '/ride/[routeId]/prepare', params: { routeId: session.route.id } }}
+      />
+    );
   }
   return <Navigation plan={plan} />;
 }
@@ -58,6 +86,7 @@ export default function NavigateScreen() {
 function Navigation({ plan }: { plan: NavigationPlan }) {
   const { routeId, scenario } = useLocalSearchParams<{ routeId: string; scenario?: string }>();
   const { t } = useTranslation(['ride', 'common']);
+  const { showToast } = useToast();
   const insets = useSafeAreaInsets();
   const session = useRideSession();
   const { route, stops, voiceEnabled, setVoiceEnabled, keepScreenOn, endRequested } = session;
@@ -76,7 +105,10 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
       line: plan.geometry,
       stops: stops.map((stop) => stop.coordinates),
       scenario: SCENARIOS.find((item) => item === scenario),
-      notification: { title: t('navigation.notificationTitle'), body: t('navigation.notificationBody') },
+      notification: {
+        title: t('navigation.notificationTitle'),
+        body: t('navigation.notificationBody'),
+      },
     }),
   );
   const { snapshot, plan: activePlan } = useNavigationSession({
@@ -103,12 +135,13 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
       }
       ended.current = true;
       const { ride } = current;
-      setCompletedRide({
+      const completedRide: CompletedRide = {
         routeId: route.id,
         routeName: route.name,
         distanceM: ride.distanceM,
         movingS: ride.movingS,
         breakS: ride.breakS,
+        breakCount: ride.breakCount,
         elapsedS: ride.elapsedS,
         averageSpeedMps: ride.movingS > 0 ? ride.distanceM / ride.movingS : 0,
         maxSpeedMps: ride.maxSpeedMps,
@@ -116,11 +149,19 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
         startedAt: ride.startedAt,
         endedAt: Date.now(),
         completed,
-      });
-      // Back to the tabs, on the Record tab (08.05 "Sürüşü kaydet" picks the ride up there).
-      router.navigate('/record');
+      };
+      // The ride becomes a draft on the device, then "Sürüşü kaydet" (08.05) opens for it.
+      ridesRepository
+        .createDraftFromNavigation(completedRide, route)
+        .then((draft) =>
+          router.replace({ pathname: '/rides/[rideId]/save', params: { rideId: draft.id } }),
+        )
+        .catch(() => {
+          showToast({ variant: 'failure', message: t('arrival.saveFailed') });
+          ended.current = false;
+        });
     },
-    [route.id, route.name],
+    [route, showToast, t],
   );
 
   // "Bitir" on the exit sheet: route tracking stops; the ride so far goes to Record.
@@ -133,7 +174,6 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
   const leaveWithoutSaving = () => {
     ended.current = true;
     setDiscardVisible(false);
-    setCompletedRide(null);
     router.dismissTo({ pathname: '/route/[id]', params: { id: route.id } });
   };
 
@@ -149,34 +189,54 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
     };
   } else if (snapshot.nextStep) {
     const arriving = snapshot.nextStep.type === 'arrive';
-    const stopNumber = arriving && snapshot.nextStopIndex !== null ? snapshot.nextStopIndex + 1 : null;
+    const stopNumber =
+      arriving && snapshot.nextStopIndex !== null ? snapshot.nextStopIndex + 1 : null;
     guidance = {
-      icon: arriving ? (stopNumber !== null ? 'arrive' : 'finish') : maneuverIconKind(snapshot.nextStep),
+      icon: arriving
+        ? stopNumber !== null
+          ? 'arrive'
+          : 'finish'
+        : maneuverIconKind(snapshot.nextStep),
       title: maneuverTitle(snapshot.nextStep, snapshot.distanceToNextStepM, t, { stopNumber }),
-      subtitle: arriving ? stopName(snapshot.nextStopIndex) || t('maneuver.followRoute') : maneuverSubtitle(snapshot.nextStep, t),
+      subtitle: arriving
+        ? stopName(snapshot.nextStopIndex) || t('maneuver.followRoute')
+        : maneuverSubtitle(snapshot.nextStep, t),
     };
   } else {
-    guidance = { icon: 'straight', title: t('maneuver.now.straight'), subtitle: t('maneuver.followRoute') };
+    guidance = {
+      icon: 'straight',
+      title: t('maneuver.now.straight'),
+      subtitle: t('maneuver.followRoute'),
+    };
   }
 
   let banner = null;
   if (snapshot.offRoute) {
     banner = (
-      <NavigationBanner tone="offRoute" busy title={t('navigation.offRouteTitle')} description={t('navigation.offRouteDescription')} />
+      <NavigationBanner
+        tone="offRoute"
+        busy
+        title={t('navigation.offRouteTitle')}
+        description={t('navigation.offRouteDescription')}
+      />
     );
   } else if (snapshot.reconnectedAddedMinutes !== null) {
     banner = (
       <NavigationBanner
         tone="reconnected"
         title={t('navigation.reconnectedTitle')}
-        description={t('navigation.reconnectedDescription', { count: snapshot.reconnectedAddedMinutes })}
+        description={t('navigation.reconnectedDescription', {
+          count: snapshot.reconnectedAddedMinutes,
+        })}
       />
     );
   } else if (snapshot.gps !== 'ok') {
     banner = (
       <NavigationBanner
         tone="gps"
-        title={snapshot.gps === 'lost' ? t('navigation.gpsLostTitle') : t('navigation.gpsWeakTitle')}
+        title={
+          snapshot.gps === 'lost' ? t('navigation.gpsLostTitle') : t('navigation.gpsWeakTitle')
+        }
         description={t('navigation.gpsDescription')}
       />
     );
@@ -187,11 +247,18 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
     chip = (
       <NavigationChip
         kind="break"
-        title={t('navigation.breakStop', { number: snapshot.breakStopIndex + 1, name: stopName(snapshot.breakStopIndex) })}
+        title={t('navigation.breakStop', {
+          number: snapshot.breakStopIndex + 1,
+          name: stopName(snapshot.breakStopIndex),
+        })}
         label={t('navigation.breakLabel')}
       />
     );
-  } else if (snapshot.nextStopIndex !== null && snapshot.distanceToNextStopM !== null && snapshot.arrivedStopIndex === null) {
+  } else if (
+    snapshot.nextStopIndex !== null &&
+    snapshot.distanceToNextStopM !== null &&
+    snapshot.arrivedStopIndex === null
+  ) {
     chip = (
       <NavigationChip
         kind="nextStop"
@@ -205,18 +272,31 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
   }
 
   const remainingMinutes = Math.max(1, Math.round(snapshot.remainingS / 60));
-  const remaining = remainingMinutes < 60 ? t('units.minutes', { value: remainingMinutes }) : formatDuration(remainingMinutes);
+  const remaining =
+    remainingMinutes < 60
+      ? t('units.minutes', { value: remainingMinutes })
+      : formatDuration(remainingMinutes);
   const arrivalTime = formatClockTime(new Date(now + snapshot.remainingS * 1000));
   const finish = activePlan.geometry[activePlan.geometry.length - 1];
   const saved = isSaved(route.id);
 
   const rideTiles = [
-    { key: 'distance', label: t('arrival.metrics.distance'), value: formatDistance(snapshot.ride.distanceM / 1000, 1) },
-    { key: 'duration', label: t('arrival.metrics.duration'), value: formatRideClock(snapshot.ride.movingS) },
+    {
+      key: 'distance',
+      label: t('arrival.metrics.distance'),
+      value: formatDistance(snapshot.ride.distanceM / 1000, 1),
+    },
+    {
+      key: 'duration',
+      label: t('arrival.metrics.duration'),
+      value: formatRideClock(snapshot.ride.movingS),
+    },
     {
       key: 'speed',
       label: t('arrival.metrics.averageSpeed'),
-      value: formatSpeed(snapshot.ride.movingS > 0 ? (snapshot.ride.distanceM / snapshot.ride.movingS) * 3.6 : 0),
+      value: formatSpeed(
+        snapshot.ride.movingS > 0 ? (snapshot.ride.distanceM / snapshot.ride.movingS) * 3.6 : 0,
+      ),
     },
   ];
 
@@ -232,16 +312,28 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
         finish={finish}
         rider={
           snapshot.position
-            ? { position: snapshot.position, headingDeg: snapshot.headingDeg, weakSignal: snapshot.gps !== 'ok' }
+            ? {
+                position: snapshot.position,
+                headingDeg: snapshot.headingDeg,
+                weakSignal: snapshot.gps !== 'ok',
+              }
             : null
         }
-        camera={following && !snapshot.finished ? { mode: 'follow' } : { mode: 'overview', padding: { top: 160, right: 40, bottom: 520, left: 40 } }}
+        camera={
+          following && !snapshot.finished
+            ? { mode: 'follow' }
+            : { mode: 'overview', padding: { top: 160, right: 40, bottom: 520, left: 40 } }
+        }
         onUserGesture={() => setFollowing(false)}
       />
 
       {snapshot.finished ? (
         <View style={[styles.topActions, { top: insets.top }]}>
-          <MapActionButton icon={NavArrowLeft} accessibilityLabel={t('common:actions.back')} onPress={() => setDiscardVisible(true)} />
+          <MapActionButton
+            icon={NavArrowLeft}
+            accessibilityLabel={t('common:actions.back')}
+            onPress={() => setDiscardVisible(true)}
+          />
           <MapActionButton
             icon={saved ? BookmarkSolid : Bookmark}
             accessibilityLabel={t('common:actions.save')}
@@ -250,7 +342,9 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
           />
         </View>
       ) : (
-        <View style={[styles.guidance, { top: insets.top + GUIDANCE_TOP }]} pointerEvents="box-none">
+        <View
+          style={[styles.guidance, { top: insets.top + GUIDANCE_TOP }]}
+          pointerEvents="box-none">
           <GuidanceCard icon={guidance.icon} title={guidance.title} subtitle={guidance.subtitle} />
           {banner}
           {chip}
@@ -266,7 +360,9 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
           />
           <MapSquareButton
             onPress={() => setVoiceEnabled(!voiceEnabled)}
-            accessibilityLabel={voiceEnabled ? t('navigation.soundOnA11y') : t('navigation.soundOffA11y')}
+            accessibilityLabel={
+              voiceEnabled ? t('navigation.soundOnA11y') : t('navigation.soundOffA11y')
+            }
             icon={
               voiceEnabled ? (
                 <SoundHigh width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
@@ -292,9 +388,14 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
         ) : (
           <NavigationSummary
             remaining={remaining}
-            detail={t('navigation.distanceArrival', { distance: formatStopDistance(snapshot.remainingM, t), time: arrivalTime })}
+            detail={t('navigation.distanceArrival', {
+              distance: formatStopDistance(snapshot.remainingM, t),
+              time: arrivalTime,
+            })}
             finishLabel={t('navigation.finish')}
-            onFinish={() => router.push({ pathname: '/ride/[routeId]/exit-confirm', params: { routeId } })}
+            onFinish={() =>
+              router.push({ pathname: '/ride/[routeId]/exit-confirm', params: { routeId } })
+            }
           />
         )}
       </View>
@@ -313,7 +414,12 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
             actionsLayout="column"
             actions={[
               <Button key="leave" label={t('discard.confirm')} onPress={leaveWithoutSaving} />,
-              <Button key="back" variant="text" label={t('discard.cancel')} onPress={() => setDiscardVisible(false)} />,
+              <Button
+                key="back"
+                variant="text"
+                label={t('discard.cancel')}
+                onPress={() => setDiscardVisible(false)}
+              />,
             ]}
           />
         </View>

@@ -182,7 +182,8 @@
       "averageSpeed": "Ort. hız"
     },
     "save": "Sürüşü kaydet",
-    "leave": "Kaydetmeden çık"
+    "leave": "Kaydetmeden çık",
+    "saveFailed": "Sürüş kaydedilemedi. Lütfen tekrar dene."
   },
   "discard": {
     "title": "Kaydetmeden çıkılsın mı?",

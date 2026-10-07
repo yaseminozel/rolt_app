@@ -182,7 +182,8 @@
       "averageSpeed": "Avg. speed"
     },
     "save": "Save ride",
-    "leave": "Leave without saving"
+    "leave": "Leave without saving",
+    "saveFailed": "Couldn't save the ride. Please try again."
   },
   "discard": {
     "title": "Leave without saving?",

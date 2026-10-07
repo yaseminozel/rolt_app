@@ -56,5 +56,141 @@
       "cancel": "Cancel"
     },
     "locationRequired": "Location access is needed to record."
+  },
+  "share": {
+    "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"
+  },
+  "summary": {
+    "distance": "Distance",
+    "duration": "Time",
+    "averageSpeed": "Avg. speed",
+    "maxSpeed": "Max. speed",
+    "curves": "Bends",
+    "breaks": "Breaks"
+  },
+  "form": {
+    "title": "Save ride",
+    "editTitle": "Edit ride",
+    "close": "Close",
+    "name": {
+      "label": "Ride name",
+      "placeholder": "Give your ride a name"
+    },
+    "details": {
+      "label": "Ride details",
+      "difficulty": "Difficulty",
+      "surface": "Road type"
+    },
+    "notes": {
+      "label": "Notes",
+      "placeholder": "How was the ride?"
+    },
+    "photos": {
+      "label": "Ride photos",
+      "upload": "Upload photos",
+      "uploadHint": "Add photos",
+      "add": "Add",
+      "retry": "Try again",
+      "remove": "Remove",
+      "cancel": "Cancel",
+      "failed_one": "{{count}} photo couldn't be uploaded. Tap it to try again.",
+      "failed_other": "{{count}} photos couldn't be uploaded. Tap them to try again.",
+      "photoA11y": "Photo {{index}}",
+      "uploadingA11y": "Photo {{index}} uploading",
+      "failedA11y": "Photo {{index}} failed to upload, tap to try again"
+    },
+    "visibility": {
+      "label": "Visibility",
+      "row": "Who can see"
+    },
+    "rideType": {
+      "label": "Ride type"
+    },
+    "delete": "Delete ride",
+    "save": "Save ride",
+    "saving": "Saving…",
+    "saveChanges": "Save changes",
+    "uploadingPhotos": "Uploading photos · {{done}}/{{total}}",
+    "saveFailed": "Couldn't save the ride. Please try again.",
+    "exitDialog": {
+      "title": "Leave without saving?",
+      "description": "Your ride won't be saved and its route, time and distance will be lost.",
+      "confirm": "Leave without saving",
+      "cancel": "Back to saving"
+    },
+    "deleted": "Ride deleted"
+  },
+  "visibility": {
+    "public": "Everyone",
+    "followers": "My followers",
+    "private": "Only me",
+    "descriptions": {
+      "public": "Everyone on ROLT can see it; it can appear in Discover",
+      "followers": "Only people who follow you can see it",
+      "private": "Only you can see it; hidden on your profile"
+    },
+    "audience": {
+      "public": "Everyone can see it",
+      "followers": "Your followers can see it",
+      "private": "Only you can see it"
+    },
+    "sheet": {
+      "title": "Who can see this?",
+      "subtitle": "Choose who can see this ride. You can change it after saving too.",
+      "note": "Change the default for new rides in Settings > Ride visibility.",
+      "apply": "Apply"
+    }
+  },
+  "rideTypeSheet": {
+    "title": "Ride type",
+    "subtitle": "Pick the option that describes this ride best."
+  },
+  "photoSource": {
+    "title": "Upload photos",
+    "camera": "Take a photo",
+    "cameraHint": "Open the camera",
+    "library": "Choose from library",
+    "libraryHint_one": "You can add up to {{count}} more photo",
+    "libraryHint_other": "You can add up to {{count}} more photos",
+    "cameraPermission": {
+      "title": "Camera access needed",
+      "message": "Allow camera access in Settings to take photos."
+    },
+    "openSettings": "Open Settings",
+    "permissionCancel": "Cancel"
+  },
+  "saved": {
+    "title": "Your ride is saved",
+    "description": "Added to your profile · {{audience}}",
+    "shareTitle": "Share now",
+    "targets": {
+      "instagramStory": "Instagram Story",
+      "instagramPost": "Instagram Post",
+      "whatsapp": "WhatsApp",
+      "copyLink": "Copy link",
+      "other": "More"
+    },
+    "viewRide": "View ride",
+    "linkCopied": "Link copied"
+  },
+  "detail": {
+    "notes": "Notes",
+    "photos": "Ride photos",
+    "details": "Ride details",
+    "share": "Share",
+    "rideAgain": "Ride this route again",
+    "options": "Ride options",
+    "notFound": {
+      "title": "Ride not found",
+      "description": "This ride may have been deleted."
+    },
+    "deleteDescription": "The route, stats, photos, likes and comments will be deleted permanently. This can't be undone."
+  },
+  "options": {
+    "title": "Ride options",
+    "edit": "Edit ride",
+    "visibility": "Visibility",
+    "share": "Share",
+    "delete": "Delete ride"
   }
 }

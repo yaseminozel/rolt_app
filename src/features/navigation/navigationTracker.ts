@@ -45,6 +45,8 @@ export type RideStats = {
   movingS: number;
   /** Time spent on breaks at stops — kept apart so ride comparisons can skip it. */
   breakS: number;
+  /** Breaks taken ("Mola" on the ride detail). */
+  breakCount: number;
   elapsedS: number;
   maxSpeedMps: number;
   track: LngLat[];
@@ -124,6 +126,7 @@ export class NavigationTracker {
       distanceM: 0,
       movingS: 0,
       breakS: 0,
+      breakCount: 0,
       elapsedS: 0,
       maxSpeedMps: 0,
       track: [],
@@ -207,7 +210,10 @@ export class NavigationTracker {
     if (!this.offRoute || !this.lastRaw) {
       return null;
     }
-    const joinAlongM = Math.min(this.traveledM + NAVIGATION_RULES.reconnectAheadM, this.plan.distanceM);
+    const joinAlongM = Math.min(
+      this.traveledM + NAVIGATION_RULES.reconnectAheadM,
+      this.plan.distanceM,
+    );
     return {
       from: this.lastRaw.coordinates,
       to: pointAlong(this.plan.geometry, this.plan.cumulativeM, joinAlongM).point,
@@ -223,7 +229,10 @@ export class NavigationTracker {
     const restDuration =
       this.plan.durationS * ((this.plan.distanceM - joinAlongM) / Math.max(this.plan.distanceM, 1));
     const connectorSteps = connector.steps.filter((step) => step.type !== 'arrive');
-    const joinGap = restSteps.length > 0 ? restSteps[0].startDistanceM - joinAlongM : this.plan.distanceM - joinAlongM;
+    const joinGap =
+      restSteps.length > 0
+        ? restSteps[0].startDistanceM - joinAlongM
+        : this.plan.distanceM - joinAlongM;
     if (connectorSteps.length > 0) {
       const last = connectorSteps[connectorSteps.length - 1];
       connectorSteps[connectorSteps.length - 1] = {
@@ -237,7 +246,9 @@ export class NavigationTracker {
       [...connectorSteps, ...restSteps].map(({ startDistanceM: _unused, ...step }) => step),
       connector.durationS + restDuration,
     );
-    this.stopAlongM = this.alongForStops().map((along, index) => (this.reached[index] ? -1 : along));
+    this.stopAlongM = this.alongForStops().map((along, index) =>
+      this.reached[index] ? -1 : along,
+    );
     this.traveledM = 0;
     this.offRoute = false;
     this.offRouteCount = 0;
@@ -261,7 +272,9 @@ export class NavigationTracker {
     if (nextIndex >= 0) {
       const stop = this.stops[nextIndex];
       const near = distanceM(fix.coordinates, stop.coordinates) <= NAVIGATION_RULES.stopArrivalM;
-      const passed = !this.offRoute && this.traveledM >= this.stopAlongM[nextIndex] + NAVIGATION_RULES.stopArrivalM;
+      const passed =
+        !this.offRoute &&
+        this.traveledM >= this.stopAlongM[nextIndex] + NAVIGATION_RULES.stopArrivalM;
       if (near || passed) {
         // A stop is a waypoint, not the finish: it completes on its own (note `oWZdq`).
         this.reached[nextIndex] = true;
@@ -272,7 +285,11 @@ export class NavigationTracker {
 
     const speed = fix.speedMps ?? this.speedFromLast(fix);
     const moving = speed > NAVIGATION_RULES.movingSpeedMps;
-    if (this.arrivedStopIndex !== null && fix.timestamp - this.arrivedAt >= NAVIGATION_RULES.arrivalCardMs && moving) {
+    if (
+      this.arrivedStopIndex !== null &&
+      fix.timestamp - this.arrivedAt >= NAVIGATION_RULES.arrivalCardMs &&
+      moving
+    ) {
       this.arrivedStopIndex = null;
     }
 
@@ -280,11 +297,16 @@ export class NavigationTracker {
     const lastReached = this.reached.lastIndexOf(true);
     const atStop =
       lastReached >= 0 &&
-      distanceM(fix.coordinates, this.stops[lastReached].coordinates) <= NAVIGATION_RULES.breakRadiusM;
+      distanceM(fix.coordinates, this.stops[lastReached].coordinates) <=
+        NAVIGATION_RULES.breakRadiusM;
     if (atStop && speed < NAVIGATION_RULES.standingSpeedMps) {
       this.standingSince ??= fix.timestamp;
-      if (this.breakStopIndex === null && fix.timestamp - this.standingSince >= NAVIGATION_RULES.breakAfterMs) {
+      if (
+        this.breakStopIndex === null &&
+        fix.timestamp - this.standingSince >= NAVIGATION_RULES.breakAfterMs
+      ) {
         this.breakStopIndex = lastReached;
+        this.ride.breakCount += 1;
         this.arrivedStopIndex = null;
         // The whole stand counts as break time, not only the part after it was recognised.
         this.ride.breakS += (fix.timestamp - this.standingSince) / 1000;
@@ -341,7 +363,10 @@ export class NavigationTracker {
         : this.accuracyM !== null && this.accuracyM > NAVIGATION_RULES.weakAccuracyM
           ? 'weak'
           : 'ok';
-    if (this.reconnectedAddedMinutes !== null && this.now - this.reconnectedAt > NAVIGATION_RULES.reconnectedCardMs) {
+    if (
+      this.reconnectedAddedMinutes !== null &&
+      this.now - this.reconnectedAt > NAVIGATION_RULES.reconnectedCardMs
+    ) {
       this.reconnectedAddedMinutes = null;
     }
 
@@ -357,7 +382,11 @@ export class NavigationTracker {
       nextStep,
       followingStep,
       distanceToNextStepM: nextStep ? Math.max(0, nextStep.startDistanceM - this.traveledM) : 0,
-      stops: this.stops.map((stop, index) => ({ id: stop.id, name: stop.name, reached: this.reached[index] })),
+      stops: this.stops.map((stop, index) => ({
+        id: stop.id,
+        name: stop.name,
+        reached: this.reached[index],
+      })),
       nextStopIndex: nextStopIndex >= 0 ? nextStopIndex : null,
       distanceToNextStopM:
         nextStopIndex >= 0 ? Math.max(0, this.stopAlongM[nextStopIndex] - this.traveledM) : null,

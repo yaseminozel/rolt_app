@@ -56,5 +56,141 @@
       "cancel": "Vazgeç"
     },
     "locationRequired": "Kayıt için konum izni gerekli."
+  },
+  "share": {
+    "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"
+  },
+  "summary": {
+    "distance": "Mesafe",
+    "duration": "Süre",
+    "averageSpeed": "Ort. hız",
+    "maxSpeed": "Maks. hız",
+    "curves": "Viraj",
+    "breaks": "Mola"
+  },
+  "form": {
+    "title": "Sürüşü Kaydet",
+    "editTitle": "Sürüşü düzenle",
+    "close": "Kapat",
+    "name": {
+      "label": "Sürüş adı",
+      "placeholder": "Sürüşüne bir ad ver"
+    },
+    "details": {
+      "label": "Sürüş detayları",
+      "difficulty": "Zorluk seviyesi",
+      "surface": "Yol tipi"
+    },
+    "notes": {
+      "label": "Notlar",
+      "placeholder": "Sürüş nasıl geçti?"
+    },
+    "photos": {
+      "label": "Sürüş görselleri",
+      "upload": "Görsel yükle",
+      "uploadHint": "Fotoğraf ekle",
+      "add": "Ekle",
+      "retry": "Tekrar dene",
+      "remove": "Kaldır",
+      "cancel": "Vazgeç",
+      "failed_one": "{{count}} görsel yüklenemedi. Tekrar denemek için görsele dokun.",
+      "failed_other": "{{count}} görsel yüklenemedi. Tekrar denemek için görsellere dokun.",
+      "photoA11y": "{{index}}. görsel",
+      "uploadingA11y": "{{index}}. görsel yükleniyor",
+      "failedA11y": "{{index}}. görsel yüklenemedi, tekrar denemek için dokun"
+    },
+    "visibility": {
+      "label": "Görünürlük",
+      "row": "Kimler görebilir"
+    },
+    "rideType": {
+      "label": "Sürüş tipi"
+    },
+    "delete": "Sürüşü sil",
+    "save": "Sürüşü kaydet",
+    "saving": "Kaydediliyor…",
+    "saveChanges": "Değişiklikleri kaydet",
+    "uploadingPhotos": "Görseller yükleniyor · {{done}}/{{total}}",
+    "saveFailed": "Sürüş kaydedilemedi. Lütfen tekrar dene.",
+    "exitDialog": {
+      "title": "Kaydetmeden çıkılsın mı?",
+      "description": "Sürüşün kaydedilmeyecek ve rota, süre ve mesafe bilgileri kaybolacak.",
+      "confirm": "Kaydetmeden çık",
+      "cancel": "Sürüşü kaydetmeye dön"
+    },
+    "deleted": "Sürüş silindi"
+  },
+  "visibility": {
+    "public": "Herkes",
+    "followers": "Takipçilerim",
+    "private": "Sadece ben",
+    "descriptions": {
+      "public": "ROLT’taki herkes görebilir, keşfette çıkabilir",
+      "followers": "Yalnızca seni takip edenler görebilir",
+      "private": "Yalnızca sen görebilirsin, profilinde gizli kalır"
+    },
+    "audience": {
+      "public": "Herkes görebilir",
+      "followers": "Takipçilerin görebilir",
+      "private": "Yalnızca sen görebilirsin"
+    },
+    "sheet": {
+      "title": "Kimler görebilir?",
+      "subtitle": "Bu sürüşü kimlerin görebileceğini seç. Kaydettikten sonra da değiştirebilirsin.",
+      "note": "Yeni sürüşlerin varsayılanını Ayarlar > Sürüş görünürlüğü’nden değiştirebilirsin.",
+      "apply": "Uygula"
+    }
+  },
+  "rideTypeSheet": {
+    "title": "Sürüş Tipi",
+    "subtitle": "Bu sürüşü en iyi anlatan seçeneği belirle."
+  },
+  "photoSource": {
+    "title": "Görsel yükle",
+    "camera": "Fotoğraf çek",
+    "cameraHint": "Kamerayı aç",
+    "library": "Galeriden seç",
+    "libraryHint_one": "En fazla {{count}} görsel daha ekleyebilirsin",
+    "libraryHint_other": "En fazla {{count}} görsel daha ekleyebilirsin",
+    "cameraPermission": {
+      "title": "Kamera izni gerekli",
+      "message": "Fotoğraf çekmek için Ayarlar'dan kamera iznini aç."
+    },
+    "openSettings": "Ayarlar'ı aç",
+    "permissionCancel": "Vazgeç"
+  },
+  "saved": {
+    "title": "Sürüşün kaydedildi",
+    "description": "Profiline eklendi · {{audience}}",
+    "shareTitle": "Hemen paylaş",
+    "targets": {
+      "instagramStory": "Instagram Hikaye",
+      "instagramPost": "Instagram Gönderi",
+      "whatsapp": "WhatsApp",
+      "copyLink": "Bağlantı Kopyala",
+      "other": "Diğer"
+    },
+    "viewRide": "Sürüşü görüntüle",
+    "linkCopied": "Bağlantı kopyalandı"
+  },
+  "detail": {
+    "notes": "Notlar",
+    "photos": "Sürüş görselleri",
+    "details": "Sürüş detayları",
+    "share": "Paylaş",
+    "rideAgain": "Rotayı tekrar sür",
+    "options": "Sürüş seçenekleri",
+    "notFound": {
+      "title": "Sürüş bulunamadı",
+      "description": "Bu sürüş silinmiş olabilir."
+    },
+    "deleteDescription": "Rota, istatistikler, görseller, beğeni ve yorumlar kalıcı olarak silinir. Bu işlem geri alınamaz."
+  },
+  "options": {
+    "title": "Sürüş seçenekleri",
+    "edit": "Sürüşü düzenle",
+    "visibility": "Görünürlük",
+    "share": "Paylaş",
+    "delete": "Sürüşü sil"
   }
 }

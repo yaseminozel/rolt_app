@@ -36,6 +36,8 @@ export type ButtonProps = {
    * its size and colors; presses are ignored and `accessibilityState.busy` is set.
    */
   loading?: boolean;
+  /** While `loading`, show a spinner next to this label instead of a bare spinner ("Kaydediliyor…", 08.05). */
+  loadingLabel?: string;
   /** Leading icon, e.g. an `iconoir-react-native` icon. Rendered at 20 px. */
   icon?: ComponentType<SvgProps>;
   /** Trailing icon slot ("Right icon" in the design's Default section). */
@@ -51,7 +53,12 @@ const ICON_STROKE = 1.5;
 const ICON_ONLY_CONTENT_WIDTH = 48;
 const HEIGHT: Record<ButtonSize, number> = { md: 44, lg: 48, xl: 60 };
 
-type Palette = { background: string; pressedBackground: string; border?: string; foreground: string };
+type Palette = {
+  background: string;
+  pressedBackground: string;
+  border?: string;
+  foreground: string;
+};
 
 const neutral: Record<ButtonVariant, Palette> = {
   contained: {
@@ -154,6 +161,7 @@ export function Button({
   size = 'md',
   disabled = false,
   loading = false,
+  loadingLabel,
   icon: Icon,
   trailingIcon: TrailingIcon,
   accessibilityLabel,
@@ -189,10 +197,22 @@ export function Button({
         tone.border ? { borderColor: tone.border, borderWidth: 1 } : null,
         { backgroundColor: pressed ? tone.pressedBackground : tone.background },
         style,
-      ]}
-    >
+      ]}>
+      {loading && loadingLabel ? (
+        <View style={styles.content}>
+          <ActivityIndicator size="small" color={tone.foreground} />
+          <Text style={[styles.label, { color: tone.foreground }]} numberOfLines={1}>
+            {loadingLabel}
+          </Text>
+        </View>
+      ) : null}
       {/* Content stays mounted (invisible) while loading so the button keeps its width. */}
-      <View style={[styles.content, loading && styles.hidden]}>
+      <View
+        style={[
+          styles.content,
+          loading && styles.hidden,
+          loading && loadingLabel ? styles.collapsed : null,
+        ]}>
         {iconOnly ? (
           <View style={styles.iconOnlyContent}>{renderIcon(Icon ?? TrailingIcon)}</View>
         ) : (
@@ -200,7 +220,11 @@ export function Button({
             {renderIcon(Icon)}
             {label ? (
               <Text
-                style={[styles.label, size === 'xl' && styles.labelLarge, { color: tone.foreground }]}
+                style={[
+                  styles.label,
+                  size === 'xl' && styles.labelLarge,
+                  { color: tone.foreground },
+                ]}
                 numberOfLines={1}>
                 {label}
               </Text>
@@ -209,7 +233,7 @@ export function Button({
           </>
         )}
       </View>
-      {loading ? (
+      {loading && !loadingLabel ? (
         <View style={styles.spinner} pointerEvents="none">
           <ActivityIndicator size="small" color={tone.foreground} />
         </View>
@@ -238,6 +262,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: spacing.sm,
     flexShrink: 1,
+  },
+  collapsed: {
+    position: 'absolute',
   },
   hidden: {
     opacity: 0,

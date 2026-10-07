@@ -62,8 +62,13 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 - **Geri bildirim:** Uygulama geneli tek toast `useToast()` (`ToastProvider`); kaydetme → "saved" + "Görüntüle", kaldırma → "removed" + "Geri al".
 
 **Açık kararlar (uygulamadan önce kullanıcıya sor):**
-- Sürüş görünürlüğü varsayılanı: brief "Public" diyor; öneri "ilk sürüş Private, sonra son seçim hatırlansın". Henüz onaylanmadı.
-- Like / Follow ve Story/paylaşım şablonlarının MVP'deki yeri.
+- Like / Follow ve Story/paylaşım şablonlarının MVP'deki yeri ("Paylaşım görseli oluştur" bunlara bağlı).
+
+**Kayıt (Akış 13, 2026-10-07):**
+- Sürüşler önce cihazda: `src/features/rides/storage` (iOS/Android `expo-sqlite`, web önizlemesinde `localStorage`), durumlar `recording` → `draft` → `saved`; `synced` backend gelene kadar false. "Kaydedildi" yalnız yerel yazımdan sonra (P0).
+- Saf `RideRecorder` (`rideRecorder.ts`): GPS > 50 m doğrulukta veya 30 sn sessizse kayıt kendiliğinden duraklar (mesafe/süre saymaz, iz yeni parçaya geçer); 5 m altı adım ve > 70 m/sn sıçrama atılır; 60 sn durmak bir mola; aynı yöne 150 m içinde ≥ 45° dönüş bir viraj (`CurveCounter`, navigasyon sürüşlerinde `countCurves`). Ort. hız = mesafe / (süre − mola).
+- `RideRecordingProvider` root layout'ta: kayıt sekme değişse de sürer, 10 sn'de bir ve her duraklatmada cihaza yazılır; açılışta yarım kayıt 08.03 kurtarma olur. Konum kaynağı navigasyonla aynı (arka plan görevi / ön plan / simülatör).
+- Görünürlük varsayılanı (kullanıcı kararı): ilk sürüş "Sadece ben", sonra son seçim hatırlanır (Ayarlar > Sürüş görünürlüğü gelince oradan da). 1 km altı sürüş kaydedilemez (08.04).
 
 ## Ekran envanteri (Pencil)
 
@@ -77,8 +82,8 @@ Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8
 | 05 Discover (Akış 08) | 05.01 Ana sayfa (harita odaklı / konum izni yok / çevrimdışı / iskelet), 05.02 Arama (aktif / sonuçlar / sıralama / sonuç yok), 05.03 Önerilen rotalar — Tümü, 05.04 Rota detayı (standart sokak / topografik, uzun içerik) |
 | 06 Rotayı sür (Akış 09) | 06.01 Hazırlık (başlangıçtan uzak / başlangıçta / duraklı), 06.02 Durak ekle (arama, haritadan seç), 06.03 Durak önizleme, 06.04 Arka plan konum izni (ön bilgi + iOS uyarısı), 06.05 Geri sayım, 06.06 Navigasyon (dönüş, rotadan çıktın, bağlandın, durağa varış, mola, sonraki durak, GPS zayıf, çıkış onayı), 06.07 Varış |
 | 07 Map Explore (Akış 10–12) | 07.01 Rotalar (kümelenmiş pinler / fotoğraflı pinler / rota seçili), 07.02 Benzinlikler, 07.03 Tamirciler, 07.04 Arama (yazılıyor / aranıyor / sonuç yok) |
-| 08–13 (Akış 13–22) | Record, Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
-| 02 Record | Ready (rotalı/serbest, sürüş tipi şeridi alternatifi), Recording, Paused, Recovery, Sürüş modu full ekran, Durdurma onayı, Sürüşü kaydet (form), Sürüş tipi seçimi sheet |
+| 08 Record (Akış 13) | 08.01 Hazır (varsayılan / GPS aranıyor / GPS hazır / konum izni yok), 08.02 Sürüş (kayıt / duraklatıldı / tam ekran / GPS zayıf), 08.03 Kurtarma, 08.04 Çok kısa sürüş, 08.05 Sürüşü kaydet (varsayılan / fotoğraflı / kaydediliyor / kaydedilemedi), 08.06 Sürüş tipi, 08.07 Fotoğraf kaynağı, 08.08 Görünürlük, 08.09 Sil onayı, 08.10 Kaydetmeden çık, 08.11 Sürüş kaydedildi, 09.06 Sürüş detayı (+ seçenekler, silme onayı), 09.07 Sürüşü düzenle |
+| 09–13 (Akış 14–22) | Profil, Ayarlar, Motorum, Bildirimler, Topluluk — aşağıdaki satırlar eski numaralandırmayla; o akışlar yeni dosyaya göre güncellenince değiştir |
 | 03 Profil / Ayarlar | Profil genel (Sürüşler/Performans/Kaydettiklerim sekmeleri), Profili paylaş (QR), Aktivite paylaşımı (karusel şablonlar), Kaydettiklerim (liste/kaydedildi/kaldırıldı/boş), Ayarlar ve alt sayfaları: hesap, sürüş görünürlüğü, başlangıç-bitiş gizleme, engellenenler, konum/fotoğraf izni, bildirimler, dil, ölçü birimleri, yardım/SSS, geri bildirim, gizlilik politikası, kullanım koşulları, çıkış |
 | 04 Motorum | Boş durum, Motor ekle (marka → model, bottom sheet), Eklendi, Motoru değiştir |
 | 04 Rota öner | Konum seçimi, Rota bilgileri, Önizleme, Gönderiliyor, Başarılı, Hatalı |
@@ -276,7 +281,18 @@ Tasarım kendi içinde çeliştiğinde karar sistem tutarlılığı, anlam ve er
 | Rotadan çıkma (`W0nTTe`) | Onay yok | Sürücüden ~300 m ilerideki rota noktasına Directions ile bağlanıp kalan rotaya eklenir (yeniden planlama değil); kırmızı banner hesap süresince, yeşil "+N dk" banner 5 sn |
 | Durağa varış (`yqADk` vs `h3s1pA`) | Bir not "Mola ver / Devam et" diyor, diğeri aksiyon yok | Sonraki not (`h3s1pA`, `O5EZ3F`) uygulanır: varış otomatik, kart ~3 sn (hareket edene kadar), durunca pasif "Mola" çipi; aksiyon yok. Mola süresi sürüşte ayrı tutulur (`breakS`) |
 | İlerleme çubuğu (`yqADk` 5. adım) | Not "ilerleme çubuğunda durak işaretleri" diyor, karede yok | Uygulanmadı (tasarımı yok); açık soru |
-| Navigasyon "Bitir" | Çıkış onayı yalnız "rota takibi duracak" diyor | Takip durur, o ana kadarki sürüş (`completed: false`) Kaydet sekmesine geçer; varışta "Sürüşü kaydet" de aynı yere (`completedRideStore`), "Kaydetmeden çık" 08.10 diyaloğu (`Dialog actionsLayout="column"`) |
+| Navigasyon "Bitir" | Çıkış onayı yalnız "rota takibi duracak" diyor | Takip durur, o ana kadarki sürüş taslak olur ve doğrudan 08.05 "Sürüşü kaydet" açılır (varıştaki "Sürüşü kaydet" de); sürüş tipi rotanın etiketinden, zorluk/yol tipi rotadan gelir. "Kaydetmeden çık" 08.10 diyaloğu (`Dialog actionsLayout="column"`) |
+| Kaydet sekmesi (08.01–08.04) | Tasarımda sekme barı yok, sol üstte geri | Kaydet açıkken native tab bar gizlenir (`useHiddenTabBar`, NativeTabs `hidden`); geri Keşfet'e döner. Kontroller sabit panel (sürüklenmez), "Başlat / Duraklat / Devam et / Bitir" 60 pt (`Button size="xl"`, eldivenle). Durum bandı (GPS alınıyor → GPS hazır 3 sn, GPS zayıf, yarım kalan, çok kısa 4 sn) panelin 12 pt üstünde, tek seferde biri |
+| Konum izni yok (08.01 `QA0eS`) | CTA katmanı "Ayarlar'a git", etiketi "İzin ver" | Sorulabiliyorsa "İzin ver" (sistem izni), sorulamıyorsa "Ayarlar'a git"; "Şimdi değil" Keşfet'e döner |
+| Arka plan izni (Kayıt) | Tasarımı yalnız navigasyonda | İlk serbest kayıtta aynı 06.04 sheet'i (`BackgroundPermissionContent`); kapanınca kayıt başlar (başlatma niyeti korunur) |
+| Sürüşü kaydet formu (08.05) | 6 varyantta alan sırası ve görünürlük denetimi farklı | `VdbQJ` sırası: özet kartı, ad, sürüş detayları, notlar, görseller, görünürlük satırı (Herkes / Takipçilerim / Sadece ben sheet'i), sürüş tipi; altta "Sürüşü sil". Düzenleme (09.07) aynı form. Alanların hepsi isteğe bağlı; ad boşsa otomatik başlık ("Antalya · Çarşamba sürüşü", en yakın il merkezi). Alt CTA 48 pt |
+| Zorluk / Yol tipi satırları | Seçim sheet'leri çizilmemiş | Kullanıcı kararı: dahil; görünürlük sheet'inin radyo satırlarıyla (`ChoiceRow`) Kolay/Orta/Zorlu ve Asfalt/Karışık/Toprak, seçince kapanır |
+| Sürüş görselleri (08.07) | "Fotoğraf veya video ekle" | Yalnız fotoğraf (video yükleme yolu yok), alt metin "Fotoğraf ekle". En fazla 10; eklenince yüklenir (mock, her 4. bir kez hata), kutucukta "%64" ve çubuk, hatalıda kırmızı çerçeve + "Tekrar dene" (dokununca yeniden), dokununca "Kaldır". Hatalı görsel varken kaydet pasif; kaydet yüklemeleri bekler ("Görseller yükleniyor · 1/2") |
+| Kaydediliyor / kaydedilemedi | — | Form %48 soluk ve kilitli, buton spinner + "Kaydediliyor…" (`Button loadingLabel`); hata failure toast, form korunur |
+| Sürüş özeti haritası (08.05, 08.11, 09.06) | Tasarımda statik harita görseli | `RideMapPreview`: token varsa Mapbox Static Images (merkez ve zoom iz üzerinden hesaplanır, çizgi SVG ile tam üstüne), yoksa / çevrimdışıysa tasarımın sokak haritası görseli + sığdırılmış iz. Etkileşimli harita değil (ScrollView kuralı) |
+| Sürüş kaydedildi (08.11) | Paylaşım satırı, "Paylaşım görseli oluştur" | Kullanıcı kararı: satır çalışır, görsel sonra (CTA gizli). WhatsApp metinle açılır, yoksa sistem paylaşımı; Instagram dışarıdan metin almadığı için iki Instagram hedefi ve "Diğer" sistem paylaşımı; "Bağlantı kopyala" panoya (`expo-clipboard`) + toast. Bağlantı `rolt://ride/<id>`. Uygulama ikonları tasarım export'u (`assets/images/share/`). Geri Kaydet sekmesine döner |
+| Sürüş detayı (09.06) | Harita üstünde oynat butonu, "Rotayı tekrar sür" | Oynat butonu uygulanmadı (davranışı tanımsız; açık soru). "Rotayı tekrar sür" yalnız rota ile kaydedilmiş sürüşte (kullanıcı kararı, Ride ≠ Route), rotanın Hazırlık ekranını açar. "Paylaş" sistem paylaşımı. Sürüş detayları satırları salt okunur (rota detayıyla aynı) |
+| Sürüş seçenekleri (09.06 `W8Hilq`) | — | Native formSheet: düzenle, görünürlük (sheet'te "Uygula" anında kaydeder), paylaş, sil (onay detay ekranında). Silince Profil sekmesi + "Sürüş silindi" toast'u (09.01 `tJEMc`) |
 | Varış ekranı | İki varyant | Ana varyant (illüstrasyon); "Alt. Kutlama" uygulanmadı. Süre kayıt saati (`formatRideClock` "18:42") |
 | Harita butonları (06.06) | Pusula / Ses şeffaf zemin | Okunurluk için beyaz zemin + border. Pusula elle kaydırmadan sonra sürüş yönüne takibi geri açar; Ses sesli yönlendirmeyi açıp kapatır |
 | Navigasyon harita işaretleri | — | Rota çizgisi marka mavisi; yön işareti tasarım export'u, nokta etrafında döner; durak numaraları, ulaşılınca yeşil onaylı pin; bitiş bayrağı. GPS zayıfken işaret %50 + doğruluk halkası |
