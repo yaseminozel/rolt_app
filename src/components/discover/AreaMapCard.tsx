@@ -1,12 +1,17 @@
 import { Image } from 'expo-image';
-import { Enlarge, MapPin, MapXmark } from 'iconoir-react-native';
-import { useRef } from 'react';
+import { MapPin, MapXmark } from 'iconoir-react-native';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { SvgProps } from 'react-native-svg';
 
 import { mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
 import { useMapExpand } from '@/components/map/MapExpandTransition';
+import { exploreInitialView } from '@/features/discover/exploreInitialView';
+
+import { ExpandMapIcon } from './ExpandMapIcon';
 import { colors, radius, shadows, spacing, typography } from '@/theme';
 
 type AreaMapCardProps = {
@@ -22,21 +27,53 @@ type AreaMapCardProps = {
 };
 
 const CARD_HEIGHT = 206;
+
+/** `MapActionButton` takes an SVG component; the design's glyph in the button's ink. */
+function ExpandIcon({ width, color }: SvgProps) {
+  return <ExpandMapIcon size={Number(width) || 20} color={typeof color === 'string' ? color : colors.textPrimary} />;
+}
 const PILL_ICON_SIZE = 16;
 /** Pill top and button inset inside the card (oxSGl: y 14, 12 pt from the corner). */
 const PILL_TOP = 14;
 const OFFLINE_ICON_SIZE = 28;
 
 /**
- * "Harita kartı / Bölgedeki rotalar" (p4CIJi `oxSGl`). A static preview on purpose: a live
- * map inside the scrolling feed would fight the scroll gesture (and can't run in Expo Go),
- * so the card shows the design's map artwork and opens "Haritada keşfet" (07.01) on tap; the
- * corner button is "Haritayı genişlet" (05.01 `H8ChY`, maximize-2 → Iconoir `Enlarge`).
+ * "Harita kartı / Bölgedeki rotalar" (05.01 Pencil `wee2e`). The card shows the real Mapbox
+ * map: a Static Images picture of exactly the view "Haritada keşfet" (07.01) opens on, cropped
+ * around its area. A picture, not a live map, so it never fights the feed's scroll; tapping the
+ * card or its corner button (`uVdPv`, the design's enlarge glyph) grows the picture into the
+ * screen and the live map takes over on the same frame. Without a Mapbox token (Expo Go) the
+ * design artwork stands in.
  */
 export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) {
   const { t } = useTranslation('discover');
   const { expand, activeSource } = useMapExpand();
   const cardRef = useRef<View>(null);
+  const window = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const [cardWidth, setCardWidth] = useState(0);
+  const view = useMemo(
+    () =>
+      exploreInitialView({
+        width: window.width,
+        height: window.height,
+        insetTop: insets.top,
+        insetBottom: insets.bottom,
+      }),
+    [insets.bottom, insets.top, window.height, window.width],
+  );
+  const [pictureFailed, setPictureFailed] = useState(false);
+  const picture = view && !pictureFailed ? { uri: view.uri } : mapFallbacks.homeCard;
+  // Cover scales the screen-sized picture to the card's width; keep its area centred.
+  const contentPosition = useMemo(() => {
+    if (!view || pictureFailed || cardWidth === 0) {
+      return undefined;
+    }
+    const scale = cardWidth / view.width;
+    const offset = CARD_HEIGHT / 2 - view.focusY * scale;
+    const range = CARD_HEIGHT - view.height * scale;
+    return { top: `${Math.round(Math.min(Math.max(offset / range, 0), 1) * 100)}%` } as const;
+  }, [cardWidth, pictureFailed, view]);
   const countLabel =
     routeCount === undefined ? undefined : t('home.areaRouteCount', { count: routeCount });
 
@@ -70,7 +107,7 @@ export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) 
   ) : null;
   const button = {
     size: 'control',
-    icon: Enlarge,
+    icon: ExpandIcon,
     accessibilityLabel: t('home.expandMap'),
     style: styles.locate,
   } as const;
@@ -78,7 +115,8 @@ export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) 
     expand(
       {
         ref: cardRef,
-        image: mapFallbacks.homeCard,
+        image: picture,
+        contentPosition,
         decorations: (
           <>
             {pill}
@@ -98,9 +136,18 @@ export function AreaMapCard({ routeCount, onPress, offline }: AreaMapCardProps) 
         countLabel ? `${t('home.exploreMapA11y')}, ${countLabel}` : t('home.exploreMapA11y')
       }
       // Under its growing clone while the map opens or closes.
+      onLayout={(event) => setCardWidth(event.nativeEvent.layout.width)}
       style={[styles.card, activeSource === cardRef && styles.hidden]}>
       <View style={styles.media}>
-        <Image source={mapFallbacks.homeCard} contentFit="cover" style={StyleSheet.absoluteFill} />
+        <Image
+          source={picture}
+          placeholder={mapFallbacks.homeCard}
+          contentFit="cover"
+          contentPosition={contentPosition}
+          onError={() => setPictureFailed(true)}
+          cachePolicy="memory-disk"
+          style={StyleSheet.absoluteFill}
+        />
         <View style={styles.stroke} />
       </View>
       {pill}

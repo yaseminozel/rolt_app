@@ -20,7 +20,7 @@ export function DesignFade({ top, height, stops }: DesignFadeProps) {
   // SVG ids are document-wide on web; strip the colons React puts in `useId`.
   const gradientId = `fade${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
-    <View style={[styles.band, { top, height }]}>
+    <View style={[styles.band, { top, height }]} pointerEvents="none">
       <Svg width={DESIGN_CANVAS.width} height={height}>
         <Defs>
           <LinearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">

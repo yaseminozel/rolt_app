@@ -26,6 +26,8 @@ export const radius = {
   /** Map and status cards (AreaMapCard, RouteStatusCard). */
   media: 20,
   xl: 24,
+  /** ROLT logo tile on the share onboarding page (bblG8 `W7NIJ`). */
+  appTile: 28,
   xxl: 32,
   pill: 9999,
 } as const;
@@ -83,6 +85,8 @@ export const shadows = {
   statusBanner: '0px 4px 3.5px rgba(167, 167, 167, 0.25)',
   /** QR profile card (09.02 "Kart / Karekod"). */
   qrCard: '0px 12px 28px rgba(16, 19, 24, 0.12), 2px 2px 7.7px rgba(16, 19, 24, 0.06)',
+  /** Brand-tinted glow under the ROLT logo tile (bblG8 `W7NIJ`). */
+  brandGlow: '0px 10px 21px rgba(20, 20, 255, 0.28)',
   /** Centered dialog card over a scrim ("Diyalog / Taslak kaydet", `zMCLP`). */
   dialog: '0px 12px 32px rgba(16, 19, 24, 0.25)',
 } as const;

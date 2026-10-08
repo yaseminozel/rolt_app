@@ -58,6 +58,8 @@ export const typography = {
   /** Like / comment / save counters on ride cards (gKG8D "142"): Mono 12. */
   metricCaption: variant(fontFamily.monoMedium, 12, 16),
   wordmark: variant(fontFamily.brand, 28),
+  /** "ROLT" on the share onboarding logo tile (bblG8 `W7NIJ`). */
+  wordmarkTile: variant(fontFamily.brand, 26),
 } as const;
 
 export type TypographyVariant = keyof typeof typography;
