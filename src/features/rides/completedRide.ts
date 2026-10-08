@@ -12,6 +12,8 @@ export type CompletedRide = {
   elapsedS: number;
   averageSpeedMps: number;
   maxSpeedMps: number;
+  maxLeanLeftDeg: number;
+  maxLeanRightDeg: number;
   track: LngLat[];
   startedAt: number;
   endedAt: number;

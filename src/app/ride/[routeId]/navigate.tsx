@@ -145,6 +145,8 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
         elapsedS: ride.elapsedS,
         averageSpeedMps: ride.movingS > 0 ? ride.distanceM / ride.movingS : 0,
         maxSpeedMps: ride.maxSpeedMps,
+        maxLeanLeftDeg: ride.maxLeanLeftDeg,
+        maxLeanRightDeg: ride.maxLeanRightDeg,
         track: ride.track,
         startedAt: ride.startedAt,
         endedAt: Date.now(),

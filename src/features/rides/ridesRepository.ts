@@ -88,6 +88,8 @@ export const ridesRepository = {
         breakCount: ride.breakCount,
         maxSpeedMps: ride.maxSpeedMps,
         curveCount: countCurves(track),
+        maxLeanLeftDeg: ride.maxLeanLeftDeg,
+        maxLeanRightDeg: ride.maxLeanRightDeg,
       },
       track,
       synced: false,

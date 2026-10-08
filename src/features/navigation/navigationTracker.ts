@@ -1,3 +1,4 @@
+import { LeanEstimator } from '@/features/rides/leanAngle';
 import type { LngLat } from '@/features/routes/types';
 
 import { distanceM, pointAlong, projectOnLine, sliceLine } from './geometry';
@@ -58,6 +59,9 @@ export type RideStats = {
   breakCount: number;
   elapsedS: number;
   maxSpeedMps: number;
+  /** Largest estimated lean to each side, degrees (`LeanEstimator`). */
+  maxLeanLeftDeg: number;
+  maxLeanRightDeg: number;
   track: LngLat[];
   startedAt: number;
 };
@@ -122,6 +126,7 @@ export class NavigationTracker {
   private reconnectedAddedMinutes: number | null = null;
   private reconnectedAt = 0;
   private finished = false;
+  private lean = new LeanEstimator();
   private now: number;
   private readonly ride: RideStats;
 
@@ -139,6 +144,8 @@ export class NavigationTracker {
       breakCount: 0,
       elapsedS: 0,
       maxSpeedMps: 0,
+      maxLeanLeftDeg: 0,
+      maxLeanRightDeg: 0,
       track: [],
       startedAt: now,
     };
@@ -364,6 +371,9 @@ export class NavigationTracker {
     if (moved >= NAVIGATION_RULES.minMoveM) {
       this.ride.distanceM += moved;
       this.ride.track.push(fix.coordinates);
+      this.lean.add(fix.coordinates, fix.timestamp);
+      this.ride.maxLeanLeftDeg = this.lean.maxLeftDeg;
+      this.ride.maxLeanRightDeg = this.lean.maxRightDeg;
     }
     if (this.breakStopIndex !== null) {
       this.ride.breakS += seconds;

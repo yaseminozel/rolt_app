@@ -2,6 +2,7 @@ import { bearingDeg, distanceM } from '@/features/navigation/geometry';
 import type { LocationFix } from '@/features/navigation/types';
 import type { LngLat } from '@/features/routes/types';
 
+import { LeanEstimator } from './leanAngle';
 import { EMPTY_RIDE_STATS, type RideStats } from './types';
 
 /** Thresholds of the ride recorder; written to CLAUDE.md's decision table. */
@@ -148,6 +149,7 @@ export class RideRecorder {
   private standingSince: number | null = null;
   private breakCounted = false;
   private curves = new CurveCounter();
+  private lean = new LeanEstimator();
 
   constructor(now: number, resume?: RecorderResumeState) {
     this.stats = resume ? { ...resume.stats } : { ...EMPTY_RIDE_STATS };
@@ -183,6 +185,7 @@ export class RideRecorder {
     this.track.push([]);
     this.lastGood = null;
     this.curves.breakTrack();
+    this.lean.breakTrack();
     this.standingSince = null;
   }
 
@@ -257,6 +260,9 @@ export class RideRecorder {
     if (this.curves.add(fix.coordinates)) {
       this.stats.curveCount += 1;
     }
+    this.lean.add(fix.coordinates, fix.timestamp);
+    this.stats.maxLeanLeftDeg = Math.max(this.stats.maxLeanLeftDeg ?? 0, this.lean.maxLeftDeg);
+    this.stats.maxLeanRightDeg = Math.max(this.stats.maxLeanRightDeg ?? 0, this.lean.maxRightDeg);
   }
 
   private trackStanding(fix: LocationFix, speed: number) {

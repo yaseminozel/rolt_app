@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   StyleSheet,
   Text,
@@ -36,6 +36,9 @@ const METRES_PER_DEGREE_LAT = 111_320;
 const ZONE_MIN_RADIUS = 14;
 const ZONE_TAG_WIDTH = 104;
 const DEFAULT_PADDING: BoxPadding = { top: 24, right: 24, bottom: 24, left: 24 };
+/** "▷" replay (09.06): a marker rides the track from start to finish in this long. */
+const REPLAY_MS = 4000;
+const REPLAY_RADIUS = 7;
 
 type RideMapPreviewProps = {
   /** Track segments as recorded. */
@@ -51,8 +54,35 @@ type RideMapPreviewProps = {
   hiddenEnds?: { metres: number; startLabel: string; finishLabel: string };
   /** Line colour; recorded rides use the live-ride accent. */
   trackColor?: string;
+  /** Changing it (to a new non-zero value) replays the ride: a marker rides along the track. */
+  replayToken?: number;
   style?: StyleProp<ViewStyle>;
 };
+
+/** Point at `fraction` (0–1) of the way along screen polylines. */
+function pointAlong(lines: ScreenPoint[][], fraction: number): ScreenPoint | null {
+  const pieces: { from: ScreenPoint; to: ScreenPoint; length: number }[] = [];
+  for (const line of lines) {
+    for (let index = 1; index < line.length; index += 1) {
+      const from = line[index - 1];
+      const to = line[index];
+      pieces.push({ from, to, length: Math.hypot(to.x - from.x, to.y - from.y) });
+    }
+  }
+  const total = pieces.reduce((sum, piece) => sum + piece.length, 0);
+  if (pieces.length === 0 || total === 0) {
+    return null;
+  }
+  let remaining = Math.min(Math.max(fraction, 0), 1) * total;
+  for (const piece of pieces) {
+    if (remaining <= piece.length) {
+      const t = piece.length === 0 ? 0 : remaining / piece.length;
+      return { x: piece.from.x + (piece.to.x - piece.from.x) * t, y: piece.from.y + (piece.to.y - piece.from.y) * t };
+    }
+    remaining -= piece.length;
+  }
+  return pieces[pieces.length - 1].to;
+}
 
 /** `mapbox://styles/user/id` → `user/id` for the Static Images API. */
 function staticStyleId() {
@@ -73,9 +103,30 @@ export function RideMapPreview({
   overlay,
   hiddenEnds,
   trackColor = colors.accentStrong,
+  replayToken = 0,
   style,
 }: RideMapPreviewProps) {
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const [replay, setReplay] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!replayToken) {
+      return;
+    }
+    let frame = 0;
+    const startedAt = Date.now();
+    const step = () => {
+      const fraction = (Date.now() - startedAt) / REPLAY_MS;
+      if (fraction >= 1) {
+        setReplay(null);
+        return;
+      }
+      setReplay(fraction);
+      frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [replayToken]);
   const [staticFailed, setStaticFailed] = useState(false);
   const points = useMemo(() => track.flat(), [track]);
   const useStatic = hasMapboxToken && !staticFailed && points.length > 1;
@@ -141,6 +192,7 @@ export function RideMapPreview({
         .filter((segment) => segment.length > 1)
         .map((segment) => segment.map(view.project))
     : [];
+  const replayPoint = replay !== null ? pointAlong(segments, replay) : null;
   const start = view && points.length > 0 ? view.project(points[0]) : null;
   const end = view && points.length > 1 ? view.project(points[points.length - 1]) : null;
   // Radius of the hidden areas on screen: from the start to a point that many metres north.
@@ -222,6 +274,16 @@ export function RideMapPreview({
               />
             ) : null,
           )}
+          {replayPoint ? (
+            <Circle
+              cx={replayPoint.x}
+              cy={replayPoint.y}
+              r={REPLAY_RADIUS}
+              fill={colors.accentStrong}
+              stroke={colors.surface}
+              strokeWidth={DOT_STROKE}
+            />
+          ) : null}
         </Svg>
       ) : null}
       {hiddenEnds && start && end

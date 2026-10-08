@@ -24,6 +24,9 @@ export type RideStats = {
   maxSpeedMps: number;
   /** Bends of at least `RECORDER_RULES.curveMinTurnDeg` along the track ("Viraj"). */
   curveCount: number;
+  /** Largest estimated lean to each side, degrees (`LeanEstimator`); missing on older rides. */
+  maxLeanLeftDeg?: number;
+  maxLeanRightDeg?: number;
 };
 
 /** A ride photo copied into the app; `failed` until "Tekrar dene" succeeds (08.07). */
@@ -71,4 +74,6 @@ export const EMPTY_RIDE_STATS: RideStats = {
   breakCount: 0,
   maxSpeedMps: 0,
   curveCount: 0,
+  maxLeanLeftDeg: 0,
+  maxLeanRightDeg: 0,
 };

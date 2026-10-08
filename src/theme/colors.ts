@@ -77,6 +77,13 @@ export const palette = {
   green750: '#1F7A57',
   orange75: '#FFF4E5',
   orange850: '#8A4B08',
+  // Lean angle gauge (09.06 `1092:18290` "Kademeli yarım daire göstergesi")
+  gray140: '#ECEEF1',
+  gray160: '#E5E7EB',
+  gray180: '#E4E4E4',
+  gray260: '#CDD1D7',
+  gray280: '#C7CBD1',
+  slate550: '#59616E',
   // Ride points card (06.01 "Map / Rota noktaları"): rider position halo, start → finish dots
   blue75: '#DCE0FF',
   gray450: '#8C8C8C',
@@ -280,6 +287,13 @@ export const colors = {
   /** Over the blurred profile behind the QR card (09.02). */
   shareVeil: 'rgba(16, 19, 24, 0.12)',
   transparent: 'transparent',
+  /** Lean angle gauge (09.06 "Yatış açısı"): arc track, ticks, centre axis, base line, labels. */
+  gaugeTrack: palette.gray140,
+  gaugeTick: palette.gray160,
+  gaugeTickMajor: palette.gray280,
+  gaugeAxis: palette.gray260,
+  gaugeBase: palette.gray180,
+  gaugeLabel: palette.slate550,
 } as const;
 
 export type ColorToken = keyof typeof colors;

@@ -66,7 +66,8 @@
     "averageSpeed": "Ort. hız",
     "maxSpeed": "Maks. hız",
     "curves": "Viraj",
-    "breaks": "Mola"
+    "breaks": "Mola",
+    "maxLean": "Maks. yatış"
   },
   "form": {
     "title": "Sürüşü Kaydet",
@@ -184,7 +185,17 @@
       "title": "Sürüş bulunamadı",
       "description": "Bu sürüş silinmiş olabilir."
     },
-    "deleteDescription": "Rota, istatistikler, görseller, beğeni ve yorumlar kalıcı olarak silinir. Bu işlem geri alınamaz."
+    "deleteDescription": "Rota, istatistikler, görseller, beğeni ve yorumlar kalıcı olarak silinir. Bu işlem geri alınamaz.",
+    "leanAngle": "Yatış açısı",
+    "leanLeft": "Sol maks.",
+    "leanRight": "Sağ maks.",
+    "degrees": "{{value}}°",
+    "replay": "Sürüşü oynat",
+    "route": {
+      "title": "Sürüş güzergahı",
+      "start": "Başlangıç",
+      "end": "Bitiş"
+    }
   },
   "options": {
     "title": "Sürüş seçenekleri",

@@ -66,7 +66,8 @@
     "averageSpeed": "Avg. speed",
     "maxSpeed": "Max. speed",
     "curves": "Bends",
-    "breaks": "Breaks"
+    "breaks": "Breaks",
+    "maxLean": "Max. lean"
   },
   "form": {
     "title": "Save ride",
@@ -184,7 +185,17 @@
       "title": "Ride not found",
       "description": "This ride may have been deleted."
     },
-    "deleteDescription": "The route, stats, photos, likes and comments will be deleted permanently. This can't be undone."
+    "deleteDescription": "The route, stats, photos, likes and comments will be deleted permanently. This can't be undone.",
+    "leanAngle": "Lean angle",
+    "leanLeft": "Left max.",
+    "leanRight": "Right max.",
+    "degrees": "{{value}}°",
+    "replay": "Replay ride",
+    "route": {
+      "title": "Ride route",
+      "start": "Start",
+      "end": "Finish"
+    }
   },
   "options": {
     "title": "Ride options",
