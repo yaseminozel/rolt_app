@@ -1,5 +1,4 @@
 import { router, Stack } from 'expo-router';
-import { Bookmark, Motorcycle, PathArrow, User } from 'iconoir-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -8,8 +7,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DialogModal } from '@/components/feedback/DialogModal';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { SelectField } from '@/components/ride-form/SelectField';
-import { SettingsRow } from '@/components/settings/SettingsRow';
-import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { useAuth } from '@/features/auth/AuthProvider';
@@ -21,14 +18,14 @@ import { ridesRepository } from '@/features/rides/ridesRepository';
 import { useSavedRoutes } from '@/features/routes/SavedRoutesProvider';
 import { formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
-import { colors, layout, spacing, typography } from '@/theme';
+import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
 
 /** "Neden ayrılıyorsun?" options; the list isn't drawn, so these follow common exit surveys. */
 const LEAVE_REASONS = ['notRiding', 'otherApp', 'privacy', 'notUseful', 'other'] as const;
 type LeaveReason = (typeof LEAVE_REASONS)[number];
 
 /**
- * 10.16 Hesabı sil (Figma `1005:35917`, "Onaylandı" `1005:35977`, "Son onay" `1005:35951`):
+ * 10.16 Hesabı sil (Pencil `oOa5H`, "Onaylandı" `Q5FUyQ`, "Son onay" `lnae1`):
  * what will be deleted with this account's own numbers, an optional reason, a required
  * acknowledgement, then a last confirmation dialog. Deleting starts over from onboarding.
  */
@@ -96,47 +93,44 @@ export default function DeleteAccountScreen() {
           <Text style={styles.description}>{t('deleteAccount.description')}</Text>
         </View>
 
-        <SettingsSection inset>
+        <View style={styles.card}>
           {[
-            <SettingsRow
-              key="rides"
-              icon={Motorcycle}
-              label={t('deleteAccount.items.rides')}
-              description={t('deleteAccount.items.ridesDetail', {
+            {
+              key: 'rides',
+              label: t('deleteAccount.items.rides'),
+              detail: t('deleteAccount.items.ridesDetail', {
                 count: rideCount,
                 value: formatNumber(rideCount),
-              })}
-              trailing="none"
-            />,
-            <SettingsRow
-              key="routes"
-              icon={PathArrow}
-              label={t('deleteAccount.items.routes')}
-              description={t('deleteAccount.items.routesDetail', {
+              }),
+            },
+            {
+              key: 'routes',
+              label: t('deleteAccount.items.routes'),
+              detail: t('deleteAccount.items.routesDetail', {
                 count: suggestedRoutes.length,
                 value: formatNumber(suggestedRoutes.length),
-              })}
-              trailing="none"
-            />,
-            <SettingsRow
-              key="saved"
-              icon={Bookmark}
-              label={t('deleteAccount.items.saved')}
-              description={t('deleteAccount.items.savedDetail', {
+              }),
+            },
+            {
+              key: 'saved',
+              label: t('deleteAccount.items.saved'),
+              detail: t('deleteAccount.items.savedDetail', {
                 count: savedIds.length,
                 value: formatNumber(savedIds.length),
-              })}
-              trailing="none"
-            />,
-            <SettingsRow
-              key="profile"
-              icon={User}
-              label={t('deleteAccount.items.profile')}
-              description={t('deleteAccount.items.profileDetail')}
-              trailing="none"
-            />,
-          ]}
-        </SettingsSection>
+              }),
+            },
+            {
+              key: 'profile',
+              label: t('deleteAccount.items.profile'),
+              detail: t('deleteAccount.items.profileDetail'),
+            },
+          ].map((item) => (
+            <View key={item.key} style={styles.item} accessible>
+              <Text style={styles.itemLabel}>{item.label}</Text>
+              <Text style={styles.itemDetail}>{item.detail}</Text>
+            </View>
+          ))}
+        </View>
 
         <View style={styles.field}>
           <View style={styles.labelRow}>
@@ -144,8 +138,7 @@ export default function DeleteAccountScreen() {
             <Text style={styles.optional}>{t('deleteAccount.optional')}</Text>
           </View>
           <SelectField
-            value={reason ? t(`deleteAccount.reasons.${reason}`) : ''}
-            placeholder={t('deleteAccount.reasonPlaceholder')}
+            value={reason ? t(`deleteAccount.reasons.${reason}`) : t('deleteAccount.reasonPlaceholder')}
             accessibilityLabel={t('deleteAccount.reasonLabel')}
             onPress={chooseReason}
           />
@@ -155,6 +148,7 @@ export default function DeleteAccountScreen() {
           checked={acknowledged}
           onPress={() => setAcknowledged((value) => !value)}
           label={t('deleteAccount.acknowledge')}
+          compact
         />
       </ScrollView>
       <View style={[styles.bar, { paddingBottom: insets.bottom + spacing.lg }]}>
@@ -209,10 +203,35 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   heading: {
-    ...typography.titleSmall,
-    fontSize: 18,
+    fontFamily: fontFamily.semibold,
+    fontSize: 20,
     lineHeight: 24,
     color: colors.textPrimary,
+  },
+  // "Kart / Silinecekler" (`oOa5H`): four 72 pt rows, no icons or dividers.
+  card: {
+    paddingVertical: 1,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.lg,
+  },
+  item: {
+    height: 72,
+    justifyContent: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+  },
+  itemLabel: {
+    fontFamily: fontFamily.regular,
+    fontSize: 15,
+    lineHeight: 20,
+    color: colors.textPrimary,
+  },
+  itemDetail: {
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.textSecondary,
   },
   description: {
     ...typography.callout,

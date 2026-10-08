@@ -12,6 +12,8 @@ export type CheckboxProps = {
   accessibilityLabel?: string;
   /** Text to the right of the control (design: "Select option"). */
   label?: string;
+  /** 14 pt label for long acknowledgements (10.16 "Checkbox / Onay"); 16 by default. */
+  compact?: boolean;
   /** Secondary line under the label (design: "Supporting text"). */
   helperText?: string;
   /** Outer layout only. */
@@ -35,6 +37,7 @@ export function Checkbox({
   error = false,
   accessibilityLabel,
   label,
+  compact = false,
   helperText,
   style,
 }: CheckboxProps) {
@@ -89,7 +92,12 @@ export function Checkbox({
           </View>
           {label ? (
             <View style={styles.content}>
-              <Text style={[styles.label, { color: disabled ? colors.textDisabled : colors.textPrimary }]}>
+              <Text
+                style={[
+                  styles.label,
+                  compact && styles.labelCompact,
+                  { color: disabled ? colors.textDisabled : colors.textPrimary },
+                ]}>
                 {label}
               </Text>
               {helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
@@ -142,6 +150,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: spacing.xxs,
+  },
+  labelCompact: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   label: {
     ...typography.bodyLarge,
