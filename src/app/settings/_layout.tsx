@@ -10,7 +10,6 @@ const sheet: ScreenOptions = {
   headerShown: false,
   sheetAllowedDetents: 'fitToContents',
   sheetGrabberVisible: true,
-  sheetCornerRadius: 24,
 };
 
 /**

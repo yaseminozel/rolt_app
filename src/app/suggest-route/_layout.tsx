@@ -35,7 +35,6 @@ export default function SuggestRouteLayout() {
             headerShown: false,
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
-            sheetCornerRadius: 24,
           }}
         />
         <Stack.Screen name="preview" />

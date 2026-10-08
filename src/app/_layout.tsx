@@ -152,7 +152,6 @@ function RootNavigator() {
             presentation: 'formSheet',
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
-            sheetCornerRadius: 24,
             contentStyle: { backgroundColor: colors.surface },
           }}
         />
@@ -170,7 +169,6 @@ function RootNavigator() {
             presentation: 'formSheet',
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
-            sheetCornerRadius: 28,
             contentStyle: { backgroundColor: colors.surface },
           }}
         />

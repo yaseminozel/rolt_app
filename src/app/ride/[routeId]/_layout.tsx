@@ -14,7 +14,6 @@ const sheet = (detents: number[] | 'fitToContents'): ScreenOptions => ({
   presentation: 'formSheet',
   sheetAllowedDetents: detents,
   sheetGrabberVisible: true,
-  sheetCornerRadius: 24,
 });
 
 /**

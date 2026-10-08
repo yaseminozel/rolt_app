@@ -12,7 +12,6 @@ const optionSheet = (initialDetent: number): ComponentProps<typeof Stack.Screen>
   sheetAllowedDetents: [initialDetent, 1],
   sheetInitialDetentIndex: 0,
   sheetGrabberVisible: true,
-  sheetCornerRadius: 24,
 });
 
 /**

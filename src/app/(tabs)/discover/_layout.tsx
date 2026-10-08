@@ -28,7 +28,6 @@ export default function DiscoverLayout() {
             headerShown: false,
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
-            sheetCornerRadius: 24,
           }}
         />
         <Stack.Screen
@@ -38,7 +37,6 @@ export default function DiscoverLayout() {
             headerShown: false,
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
-            sheetCornerRadius: 24,
           }}
         />
         <Stack.Screen
@@ -49,7 +47,6 @@ export default function DiscoverLayout() {
             // The whole sheet (622 pt in PXcQ0) fits on every supported iPhone, footer included.
             sheetAllowedDetents: 'fitToContents',
             sheetGrabberVisible: true,
-            sheetCornerRadius: 24,
           }}
         />
         <Stack.Screen
@@ -60,7 +57,6 @@ export default function DiscoverLayout() {
             sheetAllowedDetents: [0.6, 1],
             sheetInitialDetentIndex: 0,
             sheetGrabberVisible: true,
-            sheetCornerRadius: 24,
           }}
         />
       </Stack>
