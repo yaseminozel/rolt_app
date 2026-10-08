@@ -1,4 +1,4 @@
-import { Image, type ImageSource } from 'expo-image';
+import type { ImageSource } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -13,6 +13,7 @@ import Animated, {
 import { colors, radius, shadows, typography } from '@/theme';
 
 import { DesignFade } from './DesignFade';
+import { DesignImage } from './DesignImage';
 import {
   DESIGN_CANVAS,
   designCenter,
@@ -59,6 +60,13 @@ const LOGO_PULSE_GROWTH = 0.04;
 const ITEM_PADDING = 22;
 /** "Logo" (`W7NIJ`): 96 pt brand tile, drawn natively so the wordmark stays sharp. */
 const LOGO_SIZE = 96;
+/**
+ * The wordmark is laid out at this multiple and shrunk back, so the canvas scale and the logo's
+ * pulse only ever shrink its glyphs (sharp) instead of enlarging a 1x bitmap (soft).
+ */
+const WORDMARK_OVERSAMPLE = 2;
+/** "ROLT" in the logo tile is 26 pt (`typography.wordmarkTile`). */
+const { fontSize: WORDMARK_SIZE = 26 } = typography.wordmarkTile;
 /** Spinning eases out under the finger and back in after release. */
 const HOLD_EASE_MS = 160;
 const RELEASE_EASE_MS = 900;
@@ -293,7 +301,7 @@ function PulsingRing({ ring, order, clock }: PulsingRingProps) {
         { left: ring.left, top: ring.top, width: ring.size, height: ring.size },
         animatedStyle,
       ]}>
-      <Image source={ring.image} style={StyleSheet.absoluteFill} />
+      <DesignImage source={ring.image} style={StyleSheet.absoluteFill} />
     </Animated.View>
   );
 }
@@ -347,7 +355,7 @@ function OrbitItemView({ item, clock, spin, pop }: OrbitItemViewProps) {
         },
         animatedStyle,
       ]}>
-      <Image source={item.image} style={StyleSheet.absoluteFill} />
+      <DesignImage source={item.image} style={StyleSheet.absoluteFill} />
     </Animated.View>
   );
 }
@@ -378,7 +386,9 @@ const styles = StyleSheet.create({
   },
   logoText: {
     ...typography.wordmarkTile,
+    fontSize: WORDMARK_SIZE * WORDMARK_OVERSAMPLE,
     color: colors.textInverse,
+    transform: [{ scale: 1 / WORDMARK_OVERSAMPLE }],
   },
   orbit: {
     position: 'absolute',

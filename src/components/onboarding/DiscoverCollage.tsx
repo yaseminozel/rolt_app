@@ -1,4 +1,4 @@
-import { Image, type ImageSource } from 'expo-image';
+import type { ImageSource } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { DesignFade } from './DesignFade';
+import { DesignImage } from './DesignImage';
 import {
   DESIGN_CANVAS,
   designFrameStyle,
@@ -162,7 +163,7 @@ function CollageColumn({ column, index, clock, drag }: CollageColumnProps) {
     <View style={[styles.column, { left: index * (COLUMN_WIDTH + COLUMN_GAP) }]}>
       <Animated.View style={animatedStyle}>
         {Array.from({ length: STRIP_COPIES }, (_, copy) => (
-          <Image
+          <DesignImage
             key={copy}
             source={column.strip}
             style={[styles.strip, { top: copy * STRIP_HEIGHT - SHADOW_ROOM }]}

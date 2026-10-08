@@ -1,4 +1,4 @@
-import { Image, type ImageSource } from 'expo-image';
+import type { ImageSource } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -15,6 +15,7 @@ import Svg, { G, Path } from 'react-native-svg';
 import { colors } from '@/theme';
 
 import { DesignFade } from './DesignFade';
+import { DesignImage } from './DesignImage';
 import { DESIGN_CANVAS, SCENE_GESTURES_ENABLED, popScale, useAnimationClock } from './designCanvas';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -182,7 +183,7 @@ export function RecordRouteScene({ running, reduceMotion }: RecordRouteSceneProp
     <GestureDetector gesture={Gesture.Race(pan, tap)}>
       <View style={styles.layer}>
         <Animated.View style={[styles.layer, mapStyle]}>
-          <Image
+          <DesignImage
             source={require('../../../assets/images/onboarding/record-map.jpg')}
             style={styles.map}
           />
@@ -218,7 +219,7 @@ export function RecordRouteScene({ running, reduceMotion }: RecordRouteSceneProp
         <DesignFade top={254} height={270} stops={bottomFade} />
         <DesignFade top={0} height={100} stops={topFade} />
         <Animated.View style={[styles.strip, stripStyle]}>
-          <Image
+          <DesignImage
             source={require('../../../assets/images/onboarding/record-strip.webp')}
             style={StyleSheet.absoluteFill}
           />
@@ -363,7 +364,7 @@ function RoutePin({ pin, clock, pop, reduceMotion }: RoutePinProps) {
         },
         animatedStyle,
       ]}>
-      <Image source={pin.image} style={StyleSheet.absoluteFill} />
+      <DesignImage source={pin.image} style={StyleSheet.absoluteFill} />
     </Animated.View>
   );
 }
