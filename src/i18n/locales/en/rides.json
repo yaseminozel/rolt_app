@@ -131,11 +131,6 @@
       "followers": "Only people who follow you can see it",
       "private": "Only you can see it; hidden on your profile"
     },
-    "audience": {
-      "public": "Everyone can see it",
-      "followers": "Your followers can see it",
-      "private": "Only you can see it"
-    },
     "sheet": {
       "title": "Who can see this?",
       "subtitle": "Choose who can see this ride. You can change it after saving too.",
@@ -163,7 +158,7 @@
   },
   "saved": {
     "title": "Your ride is saved",
-    "description": "Added to your profile · {{audience}}",
+    "description": "Added to your profile",
     "shareTitle": "Share now",
     "targets": {
       "instagramStory": "Instagram Story",

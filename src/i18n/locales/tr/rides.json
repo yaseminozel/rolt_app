@@ -131,11 +131,6 @@
       "followers": "Yalnızca seni takip edenler görebilir",
       "private": "Yalnızca sen görebilirsin, profilinde gizli kalır"
     },
-    "audience": {
-      "public": "Herkes görebilir",
-      "followers": "Takipçilerin görebilir",
-      "private": "Yalnızca sen görebilirsin"
-    },
     "sheet": {
       "title": "Kimler görebilir?",
       "subtitle": "Bu sürüşü kimlerin görebileceğini seç. Kaydettikten sonra da değiştirebilirsin.",
@@ -163,7 +158,7 @@
   },
   "saved": {
     "title": "Sürüşün kaydedildi",
-    "description": "Profiline eklendi · {{audience}}",
+    "description": "Profiline eklendi",
     "shareTitle": "Hemen paylaş",
     "targets": {
       "instagramStory": "Instagram Hikaye",

@@ -1,9 +1,9 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { StatusIcon } from '@/components/feedback/StatusIcon';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { RideMapPreview } from '@/components/record/RideMapPreview';
 import { averageSpeedKmh } from '@/components/ride-form/RideSummaryCard';
@@ -18,9 +18,10 @@ import { colors, fontFamily, layout, radius, shadows, spacing, typography } from
 
 /** The track stays in the open map above the panel. */
 const MAP_PADDING: BoxPadding = { top: 80, right: 40, bottom: 470, left: 40 };
+const illustration = require('../../../../assets/images/ride/route-complete.png');
 
 /**
- * 08.11 Sürüş kaydedildi — Paylaş (Pencil `f78naq`): shown only once the ride is stored on the
+ * 08.11 Sürüş kaydedildi — Paylaş (Figma `1005:37826`, illustration as on 06.07): shown only once the ride is stored on the
  * device (P0). Share targets send text and link; "Paylaşım görseli oluştur" comes with the
  * share templates (decision 2026-10-07), so it isn't shown yet. Back goes to Record.
  */
@@ -43,12 +44,17 @@ export default function RideSavedScreen() {
       <View style={[styles.panel, { paddingBottom: insets.bottom + spacing.lg }]}>
         <View style={styles.handle} />
         <View style={styles.heading}>
-          <StatusIcon status="success" />
+          <Image
+            source={illustration}
+            style={styles.illustration}
+            contentFit="cover"
+            accessibilityIgnoresInvertColors
+          />
           <Text style={styles.title} accessibilityRole="header">
             {t('saved.title')}
           </Text>
           <Text style={styles.description}>
-            {t('saved.description', { audience: t(`visibility.audience.${ride.visibility}`) })}
+            {t('saved.description')}
           </Text>
         </View>
         <MetricsCard
@@ -92,6 +98,10 @@ export default function RideSavedScreen() {
 }
 
 const styles = StyleSheet.create({
+  illustration: {
+    width: 95,
+    height: 120,
+  },
   screen: {
     flex: 1,
     justifyContent: 'flex-end',
