@@ -28,6 +28,7 @@ import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i
 import { initialsOf } from '@/lib/initials';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
+import { openShareRide } from '@/features/rides/openShareRide';
 
 type Section = 'rides' | 'saved';
 
@@ -265,7 +266,7 @@ function OwnRides({
             onLikePress={() => openRide(ride.id)}
             onCommentPress={() => openRide(ride.id)}
             onSavePress={() => openRide(ride.id)}
-            onSharePress={() => openRide(ride.id)}
+            onSharePress={() => openShareRide(ride.id)}
             onMorePress={() =>
               router.push({ pathname: '/rides/[rideId]/options', params: { rideId: ride.id } })
             }

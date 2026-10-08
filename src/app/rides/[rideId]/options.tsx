@@ -6,9 +6,9 @@ import { StyleSheet, View } from 'react-native';
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { useRideForm } from '@/features/rides/RideFormProvider';
-import { shareRide } from '@/features/rides/shareRide';
 import { colors, layout, radius, spacing } from '@/theme';
 import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
+import { openShareRide } from '@/features/rides/openShareRide';
 
 /**
  * 09.06 Sürüş detayı — Seçenekler (Pencil `W8Hilq`): edit, visibility, share and delete. The
@@ -54,7 +54,7 @@ export default function RideOptionsSheet() {
           trailing="chevron"
           onPress={() => {
             router.back();
-            shareRide(ride, 'other').catch(() => undefined);
+            openShareRide(ride.id);
           }}
         />
         <View style={styles.divider} />

@@ -16,6 +16,7 @@ import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, spacing } from '@/theme';
 
 import { CommunityPostCard } from '@/components/community/CommunityPostCard';
+import { openShareRide } from '@/features/rides/openShareRide';
 
 import { RideActivityCard } from './RideActivityCard';
 
@@ -96,6 +97,11 @@ export function RiderRidesFeed({
   const openComments = () => requireAccount('commentRide', () => undefined);
 
   const shareRide = (ride: RideSummary) => {
+    // The own sample rides get the share templates (09.03); others' rides share as text.
+    if (own) {
+      openShareRide(ride.id, { riderId });
+      return;
+    }
     Share.share({
       message: t('share.rideMessage', {
         title: ride.title,

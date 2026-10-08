@@ -168,7 +168,8 @@
       "other": "Diğer"
     },
     "viewRide": "Sürüşü görüntüle",
-    "linkCopied": "Bağlantı kopyalandı"
+    "linkCopied": "Bağlantı kopyalandı",
+    "createImage": "Paylaşım görseli oluştur"
   },
   "detail": {
     "notes": "Notlar",
@@ -199,5 +200,16 @@
     "visibility": "Görünürlük",
     "share": "Paylaş",
     "delete": "Sürüşü sil"
+  },
+  "shareSheet": {
+    "title": "Sürüşü paylaş",
+    "share": "Paylaş",
+    "failed": "Görsel paylaşılamadı. Tekrar dene.",
+    "templates": {
+      "map": "Harita şablonu",
+      "transparent": "Şeffaf şablon",
+      "photo": "Fotoğraf şablonu",
+      "brand": "ROLT şablonu"
+    }
   }
 }

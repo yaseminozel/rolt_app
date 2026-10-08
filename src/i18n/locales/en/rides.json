@@ -168,7 +168,8 @@
       "other": "More"
     },
     "viewRide": "View ride",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "createImage": "Create share image"
   },
   "detail": {
     "notes": "Notes",
@@ -199,5 +200,16 @@
     "visibility": "Visibility",
     "share": "Share",
     "delete": "Delete ride"
+  },
+  "shareSheet": {
+    "title": "Share ride",
+    "share": "Share",
+    "failed": "The image couldn't be shared. Try again.",
+    "templates": {
+      "map": "Map template",
+      "transparent": "Transparent template",
+      "photo": "Photo template",
+      "brand": "ROLT template"
+    }
   }
 }

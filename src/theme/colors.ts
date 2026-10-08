@@ -94,6 +94,8 @@ export const palette = {
   gray145: '#E8E8E8',
   gray120: '#EFEFEF',
   gray110: '#F3F4F6',
+  // Share template selection (09.03 "Seçim çerçevesi")
+  blue550: '#0043FF',
   // Search row subtitles (13.04 "Açıklama")
   gray650: '#373A40',
   // Lean angle gauge (09.06 `1092:18290` "Kademeli yarım daire göstergesi")
@@ -315,6 +317,21 @@ export const colors = {
   gaugeLabel: palette.slate550,
   /** Second line of community search rows (13.04 "Açıklama"). */
   textSubtle: palette.gray650,
+  /** Selected share template outline and check (09.03). */
+  shareSelected: palette.blue550,
+  /** "Şablon / Marka" stripes (09.03), full and 55 %. */
+  shareStripe: palette.blue700,
+  shareStripeSoft: 'rgba(29, 78, 216, 0.55)',
+  /** Transparent template preview squares (09.03 "Şeffaflık deseni"). */
+  shareChecker: 'rgba(229, 230, 232, 0.75)',
+  /** Readability gradient at the bottom of image templates (09.03 "Okunabilirlik gradyanı"). */
+  shareShade: 'rgba(0, 0, 0, 0.82)',
+  shareShadeClear: 'rgba(0, 0, 0, 0)',
+  /** Empty selection ring over light / dark templates (09.03 "Seçim işareti / Boş"). */
+  shareRingLight: 'rgba(16, 19, 24, 0.35)',
+  shareRingLightFill: 'rgba(0, 0, 0, 0.04)',
+  shareRingDark: 'rgba(255, 255, 255, 0.9)',
+  shareRingDarkFill: 'rgba(0, 0, 0, 0.28)',
   /** Liked heart in community posts. */
   like: palette.red450,
   /** Icon tiles: composer photo button, search row tiles (13.01, 13.04). */

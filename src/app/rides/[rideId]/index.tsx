@@ -25,10 +25,10 @@ import { useOwnRider } from '@/features/riders/ownRider';
 import { useDeleteRide, useRideEndpoints } from '@/features/rides/queries';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { rideTitle } from '@/features/rides/rideTitle';
-import { shareRide } from '@/features/rides/shareRide';
 import { useRoute } from '@/features/routes/queries';
 import { formatClockTime, formatDistance, formatNumber, formatRideClock, formatSpeed } from '@/i18n/format';
 import { colors, layout, radius, spacing, typography } from '@/theme';
+import { openShareRide } from '@/features/rides/openShareRide';
 
 const MAP_HEIGHT = 360;
 /** The sheet starts at 252 pt over a 360 pt map (09.06 `1005:37957`). */
@@ -206,7 +206,7 @@ export default function RideDetailScreen() {
           variant={ride.routeId ? 'outlined' : 'contained'}
           icon={ShareAndroid}
           label={t('detail.share')}
-          onPress={() => shareRide(ride, 'other').catch(() => undefined)}
+          onPress={() => openShareRide(ride.id)}
           style={styles.flex}
         />
         {ride.routeId ? (

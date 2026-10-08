@@ -86,7 +86,8 @@
           "isAccessMediaLocationEnabled": true
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-sharing"
     ],
     "scheme": "rolt",
     "experiments": {

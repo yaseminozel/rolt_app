@@ -138,6 +138,16 @@ function RootNavigator() {
           name="share-profile"
           options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
+        {/* 09.03 Sürüşü paylaş: share templates as a native sheet. */}
+        <Stack.Screen
+          name="share-ride"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: 'fitToContents',
+            sheetGrabberVisible: true,
+            contentStyle: { backgroundColor: colors.surface },
+          }}
+        />
         {/* 09.05 Profili düzenle: own stack with a native header and the city sheet. */}
         <Stack.Screen name="edit-profile" />
         {/* 10.x Ayarlar: modal stack closed with × (sub pages push inside it). */}
