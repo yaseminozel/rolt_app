@@ -28,7 +28,8 @@
     "rate": "ROLT’u değerlendir",
     "recommend": "Arkadaşına öner",
     "instagram": "Instagram",
-    "signOut": "Çıkış yap"
+    "signOut": "Çıkış yap",
+    "sensors": "Sensörler"
   },
   "values": {
     "visibility": {
@@ -61,7 +62,9 @@
     "units": "Metrik (km, km/sa)",
     "instagram": "@roltapp",
     "noBike": "Ekle",
-    "unitsImperial": "Imperial (mi, mph)"
+    "unitsImperial": "Imperial (mi, mph)",
+    "sensorsCalibrated": "Kalibre edildi",
+    "sensorsNotCalibrated": "Kalibre edilmedi"
   },
   "rateHint": {
     "ios": "App Store’da puan ver",

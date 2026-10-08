@@ -94,6 +94,12 @@ export const palette = {
   gray145: '#E8E8E8',
   gray120: '#EFEFEF',
   gray110: '#F3F4F6',
+  // Lean calibration (08.00): upright zone, steady chip, shaking (amber)
+  teal150: '#A0F5E5',
+  teal25: '#E6FBF6',
+  teal550: '#14A88A',
+  teal850: '#0B6B58',
+  amber550: '#D97706',
   // Share template selection (09.03 "Seçim çerçevesi")
   blue550: '#0043FF',
   // Search row subtitles (13.04 "Açıklama")
@@ -317,6 +323,12 @@ export const colors = {
   gaugeLabel: palette.slate550,
   /** Second line of community search rows (13.04 "Açıklama"). */
   textSubtle: palette.gray650,
+  /** Lean calibration (08.00 Kalibrasyon): dial zone, step done, status chips, needle states. */
+  leanZone: palette.teal150,
+  leanOkSurface: palette.teal25,
+  leanOkDot: palette.teal550,
+  leanOkText: palette.teal850,
+  leanWarn: palette.amber550,
   /** Selected share template outline and check (09.03). */
   shareSelected: palette.blue550,
   /** "Şablon / Marka" stripes (09.03), full and 55 %. */

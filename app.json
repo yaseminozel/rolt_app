@@ -87,7 +87,13 @@
         }
       ],
       "expo-sqlite",
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "ROLT, sürüş sırasında yatış açını ölçmek için telefonun hareket sensörlerini kullanır."
+        }
+      ]
     ],
     "scheme": "rolt",
     "experiments": {

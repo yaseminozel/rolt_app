@@ -196,5 +196,57 @@
     "reconnected": "You’re back on the route.",
     "stopReached": "You reached stop {{number}}.",
     "finished": "You completed the route."
+  },
+  "calibration": {
+    "title": "Calibration",
+    "back": "Back",
+    "skip": "Skip",
+    "eyebrow": "LEAN ANGLE",
+    "headline": "Hold the bike upright and let's set the zero point",
+    "description": "Calibrate once so we can measure your lean angle accurately for the way your phone sits in its mount.",
+    "left": "LEFT",
+    "right": "RIGHT",
+    "degrees": "{{value}}°",
+    "live": "Live lean",
+    "liveSide": {
+      "left": "Live lean · left",
+      "right": "Live lean · right"
+    },
+    "zeroSaved": "Zero point saved",
+    "status": {
+      "upright": "Upright · steady",
+      "shaking": "Moving · hold still",
+      "measuring": "Measuring · don't move",
+      "done": "Calibration complete",
+      "tilted": {
+        "right": "Not upright · straighten to the left",
+        "left": "Not upright · straighten to the right"
+      }
+    },
+    "steps": {
+      "mount": {
+        "title": "Fix the phone in its mount",
+        "sub": "Don't move the phone after calibrating"
+      },
+      "upright": {
+        "title": "Bring the bike upright",
+        "sub": "Raise the side stand and keep the bars straight",
+        "tilted": {
+          "right": "The bike leans right; raise the side stand and keep the bars straight",
+          "left": "The bike leans left; raise the side stand and keep the bars straight"
+        }
+      },
+      "still": {
+        "title": "Hold still for 3 seconds",
+        "sub": "Starts after you tap Calibrate",
+        "shaking": "Calibrate turns on once the bike is still",
+        "measuring": "Don't move the bike until the countdown ends",
+        "done": "Zero point saved for this phone position"
+      }
+    },
+    "calibrate": "Calibrate",
+    "measuring": "Measuring… {{seconds}} s",
+    "toRecord": "Start recording",
+    "note": "You can redo it any time in Settings › Sensors."
   }
 }

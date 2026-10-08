@@ -196,5 +196,57 @@
     "reconnected": "Rotaya yeniden bağlandın.",
     "stopReached": "{{number}}. durağa ulaştın.",
     "finished": "Rotayı tamamladın."
+  },
+  "calibration": {
+    "title": "Kalibrasyon",
+    "back": "Geri",
+    "skip": "Atla",
+    "eyebrow": "YATIŞ AÇISI",
+    "headline": "Motoru dik tut, sıfır noktasını ayarlayalım",
+    "description": "Telefon tutucudaki konumuna göre yatış açını doğru ölçebilmemiz için bir kez kalibre etmen yeterli.",
+    "left": "SOL",
+    "right": "SAĞ",
+    "degrees": "{{value}}°",
+    "live": "Anlık yatış",
+    "liveSide": {
+      "left": "Anlık yatış · sola",
+      "right": "Anlık yatış · sağa"
+    },
+    "zeroSaved": "Sıfır noktası kaydedildi",
+    "status": {
+      "upright": "Dik konumda · sabit",
+      "shaking": "Sallanıyor · sabit tut",
+      "measuring": "Ölçülüyor · hareket etme",
+      "done": "Kalibrasyon tamamlandı",
+      "tilted": {
+        "right": "Dik değil · motoru sola doğrult",
+        "left": "Dik değil · motoru sağa doğrult"
+      }
+    },
+    "steps": {
+      "mount": {
+        "title": "Telefonu tutucuya sabitle",
+        "sub": "Kalibrasyondan sonra telefonun yerini değiştirme"
+      },
+      "upright": {
+        "title": "Motoru dik konuma getir",
+        "sub": "Yan sehpayı kaldır, gidonu düz tut",
+        "tilted": {
+          "right": "Motor sağa yatık; yan sehpayı kaldır, gidonu düz tut",
+          "left": "Motor sola yatık; yan sehpayı kaldır, gidonu düz tut"
+        }
+      },
+      "still": {
+        "title": "3 saniye hareketsiz bekle",
+        "sub": "Kalibre et'e bastıktan sonra başlar",
+        "shaking": "Motor sabitlenince Kalibre et açılır",
+        "measuring": "Sayaç bitene kadar motoru oynatma",
+        "done": "Sıfır noktası bu telefon konumu için kaydedildi"
+      }
+    },
+    "calibrate": "Kalibre et",
+    "measuring": "Ölçülüyor… {{seconds}} sn",
+    "toRecord": "Kayda geç",
+    "note": "İstediğin zaman Ayarlar › Sensörler'den yenileyebilirsin."
   }
 }

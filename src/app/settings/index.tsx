@@ -14,6 +14,7 @@ import {
   MediaImage,
   Motorcycle,
   Page,
+  Position,
   Ruler,
   User,
   Xmark,
@@ -38,6 +39,7 @@ import { StatusIcon } from '@/components/feedback/StatusIcon';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useLeanCalibration } from '@/features/lean/leanCalibration';
 import { useOwnProfile } from '@/features/profile/queries';
 import { useDefaultRideVisibility } from '@/features/rides/queries';
 import { usePermissionStatuses } from '@/features/settings/permissionStatus';
@@ -95,6 +97,7 @@ export default function SettingsScreen() {
   const permissions = usePermissionStatuses();
 
   // The React Compiler memoizes this list.
+  const leanCalibrated = useLeanCalibration() !== null;
   const items = ((): SettingsMenuItem[] => {
     const go = (page: SettingsPage) => () => router.push(`/settings/${page}`);
     return [
@@ -179,6 +182,15 @@ export default function SettingsScreen() {
         label: t('items.units'),
         value: t(getUnitSystem() === 'imperial' ? 'values.unitsImperial' : 'values.units'),
         onPress: go('units'),
+      },
+      {
+        // 08.00 note: "İstediğin zaman Ayarlar › Sensörler'den yenileyebilirsin."
+        id: 'sensors',
+        section: 'app',
+        icon: Position,
+        label: t('items.sensors'),
+        value: t(leanCalibrated ? 'values.sensorsCalibrated' : 'values.sensorsNotCalibrated'),
+        onPress: () => router.push('/calibrate-lean'),
       },
       {
         id: 'help',

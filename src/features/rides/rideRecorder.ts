@@ -2,6 +2,8 @@ import { bearingDeg, distanceM } from '@/features/navigation/geometry';
 import type { LocationFix } from '@/features/navigation/types';
 import type { LngLat } from '@/features/routes/types';
 
+import { SensorLeanTracker } from '@/features/lean/leanMath';
+
 import { LeanEstimator } from './leanAngle';
 import { EMPTY_RIDE_STATS, type RideStats } from './types';
 
@@ -150,8 +152,17 @@ export class RideRecorder {
   private breakCounted = false;
   private curves = new CurveCounter();
   private lean = new LeanEstimator();
+  /** Calibrated motion-sensor lean (08.00); replaces the GPS estimate when present. */
+  private sensorLean: SensorLeanTracker | null = null;
+  private lastSpeedMps = 0;
 
-  constructor(now: number, resume?: RecorderResumeState) {
+  constructor(now: number, resume?: RecorderResumeState, options?: { sensorLean?: boolean }) {
+    if (options?.sensorLean) {
+      this.sensorLean = new SensorLeanTracker();
+      // A restored ride keeps the extremes it already had.
+      this.sensorLean.maxLeftDeg = resume?.stats.maxLeanLeftDeg ?? 0;
+      this.sensorLean.maxRightDeg = resume?.stats.maxLeanRightDeg ?? 0;
+    }
     this.stats = resume ? { ...resume.stats } : { ...EMPTY_RIDE_STATS };
     this.track = resume ? resume.track.map((segment) => [...segment]) : [];
     this.lastCountedAt = now;
@@ -247,6 +258,7 @@ export class RideRecorder {
       return;
     }
     const speed = fix.speedMps ?? derivedSpeed;
+    this.lastSpeedMps = speed;
     if (speed <= RECORDER_RULES.maxPlausibleSpeedMps) {
       this.stats.maxSpeedMps = Math.max(this.stats.maxSpeedMps, speed);
     }
@@ -260,9 +272,21 @@ export class RideRecorder {
     if (this.curves.add(fix.coordinates)) {
       this.stats.curveCount += 1;
     }
-    this.lean.add(fix.coordinates, fix.timestamp);
-    this.stats.maxLeanLeftDeg = Math.max(this.stats.maxLeanLeftDeg ?? 0, this.lean.maxLeftDeg);
-    this.stats.maxLeanRightDeg = Math.max(this.stats.maxLeanRightDeg ?? 0, this.lean.maxRightDeg);
+    if (!this.sensorLean) {
+      this.lean.add(fix.coordinates, fix.timestamp);
+      this.stats.maxLeanLeftDeg = Math.max(this.stats.maxLeanLeftDeg ?? 0, this.lean.maxLeftDeg);
+      this.stats.maxLeanRightDeg = Math.max(this.stats.maxLeanRightDeg ?? 0, this.lean.maxRightDeg);
+    }
+  }
+
+  /** A calibrated lean reading (degrees, right positive); counts only while riding. */
+  addSensorLean(leanDeg: number) {
+    if (!this.sensorLean || !this.counting) {
+      return;
+    }
+    this.sensorLean.add(leanDeg, this.lastSpeedMps);
+    this.stats.maxLeanLeftDeg = this.sensorLean.maxLeftDeg;
+    this.stats.maxLeanRightDeg = this.sensorLean.maxRightDeg;
   }
 
   private trackStanding(fix: LocationFix, speed: number) {

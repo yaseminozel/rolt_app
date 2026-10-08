@@ -1,3 +1,4 @@
+import { SensorLeanTracker } from '@/features/lean/leanMath';
 import { LeanEstimator } from '@/features/rides/leanAngle';
 import type { LngLat } from '@/features/routes/types';
 
@@ -127,6 +128,9 @@ export class NavigationTracker {
   private reconnectedAt = 0;
   private finished = false;
   private lean = new LeanEstimator();
+  /** Calibrated motion-sensor lean (08.00); once it reports, the GPS estimate stops counting. */
+  private sensorLean: SensorLeanTracker | null = null;
+  private lastSpeedMps = 0;
   private now: number;
   private readonly ride: RideStats;
 
@@ -355,12 +359,23 @@ export class NavigationTracker {
     return seconds > 0 ? distanceM(this.lastRaw.coordinates, fix.coordinates) / seconds : 0;
   }
 
+  /** A calibrated lean reading (degrees, right positive) from the motion sensors. */
+  addSensorLean(leanDeg: number) {
+    if (!this.sensorLean) {
+      this.sensorLean = new SensorLeanTracker();
+    }
+    this.sensorLean.add(leanDeg, this.lastSpeedMps);
+    this.ride.maxLeanLeftDeg = this.sensorLean.maxLeftDeg;
+    this.ride.maxLeanRightDeg = this.sensorLean.maxRightDeg;
+  }
+
   private recordRide(fix: LocationFix) {
     const previous = this.lastRaw;
     if (fix.accuracyM > NAVIGATION_RULES.maxUsableAccuracyM) {
       return;
     }
     const speed = fix.speedMps ?? this.speedFromLast(fix);
+    this.lastSpeedMps = speed;
     this.ride.maxSpeedMps = Math.max(this.ride.maxSpeedMps, speed);
     if (!previous) {
       this.ride.track.push(fix.coordinates);
@@ -371,9 +386,11 @@ export class NavigationTracker {
     if (moved >= NAVIGATION_RULES.minMoveM) {
       this.ride.distanceM += moved;
       this.ride.track.push(fix.coordinates);
-      this.lean.add(fix.coordinates, fix.timestamp);
-      this.ride.maxLeanLeftDeg = this.lean.maxLeftDeg;
-      this.ride.maxLeanRightDeg = this.lean.maxRightDeg;
+      if (!this.sensorLean) {
+        this.lean.add(fix.coordinates, fix.timestamp);
+        this.ride.maxLeanLeftDeg = this.lean.maxLeftDeg;
+        this.ride.maxLeanRightDeg = this.lean.maxRightDeg;
+      }
     }
     if (this.breakStopIndex !== null) {
       this.ride.breakS += seconds;

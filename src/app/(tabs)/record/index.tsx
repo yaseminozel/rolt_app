@@ -1,7 +1,7 @@
 import * as Location from 'expo-location';
 import { router, useFocusEffect } from 'expo-router';
 import { Collapse, Expand, MapsArrow, NavArrowLeft } from 'iconoir-react-native';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,6 +25,9 @@ import type { RideType } from '@/features/rides/rideTypes';
 import { formatDistance } from '@/i18n/format';
 import { useNow } from '@/lib/useNow';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
+import { calibrationFlow, usePendingCalibrationStart } from '@/features/lean/calibrationFlow';
+import { leanCalibration } from '@/features/lean/leanCalibration';
+import { isLeanSensorAvailable } from '@/features/lean/leanSensor';
 
 const illustration = require('../../../../assets/images/location-off-illustration.png');
 
@@ -97,6 +100,9 @@ export default function RecordScreen() {
     }, [beginRecording, readLocationAccess]),
   );
 
+  // Back from 08.00 Kalibrasyon ("Kayda geç" / "Atla"): carry on with the start.
+  const calibrationStart = usePendingCalibrationStart();
+
   // GPS warm-up while waiting on "Başlat".
   const previewing = !active && !interrupted && access === 'granted';
   useFocusEffect(
@@ -113,6 +119,15 @@ export default function RecordScreen() {
           await readLocationAccess();
           return;
         }
+        // 08.00: the first start on a phone with motion sensors calibrates the lean angle.
+        if (
+          !leanCalibration.get() &&
+          !leanCalibration.wasSkipped() &&
+          (await isLeanSensorAvailable())
+        ) {
+          router.push({ pathname: '/calibrate-lean', params: { then: 'record' } });
+          return;
+        }
         const background = await Location.getBackgroundPermissionsAsync();
         if (!background.granted && background.canAskAgain && !(await wasBackgroundPromptShown())) {
           pendingStart.current = true;
@@ -122,6 +137,14 @@ export default function RecordScreen() {
       }
       await beginRecording();
     });
+
+  useEffect(() => {
+    if (calibrationStart && calibrationFlow.takeStart()) {
+      handleStart();
+    }
+    // `handleStart` changes every render; the start runs once per hand-off.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calibrationStart]);
 
   const handleFinish = async () => {
     setBusy(true);

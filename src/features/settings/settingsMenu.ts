@@ -15,6 +15,7 @@ export type SettingsItemId =
   | 'notifications'
   | 'language'
   | 'units'
+  | 'sensors'
   | 'help'
   | 'feedback'
   | 'privacyPolicy'

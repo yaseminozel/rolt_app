@@ -6,8 +6,12 @@ import { maneuverTitle } from './instructions';
 import { NavigationTracker, type NavigationSnapshot, type TrackedStop } from './navigationTracker';
 import type { LocationSource, NavigationPlan } from './types';
 import { speak, stopSpeaking, VOICE_THRESHOLDS_M } from './voiceGuidance';
+import { leanCalibration } from '@/features/lean/leanCalibration';
+import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
+import { subscribeLean } from '@/features/lean/leanSensor';
 
 const TICK_MS = 1_000;
+const LEAN_INTERVAL_MS = 100;
 /** Wait before trying a failed reconnection again. */
 const RECONNECT_RETRY_MS = 10_000;
 
@@ -138,8 +142,21 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
       }
     }, TICK_MS);
 
+    // Calibrated phones measure lean with the motion sensors (08.00).
+    const calibration = leanCalibration.get();
+    let smoothed: number | null = null;
+    const leanSubscription = calibration
+      ? subscribeLean((sample) => {
+          const lean = sample.rawDeg - calibration.offsetDeg;
+          smoothed =
+            smoothed === null ? lean : smoothed + (lean - smoothed) * LEAN_SENSOR_RULES.smoothing;
+          tracker.addSensorLean(smoothed);
+        }, LEAN_INTERVAL_MS)
+      : null;
+
     return () => {
       cancelled = true;
+      leanSubscription?.remove();
       clearInterval(timer);
       stopSource?.();
       stopSpeaking();

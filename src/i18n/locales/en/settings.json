@@ -28,7 +28,8 @@
     "rate": "Rate ROLT",
     "recommend": "Recommend to a friend",
     "instagram": "Instagram",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "sensors": "Sensors"
   },
   "values": {
     "visibility": {
@@ -61,7 +62,9 @@
     "units": "Metric (km, km/h)",
     "instagram": "@roltapp",
     "noBike": "Add",
-    "unitsImperial": "Imperial (mi, mph)"
+    "unitsImperial": "Imperial (mi, mph)",
+    "sensorsCalibrated": "Calibrated",
+    "sensorsNotCalibrated": "Not calibrated"
   },
   "rateHint": {
     "ios": "Rate us on the App Store",

@@ -13,6 +13,9 @@ import {
   createNavigationLocationSource,
   isSimulatedNavigation,
 } from '@/features/navigation/location';
+import { leanCalibration } from '@/features/lean/leanCalibration';
+import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
+import { subscribeLean } from '@/features/lean/leanSensor';
 import type { LocationFix, LocationSource } from '@/features/navigation/types';
 import { ROUTE_FIXTURES } from '@/features/routes/fixtures/routes';
 import type { LngLat } from '@/features/routes/types';
@@ -29,6 +32,8 @@ export const MIN_SAVE_DISTANCE_M = 1_000;
 /** The recording row is rewritten this often, so a crash loses at most this much (08.03). */
 const PERSIST_INTERVAL_MS = 10_000;
 const TICK_MS = 1_000;
+/** Lean readings while recording (10 Hz is plenty for peak lean). */
+const LEAN_RECORD_INTERVAL_MS = 100;
 /** The web preview and Expo Go ride along this route when no route is attached. */
 const SIMULATION_FALLBACK_ROUTE = 'geyikbayiri';
 
@@ -110,6 +115,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const recordRef = useRef<RideRecord | null>(null);
   const sourceRef = useRef<LocationSource | null>(null);
   const stopSourceRef = useRef<(() => void) | null>(null);
+  const leanSubscriptionRef = useRef<{ remove: () => void } | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastPersistRef = useRef(0);
 
@@ -172,6 +178,8 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   );
 
   const stopTracking = useCallback(() => {
+    leanSubscriptionRef.current?.remove();
+    leanSubscriptionRef.current = null;
     stopSourceRef.current?.();
     stopSourceRef.current = null;
     sourceRef.current = null;
@@ -191,6 +199,19 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
         recorderRef.current?.tick(source.now());
         publish();
       }, TICK_MS);
+      // Calibrated phones measure lean with the motion sensors (08.00); others keep the GPS estimate.
+      const calibration = leanCalibration.get();
+      if (calibration) {
+        let smoothed: number | null = null;
+        leanSubscriptionRef.current = subscribeLean((sample) => {
+          const lean = sample.rawDeg - calibration.offsetDeg;
+          smoothed =
+            smoothed === null
+              ? lean
+              : smoothed + (lean - smoothed) * LEAN_SENSOR_RULES.smoothing;
+          recorderRef.current?.addSensorLean(smoothed);
+        }, LEAN_RECORD_INTERVAL_MS);
+      }
     },
     [handleFix, publish, stopTracking],
   );
@@ -265,7 +286,9 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       recordRef.current = record;
       await ridesRepository.put(record);
       setInterrupted(null);
-      recorderRef.current = new RideRecorder(now);
+      recorderRef.current = new RideRecorder(now, undefined, {
+        sensorLean: leanCalibration.get() !== null,
+      });
       publish();
       await startTracking(route?.line);
     },
@@ -346,10 +369,11 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     }
     recordRef.current = interrupted;
     setInterrupted(null);
-    recorderRef.current = new RideRecorder(Date.now(), {
-      stats: interrupted.stats,
-      track: interrupted.track,
-    });
+    recorderRef.current = new RideRecorder(
+      Date.now(),
+      { stats: interrupted.stats, track: interrupted.track },
+      { sensorLean: leanCalibration.get() !== null },
+    );
     publish();
     // Only the simulator needs the line (it drives along it); real GPS ignores it.
     const route = ROUTE_FIXTURES.find((item) => item.id === interrupted.routeId);

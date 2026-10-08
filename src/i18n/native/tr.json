@@ -6,7 +6,8 @@
     "NSLocationAlwaysUsageDescription": "ROLT, ekran kapalıyken de sürüş kaydedebilmek için konumunu her zaman kullanır.",
     "NSPhotoLibraryUsageDescription": "ROLT, profiline, sürüşlerine ve önerdiğin rotalara fotoğraf ekleyebilmen için seçtiğin fotoğraflara erişir.",
     "NSCameraUsageDescription": "ROLT, rotalarına ve sürüşlerine fotoğraf ekleyebilmen için kamerayı kullanır.",
-    "NSPhotoLibraryAddUsageDescription": "ROLT, profil kartını fotoğraflarına kaydedebilmen için galeriye görsel ekler."
+    "NSPhotoLibraryAddUsageDescription": "ROLT, profil kartını fotoğraflarına kaydedebilmen için galeriye görsel ekler.",
+    "NSMotionUsageDescription": "ROLT, sürüş sırasında yatış açını ölçmek için telefonun hareket sensörlerini kullanır."
   },
   "android": {
     "app_name": "ROLT"
