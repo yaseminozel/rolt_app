@@ -4,35 +4,28 @@ import { NavArrowLeft } from 'iconoir-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Image,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
-  type ImageSourcePropType,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import {
+  OnboardingIllustration,
+  type OnboardingIllustrationKey,
+} from '@/components/onboarding/OnboardingIllustration';
 import { Button } from '@/components/ui/Button';
 import { trackEvent } from '@/features/analytics/track';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { colors, layout, radius, spacing, typography } from '@/theme';
 
-type OnboardingPage = {
-  key: 'discover' | 'record' | 'share';
-  /** Illustration exported from the page's "Görsel" frame (393 × 520). */
-  image: ImageSourcePropType;
-};
-
-const pages: readonly OnboardingPage[] = [
-  { key: 'discover', image: require('../../assets/images/onboarding/discover.jpg') },
-  { key: 'record', image: require('../../assets/images/onboarding/record.jpg') },
-  { key: 'share', image: require('../../assets/images/onboarding/share.jpg') },
-];
+/** Pages in order; each draws its animated "Görsel" frame (393 × 520). */
+const pages: readonly OnboardingIllustrationKey[] = ['discover', 'record', 'share'];
 
 const LAST_PAGE = pages.length - 1;
 /** Illustration frame size; it fills the width and keeps this ratio unless the screen is short. */
@@ -55,7 +48,7 @@ const ACTION_GAP = spacing.md;
 const MIN_COPY_TO_ACTIONS = spacing.xxl;
 
 /**
- * 01.01–01.03 Onboarding — Pencil `rqDIe` (Keşfet), `pyaeU` (Sür ve kaydet), `I7pX5R` (Paylaş).
+ * 01.01–01.03 Onboarding — Pencil `EAG9T` (Keşfet), `l3qzJM` (Sür ve kaydet), `bblG8` (Paylaş).
  * Shown once after the splash (note `YMpU5`); replaces the old Get Started screen. Pages move
  * by swiping or "Devam et"; "Atla" (pages 1–2), "Hemen başla" and "Giriş yap" all lead to
  * sign-in. No permission is requested here: the pages only prepare the reasons (note `OcoKg`).
@@ -121,19 +114,19 @@ export default function OnboardingScreen() {
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleMomentumEnd}
         contentInsetAdjustmentBehavior="never">
-        {pages.map((page) => (
-          <View key={page.key} style={{ width }}>
-            <Image
-              source={page.image}
-              style={[styles.illustration, { height: illustrationHeight }]}
-              resizeMode="cover"
-              accessibilityIgnoresInvertColors
+        {pages.map((page, index) => (
+          <View key={page} style={{ width }}>
+            <OnboardingIllustration
+              page={page}
+              active={index === pageIndex}
+              width={width}
+              height={illustrationHeight}
             />
             <View style={styles.copy}>
               <Text style={styles.title} accessibilityRole="header">
-                {t(`onboarding.pages.${page.key}.title`)}
+                {t(`onboarding.pages.${page}.title`)}
               </Text>
-              <Text style={styles.body}>{t(`onboarding.pages.${page.key}.body`)}</Text>
+              <Text style={styles.body}>{t(`onboarding.pages.${page}.body`)}</Text>
             </View>
           </View>
         ))}
@@ -144,7 +137,7 @@ export default function OnboardingScreen() {
         accessibilityRole="progressbar"
         accessibilityLabel={t('onboarding.pageA11y', { page: pageIndex + 1, total: pages.length })}>
         {pages.map((page, index) => (
-          <View key={page.key} style={[styles.dot, index === pageIndex && styles.dotActive]} />
+          <View key={page} style={[styles.dot, index === pageIndex && styles.dotActive]} />
         ))}
       </View>
 
@@ -198,9 +191,6 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.surface,
-  },
-  illustration: {
-    width: '100%',
   },
   copy: {
     marginTop: COPY_TOP,
