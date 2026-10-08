@@ -290,8 +290,8 @@ function OwnRides({
 }
 
 /**
- * 09.04 Kaydettiklerim (Figma `1005:35739` list, `1005:35784` empty): saved routes as row cards
- * with distance, time and average speed, divided by hairlines; newest first.
+ * 09.04 Kaydettiklerim (Pencil `tBE7w` list, `iGC1m` empty): saved routes as row cards with
+ * distance and time, divided by hairlines; newest first.
  */
 function SavedRoutes() {
   const { t } = useTranslation(['profile', 'routes']);
@@ -319,7 +319,6 @@ function SavedRoutes() {
             subtitle={route.summary}
             distance={formatDistance(route.distanceKm)}
             duration={formatDuration(route.durationMinutes)}
-            speed={formatSpeed(route.averageSpeedKmh)}
             badgeLabel={t(`routes:tags.${route.tag}`)}
             saved={isSaved(route.id)}
             onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_OFFSET })}
