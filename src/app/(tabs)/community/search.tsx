@@ -208,6 +208,7 @@ function Results({
             type="toggle"
             label={t(`search.tabs.${item}`)}
             selected={tab === item}
+            showIcon={false}
             onPress={() => onTab(item)}
           />
         ))}

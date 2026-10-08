@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import { Check, Garage, Motorcycle, MoreHoriz, PathArrow, ShareIos } from 'iconoir-react-native';
+import { Garage, Motorcycle, MoreHoriz, PathArrow, ShareIos } from 'iconoir-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, Share, StyleSheet, View } from 'react-native';
@@ -32,6 +32,7 @@ import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { formatApproxDuration, formatDistance, formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
+import { initialsOf } from '@/lib/initials';
 
 type ProfileSection = 'rides' | 'routes' | 'garage';
 
@@ -195,6 +196,7 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
           name={rider.name}
           handle={rider.handle}
           avatar={rider.avatar}
+          avatarInitials={initialsOf(rider.name)}
           bio={rider.bio}
           city={rider.city}
           bike={primaryBikeLine(rider.bikes, t)}
@@ -214,25 +216,26 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
           actions={
             <View style={styles.actions}>
               {rider.isFollowing ? (
+                // 13.03 "Takip ediliyor" (Figma `1114:22157`): one full-width "Takibi bırak".
                 <Button
-                  label={t('actions.following')}
+                  label={t('actions.unfollow')}
                   variant="outlined"
-                  icon={Check}
                   onPress={toggleFollow}
-                  accessibilityLabel={t('actions.following')}
                   style={styles.action}
                 />
               ) : (
-                <Button label={t('actions.follow')} onPress={toggleFollow} style={styles.action} />
+                <>
+                  <Button label={t('actions.follow')} onPress={toggleFollow} style={styles.action} />
+                  <Button
+                    label={t('actions.rideTogether')}
+                    variant="outlined"
+                    onPress={() =>
+                      router.push({ pathname: '/ride-together/[id]', params: { id: rider.id } })
+                    }
+                    style={styles.action}
+                  />
+                </>
               )}
-              <Button
-                label={t('actions.rideTogether')}
-                variant="outlined"
-                onPress={() =>
-                  router.push({ pathname: '/ride-together/[id]', params: { id: rider.id } })
-                }
-                style={styles.action}
-              />
             </View>
           }
         />
@@ -247,7 +250,11 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
 
       <View style={styles.section}>
         {section === 'rides' ? (
-          <RiderRidesFeed riderId={rider.id} riderName={rider.name} riderAvatar={rider.avatar} />
+          <RiderRidesFeed
+            riderId={rider.id}
+            riderName={rider.name}
+            riderAvatar={rider.avatar}
+          />
         ) : null}
         {section === 'routes' ? <RoutesList riderId={rider.id} /> : null}
         {section === 'garage' ? <GarageList bikes={rider.bikes} /> : null}

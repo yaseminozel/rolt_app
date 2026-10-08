@@ -30,7 +30,8 @@
     "more": "More options",
     "editProfile": "Edit profile",
     "changePhoto": "Change profile photo",
-    "settings": "Settings"
+    "settings": "Settings",
+    "unfollow": "Unfollow"
   },
   "tabs": {
     "label": "Profile sections",
