@@ -52,6 +52,8 @@ export type RideSummary = {
   distanceKm: number;
   durationMinutes: number;
   averageSpeedKmh: number;
+  /** "Viraj" on community-style cards (13.03); older fixtures omit it. */
+  curveCount?: number;
   likeCount: number;
   commentCount: number;
   /** Bookmark count ("Aksiyon / Kaydet" in the design). */

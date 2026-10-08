@@ -22,8 +22,8 @@ export type PostRide = {
   distanceKm: number;
   durationMinutes: number;
   averageSpeedKmh?: number;
-  /** "Yükseklik" instead of the average speed when the ride climbed (13.02 Kaş – Kalkan). */
-  elevationGainM?: number;
+  /** "Viraj", the fourth metric (13.01). */
+  curveCount?: number;
   /** Static map thumbnail with the ride trace. */
   mapImage?: ImageSourcePropType;
 };
@@ -44,6 +44,8 @@ export type CommunityPost = {
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
+  /** Whether the viewer follows the author; otherwise a "+" badge sits on the avatar. */
+  isFollowingAuthor: boolean;
   /** "Herkese açık" or followers only (composer choice). */
   audience: PostAudience;
 };
@@ -112,6 +114,7 @@ export interface CommunityRepository {
   getPost(id: string): Promise<CommunityPost | null>;
   createPost(post: NewPost): Promise<CommunityPost>;
   setLiked(postId: string, liked: boolean): Promise<void>;
+  followAuthor(authorId: string): Promise<void>;
   listComments(postId: string): Promise<CommunityComment[]>;
   addComment(postId: string, text: string): Promise<CommunityComment>;
   /** Up to 4 mixed suggestions while typing (13.04 "Öneriler"). */

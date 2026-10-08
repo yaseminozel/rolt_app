@@ -77,6 +77,23 @@ export const palette = {
   green750: '#1F7A57',
   orange75: '#FFF4E5',
   orange850: '#8A4B08',
+  // "Avatar / Token Colors" initials discs (13.01–13.04)
+  lime100: '#EEF9A4',
+  lime800: '#687009',
+  pink150: '#FFB8DF',
+  pink600: '#E60079',
+  rose150: '#FFC7C9',
+  rose600: '#E60004',
+  yellow200: '#FFF685',
+  yellow800: '#837500',
+  // Stacked placeholder cards of empty states ("Silüet / Motor yığını")
+  gray105: '#F6F6F6',
+  gray115: '#F1F1F1',
+  gray130: '#EBEBEB',
+  gray135: '#EAEAEA',
+  gray145: '#E8E8E8',
+  gray120: '#EFEFEF',
+  gray110: '#F3F4F6',
   // Lean angle gauge (09.06 `1092:18290` "Kademeli yarım daire göstergesi")
   gray140: '#ECEEF1',
   gray160: '#E5E7EB',
@@ -294,6 +311,40 @@ export const colors = {
   gaugeAxis: palette.gray260,
   gaugeBase: palette.gray180,
   gaugeLabel: palette.slate550,
+  /** Liked heart in community posts. */
+  like: palette.red450,
+  /** Icon tiles: composer photo button, search row tiles (13.01, 13.04). */
+  tile: palette.gray110,
+  /** Stacked placeholder cards of empty states (11.01, 13.01, 13.04): back, right, front. */
+  stackBackTile: palette.gray110,
+  stackBackBarLong: palette.gray100,
+  stackBackBarShort: palette.gray105,
+  stackRightTile: palette.gray135,
+  stackRightBarLong: palette.gray115,
+  stackRightBarShort: palette.gray100,
+  stackFrontTile: palette.gray130,
+  stackFrontBarLong: palette.gray145,
+  stackFrontBarShort: palette.gray120,
 } as const;
+
+/** Initials disc tones ("Avatar / Token Colors"), picked per person by `avatarTone`. */
+export const avatarTones = [
+  { background: palette.lime100, text: palette.lime800 },
+  { background: palette.teal100, text: palette.teal600 },
+  { background: palette.pink150, text: palette.pink600 },
+  { background: palette.rose150, text: palette.rose600 },
+  { background: palette.yellow200, text: palette.yellow800 },
+] as const;
+
+export type AvatarTone = (typeof avatarTones)[number];
+
+/** Stable tone for a person id, so the same rider always gets the same colours. */
+export function avatarTone(id: string): AvatarTone {
+  let hash = 0;
+  for (const char of id) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return avatarTones[hash % avatarTones.length];
+}
 
 export type ColorToken = keyof typeof colors;

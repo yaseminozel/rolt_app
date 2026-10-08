@@ -22,9 +22,6 @@
       "followers": "My followers"
     },
     "addPhoto": "Add photos",
-    "addRide": "Add a ride",
-    "rideTitle": "Ride to share",
-    "removeRide": "Remove ride",
     "removePhoto": "Remove photo",
     "cancel": "Cancel",
     "posted": "Shared.",
@@ -43,8 +40,9 @@
       "distance": "Distance",
       "duration": "Time",
       "averageSpeed": "Avg. speed",
-      "elevation": "Elevation"
-    }
+      "curves": "Bends"
+    },
+    "follow": "Follow {{name}}"
   },
   "comments": {
     "title": "Comments · {{count}}",

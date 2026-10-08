@@ -18,21 +18,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CommunityPostCard } from '@/components/community/CommunityPostCard';
 import { PostComposer } from '@/components/community/PostComposer';
-import { EmptyState } from '@/components/feedback/EmptyState';
+import { StackedCardsIllustration } from '@/components/illustrations/StackedCardsIllustration';
 import { Button } from '@/components/ui/Button';
 import { FilterChip } from '@/components/ui/FilterChip';
-import { useCommunityFeed, useSetPostLiked } from '@/features/community/queries';
+import { useCommunityFeed, useFollowAuthor, useSetPostLiked } from '@/features/community/queries';
 import type { CommunityPost, FeedFilter } from '@/features/community/types';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
-import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
+import { colors, fontFamily, layout, radius, spacing } from '@/theme';
 
 /** Room for the floating tab bar under the last post. */
 const TAB_BAR_ROOM = 120;
 
 /**
- * 13.01 Topluluk / Akış (Figma `1005:39834` default, `1005:39885` composing, `1005:39577`
- * empty): title with search, the composer, "Son paylaşılanlar" with a filter and the posts
- * divided by hairlines. Likes and comments need an account (guests sign in first).
+ * 13.01 Topluluk / Akış (Pencil `pfLw4` default, `T0ZMr` composing, `ZwHY6` empty): title
+ * with search, the composer, "Son paylaşılanlar" with a filter and the posts divided by
+ * hairlines; empty, the composer gives way to the stacked-cards picture and two actions.
+ * Likes, comments and follows need an account (guests sign in first).
  */
 export default function CommunityScreen() {
   const { t } = useTranslation('community');
@@ -41,7 +42,9 @@ export default function CommunityScreen() {
   const [filter, setFilter] = useState<FeedFilter>('all');
   const feed = useCommunityFeed(filter);
   const setLiked = useSetPostLiked();
+  const followAuthor = useFollowAuthor();
   const posts = feed.data ?? [];
+  const empty = !feed.isPending && posts.length === 0;
 
   const like = (post: CommunityPost) =>
     requireAccount('likeRide', () => setLiked.mutate({ postId: post.id, liked: !post.isLiked }));
@@ -62,6 +65,7 @@ export default function CommunityScreen() {
         contentContainerStyle={[
           styles.content,
           { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + TAB_BAR_ROOM },
+          empty && styles.contentEmpty,
         ]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
@@ -77,10 +81,10 @@ export default function CommunityScreen() {
               accessibilityRole="button"
               accessibilityLabel={t('search.open')}
               style={({ pressed }) => [styles.searchButton, pressed && styles.pressed]}>
-              <Search width={24} height={24} color={colors.textPrimary} strokeWidth={1.5} />
+              <Search width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
             </Pressable>
           </View>
-          <PostComposer />
+          {empty ? null : <PostComposer />}
         </View>
 
         <View style={styles.section}>
@@ -99,13 +103,19 @@ export default function CommunityScreen() {
 
           {feed.isPending ? (
             <ActivityIndicator style={styles.loading} color={colors.textSecondary} />
-          ) : posts.length === 0 ? (
+          ) : empty ? (
             <View style={styles.empty}>
-              <EmptyState title={t('empty.title')} description={t('empty.description')} />
+              <StackedCardsIllustration />
+              <View style={styles.emptyCopy}>
+                <Text style={styles.emptyTitle} accessibilityRole="header">
+                  {t('empty.title')}
+                </Text>
+                <Text style={styles.emptyDescription}>{t('empty.description')}</Text>
+              </View>
               <View style={styles.emptyActions}>
                 <Button label={t('empty.shareRide')} onPress={() => router.navigate('/record')} />
                 <Button
-                  variant="outlined"
+                  variant="text"
                   label={t('empty.discover')}
                   onPress={() => router.navigate('/discover')}
                 />
@@ -119,6 +129,9 @@ export default function CommunityScreen() {
                   post={post}
                   onAuthorPress={() =>
                     router.push({ pathname: '/rider/[id]', params: { id: post.author.id } })
+                  }
+                  onFollowPress={() =>
+                    requireAccount('followRider', () => followAuthor.mutate(post.author.id))
                   }
                   onLikePress={() => like(post)}
                   onCommentPress={() => comment(post)}
@@ -163,6 +176,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.pill,
+    backgroundColor: colors.surfaceMuted,
+  },
+  contentEmpty: {
+    flexGrow: 1,
   },
   pressed: {
     backgroundColor: colors.surfacePressed,
@@ -177,7 +194,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   sectionTitle: {
-    ...typography.bodyLargeSemibold,
+    fontFamily: fontFamily.semibold,
+    fontSize: 18,
     lineHeight: 22,
     color: colors.textPrimary,
   },
@@ -188,11 +206,30 @@ const styles = StyleSheet.create({
   loading: {
     paddingVertical: spacing.xxxl,
   },
+  // "Boş durum" (`ZwHY6`): 96 pt below the section header, 24 pt between its parts.
   empty: {
     gap: spacing.xxl,
-    paddingTop: spacing.xxxl,
+    paddingTop: 96 - spacing.lg,
+  },
+  emptyCopy: {
+    gap: spacing.sm,
+  },
+  emptyTitle: {
+    fontFamily: fontFamily.medium,
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontFamily: fontFamily.regular,
+    fontSize: 15,
+    lineHeight: 22,
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
   emptyActions: {
-    gap: spacing.md,
+    alignItems: 'center',
+    gap: spacing.xs,
   },
 });

@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { ChatBubbleEmpty, Heart, HeartSolid, ShareAndroid } from 'iconoir-react-native';
+import { ChatBubbleEmpty, Heart, HeartSolid, Plus, ShareAndroid } from 'iconoir-react-native';
 import { useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -7,9 +7,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
   type ImageSourcePropType,
+  type LayoutChangeEvent,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
@@ -19,45 +19,48 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { RideTypeBadge } from '@/components/ride/RideTypeBadge';
 import type { CommunityPost } from '@/features/community/types';
 import {
+  formatCompactDuration,
   formatDistance,
-  formatDuration,
-  formatElevation,
   formatNumber,
   formatPostTime,
   formatSpeed,
 } from '@/i18n/format';
 import { initialsOf } from '@/lib/initials';
-import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
+import { avatarTone, colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
 
-const AVATAR_SIZE = 36;
+const AVATAR_SIZE = 40;
+const BADGE_SIZE = 12;
 const ACTION_ICON_SIZE = 20;
-const METRIC_COLUMN_WIDTH = 96;
 const MAP_WIDTH = 240;
 const PHOTO_WIDTH = 86;
 const MEDIA_HEIGHT = 100;
-/** Photo-only posts: a full-width carousel ("Post / Fotoğraf", 4:3). */
-const CAROUSEL_RATIO = 3 / 4;
-/** Text-only posts fold after this many lines with "Devamını gör". */
-const TEXT_LINES = 4;
+const CAROUSEL_HEIGHT = 270;
+const DOT_SIZE = 6;
+/** Text-only posts fold after this many lines with "Devamını gör" (`f4cJS`: 8 lines). */
+const TEXT_LINES = 8;
 const ACTION_HIT_SLOP = { top: 8, bottom: 8, left: 6, right: 6 };
 
 type CommunityPostCardProps = {
   post: CommunityPost;
   onAuthorPress: () => void;
+  /** "+" on the avatar of riders the viewer doesn't follow ("Takip et rozeti"). */
+  onFollowPress?: () => void;
   onLikePress: () => void;
   onCommentPress: () => void;
   onSharePress: () => void;
 };
 
 /**
- * A community post (13.01 "Post / …", Figma `1005:39842`–`1005:39848`): author with bike and
- * time, then whatever was shared — text (folded after four lines), a ride or route with its
- * type and metrics, photos (a strip after the ride map, or a full-width carousel on their own) —
- * and like / comment counts with share.
+ * A community post (13.01 "Post / …", Pencil `qt8Xk`, `f4cJS`, `PqGi6`, `SEtAW`): a 40 pt token
+ * avatar (with a "+" when not followed), name and @handle over bike · time, then the shared
+ * content — a ride (title, note, type, distance / time / speed / bends, map or map + photos),
+ * text folded after eight lines, or a 270 pt photo carousel with "1/4" and page dots — and
+ * like (red when liked), comment and share.
  */
 export function CommunityPostCard({
   post,
   onAuthorPress,
+  onFollowPress,
   onLikePress,
   onCommentPress,
   onSharePress,
@@ -68,72 +71,100 @@ export function CommunityPostCard({
 
   return (
     <View style={styles.container}>
-      <Pressable
-        onPress={onAuthorPress}
-        accessibilityRole="button"
-        accessibilityLabel={t('post.authorA11y', { name: author.name })}
-        style={styles.header}>
-        <ProfileAvatar source={author.avatar} initials={initialsOf(author.name)} size={AVATAR_SIZE} />
-        <View style={styles.headerCopy}>
-          <Text style={styles.nameRow} numberOfLines={1}>
-            <Text style={styles.name}>{author.name}</Text>
-            <Text style={styles.handle}>{`  ${t('handle', { handle: author.handle })}`}</Text>
-          </Text>
-          <Text style={styles.caption} numberOfLines={1}>
-            {caption}
-          </Text>
-        </View>
-      </Pressable>
+      <View style={styles.header}>
+        <Pressable
+          onPress={onAuthorPress}
+          accessibilityRole="button"
+          accessibilityLabel={t('post.authorA11y', { name: author.name })}
+          style={styles.author}>
+          <View style={styles.avatarArea}>
+            <ProfileAvatar
+              source={author.avatar}
+              initials={initialsOf(author.name)}
+              tone={avatarTone(author.id)}
+              size={AVATAR_SIZE}
+            />
+          </View>
+          <View style={styles.headerCopy}>
+            <View style={styles.nameRow}>
+              <Text style={styles.name} numberOfLines={1}>
+                {author.name}
+              </Text>
+              <Text style={styles.handle} numberOfLines={1}>
+                {t('handle', { handle: author.handle })}
+              </Text>
+            </View>
+            <Text style={styles.caption} numberOfLines={1}>
+              {caption}
+            </Text>
+          </View>
+        </Pressable>
+        {!post.isFollowingAuthor && onFollowPress ? (
+          <Pressable
+            onPress={onFollowPress}
+            hitSlop={14}
+            accessibilityRole="button"
+            accessibilityLabel={t('post.follow', { name: author.name })}
+            style={styles.followBadge}>
+            <Plus width={10} height={10} color={colors.textInverse} strokeWidth={2.5} />
+          </Pressable>
+        ) : null}
+      </View>
 
       {ride ? (
         <View style={styles.ride}>
-          <Text style={styles.rideTitle} numberOfLines={2}>
-            {ride.title}
-          </Text>
-          {ride.description ? <Text style={styles.body}>{ride.description}</Text> : null}
-        </View>
-      ) : null}
-
-      {text ? <PostText text={text} folded={!ride && photos.length === 0} /> : null}
-
-      {ride ? (
-        <View style={styles.ride}>
+          <View style={styles.rideCopy}>
+            <Text style={styles.rideTitle} numberOfLines={2}>
+              {ride.title}
+            </Text>
+            {ride.description ? <Text style={styles.rideNote}>{ride.description}</Text> : null}
+          </View>
           <RideTypeBadge type={ride.rideType} />
           <View style={styles.metrics}>
             <Metric label={t('post.metrics.distance')} value={formatDistance(ride.distanceKm, 1)} />
-            <Metric label={t('post.metrics.duration')} value={formatDuration(ride.durationMinutes)} />
-            {ride.elevationGainM !== undefined ? (
-              <Metric label={t('post.metrics.elevation')} value={formatElevation(ride.elevationGainM)} />
-            ) : ride.averageSpeedKmh !== undefined ? (
+            <Metric
+              label={t('post.metrics.duration')}
+              value={formatCompactDuration(ride.durationMinutes)}
+            />
+            {ride.averageSpeedKmh !== undefined ? (
               <Metric label={t('post.metrics.averageSpeed')} value={formatSpeed(ride.averageSpeedKmh)} />
             ) : null}
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.mediaStrip}
-            contentContainerStyle={styles.mediaContent}>
-            {ride.mapImage ? (
-              <Media source={ride.mapImage} width={MAP_WIDTH} label={t('post.map')} />
+            {ride.curveCount !== undefined ? (
+              <Metric label={t('post.metrics.curves')} value={formatNumber(ride.curveCount)} />
             ) : null}
-            {photos.map((photo, index) => (
-              <Media
-                key={index}
-                source={photo}
-                width={PHOTO_WIDTH}
-                label={t('post.photo', { index: index + 1 })}
-              />
-            ))}
-          </ScrollView>
+          </View>
+          {photos.length === 0 && ride.mapImage ? (
+            <Media source={ride.mapImage} label={t('post.map')} style={styles.mapWide} />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.mediaStrip}
+              contentContainerStyle={styles.mediaContent}>
+              {ride.mapImage ? (
+                <Media source={ride.mapImage} label={t('post.map')} style={{ width: MAP_WIDTH }} />
+              ) : null}
+              {photos.map((photo, index) => (
+                <Media
+                  key={index}
+                  source={photo}
+                  label={t('post.photo', { index: index + 1 })}
+                  style={{ width: PHOTO_WIDTH }}
+                />
+              ))}
+            </ScrollView>
+          )}
         </View>
-      ) : photos.length > 0 ? (
-        <PhotoCarousel photos={photos} />
       ) : null}
+
+      {!ride && text ? <PostText text={text} folded={photos.length === 0} /> : null}
+      {!ride && photos.length > 0 ? <PhotoCarousel photos={photos} /> : null}
 
       <View style={styles.actions}>
         <View style={styles.interactions}>
           <CountAction
             icon={post.isLiked ? HeartSolid : Heart}
+            iconColor={post.isLiked ? colors.like : colors.textPrimary}
             count={post.likeCount}
             label={t('post.like')}
             selected={post.isLiked}
@@ -163,15 +194,14 @@ function PostText({ text, folded }: { text: string; folded: boolean }) {
   const { t } = useTranslation('community');
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
-  const limit = folded && !expanded ? TEXT_LINES : undefined;
 
   return (
     <View style={styles.textBlock}>
       <Text
         style={styles.body}
-        numberOfLines={limit}
+        numberOfLines={folded && !expanded ? TEXT_LINES : undefined}
         onTextLayout={(event) => {
-          if (folded && !expanded && event.nativeEvent.lines.length > TEXT_LINES) {
+          if (folded && !expanded && event.nativeEvent.lines.length >= TEXT_LINES) {
             setOverflows(true);
           }
         }}>
@@ -188,35 +218,46 @@ function PostText({ text, folded }: { text: string; folded: boolean }) {
 
 function PhotoCarousel({ photos }: { photos: ImageSourcePropType[] }) {
   const { t } = useTranslation('community');
-  const { width: screenWidth } = useWindowDimensions();
-  const width = screenWidth - layout.screenGutter * 2;
+  const [width, setWidth] = useState(0);
   const [index, setIndex] = useState(0);
 
+  const onLayout = (event: LayoutChangeEvent) => setWidth(event.nativeEvent.layout.width);
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) =>
-    setIndex(Math.round(event.nativeEvent.contentOffset.x / width));
+    width > 0 && setIndex(Math.round(event.nativeEvent.contentOffset.x / width));
 
   return (
-    <View style={[styles.carousel, { width, height: width * CAROUSEL_RATIO }]}>
-      <ScrollView
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={onScroll}>
-        {photos.map((photo, photoIndex) => (
-          <Image
-            key={photoIndex}
-            source={photo}
-            contentFit="cover"
-            style={{ width, height: width * CAROUSEL_RATIO }}
-            accessibilityLabel={t('post.photo', { index: photoIndex + 1 })}
-          />
-        ))}
-      </ScrollView>
+    <View style={styles.carouselBlock}>
+      <View style={styles.carousel} onLayout={onLayout}>
+        {width > 0 ? (
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={onScroll}>
+            {photos.map((photo, photoIndex) => (
+              <Image
+                key={photoIndex}
+                source={photo}
+                contentFit="cover"
+                style={{ width, height: CAROUSEL_HEIGHT }}
+                accessibilityLabel={t('post.photo', { index: photoIndex + 1 })}
+              />
+            ))}
+          </ScrollView>
+        ) : null}
+        {photos.length > 1 ? (
+          <View style={styles.counter} pointerEvents="none">
+            <Text style={styles.counterLabel}>
+              {t('post.photoCounter', { index: index + 1, total: photos.length })}
+            </Text>
+          </View>
+        ) : null}
+      </View>
       {photos.length > 1 ? (
-        <View style={styles.counter} pointerEvents="none">
-          <Text style={styles.counterLabel}>
-            {t('post.photoCounter', { index: index + 1, total: photos.length })}
-          </Text>
+        <View style={styles.dots} importantForAccessibility="no-hide-descendants">
+          {photos.map((_, dotIndex) => (
+            <View key={dotIndex} style={[styles.dot, dotIndex === index && styles.dotActive]} />
+          ))}
         </View>
       ) : null}
     </View>
@@ -236,9 +277,17 @@ function Metric({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Media({ source, width, label }: { source: ImageSourcePropType; width: number; label: string }) {
+function Media({
+  source,
+  label,
+  style,
+}: {
+  source: ImageSourcePropType;
+  label: string;
+  style: object;
+}) {
   return (
-    <View style={[styles.media, { width }]} accessible accessibilityRole="image" accessibilityLabel={label}>
+    <View style={[styles.media, style]} accessible accessibilityRole="image" accessibilityLabel={label}>
       <Image source={source} contentFit="cover" style={styles.mediaImage} />
       <View style={styles.mediaStroke} />
     </View>
@@ -247,13 +296,21 @@ function Media({ source, width, label }: { source: ImageSourcePropType; width: n
 
 type CountActionProps = {
   icon: ComponentType<SvgProps>;
+  iconColor?: string;
   count: number;
   label: string;
   selected?: boolean;
   onPress: () => void;
 };
 
-function CountAction({ icon: Icon, count, label, selected, onPress }: CountActionProps) {
+function CountAction({
+  icon: Icon,
+  iconColor = colors.textPrimary,
+  count,
+  label,
+  selected,
+  onPress,
+}: CountActionProps) {
   const value = formatNumber(count);
   return (
     <Pressable
@@ -264,7 +321,7 @@ function CountAction({ icon: Icon, count, label, selected, onPress }: CountActio
       accessibilityValue={{ text: value }}
       accessibilityState={selected === undefined ? undefined : { selected }}
       style={styles.action}>
-      <Icon width={ACTION_ICON_SIZE} height={ACTION_ICON_SIZE} color={colors.textPrimary} />
+      <Icon width={ACTION_ICON_SIZE} height={ACTION_ICON_SIZE} color={iconColor} />
       <Text style={styles.count}>{value}</Text>
     </Pressable>
   );
@@ -277,47 +334,89 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  author: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
+  },
+  avatarArea: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+  },
+  followBadge: {
+    position: 'absolute',
+    left: 28,
+    top: 28,
+    width: BADGE_SIZE,
+    height: BADGE_SIZE,
+    borderRadius: BADGE_SIZE / 2,
+    borderWidth: 1,
+    borderColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.textPrimary,
   },
   headerCopy: {
     flex: 1,
     gap: spacing.xxs,
   },
   nameRow: {
-    ...typography.bodyMedium,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   name: {
-    ...typography.bodyMedium,
+    fontFamily: fontFamily.medium,
+    fontSize: 14,
+    lineHeight: 17,
     color: colors.textPrimary,
   },
   handle: {
-    ...typography.body,
+    flex: 1,
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: 17,
     color: colors.textSecondary,
   },
   caption: {
-    ...typography.caption,
-    color: colors.textTertiary,
+    fontFamily: fontFamily.regular,
+    fontSize: 12,
+    lineHeight: 15,
+    color: colors.textSecondary,
   },
   ride: {
-    gap: spacing.sm,
+    gap: spacing.md,
+  },
+  rideCopy: {
+    gap: spacing.xs,
   },
   rideTitle: {
-    ...typography.bodyMedium,
+    fontFamily: fontFamily.medium,
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 20,
     color: colors.textPrimary,
+  },
+  rideNote: {
+    fontFamily: fontFamily.regular,
+    fontSize: 14,
+    lineHeight: 18,
+    color: colors.textSecondary,
   },
   textBlock: {
     gap: spacing.xs,
   },
   body: {
-    ...typography.body,
-    lineHeight: 20,
+    fontFamily: fontFamily.regular,
+    fontSize: 15,
+    lineHeight: 22,
     color: colors.textPrimary,
   },
   more: {
-    ...typography.bodyMedium,
-    lineHeight: 20,
+    fontFamily: fontFamily.medium,
+    fontSize: 14,
+    lineHeight: 18,
     color: colors.textSecondary,
   },
   metrics: {
@@ -325,8 +424,7 @@ const styles = StyleSheet.create({
     gap: spacing.xxs,
   },
   metric: {
-    width: METRIC_COLUMN_WIDTH,
-    flexShrink: 1,
+    flex: 1,
     gap: spacing.xxs,
   },
   metricLabel: {
@@ -335,36 +433,42 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   metricValue: {
-    ...typography.metricSmall,
+    fontFamily: fontFamily.monoMedium,
+    fontSize: 14,
+    lineHeight: 18,
     color: colors.textPrimary,
+  },
+  mapWide: {
+    alignSelf: 'stretch',
   },
   mediaStrip: {
     marginHorizontal: -layout.screenGutter,
-    marginVertical: -spacing.sm,
   },
   mediaContent: {
     gap: spacing.sm,
     paddingHorizontal: layout.screenGutter,
-    paddingVertical: spacing.sm,
   },
   media: {
     height: MEDIA_HEIGHT,
     borderRadius: radius.md,
-    boxShadow: shadows.raised,
+    overflow: 'hidden',
     backgroundColor: colors.surfaceMuted,
   },
   mediaImage: {
     ...StyleSheet.absoluteFill,
-    borderRadius: radius.md,
   },
   mediaStroke: {
     ...StyleSheet.absoluteFill,
     borderRadius: radius.md,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.surface,
     pointerEvents: 'none',
   },
+  carouselBlock: {
+    gap: spacing.sm,
+  },
   carousel: {
+    height: CAROUSEL_HEIGHT,
     borderRadius: radius.md,
     overflow: 'hidden',
     backgroundColor: colors.surfaceMuted,
@@ -374,16 +478,32 @@ const styles = StyleSheet.create({
     top: spacing.md,
     right: spacing.md,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
+    paddingVertical: spacing.xs,
     borderRadius: radius.pill,
-    backgroundColor: colors.mapScrim,
+    backgroundColor: colors.textPrimary,
   },
   counterLabel: {
-    ...typography.caption,
+    fontFamily: fontFamily.monoMedium,
+    fontSize: 12,
     lineHeight: 16,
     color: colors.textInverse,
   },
+  dots: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    gap: spacing.xs,
+  },
+  dot: {
+    width: DOT_SIZE,
+    height: DOT_SIZE,
+    borderRadius: DOT_SIZE / 2,
+    backgroundColor: colors.textSecondary,
+  },
+  dotActive: {
+    backgroundColor: colors.textPrimary,
+  },
   actions: {
+    height: 32,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -400,7 +520,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   count: {
-    ...typography.metricCaption,
+    fontFamily: fontFamily.monoMedium,
+    fontSize: 12,
+    lineHeight: 16,
     color: colors.textSecondary,
   },
 });

@@ -22,9 +22,6 @@
       "followers": "Takipçilerim"
     },
     "addPhoto": "Fotoğraf ekle",
-    "addRide": "Sürüş ekle",
-    "rideTitle": "Paylaşılacak sürüş",
-    "removeRide": "Sürüşü kaldır",
     "removePhoto": "Fotoğrafı kaldır",
     "cancel": "Vazgeç",
     "posted": "Paylaşıldı.",
@@ -43,8 +40,9 @@
       "distance": "Mesafe",
       "duration": "Süre",
       "averageSpeed": "Ort. Hız",
-      "elevation": "Yükseklik"
-    }
+      "curves": "Viraj"
+    },
+    "follow": "Takip et: {{name}}"
   },
   "comments": {
     "title": "Yorumlar · {{count}}",

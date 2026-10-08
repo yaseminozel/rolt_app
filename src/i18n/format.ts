@@ -214,3 +214,17 @@ export function formatShortAgo(date: Date, now = Date.now()) {
   }
   return i18n.t('time.agoDays', { value: formatNumber(Math.floor(hours / 24)) });
 }
+
+/** Compact duration in feed metrics (13.01): "1sa12dk", "41dk" (en: "1h12m", "41m"). */
+export function formatCompactDuration(totalMinutes: number) {
+  const rounded = Math.round(totalMinutes);
+  const hours = Math.floor(rounded / 60);
+  const minutes = rounded % 60;
+  if (hours === 0) {
+    return i18n.t('units.compactMinutes', { minutes });
+  }
+  if (minutes === 0) {
+    return i18n.t('units.compactHours', { hours });
+  }
+  return i18n.t('units.compactHoursMinutes', { hours, minutes: String(minutes).padStart(2, '0') });
+}

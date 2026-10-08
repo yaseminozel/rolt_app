@@ -7,7 +7,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { MotorcycleBrandLogo, motorcycleBrandNames } from '@/components/brand/MotorcycleBrandLogo';
 import { DialogModal } from '@/components/feedback/DialogModal';
 import { useToast } from '@/components/feedback/ToastProvider';
-import { BikeStackIllustration } from '@/components/garage/BikeStackIllustration';
+import { StackedCardsIllustration } from '@/components/illustrations/StackedCardsIllustration';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Button } from '@/components/ui/Button';
@@ -135,7 +135,7 @@ export default function GarageScreen() {
         </ScrollView>
       ) : (
         <View style={styles.empty}>
-          <BikeStackIllustration />
+          <StackedCardsIllustration />
           <View style={styles.emptyText}>
             <Text style={styles.emptyTitle} accessibilityRole="header">
               {t('garage.empty.title')}

@@ -1,4 +1,5 @@
 import { RIDER_FIXTURES } from '@/features/riders/fixtures/riders';
+import { mockRidersRepository } from '@/features/riders/mockRidersRepository';
 import { MOCK_OWN_RIDER_ID } from '@/features/riders/ownRider';
 import { matchesSearch } from '@/lib/searchText';
 
@@ -93,6 +94,7 @@ export const mockCommunityRepository: CommunityRepository = {
       likeCount: 0,
       commentCount: 0,
       isLiked: false,
+      isFollowingAuthor: true,
       audience,
     };
     posts = [post, ...posts];
@@ -105,6 +107,13 @@ export const mockCommunityRepository: CommunityRepository = {
       post.id === postId && post.isLiked !== liked
         ? { ...post, isLiked: liked, likeCount: post.likeCount + (liked ? 1 : -1) }
         : post,
+    );
+  },
+
+  async followAuthor(authorId) {
+    await mockRidersRepository.setFollowing(authorId, true);
+    posts = posts.map((post) =>
+      post.author.id === authorId ? { ...post, isFollowingAuthor: true } : post,
     );
   },
 

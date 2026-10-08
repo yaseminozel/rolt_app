@@ -101,3 +101,19 @@ export function useAddComment(postId: string) {
     },
   });
 }
+
+/** "+" on a post avatar: follow the author; every post of theirs drops the badge. */
+export function useFollowAuthor() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (authorId: string) => communityRepository.followAuthor(authorId),
+    onMutate: (authorId) =>
+      queryClient.setQueriesData<CommunityPost[]>(
+        { queryKey: [...communityKeys.all, 'feed'] },
+        (posts) =>
+          posts?.map((post) =>
+            post.author.id === authorId ? { ...post, isFollowingAuthor: true } : post,
+          ),
+      ),
+  });
+}

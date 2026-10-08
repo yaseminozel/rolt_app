@@ -40,7 +40,10 @@
     "kmShort": "km",
     "milesShort": "mi",
     "kmhShort": "km/h",
-    "mphShort": "mph"
+    "mphShort": "mph",
+    "compactHoursMinutes": "{{hours}}h{{minutes}}m",
+    "compactHours": "{{hours}}h",
+    "compactMinutes": "{{minutes}}m"
   },
   "time": {
     "today": "Today, {{time}}",
