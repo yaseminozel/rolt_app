@@ -23,8 +23,8 @@ const TILE_SIZE = 56;
 const LOGO_SIZE = 32;
 
 /**
- * 11.01 Motorum / Boş durum (Figma `1005:38330`) and 11.07 Motor detayı (`1005:36148`, delete
- * confirmation `1005:36181`). The rider has one bike (the profile's): its rides and kilometres,
+ * 11.01 Motorum / Boş durum (Pencil `dCCN1`) and 11.07 Motor detayı (`I0Qb89`, delete
+ * confirmation `xtxb6`). Brand / model / year rows reopen the add sheet at that step. The rider has one bike (the profile's): its rides and kilometres,
  * brand / model / year, "Motoru değiştir" (the add sheet again) and "Motoru sil". Toasts:
  * "Motorun eklendi." (11.06), "Motorun silindi." (11.01 `1005:36223`).
  */
@@ -54,8 +54,8 @@ export default function GarageScreen() {
     deviceRides.reduce((sum, ride) => sum + ride.stats.distanceM / 1000, 0) +
     sampleRides.reduce((sum, ride) => sum + ride.distanceKm, 0);
 
-  const openAdd = (mode: 'add' | 'change') =>
-    router.push({ pathname: '/settings/garage-add', params: { mode } });
+  const openAdd = (mode: 'add' | 'change', step?: 'brand' | 'model' | 'year') =>
+    router.push({ pathname: '/settings/garage-add', params: { mode, step } });
 
   const deleteBike = async () => {
     setConfirmDelete(false);
@@ -77,10 +77,7 @@ export default function GarageScreen() {
                 {`${motorcycleBrandNames[bike.brand]} ${bike.model}`}
               </Text>
               <Text style={styles.bikeSummary}>
-                <Text style={styles.bikeSummaryValue}>{formatNumber(rideCount)}</Text>
-                {` ${t('garage.rides')}  ·  `}
-                <Text style={styles.bikeSummaryValue}>{formatNumber(Math.round(distanceKm))}</Text>
-                {` ${t('garage.km')}`}
+                {`${formatNumber(rideCount)} ${t('garage.rides')} · ${formatNumber(Math.round(distanceKm))} ${t('garage.km')}`}
               </Text>
             </View>
           </View>
@@ -90,13 +87,15 @@ export default function GarageScreen() {
               <SettingsRow
                 key="brand"
                 label={t('garage.brand')}
-                trailing="value"
+                trailing="valueChevron"
                 value={motorcycleBrandNames[bike.brand]}
+                onPress={() => openAdd('change', 'brand')}
               />,
               <SettingsRow
                 key="model"
                 label={t('garage.model')}
-                trailing="value"
+                trailing="valueChevron"
+                onPress={() => openAdd('change', 'model')}
                 value={
                   model
                     ? t('garage.modelWithCc', {
@@ -109,8 +108,9 @@ export default function GarageScreen() {
               <SettingsRow
                 key="year"
                 label={t('garage.year')}
-                trailing="value"
+                trailing="valueChevron"
                 value={bike.year ? String(bike.year) : '–'}
+                onPress={() => openAdd('change', 'year')}
               />,
             ]}
           </SettingsSection>
@@ -119,7 +119,7 @@ export default function GarageScreen() {
 
           <View style={styles.actions}>
             <Button
-              variant="outlined"
+              variant="tonal"
               size="lg"
               label={t('garage.change')}
               onPress={() => openAdd('change')}
@@ -207,7 +207,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.md,
-    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
   bikeText: {
     flex: 1,
@@ -220,13 +222,10 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   bikeSummary: {
-    ...typography.callout,
+    fontFamily: fontFamily.monoMedium,
+    fontSize: 13,
     lineHeight: 18,
     color: colors.textSecondary,
-  },
-  bikeSummaryValue: {
-    fontFamily: fontFamily.monoMedium,
-    color: colors.textPrimary,
   },
   note: {
     ...typography.callout,

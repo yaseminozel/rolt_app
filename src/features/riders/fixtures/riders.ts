@@ -79,6 +79,7 @@ export const RIDER_FIXTURES: readonly Rider[] = [
         id: 'yasemin-pulsar',
         brand: 'bajaj',
         model: 'Pulsar N250',
+        year: 2023,
         displacementCc: 249,
         category: 'naked',
         isPrimary: true,

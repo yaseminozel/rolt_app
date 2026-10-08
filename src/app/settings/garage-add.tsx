@@ -11,10 +11,10 @@ import { BrandRow } from '@/components/settings/BrandRow';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { SettingsSection } from '@/components/settings/SettingsSection';
 import { Button } from '@/components/ui/Button';
-import { modelsForBrand } from '@/features/garage/fixtures/motorcycleModels';
+import { MOTORCYCLE_MODELS, modelsForBrand } from '@/features/garage/fixtures/motorcycleModels';
 import { garageResult } from '@/features/garage/garageFlow';
 import type { MotorcycleModel } from '@/features/garage/types';
-import { useUpdateOwnProfile } from '@/features/profile/queries';
+import { useOwnProfile, useUpdateOwnProfile } from '@/features/profile/queries';
 import { modelYears, REGISTRATION_BRANDS } from '@/features/registration/garageOptions';
 import { formatNumber } from '@/i18n/format';
 import { matchesSearch } from '@/lib/searchText';
@@ -26,19 +26,29 @@ type Step = 'brand' | 'model' | 'year' | 'summary';
 /**
  * 11.02 Marka seç → 11.03 Model seç → 11.04 Yıl seç → 11.05 Özet (Figma `1005:38399`,
  * `1005:38454`, `1005:38502`, `1005:38354`): one sheet stepping through the bike, "Geri" going
- * one step back. "Kaydet" makes it the profile's bike and closes the sheet.
+ * one step back; the summary rows jump back to their step. "Kaydet" makes it the profile's bike
+ * and closes the sheet.
  */
 export default function GarageAddSheet() {
   const { t, i18n } = useTranslation(['settings', 'registration']);
-  const { mode } = useLocalSearchParams<{ mode?: 'add' | 'change' }>();
+  const { mode, step: startStep } = useLocalSearchParams<{
+    mode?: 'add' | 'change';
+    step?: 'brand' | 'model' | 'year';
+  }>();
+  const { data: profile } = useOwnProfile();
   const update = useUpdateOwnProfile();
+  // Editing one row of the bike (11.07) starts from the current bike at that step.
+  const current = mode === 'change' ? profile?.bike : undefined;
+  const currentModel = current
+    ? MOTORCYCLE_MODELS.find((item) => item.brand === current.brand && item.name === current.model)
+    : undefined;
   const bottomPadding = useSheetBottomPadding((inset) => inset + spacing.lg);
   const [years] = useState(() => modelYears());
-  const [step, setStep] = useState<Step>('brand');
+  const [step, setStep] = useState<Step>(startStep ?? 'brand');
   const [query, setQuery] = useState('');
-  const [brand, setBrand] = useState<MotorcycleBrand | null>(null);
-  const [model, setModel] = useState<MotorcycleModel | null>(null);
-  const [year, setYear] = useState<number | null>(null);
+  const [brand, setBrand] = useState<MotorcycleBrand | null>(current?.brand ?? null);
+  const [model, setModel] = useState<MotorcycleModel | null>(currentModel ?? null);
+  const [year, setYear] = useState<number | null>(current?.year ?? null);
 
   const go = (next: Step) => {
     setQuery('');
@@ -158,13 +168,15 @@ export default function GarageAddSheet() {
             <SettingsRow
               key="brand"
               label={t('garage.brand')}
-              trailing="value"
+              trailing="valueChevron"
               value={motorcycleBrandNames[brand]}
+              onPress={() => go('brand')}
             />,
             <SettingsRow
               key="model"
               label={t('garage.model')}
-              trailing="value"
+              trailing="valueChevron"
+              onPress={() => go('model')}
               value={t('garage.modelWithCc', {
                 model: model.name,
                 cc: formatNumber(model.displacementCc),
@@ -173,8 +185,9 @@ export default function GarageAddSheet() {
             <SettingsRow
               key="year"
               label={t('garage.year')}
-              trailing="value"
+              trailing="valueChevron"
               value={year ? String(year) : '–'}
+              onPress={() => go('year')}
             />,
           ]}
         </SettingsSection>
