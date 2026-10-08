@@ -22,14 +22,14 @@ import type { CommunityComment } from '@/features/community/types';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { formatNumber, formatShortAgo } from '@/i18n/format';
 import { initialsOf } from '@/lib/initials';
-import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
+import { avatarTone, colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
 
 const AVATAR_SIZE = 36;
 const COMMENT_MAX = 280;
 
 /**
- * 13.02 Topluluk / Yorumlar (Figma `1005:39609`): "Yorumlar · N" over the post's comments,
- * oldest first, and "Yorum yaz…" at the bottom. Writing needs an account.
+ * 13.02 Topluluk / Yorumlar (Pencil `LEzhw`): "Yorumlar · N" and the post title over its
+ * comments, oldest first, and a "Yorum yaz…" field with a send glyph. Writing needs an account.
  */
 export default function CommentsSheet() {
   const { t } = useTranslation('community');
@@ -40,7 +40,8 @@ export default function CommentsSheet() {
   const addComment = useAddComment(postId ?? '');
   const requireAccount = useRequireAccount();
   const [text, setText] = useState('');
-  const count = comments.data?.length ?? post?.commentCount ?? 0;
+  const count = post?.commentCount ?? comments.data?.length ?? 0;
+  const canSend = Boolean(text.trim()) && !addComment.isPending;
 
   const send = () =>
     requireAccount('commentRide', async () => {
@@ -55,7 +56,10 @@ export default function CommentsSheet() {
     <KeyboardAvoidingView
       style={styles.sheet}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <SheetHeader title={t('comments.title', { count: formatNumber(count) })} />
+      <SheetHeader
+        title={t('comments.title', { count: formatNumber(count) })}
+        subtitle={post?.ride?.title ?? post?.author.name}
+      />
       {comments.isPending ? (
         <ActivityIndicator style={styles.loading} color={colors.textSecondary} />
       ) : (
@@ -69,29 +73,30 @@ export default function CommentsSheet() {
           keyboardShouldPersistTaps="handled"
         />
       )}
-      <View style={[styles.inputBar, { paddingBottom: insets.bottom + spacing.sm }]}>
-        <TextInput
-          value={text}
-          onChangeText={setText}
-          placeholder={t('comments.placeholder')}
-          placeholderTextColor={colors.textTertiary}
-          maxLength={COMMENT_MAX}
-          multiline
-          style={styles.input}
-          accessibilityLabel={t('comments.placeholder')}
-        />
-        <Pressable
-          onPress={send}
-          disabled={!text.trim() || addComment.isPending}
-          accessibilityRole="button"
-          accessibilityLabel={t('comments.send')}
-          style={({ pressed }) => [
-            styles.send,
-            (!text.trim() || addComment.isPending) && styles.sendDisabled,
-            pressed && styles.sendPressed,
-          ]}>
-          <Send width={20} height={20} color={colors.textInverse} strokeWidth={1.5} />
-        </Pressable>
+      <View style={[styles.inputBar, { paddingBottom: insets.bottom + spacing.lg }]}>
+        <View style={styles.field}>
+          <TextInput
+            value={text}
+            onChangeText={setText}
+            placeholder={t('comments.placeholder')}
+            placeholderTextColor={colors.textTertiary}
+            selectionColor={colors.textPrimary}
+            maxLength={COMMENT_MAX}
+            multiline
+            style={styles.input}
+            accessibilityLabel={t('comments.placeholder')}
+          />
+          <Pressable
+            onPress={send}
+            disabled={!canSend}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t('comments.send')}
+            accessibilityState={{ disabled: !canSend }}
+            style={[styles.send, !canSend && styles.sendDisabled]}>
+            <Send width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
+          </Pressable>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -103,6 +108,7 @@ function CommentRow({ comment }: { comment: CommunityComment }) {
       <ProfileAvatar
         source={comment.author.avatar}
         initials={initialsOf(comment.author.name)}
+        tone={avatarTone(comment.author.id)}
         size={AVATAR_SIZE}
       />
       <View style={styles.rowCopy}>
@@ -170,39 +176,38 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   inputBar: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: spacing.sm,
-    paddingTop: spacing.sm,
+    paddingTop: spacing.lg,
     paddingHorizontal: layout.screenGutter,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.surface,
   },
+  field: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+  },
   input: {
     ...typography.body,
     flex: 1,
-    minHeight: 44,
     maxHeight: 120,
-    paddingHorizontal: spacing.md,
-    paddingTop: 12,
-    paddingBottom: 12,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceMuted,
+    paddingVertical: 12,
     color: colors.textPrimary,
   },
   send: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 22,
-    backgroundColor: colors.surfaceInverse,
   },
   sendDisabled: {
     opacity: 0.4,
-  },
-  sendPressed: {
-    opacity: 0.8,
   },
 });

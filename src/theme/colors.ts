@@ -94,6 +94,8 @@ export const palette = {
   gray145: '#E8E8E8',
   gray120: '#EFEFEF',
   gray110: '#F3F4F6',
+  // Search row subtitles (13.04 "Açıklama")
+  gray650: '#373A40',
   // Lean angle gauge (09.06 `1092:18290` "Kademeli yarım daire göstergesi")
   gray140: '#ECEEF1',
   gray160: '#E5E7EB',
@@ -311,6 +313,8 @@ export const colors = {
   gaugeAxis: palette.gray260,
   gaugeBase: palette.gray180,
   gaugeLabel: palette.slate550,
+  /** Second line of community search rows (13.04 "Açıklama"). */
+  textSubtle: palette.gray650,
   /** Liked heart in community posts. */
   like: palette.red450,
   /** Icon tiles: composer photo button, search row tiles (13.01, 13.04). */

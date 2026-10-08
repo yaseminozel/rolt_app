@@ -1,89 +1,109 @@
 import { Image } from 'expo-image';
-import { MapPin, Motorcycle, Search, Xmark } from 'iconoir-react-native';
-import type { ReactNode } from 'react';
+import { MapPin, PathArrow, Search, User, Xmark } from 'iconoir-react-native';
+import type { ComponentType, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { SvgProps } from 'react-native-svg';
 
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import type { SearchResult } from '@/features/community/types';
-import { formatDistance, formatDuration, formatNumber } from '@/i18n/format';
+import { formatCompactDuration, formatDistance, formatNumber } from '@/i18n/format';
 import { initialsOf } from '@/lib/initials';
-import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
+import { avatarTone, colors, fontFamily, radius, spacing } from '@/theme';
 
-const LEADING_SIZE = 40;
+const KIND_ICONS: Record<SearchResult['kind'], ComponentType<SvgProps>> = {
+  rider: User,
+  ride: PathArrow,
+  place: MapPin,
+};
 
-/** Splits `text` so the part matching `query` can be drawn bold (note `1005:39831`). */
-function highlight(text: string, query?: string): ReactNode {
-  if (!query) {
-    return text;
-  }
-  const index = text.toLocaleLowerCase('tr').indexOf(query.toLocaleLowerCase('tr'));
-  if (index < 0) {
-    return text;
-  }
+/**
+ * Where the row is shown (13.04, Pencil `cLyek`, `h3sJ5`, `vDoEo`): `recent` rows use a type
+ * tile and a ×; `suggestion` rows show the rider's avatar or the ride's map; `result` rows are
+ * 44 pt with "Takip et" on riders and the ride's distance and time.
+ */
+export type SearchRowMode = 'recent' | 'suggestion' | 'result';
+
+function Tile({ icon: Icon, size = 40 }: { icon: ComponentType<SvgProps>; size?: number }) {
   return (
-    <>
-      {text.slice(0, index)}
-      <Text style={styles.match}>{text.slice(index, index + query.length)}</Text>
-      {text.slice(index + query.length)}
-    </>
+    <View style={[styles.tile, { width: size, height: size }]}>
+      <Icon width={22} height={22} color={colors.textPrimary} strokeWidth={1.5} />
+    </View>
   );
 }
 
 type SearchResultRowProps = {
   result: SearchResult;
-  /** Bold the matching part (suggestions). */
-  query?: string;
+  mode: SearchRowMode;
   onPress: () => void;
-  /** Recent searches: × removes the row. */
   onRemove?: () => void;
-  /** Rider rows in the results: "Takip et". */
-  trailing?: ReactNode;
+  /** Result rows of riders: following state and its toggle. */
+  following?: boolean;
+  onFollowPress?: () => void;
 };
 
-/**
- * One rider, ride or place in the community search (13.04): a leading avatar / thumbnail /
- * pin, the name, and a type line — the type is always written ("Sürücü", "Sürüş", "Konum"),
- * not left to the icon (note `1005:39831`).
- */
-export function SearchResultRow({ result, query, onPress, onRemove, trailing }: SearchResultRowProps) {
+/** A rider, ride or place in the community search; the type is always written out. */
+export function SearchResultRow({
+  result,
+  mode,
+  onPress,
+  onRemove,
+  following,
+  onFollowPress,
+}: SearchResultRowProps) {
   const { t } = useTranslation('community');
+  const size = mode === 'result' ? 44 : 40;
 
   let leading: ReactNode;
   let title: string;
   let subtitle: string;
   if (result.kind === 'rider') {
-    leading = (
-      <ProfileAvatar source={result.avatar} initials={initialsOf(result.name)} size={LEADING_SIZE} />
-    );
+    leading =
+      mode === 'recent' ? (
+        <Tile icon={User} />
+      ) : (
+        <ProfileAvatar
+          source={result.avatar}
+          initials={initialsOf(result.name)}
+          tone={avatarTone(result.id)}
+          size={size}
+        />
+      );
     title = result.name;
-    subtitle = trailing
-      ? [t('handle', { handle: result.handle }), result.bike].filter(Boolean).join(' · ')
-      : t('search.type.rider', { handle: result.handle });
+    subtitle =
+      mode === 'result'
+        ? [t('handle', { handle: result.handle }), result.bike].filter(Boolean).join(' · ')
+        : t('search.type.rider', { handle: result.handle });
   } else if (result.kind === 'ride') {
-    leading = result.thumbnail ? (
-      <Image source={result.thumbnail} contentFit="cover" style={styles.thumbnail} />
-    ) : (
-      <View style={styles.iconTile}>
-        <Motorcycle width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
-      </View>
-    );
+    leading =
+      mode !== 'recent' && result.thumbnail ? (
+        <Image
+          source={result.thumbnail}
+          contentFit="cover"
+          style={[styles.thumbnail, { width: size, height: size }]}
+        />
+      ) : (
+        <Tile icon={KIND_ICONS.ride} size={size} />
+      );
     title = result.title;
-    subtitle = trailing
-      ? [result.authorName, formatDistance(result.distanceKm, 1), formatDuration(result.durationMinutes)].join(
-          ' · ',
-        )
-      : t('search.type.ride', { name: result.authorName });
+    subtitle =
+      mode === 'result'
+        ? [
+            result.authorName,
+            formatDistance(result.distanceKm, 1),
+            formatCompactDuration(result.durationMinutes),
+          ].join(' · ')
+        : t('search.type.ride', { name: result.authorName });
   } else {
-    leading = (
-      <View style={styles.iconTile}>
-        <MapPin width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
-      </View>
-    );
+    leading = <Tile icon={MapPin} size={size} />;
     title = result.name;
-    subtitle = query
-      ? t('search.type.placeWithCount', { count: result.rideCount, value: formatNumber(result.rideCount) })
-      : t('search.type.place');
+    subtitle =
+      mode === 'recent'
+        ? t('search.type.place')
+        : t('search.type.placeWithCount', {
+            count: result.rideCount,
+            value: formatNumber(result.rideCount),
+          });
   }
 
   return (
@@ -91,115 +111,150 @@ export function SearchResultRow({ result, query, onPress, onRemove, trailing }: 
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${title}, ${subtitle}`}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+      style={({ pressed }) => [styles.row, mode !== 'result' && styles.rowPadded, pressed && styles.pressed]}>
       {leading}
       <View style={styles.copy}>
         <Text style={styles.title} numberOfLines={1}>
-          {highlight(title, query)}
+          {title}
         </Text>
-        <Text style={styles.subtitle} numberOfLines={1}>
+        <Text style={[styles.subtitle, mode === 'result' && styles.subtitleLarge]} numberOfLines={1}>
           {subtitle}
         </Text>
       </View>
-      {trailing}
-      {onRemove ? (
+      {onFollowPress ? (
         <Pressable
-          onPress={onRemove}
-          hitSlop={10}
+          onPress={onFollowPress}
           accessibilityRole="button"
-          accessibilityLabel={t('search.removeRecent')}
-          style={styles.remove}>
-          <Xmark width={18} height={18} color={colors.textSecondary} strokeWidth={1.5} />
+          accessibilityState={{ selected: following }}
+          style={({ pressed }) => [
+            styles.follow,
+            following && styles.followActive,
+            pressed && styles.followPressed,
+          ]}>
+          <Text style={[styles.followLabel, following && styles.followLabelActive]}>
+            {following ? t('search.following') : t('search.follow')}
+          </Text>
         </Pressable>
       ) : null}
+      {onRemove ? <RemoveButton onPress={onRemove} /> : null}
     </Pressable>
   );
 }
 
-/** A recent plain query ("olimpos") with a search glyph. */
-export function RecentQueryRow({
-  query,
-  onPress,
-  onRemove,
-}: {
-  query: string;
-  onPress: () => void;
-  onRemove: () => void;
-}) {
+function RemoveButton({ onPress }: { onPress: () => void }) {
   const { t } = useTranslation('community');
   return (
     <Pressable
       onPress={onPress}
+      hitSlop={13}
       accessibilityRole="button"
-      accessibilityLabel={query}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
-      <View style={styles.iconTile}>
-        <Search width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
-      </View>
+      accessibilityLabel={t('search.removeRecent')}
+      style={styles.remove}>
+      <Xmark width={18} height={18} color={colors.textPrimary} strokeWidth={1.5} />
+    </Pressable>
+  );
+}
+
+/** A typed query in "Son aramalar" ("olimpos") or the "tüm sonuçları gör" row. */
+export function QueryRow({
+  title,
+  subtitle,
+  onPress,
+  onRemove,
+}: {
+  title: string;
+  subtitle?: string;
+  onPress: () => void;
+  onRemove?: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      style={({ pressed }) => [styles.row, styles.rowPadded, pressed && styles.pressed]}>
+      <Tile icon={Search} />
       <View style={styles.copy}>
-        <Text style={styles.title} numberOfLines={1}>
-          {query}
+        <Text style={[styles.title, !subtitle && styles.titleRegular]} numberOfLines={1}>
+          {title}
         </Text>
-        <Text style={styles.subtitle}>{t('search.type.query')}</Text>
+        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </View>
-      <Pressable
-        onPress={onRemove}
-        hitSlop={10}
-        accessibilityRole="button"
-        accessibilityLabel={t('search.removeRecent')}
-        style={styles.remove}>
-        <Xmark width={18} height={18} color={colors.textSecondary} strokeWidth={1.5} />
-      </Pressable>
+      {onRemove ? <RemoveButton onPress={onRemove} /> : null}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   row: {
-    minHeight: 60,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingHorizontal: layout.screenGutter,
-    paddingVertical: spacing.sm,
+  },
+  rowPadded: {
+    paddingVertical: 6,
   },
   pressed: {
-    backgroundColor: colors.surfacePressed,
+    opacity: 0.7,
   },
-  thumbnail: {
-    width: LEADING_SIZE,
-    height: LEADING_SIZE,
-    borderRadius: radius.sm,
-  },
-  iconTile: {
-    width: LEADING_SIZE,
-    height: LEADING_SIZE,
+  tile: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceMuted,
+    borderRadius: radius.md,
+    backgroundColor: colors.tile,
+  },
+  thumbnail: {
+    borderRadius: radius.md,
   },
   copy: {
     flex: 1,
     gap: spacing.xxs,
   },
   title: {
-    ...typography.body,
+    fontFamily: fontFamily.semibold,
     fontSize: 15,
     lineHeight: 20,
     color: colors.textPrimary,
   },
-  match: {
-    fontFamily: fontFamily.semibold,
+  titleRegular: {
+    fontFamily: fontFamily.regular,
   },
   subtitle: {
-    ...typography.caption,
-    lineHeight: 16,
-    color: colors.textSecondary,
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: 20,
+    color: colors.textSubtle,
+  },
+  subtitleLarge: {
+    fontSize: 14,
+  },
+  follow: {
+    height: 32,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderRadius: radius.chip,
+    backgroundColor: colors.textPrimary,
+  },
+  followActive: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  followPressed: {
+    opacity: 0.85,
+  },
+  followLabel: {
+    fontFamily: fontFamily.medium,
+    fontSize: 14,
+    lineHeight: 17,
+    color: colors.textInverse,
+  },
+  followLabelActive: {
+    color: colors.textPrimary,
   },
   remove: {
-    width: 32,
-    height: 32,
+    width: 18,
+    height: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },

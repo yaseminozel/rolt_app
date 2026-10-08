@@ -5,9 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { RecentQueryRow, SearchResultRow } from '@/components/community/SearchResultRow';
-import { EmptyState } from '@/components/feedback/EmptyState';
-import { Button } from '@/components/ui/Button';
+import { QueryRow, SearchResultRow } from '@/components/community/SearchResultRow';
+import { StackedCardsIllustration } from '@/components/illustrations/StackedCardsIllustration';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { SearchField } from '@/components/ui/SearchField';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
@@ -20,7 +19,7 @@ import { useCommunityRecentSearches } from '@/features/community/recentSearches'
 import type { SearchKind, SearchResult } from '@/features/community/types';
 import { useSetFollowing } from '@/features/riders/queries';
 import { formatNumber } from '@/i18n/format';
-import { colors, layout, radius, spacing, typography } from '@/theme';
+import { colors, fontFamily, layout, spacing } from '@/theme';
 
 type Tab = 'all' | SearchKind;
 const TABS: readonly Tab[] = ['all', 'rider', 'ride', 'place'];
@@ -28,10 +27,11 @@ const TABS: readonly Tab[] = ['all', 'rider', 'ride', 'place'];
 const GROUP_PREVIEW = 2;
 
 /**
- * 13.04 Topluluk / Arama (Figma `1005:39671` opened, `1005:39714` typing, `1005:39756` results,
- * `1005:39796` no results): recent searches while empty, up to four mixed suggestions from two
- * characters, then results grouped by riders, shared rides and places with type chips. Only
- * public rides are found. Back closes the search and keeps the feed where it was.
+ * 13.04 Topluluk / Arama (Pencil `cLyek` opened, `h3sJ5` typing, `vDoEo` results, `rUMQT` no
+ * results): recent searches while empty, up to four mixed suggestions from two characters,
+ * then results grouped by riders, shared rides and places; a group's "Tümü (n)" opens its tab
+ * and the type chips show there and when nothing is found. Only public rides are found. Back
+ * closes the search and keeps the feed where it was.
  */
 export default function CommunitySearchScreen() {
   const { t } = useTranslation('community');
@@ -77,8 +77,9 @@ export default function CommunitySearchScreen() {
           onPress={() => router.back()}
           accessibilityRole="button"
           accessibilityLabel={t('search.close')}
-          style={({ pressed }) => [styles.back, pressed && styles.pressed]}>
-          <NavArrowLeft width={24} height={24} color={colors.textPrimary} strokeWidth={1.5} />
+          hitSlop={{ top: 0, bottom: 0, left: 12, right: 8 }}
+          style={({ pressed }) => [styles.back, pressed && styles.pressedText]}>
+          <NavArrowLeft width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
         </Pressable>
         <SearchField
           value={query}
@@ -96,47 +97,51 @@ export default function CommunitySearchScreen() {
         <Results query={submitted} tab={tab} onTab={setTab} results={results.data} loading={results.isPending} onOpen={open} />
       ) : query.trim().length >= SUGGEST_MIN_LENGTH ? (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.list}>
-          <Text style={styles.groupTitle}>{t('search.suggestions')}</Text>
-          {(suggestions.data ?? []).map((result) => (
-            <SearchResultRow
-              key={`${result.kind}-${result.kind === 'ride' ? result.postId : result.id}`}
-              result={result}
-              query={query.trim()}
-              onPress={() => open(result)}
+          <View style={styles.section}>
+            <Text style={styles.groupTitle}>{t('search.suggestions')}</Text>
+            {(suggestions.data ?? []).map((result) => (
+              <SearchResultRow
+                key={`${result.kind}-${result.kind === 'ride' ? result.postId : result.id}`}
+                result={result}
+                mode="suggestion"
+                onPress={() => open(result)}
+              />
+            ))}
+            <QueryRow
+              title={t('search.seeAll', { query: query.trim() })}
+              onPress={() => submit(query)}
             />
-          ))}
-          <Pressable
-            onPress={() => submit(query)}
-            accessibilityRole="button"
-            style={({ pressed }) => [styles.seeAll, pressed && styles.pressed]}>
-            <Text style={styles.seeAllLabel}>{t('search.seeAll', { query: query.trim() })}</Text>
-          </Pressable>
+          </View>
         </ScrollView>
       ) : recent.items.length > 0 ? (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.list}>
-          <View style={styles.groupHeader}>
-            <Text style={styles.groupTitle}>{t('search.recent')}</Text>
-            <Pressable onPress={recent.clear} accessibilityRole="button" hitSlop={12}>
-              <Text style={styles.link}>{t('search.clearRecent')}</Text>
-            </Pressable>
+          <View style={styles.section}>
+            <View style={styles.groupHeader}>
+              <Text style={styles.groupTitle}>{t('search.recent')}</Text>
+              <Pressable onPress={recent.clear} accessibilityRole="button" hitSlop={12}>
+                <Text style={styles.link}>{t('search.clearRecent')}</Text>
+              </Pressable>
+            </View>
+            {recent.items.map((item) =>
+              item.type === 'query' ? (
+                <QueryRow
+                  key={recent.keyOf(item)}
+                  title={item.query}
+                  subtitle={t('search.type.query')}
+                  onPress={() => submit(item.query)}
+                  onRemove={() => recent.remove(item)}
+                />
+              ) : (
+                <SearchResultRow
+                  key={recent.keyOf(item)}
+                  result={item.result}
+                  mode="recent"
+                  onPress={() => open(item.result)}
+                  onRemove={() => recent.remove(item)}
+                />
+              ),
+            )}
           </View>
-          {recent.items.map((item) =>
-            item.type === 'query' ? (
-              <RecentQueryRow
-                key={recent.keyOf(item)}
-                query={item.query}
-                onPress={() => submit(item.query)}
-                onRemove={() => recent.remove(item)}
-              />
-            ) : (
-              <SearchResultRow
-                key={recent.keyOf(item)}
-                result={item.result}
-                onPress={() => open(item.result)}
-                onRemove={() => recent.remove(item)}
-              />
-            ),
-          )}
         </ScrollView>
       ) : null}
     </View>
@@ -172,55 +177,47 @@ function Results({
     };
   }, [results]);
 
-  const followButton = (result: SearchResult) => {
-    if (result.kind !== 'rider') {
-      return undefined;
-    }
-    const following = followed[result.id] ?? result.isFollowing;
-    return (
-      <Button
-        variant={following ? 'outlined' : 'contained'}
-        label={following ? t('search.following') : t('search.follow')}
-        onPress={() =>
-          requireAccount('followRider', () => {
-            setFollowed((current) => ({ ...current, [result.id]: !following }));
-            setFollowing.mutate({ riderId: result.id, following: !following });
-          })
-        }
-        style={styles.follow}
-      />
-    );
-  };
+  const toggleFollow = (riderId: string, following: boolean) =>
+    requireAccount('followRider', () => {
+      setFollowed((current) => ({ ...current, [riderId]: !following }));
+      setFollowing.mutate({ riderId, following: !following });
+    });
 
   const kinds: SearchKind[] = tab === 'all' ? ['rider', 'ride', 'place'] : [tab];
   const empty = !loading && (results?.length ?? 0) === 0;
+  const showChips = tab !== 'all' || empty;
 
   return (
     <View style={styles.flex}>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabsScroll}
-        contentContainerStyle={styles.tabs}>
-        {TABS.map((item) => (
-          <FilterChip
-            key={item}
-            type="toggle"
-            label={t(`search.tabs.${item}`)}
-            selected={tab === item}
-            showIcon={false}
-            onPress={() => onTab(item)}
-          />
-        ))}
-      </ScrollView>
+      {showChips ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.tabsScroll}
+          contentContainerStyle={styles.tabs}>
+          {TABS.map((item) => (
+            <FilterChip
+              key={item}
+              type="toggle"
+              label={t(`search.tabs.${item}`)}
+              selected={tab === item}
+              showIcon={false}
+              onPress={() => onTab(item)}
+            />
+          ))}
+        </ScrollView>
+      ) : null}
       {loading ? (
         <ActivityIndicator style={styles.loading} color={colors.textSecondary} />
       ) : empty ? (
         <View style={styles.empty}>
-          <EmptyState
-            title={t('search.noResults.title', { query })}
-            description={t('search.noResults.description')}
-          />
+          <StackedCardsIllustration />
+          <View style={styles.emptyCopy}>
+            <Text style={styles.emptyTitle} accessibilityRole="header">
+              {t('search.noResults.title', { query })}
+            </Text>
+            <Text style={styles.emptyDescription}>{t('search.noResults.description')}</Text>
+          </View>
         </View>
       ) : (
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.list}>
@@ -246,9 +243,16 @@ function Results({
                   <SearchResultRow
                     key={`${result.kind}-${result.kind === 'ride' ? result.postId : result.id}`}
                     result={result}
-                    query={query}
+                    mode="result"
                     onPress={() => onOpen(result)}
-                    trailing={followButton(result) ?? (result.kind === 'ride' ? <View /> : undefined)}
+                    following={
+                      result.kind === 'rider' ? (followed[result.id] ?? result.isFollowing) : undefined
+                    }
+                    onFollowPress={
+                      result.kind === 'rider'
+                        ? () => toggleFollow(result.id, followed[result.id] ?? result.isFollowing)
+                        : undefined
+                    }
                   />
                 ))}
               </View>
@@ -271,55 +275,50 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-    paddingLeft: spacing.xs,
-    paddingRight: layout.screenGutter,
-    paddingBottom: spacing.sm,
+    gap: spacing.sm,
+    paddingHorizontal: layout.screenGutter,
+    paddingBottom: spacing.lg,
   },
   back: {
-    width: layout.minTouchTarget,
+    width: 24,
     height: layout.minTouchTarget,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.pill,
   },
-  pressed: {
-    backgroundColor: colors.surfacePressed,
+  pressedText: {
+    opacity: 0.6,
   },
   field: {
     flex: 1,
   },
   list: {
+    paddingHorizontal: layout.screenGutter,
     paddingBottom: spacing.xxxl,
+    gap: spacing.xl,
+  },
+  section: {
+    gap: spacing.sm,
   },
   group: {
-    paddingTop: spacing.sm,
+    gap: spacing.md,
   },
   groupHeader: {
+    height: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: layout.screenGutter,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
   },
   groupTitle: {
-    ...typography.bodyLargeSemibold,
-    lineHeight: 22,
+    fontFamily: fontFamily.semibold,
+    fontSize: 16,
+    lineHeight: 20,
     color: colors.textPrimary,
-    paddingHorizontal: 0,
   },
   link: {
-    ...typography.bodyMedium,
+    fontFamily: fontFamily.medium,
+    fontSize: 14,
+    lineHeight: 17,
     color: colors.textSecondary,
-  },
-  seeAll: {
-    paddingHorizontal: layout.screenGutter,
-    paddingVertical: spacing.lg,
-  },
-  seeAllLabel: {
-    ...typography.bodyMedium,
-    color: colors.brand,
   },
   tabsScroll: {
     flexGrow: 0,
@@ -327,16 +326,32 @@ const styles = StyleSheet.create({
   tabs: {
     gap: spacing.sm,
     paddingHorizontal: layout.screenGutter,
-    paddingVertical: spacing.sm,
+    paddingBottom: spacing.lg,
   },
   loading: {
     paddingVertical: spacing.xxxl,
   },
+  // "Boş durum" (`rUMQT`): 72 pt under the chips, 24 pt between its parts.
   empty: {
-    paddingTop: 96,
+    gap: spacing.xxl,
+    paddingTop: 72 - spacing.lg,
     paddingHorizontal: layout.screenGutter,
   },
-  follow: {
-    minWidth: 96,
+  emptyCopy: {
+    gap: spacing.sm,
+  },
+  emptyTitle: {
+    fontFamily: fontFamily.medium,
+    fontSize: 16,
+    lineHeight: 22,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    fontFamily: fontFamily.regular,
+    fontSize: 15,
+    lineHeight: 22,
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
 });
