@@ -11,14 +11,28 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { DesignFade } from './DesignFade';
-import { DESIGN_CANVAS, designFrameStyle, useAnimationClock, wrap } from './designCanvas';
+import {
+  DESIGN_CANVAS,
+  designFrameStyle,
+  useAnimationClock,
+  wrap,
+  SCENE_GESTURES_ENABLED,
+} from './designCanvas';
 
 /** "Kolaj" (`nAKft`): three card columns, 522 × 753, tilted 12°. */
-const COLLAGE = { x: -137.07528686523438, y: -64.00762939453125, width: 522, height: 753, rotation: 12 };
+const COLLAGE = {
+  x: -137.07528686523438,
+  y: -64.00762939453125,
+  width: 522,
+  height: 753,
+  rotation: 12,
+};
 const COLUMN_WIDTH = 166;
 const COLUMN_GAP = 12;
-/** Three 211 pt cards with 12 pt gaps; each strip image ends with one gap so copies tile seamlessly. */
+/** Three 211 pt cards with 12 pt gaps; one strip ends with one gap so copies tile seamlessly. */
 const STRIP_HEIGHT = 669;
+/** Strip exports keep 28 pt around the cards so their shadows aren't cut at the column edges. */
+const SHADOW_ROOM = 28;
 /** Copies per column: enough to cover the 753 pt column at any loop offset. */
 const STRIP_COPIES = 3;
 /** Auto-scroll eases out under the finger and back in after release. */
@@ -38,9 +52,24 @@ type Column = {
 };
 
 const columns: readonly Column[] = [
-  { strip: require('../../../assets/images/onboarding/discover-column-1.jpg'), top: 96, direction: 'up', loopMs: 30000 },
-  { strip: require('../../../assets/images/onboarding/discover-column-2.jpg'), top: 0, direction: 'down', loopMs: 26000 },
-  { strip: require('../../../assets/images/onboarding/discover-column-3.jpg'), top: 96, direction: 'up', loopMs: 34000 },
+  {
+    strip: require('../../../assets/images/onboarding/discover-column-1.webp'),
+    top: 96,
+    direction: 'up',
+    loopMs: 30000,
+  },
+  {
+    strip: require('../../../assets/images/onboarding/discover-column-2.webp'),
+    top: 0,
+    direction: 'down',
+    loopMs: 26000,
+  },
+  {
+    strip: require('../../../assets/images/onboarding/discover-column-3.webp'),
+    top: 96,
+    direction: 'up',
+    loopMs: 34000,
+  },
 ];
 
 type DiscoverCollageProps = { running: boolean };
@@ -59,11 +88,12 @@ export function DiscoverCollage({ running }: DiscoverCollageProps) {
   const dragStart = useSharedValue(0);
 
   const pan = Gesture.Pan()
+    .enabled(SCENE_GESTURES_ENABLED)
     .activeOffsetY([-DRAG_ACTIVATION, DRAG_ACTIVATION])
     .failOffsetX([-SWIPE_FAIL, SWIPE_FAIL])
     .onBegin(() => {
       cancelAnimation(drag);
-      rate.value = withTiming(0, { duration: HOLD_EASE_MS });
+      rate.set(withTiming(0, { duration: HOLD_EASE_MS }));
     })
     .onStart(() => {
       dragStart.value = drag.value;
@@ -75,7 +105,7 @@ export function DiscoverCollage({ running }: DiscoverCollageProps) {
       drag.value = withDecay({ velocity: event.velocityY });
     })
     .onFinalize(() => {
-      rate.value = withTiming(1, { duration: RELEASE_EASE_MS });
+      rate.set(withTiming(1, { duration: RELEASE_EASE_MS }));
     });
 
   return (
@@ -119,14 +149,24 @@ function CollageColumn({ column, index, clock, drag }: CollageColumnProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const drift = (clock.value / loopMs) * STRIP_HEIGHT * (direction === 'up' ? -1 : 1);
     // First copy sits within one strip above the top, so three copies always cover the column.
-    return { transform: [{ translateY: wrap(top + drift + drag.value, STRIP_HEIGHT) - STRIP_HEIGHT }] };
+    return {
+      transform: [
+        {
+          translateY: wrap(top + drift + drag.value, STRIP_HEIGHT) - STRIP_HEIGHT,
+        },
+      ],
+    };
   });
 
   return (
     <View style={[styles.column, { left: index * (COLUMN_WIDTH + COLUMN_GAP) }]}>
       <Animated.View style={animatedStyle}>
         {Array.from({ length: STRIP_COPIES }, (_, copy) => (
-          <Image key={copy} source={column.strip} style={styles.strip} />
+          <Image
+            key={copy}
+            source={column.strip}
+            style={[styles.strip, { top: copy * STRIP_HEIGHT - SHADOW_ROOM }]}
+          />
         ))}
       </Animated.View>
     </View>
@@ -149,10 +189,11 @@ const styles = StyleSheet.create({
     top: 0,
     width: COLUMN_WIDTH,
     height: COLLAGE.height,
-    overflow: 'hidden',
   },
   strip: {
-    width: COLUMN_WIDTH,
-    height: STRIP_HEIGHT,
+    position: 'absolute',
+    left: -SHADOW_ROOM,
+    width: COLUMN_WIDTH + SHADOW_ROOM * 2,
+    height: STRIP_HEIGHT + SHADOW_ROOM * 2,
   },
 });

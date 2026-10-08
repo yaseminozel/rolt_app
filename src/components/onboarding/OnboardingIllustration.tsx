@@ -21,10 +21,16 @@ type OnboardingIllustrationProps = {
 /**
  * Animated "Görsel" frame (393 × 520) of an onboarding page. The scene is laid out in design
  * coordinates and scaled to cover the given box, cropping top and bottom on short screens like
- * the old still image did. Decorative only: hidden from screen readers and touch-transparent
- * so swipes reach the pager. With reduced motion every scene holds a still pose.
+ * the old still image did. Each scene reacts to touch: vertical drags and taps play with the
+ * art, while sideways swipes fail its gestures and page the pager. Decorative only, so hidden
+ * from screen readers. With reduced motion every scene holds a still pose.
  */
-export function OnboardingIllustration({ page, active, width, height }: OnboardingIllustrationProps) {
+export function OnboardingIllustration({
+  page,
+  active,
+  width,
+  height,
+}: OnboardingIllustrationProps) {
   const reduceMotion = useReducedMotion();
   const running = active && !reduceMotion;
   const scale = Math.max(width / DESIGN_CANVAS.width, height / DESIGN_CANVAS.height);
@@ -32,7 +38,6 @@ export function OnboardingIllustration({ page, active, width, height }: Onboardi
   return (
     <View
       style={[styles.frame, { width, height }]}
-      pointerEvents="none"
       accessible={false}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants">
@@ -46,7 +51,9 @@ export function OnboardingIllustration({ page, active, width, height }: Onboardi
           },
         ]}>
         {page === 'discover' ? <DiscoverCollage running={running} /> : null}
-        {page === 'record' ? <RecordRouteScene running={running} reduceMotion={reduceMotion} /> : null}
+        {page === 'record' ? (
+          <RecordRouteScene running={running} reduceMotion={reduceMotion} />
+        ) : null}
         {page === 'share' ? <ShareOrbit running={running} /> : null}
       </View>
     </View>

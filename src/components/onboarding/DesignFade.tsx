@@ -25,7 +25,12 @@ export function DesignFade({ top, height, stops }: DesignFadeProps) {
         <Defs>
           <LinearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
             {stops.map((stop) => (
-              <Stop key={stop.offset} offset={stop.offset} stopColor={colors.surface} stopOpacity={stop.opacity} />
+              <Stop
+                key={stop.offset}
+                offset={stop.offset}
+                stopColor={colors.surface}
+                stopOpacity={stop.opacity}
+              />
             ))}
           </LinearGradient>
         </Defs>

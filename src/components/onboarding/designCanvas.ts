@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { ViewStyle } from 'react-native';
+import { Platform, type ViewStyle } from 'react-native';
 import {
   useFrameCallback,
   useSharedValue,
@@ -11,6 +11,12 @@ import {
 
 /** The onboarding "Görsel" frame every scene is drawn in (Pencil coordinates). */
 export const DESIGN_CANVAS = { width: 393, height: 520 } as const;
+
+/**
+ * Scene gestures run on iOS and Android. On web, gesture-handler blocks the browser's native
+ * swipe under them (it ignores `touchAction`), which would stop the pager in the preview.
+ */
+export const SCENE_GESTURES_ENABLED = Platform.OS !== 'web';
 
 /** Longest frame step the clock accepts, so a dropped frame or a resume doesn't jump. */
 const MAX_FRAME_STEP_MS = 64;
@@ -54,7 +60,10 @@ export function designFrameStyle(node: DesignNode): ViewStyle {
  * where they stopped. `rate` (1 = real time) lets a scene ease its motion to a halt while the
  * user holds it.
  */
-export function useAnimationClock(running: boolean, rate?: SharedValue<number>): SharedValue<number> {
+export function useAnimationClock(
+  running: boolean,
+  rate?: SharedValue<number>,
+): SharedValue<number> {
   const elapsed = useSharedValue(0);
   const frame = useFrameCallback(({ timeSincePreviousFrame }) => {
     const step = Math.min(timeSincePreviousFrame ?? 0, MAX_FRAME_STEP_MS);
@@ -78,5 +87,8 @@ export function wrap(value: number, period: number) {
 /** Quick "pop" the scenes play on a tapped element: 1 → `peak` → 1. */
 export function popScale(peak = 1.12) {
   'worklet';
-  return withSequence(withTiming(peak, { duration: 110 }), withSpring(1, { damping: 9, stiffness: 220 }));
+  return withSequence(
+    withTiming(peak, { duration: 110 }),
+    withSpring(1, { damping: 9, stiffness: 220 }),
+  );
 }
