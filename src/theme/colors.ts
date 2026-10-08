@@ -329,6 +329,10 @@ export const colors = {
   leanOkDot: palette.teal550,
   leanOkText: palette.teal850,
   leanWarn: palette.amber550,
+  /** Behind the profile "+" menu (09.01 `niGQX` "Scrim", over a 10 pt blur). */
+  menuVeil: 'rgba(255, 255, 255, 0.5)',
+  /** Between "+" menu rows ("Divider" #F0F1F2). */
+  menuDivider: palette.gray150,
   /** Selected share template outline and check (09.03). */
   shareSelected: palette.blue550,
   /** "Şablon / Marka" stripes (09.03), full and 55 %. */

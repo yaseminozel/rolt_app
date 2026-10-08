@@ -166,5 +166,11 @@
     "save": "Kaydet",
     "saved": "Profilin güncellendi.",
     "failed": "Profilin kaydedilemedi. Tekrar dene."
+  },
+  "addMenu": {
+    "post": "Gönderi yayınla",
+    "photos": "Fotoğraf ekle",
+    "open": "Ekle",
+    "close": "Menüyü kapat"
   }
 }

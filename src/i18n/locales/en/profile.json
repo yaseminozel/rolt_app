@@ -166,5 +166,11 @@
     "save": "Save",
     "saved": "Your profile was updated.",
     "failed": "Your profile couldn't be saved. Try again."
+  },
+  "addMenu": {
+    "post": "Publish a post",
+    "photos": "Add photos",
+    "open": "Add",
+    "close": "Close menu"
   }
 }

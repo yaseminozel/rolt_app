@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { Image } from 'expo-image';
 import { MediaImagePlus, Xmark } from 'iconoir-react-native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { useToast } from '@/components/feedback/ToastProvider';
+import { composeIntent } from '@/features/community/composeIntent';
 import { useCreatePost } from '@/features/community/queries';
 import type { PostAudience } from '@/features/community/types';
 import { showActionSheet } from '@/lib/showActionSheet';
@@ -35,8 +36,24 @@ export function PostComposer() {
   const createPost = useCreatePost();
   const [text, setText] = useState('');
   const [focused, setFocused] = useState(false);
-  const [photoUris, setPhotoUris] = useState<string[]>([]);
+  // A post started from the profile "+" menu before this tab mounted (see below).
+  const [initialIntent] = useState(() => composeIntent.take());
+  const [photoUris, setPhotoUris] = useState<string[]>(
+    () => initialIntent?.photoUris.slice(0, MAX_PHOTOS) ?? [],
+  );
   const [audience, setAudience] = useState<PostAudience>('public');
+  const inputRef = useRef<TextInput>(null);
+  // From the profile "+" menu: focus, with any picked photos attached. An intent set before
+  // this tab mounted is picked up here; later ones arrive through the subscription.
+  useEffect(() => {
+    if (initialIntent) {
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+    return composeIntent.subscribe((next) => {
+      setPhotoUris((current) => [...current, ...next.photoUris].slice(0, MAX_PHOTOS));
+      requestAnimationFrame(() => inputRef.current?.focus());
+    });
+  }, [initialIntent]);
 
   const canPost = Boolean(text.trim() || photoUris.length > 0) && !createPost.isPending;
 
@@ -78,6 +95,7 @@ export function PostComposer() {
   return (
     <View style={[styles.card, focused && styles.cardFocused]}>
       <TextInput
+        ref={inputRef}
         value={text}
         onChangeText={setText}
         onFocus={() => setFocused(true)}

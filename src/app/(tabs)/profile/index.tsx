@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { Bookmark, Camera, Motorcycle, Settings } from 'iconoir-react-native';
+import { Bookmark, Camera, Motorcycle, Plus, Settings } from 'iconoir-react-native';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
@@ -29,6 +29,8 @@ import { initialsOf } from '@/lib/initials';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
 import { openShareRide } from '@/features/rides/openShareRide';
+import { AddMenu } from '@/components/profile/AddMenu';
+import { composeIntent } from '@/features/community/composeIntent';
 
 type Section = 'rides' | 'saved';
 
@@ -47,6 +49,7 @@ const HEADER_TOP_PADDING = 14;
  */
 export default function ProfileScreen() {
   const { t } = useTranslation(['profile', 'common']);
+  const [menuOpen, setMenuOpen] = useState(false);
   const profileQuery = useOwnProfile();
   const updateProfile = useUpdateOwnProfile();
   const profile = profileQuery.data;
@@ -103,9 +106,28 @@ export default function ProfileScreen() {
     });
   };
 
+  // 09.01 "+" menu: start a community post here, finish it in the Topluluk composer.
+  const startPost = () => {
+    composeIntent.set({ photoUris: [] });
+    router.navigate('/community');
+  };
+  const startPhotoPost = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: true,
+      selectionLimit: 4,
+      quality: PHOTO_QUALITY,
+    });
+    if (!result.canceled && result.assets.length > 0) {
+      composeIntent.set({ photoUris: result.assets.map((asset) => asset.uri) });
+      router.navigate('/community');
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <ProfileTopBar
+        leading={{ icon: Plus, accessibilityLabel: t('addMenu.open'), onPress: () => setMenuOpen(true) }}
         actions={[
           { icon: Camera, accessibilityLabel: t('actions.changePhoto'), onPress: pickPhoto },
           {
@@ -130,6 +152,12 @@ export default function ProfileScreen() {
           )}
         </View>
       )}
+      <AddMenu
+        visible={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onPost={startPost}
+        onPhotos={startPhotoPost}
+      />
     </View>
   );
 }

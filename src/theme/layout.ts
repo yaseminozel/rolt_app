@@ -51,6 +51,8 @@ export const shadows = {
   overlay: '0px 3px 10.5px rgba(0, 0, 0, 0.14)',
   /** Floating pill on the Discover map card ("Bu bölgede N rota var", oxSGl). */
   mapPill: '0px 2px 8.75px rgba(0, 0, 0, 0.12)',
+  /** Profile "+" menu card (09.01 `niGQX`). */
+  menu: '0px 12px 32px rgba(16, 19, 24, 0.15)',
   /** Front card of the stacked empty-state picture ("Kart / Motor — silüet (ön)"). */
   stackFront: '0px 4px 12px rgba(16, 19, 24, 0.1)',
   /** Tilted photo cards of the empty search illustration (vKY7V). */
