@@ -1,5 +1,5 @@
 import { Camera, Plus } from 'iconoir-react-native';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
 
 import { colors, fontFamily, spacing, typography } from '@/theme';
 
@@ -18,6 +18,8 @@ type ProfilePhotoPickerProps = {
   title: string;
   description: string;
   onPress: () => void;
+  /** A bundled photo (the sample account's avatar) when there is no picked `photoUri`. */
+  photoSource?: ImageSourcePropType;
 };
 
 /**
@@ -25,7 +27,14 @@ type ProfilePhotoPickerProps = {
  * next to a title and hint. Empty: muted disc with a brand camera and a "+" badge; with a
  * photo: the photo and a camera badge for changing it. The whole block is one button.
  */
-export function ProfilePhotoPicker({ photoUri, title, description, onPress }: ProfilePhotoPickerProps) {
+export function ProfilePhotoPicker({
+  photoUri,
+  photoSource,
+  title,
+  description,
+  onPress,
+}: ProfilePhotoPickerProps) {
+  const source = photoUri ? { uri: photoUri } : photoSource;
   return (
     <Pressable
       onPress={onPress}
@@ -35,8 +44,8 @@ export function ProfilePhotoPicker({ photoUri, title, description, onPress }: Pr
       style={({ pressed }) => [styles.container, pressed && styles.pressed]}>
       <View style={styles.avatar}>
         <View style={styles.circle}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photo} accessibilityIgnoresInvertColors />
+          {source ? (
+            <Image source={source} style={styles.photo} accessibilityIgnoresInvertColors />
           ) : (
             <Camera
               width={EMPTY_CAMERA_SIZE}
@@ -47,7 +56,7 @@ export function ProfilePhotoPicker({ photoUri, title, description, onPress }: Pr
           )}
         </View>
         <View style={styles.badge}>
-          {photoUri ? (
+          {source ? (
             <Camera
               width={BADGE_CAMERA_SIZE}
               height={BADGE_CAMERA_SIZE}

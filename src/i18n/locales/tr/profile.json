@@ -145,5 +145,25 @@
       "message": "Görseli kaydetmek için Ayarlar'dan fotoğraflara ekleme iznini aç."
     },
     "message": "ROLT'ta beni takip et: {{link}}"
+  },
+  "edit": {
+    "title": "Profili düzenle",
+    "photoTitle": "Profil fotoğrafı",
+    "photoDescription": "Fotoğrafını değiştirmek için dokun. Kare, en az 400×400 px.",
+    "name": "Ad soyad",
+    "username": "Kullanıcı adı",
+    "profileLink": "Profil bağlantın: {{link}}",
+    "usernameTaken": "Bu kullanıcı adı alınmış.",
+    "usernameTakenExample": "Bu kullanıcı adı alınmış. Örn. @{{example}}",
+    "bio": "Biyografi",
+    "bioPlaceholder": "Kendinden kısaca bahset",
+    "city": "Konum",
+    "cityPlaceholder": "Şehir seç",
+    "cityTitle": "Konum",
+    "citySearch": "Şehir ara",
+    "cityNoResults": "Sonuç bulunamadı",
+    "save": "Kaydet",
+    "saved": "Profilin güncellendi.",
+    "failed": "Profilin kaydedilemedi. Tekrar dene."
   }
 }

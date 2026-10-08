@@ -145,5 +145,25 @@
       "message": "Allow adding to Photos in Settings to save the image."
     },
     "message": "Follow me on ROLT: {{link}}"
+  },
+  "edit": {
+    "title": "Edit profile",
+    "photoTitle": "Profile photo",
+    "photoDescription": "Tap to change your photo. Square, at least 400×400 px.",
+    "name": "Full name",
+    "username": "Username",
+    "profileLink": "Your profile link: {{link}}",
+    "usernameTaken": "This username is taken.",
+    "usernameTakenExample": "This username is taken. E.g. @{{example}}",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell riders a little about yourself",
+    "city": "Location",
+    "cityPlaceholder": "Choose a city",
+    "cityTitle": "Location",
+    "citySearch": "Search for a city",
+    "cityNoResults": "No results",
+    "save": "Save",
+    "saved": "Your profile was updated.",
+    "failed": "Your profile couldn't be saved. Try again."
   }
 }

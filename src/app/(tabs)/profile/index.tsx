@@ -177,8 +177,7 @@ function ProfileContent({ profile }: { profile: OwnProfile }) {
               <Button
                 variant="tonal"
                 label={t('actions.editProfile')}
-                // "Profili düzenle" (09.05) comes with Akış 20.
-                onPress={() => undefined}
+                onPress={() => router.push('/edit-profile')}
                 style={styles.action}
               />
               <Button
