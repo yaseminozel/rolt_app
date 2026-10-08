@@ -14,7 +14,7 @@ Temel döngü: **rota bul → sürüşü kaydet → isterse paylaş.** Her ekran
 
 ## Tasarım kaynağı (Pencil)
 
-Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/a8ce9826-8c65-45dd-ba42-64f18ffaaa58/pencil-new.pen` (2026-10-07'den itibaren; eski kopya `5d001c98-…` artık kullanılmaz)
+Tek doğruluk kaynağı pencil.dev dosyası: `/Users/noname/.pencil/documents/b8309428-b7f2-4635-b126-1ba150619577/pencil-new.pen` (2026-10-09'dan itibaren; Figma `V1 Screens` sayfasının birebir aktarımı, 208 üst düzey öğe. Eski kopyalar `a8ce9826-…` ve `5d001c98-…` artık kullanılmaz; node id'leri yeni dosyaya göre)
 
 - **Figma kopyası (2026-10-08):** `ROLT: Share Your Route (Copy)`, file key `Hy0M0G6tJYF0GcQRUSgugl`, sayfa `V1 Screens` (`397:3035`). Pencil açık olmadığında ekranlar bu dosyadan okunur; Pencil'deki import'tan sonra eklenen/değişen düğümler `1005:` dışındaki id önekleriyle (`1021`, `1025`, `1083`, `1099`…) ayırt edilir. Dosya Coze (Starter) ekibinde: Figma MCP çağrı limiti düşük, ekran görüntülerini toplu ve tek tek al.
 - `.pen` dosyasını **yalnızca Pencil MCP araçlarıyla** oku (`mcp__pencil__execute` içinde `Get`, `TakeScreenshot`); Read/Grep ile açma.
