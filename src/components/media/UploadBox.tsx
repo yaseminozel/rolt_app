@@ -8,13 +8,15 @@ type UploadBoxProps = {
   hint: string;
   onPress: () => void;
   disabled?: boolean;
+  /** Dashed outline with a brand glyph (08.05 ride photos). */
+  dashed?: boolean;
 };
 
 /**
  * Empty image field (08.05 "Görsel yükle", 10.13 "Ekran görüntüsü ekle"): a bordered box with
  * the add-image glyph, a title and a hint. Picked images replace it with tiles.
  */
-export function UploadBox({ title, hint, onPress, disabled }: UploadBoxProps) {
+export function UploadBox({ title, hint, onPress, disabled, dashed = false }: UploadBoxProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -22,8 +24,13 @@ export function UploadBox({ title, hint, onPress, disabled }: UploadBoxProps) {
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityHint={hint}
-      style={({ pressed }) => [styles.box, pressed && styles.pressed]}>
-      <MediaImagePlus width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
+      style={({ pressed }) => [styles.box, dashed && styles.dashed, pressed && styles.pressed]}>
+      <MediaImagePlus
+        width={20}
+        height={20}
+        color={dashed ? colors.brand : colors.textPrimary}
+        strokeWidth={1.5}
+      />
       <View style={styles.text}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.hint}>{hint}</Text>
@@ -43,6 +50,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderStrong,
     borderRadius: radius.md,
+  },
+  // Ride photos (08.05 "Görsel yükle"): dashed outline and a brand glyph.
+  dashed: {
+    minHeight: 92,
+    borderStyle: 'dashed',
   },
   pressed: {
     backgroundColor: colors.surfacePressed,

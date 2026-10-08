@@ -16,6 +16,9 @@ import { RidePhotosField } from './RidePhotosField';
 import { RideSummaryCard } from './RideSummaryCard';
 import { SelectField } from './SelectField';
 
+/** Notes box height in 08.05 / 09.07 ("Field / Notlar", Figma `1005:31792`). */
+const NOTES_HEIGHT = 79;
+
 type RideDetailsFormProps = {
   /** Saving in progress: the form is dimmed and locked (08.05 "Kaydediliyor", 48 %). */
   locked?: boolean;
@@ -77,6 +80,7 @@ export function RideDetailsForm({ locked = false, onDelete }: RideDetailsFormPro
         onChangeText={(notes) => setValue('notes', notes)}
         placeholder={t('form.notes.placeholder')}
         maxLength={RIDE_NOTES_MAX}
+        multilineHeight={NOTES_HEIGHT}
       />
 
       <RidePhotosField
@@ -86,6 +90,7 @@ export function RideDetailsForm({ locked = false, onDelete }: RideDetailsFormPro
         onRetry={retryPhoto}
         onRemove={removePhoto}
         disabled={locked}
+        label={ride.routeId ? t('form.photos.routeLabel') : undefined}
       />
 
       <View style={styles.section}>

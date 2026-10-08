@@ -98,7 +98,8 @@
       "failed_other": "{{count}} photos couldn't be uploaded. Tap them to try again.",
       "photoA11y": "Photo {{index}}",
       "uploadingA11y": "Photo {{index}} uploading",
-      "failedA11y": "Photo {{index}} failed to upload, tap to try again"
+      "failedA11y": "Photo {{index}} failed to upload, tap to try again",
+      "routeLabel": "Route photos"
     },
     "visibility": {
       "label": "Visibility",
@@ -110,7 +111,7 @@
     "delete": "Delete ride",
     "save": "Save ride",
     "saving": "Saving…",
-    "saveChanges": "Save changes",
+    "saveChanges": "Save",
     "uploadingPhotos": "Uploading photos · {{done}}/{{total}}",
     "saveFailed": "Couldn't save the ride. Please try again.",
     "exitDialog": {

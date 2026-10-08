@@ -19,6 +19,8 @@ type RidePhotosFieldProps = {
   onRetry: (photoId: string) => void;
   onRemove: (photoId: string) => void;
   disabled?: boolean;
+  /** Rides recorded on a route call them "Rota görselleri" (08.05 `1083:20403`). */
+  label?: string;
 };
 
 /**
@@ -33,6 +35,7 @@ export function RidePhotosField({
   onRetry,
   onRemove,
   disabled,
+  label,
 }: RidePhotosFieldProps) {
   const { t } = useTranslation('rides');
   const failed = photos.filter((photo) => photo.status === 'failed').length;
@@ -48,7 +51,7 @@ export function RidePhotosField({
   return (
     <View style={styles.field}>
       <View style={styles.labelRow}>
-        <Text style={styles.label}>{t('form.photos.label')}</Text>
+        <Text style={styles.label}>{label ?? t('form.photos.label')}</Text>
         <Text style={styles.counter}>{`${photos.length}/${max}`}</Text>
       </View>
       {photos.length === 0 ? (
@@ -57,6 +60,7 @@ export function RidePhotosField({
           hint={t('form.photos.uploadHint')}
           onPress={onAdd}
           disabled={disabled}
+          dashed
         />
       ) : (
         <ScrollView

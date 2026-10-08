@@ -98,7 +98,8 @@
       "failed_other": "{{count}} görsel yüklenemedi. Tekrar denemek için görsellere dokun.",
       "photoA11y": "{{index}}. görsel",
       "uploadingA11y": "{{index}}. görsel yükleniyor",
-      "failedA11y": "{{index}}. görsel yüklenemedi, tekrar denemek için dokun"
+      "failedA11y": "{{index}}. görsel yüklenemedi, tekrar denemek için dokun",
+      "routeLabel": "Rota görselleri"
     },
     "visibility": {
       "label": "Görünürlük",
@@ -110,7 +111,7 @@
     "delete": "Sürüşü sil",
     "save": "Sürüşü kaydet",
     "saving": "Kaydediliyor…",
-    "saveChanges": "Değişiklikleri kaydet",
+    "saveChanges": "Kaydet",
     "uploadingPhotos": "Görseller yükleniyor · {{done}}/{{total}}",
     "saveFailed": "Sürüş kaydedilemedi. Lütfen tekrar dene.",
     "exitDialog": {

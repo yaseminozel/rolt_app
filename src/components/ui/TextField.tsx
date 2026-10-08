@@ -50,6 +50,8 @@ export type TextFieldProps = Omit<
   onSuffixPress?: () => void;
   /** Outer layout only (margins, flex). */
   containerStyle?: StyleProp<ViewStyle>;
+  /** Box height of a `multiline` field when a screen draws it shorter (08.05 "Field / Notlar": 79). */
+  multilineHeight?: number;
 };
 
 const FIELD_HEIGHT = 44;
@@ -80,6 +82,7 @@ export function TextField({
   suffix,
   onSuffixPress,
   containerStyle,
+  multilineHeight,
   maxLength,
   onFocus,
   onBlur,
@@ -150,6 +153,7 @@ export function TextField({
         style={[
           styles.field,
           multiline && styles.fieldMultiline,
+          multiline && multilineHeight !== undefined ? { height: multilineHeight } : null,
           { borderColor, backgroundColor: disabled ? colors.surfaceMuted : colors.surface },
         ]}
       >
