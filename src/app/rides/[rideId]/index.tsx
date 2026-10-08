@@ -52,8 +52,8 @@ export default function RideDetailScreen() {
   const { ride } = useRideForm();
   const { data: rider } = useOwnRider();
   const deleteRide = useDeleteRide();
-  const { data: route } = useRoute(ride.routeId);
-  const { data: endpoints } = useRideEndpoints(ride, route ?? undefined);
+  const { data: route, isFetched: routeFetched } = useRoute(ride.routeId);
+  const { data: endpoints } = useRideEndpoints(ride, route, routeFetched);
   const [replayToken, setReplayToken] = useState(0);
   const leftLean = ride.stats.maxLeanLeftDeg ?? 0;
   const rightLean = ride.stats.maxLeanRightDeg ?? 0;

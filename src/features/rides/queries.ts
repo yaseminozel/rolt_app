@@ -74,7 +74,11 @@ export function useDeleteRide() {
  * Start and finish names of a ride (09.06 "Sürüş güzergahı"): a route ride uses the route's
  * own names, a free ride the area around its first and last track point.
  */
-export function useRideEndpoints(ride: RideRecord, route: Route | undefined) {
+export function useRideEndpoints(
+  ride: RideRecord,
+  route: Route | null | undefined,
+  routeSettled: boolean,
+) {
   const first = ride.track[0]?.[0];
   const lastSegment = ride.track[ride.track.length - 1];
   const last = lastSegment?.[lastSegment.length - 1];
@@ -90,7 +94,8 @@ export function useRideEndpoints(ride: RideRecord, route: Route | undefined) {
       ]);
       return { start, end };
     },
-    enabled: Boolean(first) && (!ride.routeId || route !== undefined),
+    // A route ride waits for its route; an unknown (deleted) route falls back to geocoding.
+    enabled: Boolean(first) && (!ride.routeId || routeSettled),
     staleTime: Infinity,
   });
 }
