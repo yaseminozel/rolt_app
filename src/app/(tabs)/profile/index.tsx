@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { Bookmark, Camera, Motorcycle, Settings } from 'iconoir-react-native';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -24,13 +24,7 @@ import { rideTitle } from '@/features/rides/rideTitle';
 import { useRoutesByIds } from '@/features/routes/queries';
 import { useSavedRoutes } from '@/features/routes/SavedRoutesProvider';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import {
-  formatApproxDuration,
-  formatDateTime,
-  formatDistance,
-  formatDuration,
-  formatSpeed,
-} from '@/i18n/format';
+import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { initialsOf } from '@/lib/initials';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
@@ -295,6 +289,10 @@ function OwnRides({
   );
 }
 
+/**
+ * 09.04 Kaydettiklerim (Figma `1005:35739` list, `1005:35784` empty): saved routes as row cards
+ * with distance, time and average speed, divided by hairlines; newest first.
+ */
 function SavedRoutes() {
   const { t } = useTranslation(['profile', 'routes']);
   const { savedIds } = useSavedRoutes();
@@ -303,24 +301,31 @@ function SavedRoutes() {
   const routes = routesQuery.data ?? [];
 
   if (savedIds.length === 0) {
-    return <EmptyState title={t('saved.empty.title')} description={t('saved.empty.description')} />;
+    return (
+      <View style={styles.savedEmpty}>
+        <EmptyState title={t('saved.empty.title')} description={t('saved.empty.description')} />
+      </View>
+    );
   }
   return (
-    <View style={styles.list}>
-      {routes.map((route) => (
-        <RouteCard
-          key={route.id}
-          variant="row"
-          image={route.coverImage}
-          title={route.name}
-          subtitle={route.summary}
-          distance={formatDistance(route.distanceKm)}
-          duration={formatApproxDuration(route.durationMinutes)}
-          badgeLabel={t(`routes:tags.${route.tag}`)}
-          saved={isSaved(route.id)}
-          onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_OFFSET })}
-          onPress={() => router.push({ pathname: '/route/[id]', params: { id: route.id } })}
-        />
+    <View style={styles.savedList}>
+      {routes.map((route, index) => (
+        <Fragment key={route.id}>
+          {index > 0 ? <View style={styles.divider} /> : null}
+          <RouteCard
+            variant="row"
+            image={route.coverImage}
+            title={route.name}
+            subtitle={route.summary}
+            distance={formatDistance(route.distanceKm)}
+            duration={formatDuration(route.durationMinutes)}
+            speed={formatSpeed(route.averageSpeedKmh)}
+            badgeLabel={t(`routes:tags.${route.tag}`)}
+            saved={isSaved(route.id)}
+            onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_OFFSET })}
+            onPress={() => router.push({ pathname: '/route/[id]', params: { id: route.id } })}
+          />
+        </Fragment>
       ))}
     </View>
   );
@@ -361,6 +366,14 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: spacing.lg,
+  },
+  // 8 pt either side of the hairline between saved route cards.
+  savedList: {
+    gap: spacing.sm,
+  },
+  // The empty state sits 116 pt under the tabs (09.04 `1005:35792` at y 506, tabs end at 390).
+  savedEmpty: {
+    paddingTop: 116 - spacing.lg,
   },
   divider: {
     height: 1,

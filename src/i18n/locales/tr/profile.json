@@ -119,8 +119,8 @@
   },
   "saved": {
     "empty": {
-      "title": "Henüz kaydettiğin rota yok",
-      "description": "Beğendiğin rotaları yer imiyle kaydet, burada bulursun."
+      "title": "Henüz kaydedilen rota yok",
+      "description": "Beğendiğin rotaları kaydet; daha sonra burada kolayca bul."
     }
   },
   "shareSheet": {
