@@ -4,15 +4,14 @@ import BottomSheet, {
   type BottomSheetFooterProps,
 } from '@gorhom/bottom-sheet';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bookmark, BookmarkSolid, MapsArrow, NavArrowLeft } from 'iconoir-react-native';
-import { useCallback, useMemo, useRef, type ComponentRef } from 'react';
+import { Bookmark, BookmarkSolid, NavArrowLeft, Play } from 'iconoir-react-native';
+import { useCallback, useEffect, useMemo, useRef, type ComponentRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/feedback/EmptyState';
-import { useToast } from '@/components/feedback/ToastProvider';
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
 import { cameraBoundsFor } from '@/components/map/mapGeometry';
@@ -24,9 +23,9 @@ import { ROUTE_DETAIL_CTA_HEIGHT, RouteDetailCta } from '@/components/route-deta
 import { RouteFactsCard } from '@/components/route-detail/RouteFactsCard';
 import { RouteMetricsCard } from '@/components/route-detail/RouteMetricsCard';
 import { RoutePhotoStrip } from '@/components/route-detail/RoutePhotoStrip';
+import { RouteNotesField } from '@/components/route-detail/RouteNotesField';
 import { RouteStopsCard } from '@/components/route-detail/RouteStopsCard';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
-import { useDeviceLocation } from '@/features/location/useDeviceLocation';
 import { useRoute } from '@/features/routes/queries';
 import type { Route } from '@/features/routes/types';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
@@ -35,13 +34,20 @@ import { colors, fontFamily, layout, radius, spacing } from '@/theme';
 
 type CameraRef = ComponentRef<MapboxModule['Camera']>;
 
-/** Sheet heights from the frames (852 pt): "Uzun İçerik" top at 416, "Standart" at 332. */
+/**
+ * Sheet heights from the frames (852 pt): collapsed top at 416, default at 252 (05.04
+ * "Standart · Topografik" and "Uzun içerik", Figma `1005:33412` / `1005:36426`).
+ */
 const SHEET_COLLAPSED_RATIO = (852 - 416) / 852;
-const SHEET_DEFAULT_RATIO = (852 - 332) / 852;
+const SHEET_DEFAULT_RATIO = (852 - 252) / 852;
 const TOP_BAR_HEIGHT = 48;
 const MAP_BUTTON_SIZE = 48;
-/** "Konumuma git" sits 12 pt above the sheet (01.6 `F9KRGq`). */
-const MAP_BUTTON_GAP = 12;
+/** The play button sits 16 pt above the sheet (05.04 "Konumuma git" at y 188, sheet at 252). */
+const MAP_BUTTON_GAP = 16;
+/** Route preview: the camera visits this many points along the line, this long each. */
+const PREVIEW_STEPS = 24;
+const PREVIEW_STEP_MS = 450;
+const PREVIEW_ZOOM = 13;
 /** The map button fades out over the first 80 pt the sheet is dragged above its default. */
 const MAP_BUTTON_FADE_DISTANCE = 80;
 const ROUTE_EDGE_PADDING = 32;
@@ -120,11 +126,9 @@ function TopBar({ route }: { route?: Route }) {
 }
 
 function RouteDetail({ route }: { route: Route }) {
-  const { t } = useTranslation(['routeDetail', 'routes', 'explore']);
+  const { t } = useTranslation(['routeDetail', 'routes']);
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
-  const { showToast } = useToast();
-  const { position, locate } = useDeviceLocation();
   const cameraRef = useRef<CameraRef>(null);
   const detailRoutes = useMemo(() => [route], [route]);
 
@@ -162,14 +166,43 @@ function RouteDetail({ route }: { route: Route }) {
     };
   });
 
-  const handleLocate = useCallback(async () => {
-    const coordinate = await locate();
-    if (!coordinate) {
-      showToast({ variant: 'failure', message: t('explore:map.locationUnavailable'), bottomOffset: TOAST_BOTTOM_OFFSET });
+  // "▷" on the map plays the route: the camera flies along the line, then shows it whole again.
+  // A second tap stops it. Mapbox only (Expo Go shows the design's map picture).
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopPreview = useCallback(() => {
+    if (previewTimer.current) {
+      clearTimeout(previewTimer.current);
+      previewTimer.current = null;
+    }
+  }, []);
+  useEffect(() => stopPreview, [stopPreview]);
+  const handlePreview = useCallback(() => {
+    if (previewTimer.current) {
+      stopPreview();
+      cameraRef.current?.setCamera({ ...initialCamera, animationDuration: 600 });
       return;
     }
-    cameraRef.current?.setCamera({ centerCoordinate: coordinate, zoomLevel: 12, animationDuration: 600 });
-  }, [locate, showToast, t]);
+    const points = route.coordinates;
+    const steps = Math.min(PREVIEW_STEPS, points.length);
+    let step = 0;
+    const next = () => {
+      if (step >= steps) {
+        previewTimer.current = null;
+        cameraRef.current?.setCamera({ ...initialCamera, animationDuration: 800 });
+        return;
+      }
+      const index = Math.round((step / Math.max(1, steps - 1)) * (points.length - 1));
+      cameraRef.current?.setCamera({
+        centerCoordinate: points[index],
+        zoomLevel: PREVIEW_ZOOM,
+        animationDuration: PREVIEW_STEP_MS,
+        animationMode: 'linearTo',
+      });
+      step += 1;
+      previewTimer.current = setTimeout(next, PREVIEW_STEP_MS);
+    };
+    next();
+  }, [initialCamera, route.coordinates, stopPreview]);
 
   // Riding records a ride, so guests sign in first (Akış A "gerekirse giriş"); then 06.01 Hazırlık.
   const requireAccount = useRequireAccount();
@@ -204,17 +237,16 @@ function RouteDetail({ route }: { route: Route }) {
           <>
             <Mapbox.Camera ref={cameraRef} defaultSettings={initialCamera} />
             <RouteLineLayers mapbox={Mapbox} id="route-detail" routes={detailRoutes} colorFor={detailLineColor} />
-            {position ? <Mapbox.LocationPuck puckBearingEnabled={false} /> : null}
           </>
         )}
       />
 
       <Animated.View style={[styles.mapButton, mapButtonStyle]} pointerEvents="box-none">
         <MapActionButton
-          icon={MapsArrow}
+          icon={Play}
           size="controlLarge"
-          accessibilityLabel={t('explore:map.locateMe')}
-          onPress={handleLocate}
+          accessibilityLabel={t('previewRoute')}
+          onPress={handlePreview}
           disabled={!isNativeMapAvailable}
         />
       </Animated.View>
@@ -285,14 +317,7 @@ function RouteDetail({ route }: { route: Route }) {
             <RouteFactsCard facts={facts} />
           </View>
 
-          {route.notes ? (
-            <View style={styles.notes}>
-              <Text style={styles.sectionTitle} accessibilityRole="header">
-                {t('sections.notes')}
-              </Text>
-              <Text style={styles.notesBody}>{route.notes}</Text>
-            </View>
-          ) : null}
+          {route.notes ? <RouteNotesField label={t('sections.notes')} notes={route.notes} /> : null}
         </BottomSheetScrollView>
       </BottomSheet>
     </View>
@@ -370,9 +395,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: colors.textPrimary,
   },
-  notes: {
-    gap: spacing.xs,
-  },
   // "Rota ve duraklar": title row 8 pt above the stop card.
   section: {
     gap: spacing.sm,
@@ -395,16 +417,10 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: colors.textPrimary,
   },
-  notesBody: {
-    fontFamily: fontFamily.regular,
-    fontSize: 15,
-    lineHeight: 22,
-    color: colors.textSecondary,
-  },
   photos: {
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
   facts: {
-    gap: 10,
+    gap: spacing.xs,
   },
 });

@@ -1,4 +1,3 @@
-import { Play } from 'iconoir-react-native';
 import { StyleSheet } from 'react-native';
 
 import { FADED_ACTION_BAR_HEIGHT, FadedActionBar } from '@/components/layout/FadedActionBar';
@@ -15,7 +14,7 @@ type RouteDetailCtaProps = {
 export function RouteDetailCta({ label, onPress }: RouteDetailCtaProps) {
   return (
     <FadedActionBar>
-      <Button label={label} icon={Play} onPress={onPress} style={styles.button} />
+      <Button label={label} onPress={onPress} style={styles.button} />
     </FadedActionBar>
   );
 }

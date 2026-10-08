@@ -40,5 +40,6 @@
       "stop": "Stop",
       "end": "Finish"
     }
-  }
+  },
+  "previewRoute": "Preview route"
 }
