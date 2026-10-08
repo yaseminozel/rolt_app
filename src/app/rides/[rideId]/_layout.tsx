@@ -15,7 +15,6 @@ const sheet = (detents: number[] | 'fitToContents' = 'fitToContents'): ScreenOpt
   headerShown: false,
   sheetAllowedDetents: detents,
   sheetGrabberVisible: true,
-  sheetCornerRadius: 24,
 });
 
 /**

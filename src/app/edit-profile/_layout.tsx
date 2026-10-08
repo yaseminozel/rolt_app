@@ -22,7 +22,6 @@ export default function EditProfileLayout() {
           headerShown: false,
           sheetAllowedDetents: [0.6, 1],
           sheetGrabberVisible: true,
-          sheetCornerRadius: 24,
         }}
       />
     </Stack>

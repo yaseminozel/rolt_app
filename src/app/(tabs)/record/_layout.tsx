@@ -12,7 +12,6 @@ export default function RecordLayout() {
           presentation: 'formSheet',
           sheetAllowedDetents: [0.92, 1],
           sheetGrabberVisible: true,
-          sheetCornerRadius: 24,
         }}
       />
     </Stack>

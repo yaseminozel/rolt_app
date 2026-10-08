@@ -15,7 +15,6 @@ export default function CommunityLayout() {
           headerShown: false,
           sheetAllowedDetents: [0.7, 1],
           sheetGrabberVisible: true,
-          sheetCornerRadius: 24,
         }}
       />
     </Stack>
