@@ -8,7 +8,9 @@ import { colors, fontFamily, layout, spacing } from '@/theme';
 
 type OptionSheetListProps<T> = {
   title: string;
-  onClose: () => void;
+  /** Omitted on a step without a close button (11.05 Özet has only "Geri"). */
+  onClose?: () => void;
+  onBack?: () => void;
   /** Search above the list (Marka, Model); the year sheet has none. */
   search?: { value: string; onChangeText: (text: string) => void; placeholder: string };
   /** Uppercase group line above the rows, e.g. "BAJAJ MODELLERİ". */
@@ -28,6 +30,7 @@ type OptionSheetListProps<T> = {
 export function OptionSheetList<T>({
   title,
   onClose,
+  onBack,
   search,
   sectionTitle,
   data,
@@ -39,7 +42,7 @@ export function OptionSheetList<T>({
   return (
     <>
       <View collapsable={false} style={styles.header}>
-        <SheetHeader title={title} onClose={onClose} style={styles.title} />
+        <SheetHeader title={title} onClose={onClose} onBack={onBack} style={styles.title} />
         {search ? (
           <SearchField
             value={search.value}

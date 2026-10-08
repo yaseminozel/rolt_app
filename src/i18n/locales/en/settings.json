@@ -397,5 +397,40 @@
       "description": "The {{email}} account and all your data will be deleted. This can't be undone.",
       "delete": "Yes, delete my account"
     }
+  },
+  "garage": {
+    "title": "My bike",
+    "rides": "rides",
+    "km": "km",
+    "infoSection": "BIKE DETAILS",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "modelWithCc": "{{model}} {{cc}} cc",
+    "note": "Rides are grouped by bike. If you change your bike, earlier rides stay with the old one.",
+    "change": "Change bike",
+    "delete": "Delete bike",
+    "productionYear": "Model year",
+    "save": "Save",
+    "empty": {
+      "title": "No bike added yet",
+      "description": "Add the bike you ride to your garage.",
+      "add": "Add your bike"
+    },
+    "confirm": {
+      "title": "Confirm your bike",
+      "subtitle": "Check the details before adding it to your garage."
+    },
+    "deleteDialog": {
+      "title": "Delete this bike?",
+      "description": "Your profile will show without bike details. This can't be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "added": "Your bike was added.",
+      "changed": "Your bike was updated.",
+      "deleted": "Your bike was deleted."
+    }
   }
 }

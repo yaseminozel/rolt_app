@@ -1,4 +1,4 @@
-import { Xmark } from 'iconoir-react-native';
+import { NavArrowLeft, Xmark } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
@@ -9,6 +9,8 @@ export type SheetHeaderProps = {
   subtitle?: string;
   /** Shows the close button when provided. */
   onClose?: () => void;
+  /** Leading back button of multi-step sheets (11.02–11.05 "Geri"). */
+  onBack?: () => void;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -23,10 +25,20 @@ const CLOSE_ICON_SIZE = 22;
  * (`X2Xw3h`, `l4NA5a`, `ffZT0`). The majority pattern wins: 18 pt medium title,
  * 14 pt secondary subtitle, 16 pt gutter and an optional close button.
  */
-export function SheetHeader({ title, subtitle, onClose, style }: SheetHeaderProps) {
+export function SheetHeader({ title, subtitle, onClose, onBack, style }: SheetHeaderProps) {
   const { t } = useTranslation();
   return (
-    <View style={[styles.container, onClose ? styles.withClose : null, style]}>
+    <View
+      style={[styles.container, onClose ? styles.withClose : null, onBack ? styles.withBack : null, style]}>
+      {onBack ? (
+        <Pressable
+          onPress={onBack}
+          accessibilityRole="button"
+          accessibilityLabel={t('actions.back')}
+          style={({ pressed }) => [styles.closeButton, pressed ? styles.closeButtonPressed : null]}>
+          <NavArrowLeft width={24} height={24} color={colors.textPrimary} strokeWidth={1.5} />
+        </Pressable>
+      ) : null}
       <View style={styles.text}>
         <Text style={styles.title} accessibilityRole="header">
           {title}
@@ -57,6 +69,9 @@ const styles = StyleSheet.create({
   },
   withClose: {
     paddingRight: spacing.sm,
+  },
+  withBack: {
+    paddingLeft: spacing.xs,
   },
   text: {
     flex: 1,

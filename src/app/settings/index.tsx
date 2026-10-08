@@ -53,6 +53,7 @@ import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme
 
 type SettingsPage =
   | 'account'
+  | 'garage'
   | 'ride-visibility'
   | 'endpoints'
   | 'blocked'
@@ -95,8 +96,6 @@ export default function SettingsScreen() {
 
   // The React Compiler memoizes this list.
   const items = ((): SettingsMenuItem[] => {
-    // "Motorum" (11.x) comes with Akış 17.
-    const pending = () => undefined;
     const go = (page: SettingsPage) => () => router.push(`/settings/${page}`);
     return [
       {
@@ -114,7 +113,7 @@ export default function SettingsScreen() {
         value: profile?.bike
           ? `${motorcycleBrandNames[profile.bike.brand]} ${profile.bike.model}`
           : t('values.noBike'),
-        onPress: pending,
+        onPress: go('garage'),
       },
       {
         id: 'rideVisibility',

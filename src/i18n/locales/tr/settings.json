@@ -397,5 +397,40 @@
       "description": "{{email}} hesabı ve tüm verilerin silinecek. Bu işlem geri alınamaz.",
       "delete": "Evet, hesabımı sil"
     }
+  },
+  "garage": {
+    "title": "Motorum",
+    "rides": "sürüş",
+    "km": "km",
+    "infoSection": "MOTOR BİLGİLERİ",
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "modelWithCc": "{{model}} {{cc}} cc",
+    "note": "Sürüşlerin motoruna göre gruplanır. Motoru değiştirsen de eski sürüşlerin eski motorunda kalır.",
+    "change": "Motoru değiştir",
+    "delete": "Motoru sil",
+    "productionYear": "Üretim yılı",
+    "save": "Kaydet",
+    "empty": {
+      "title": "Henüz motor eklenmedi",
+      "description": "Sürüşlerinde kullanacağın motoru garajına ekle.",
+      "add": "Motorunu ekle"
+    },
+    "confirm": {
+      "title": "Motorunu onayla",
+      "subtitle": "Garajına eklemeden önce bilgileri kontrol et."
+    },
+    "deleteDialog": {
+      "title": "Motoru silmek istediğine emin misin?",
+      "description": "Profilinde motor bilgisi olmadan görünmeye devam eder. Bu işlem geri alınamaz.",
+      "confirm": "Sil",
+      "cancel": "Vazgeç"
+    },
+    "toast": {
+      "added": "Motorun eklendi.",
+      "changed": "Motorun güncellendi.",
+      "deleted": "Motorun silindi."
+    }
   }
 }
