@@ -88,8 +88,7 @@ export default function AccountScreen() {
               label={t('account.deleteAccount')}
               destructive
               trailing="none"
-              // "Hesabı sil" (10.16) comes with Akış 18.
-              onPress={() => undefined}
+              onPress={() => router.push('/settings/delete-account')}
             />
           </View>
           <Text style={styles.note}>{t('account.deleteNote')}</Text>

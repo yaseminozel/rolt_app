@@ -360,5 +360,42 @@
         }
       ]
     }
+  },
+  "deleteAccount": {
+    "title": "Hesabı sil",
+    "heading": "Hesabını silmek üzeresin",
+    "description": "Hesabın silindiğinde aşağıdaki veriler kalıcı olarak silinir ve geri getirilemez.",
+    "items": {
+      "rides": "Sürüşlerin",
+      "ridesDetail_one": "{{value}} sürüş, rota izleri ve istatistikler",
+      "ridesDetail_other": "{{value}} sürüş, rota izleri ve istatistikler",
+      "routes": "Önerdiğin rotalar",
+      "routesDetail_one": "{{value}} rota keşfetten kaldırılır",
+      "routesDetail_other": "{{value}} rota keşfetten kaldırılır",
+      "saved": "Kaydettiklerin",
+      "savedDetail_one": "{{value}} kayıtlı rota",
+      "savedDetail_other": "{{value}} kayıtlı rota",
+      "profile": "Profilin",
+      "profileDetail": "Fotoğraf, takipçiler ve takip ettiklerin"
+    },
+    "reasonLabel": "Neden ayrılıyorsun?",
+    "optional": "Opsiyonel",
+    "reasonPlaceholder": "Bir neden seç",
+    "reasons": {
+      "notRiding": "Artık motor sürmüyorum",
+      "otherApp": "Başka bir uygulama kullanıyorum",
+      "privacy": "Gizlilik endişem var",
+      "notUseful": "Uygulama işime yaramadı",
+      "other": "Diğer"
+    },
+    "acknowledge": "Bu işlemin geri alınamayacağını ve verilerimin kalıcı olarak silineceğini anlıyorum.",
+    "submit": "Hesabımı kalıcı olarak sil",
+    "cancel": "Vazgeç",
+    "failed": "Hesabın silinemedi. Tekrar dene.",
+    "confirm": {
+      "title": "Hesabın kalıcı olarak silinsin mi?",
+      "description": "{{email}} hesabı ve tüm verilerin silinecek. Bu işlem geri alınamaz.",
+      "delete": "Evet, hesabımı sil"
+    }
   }
 }

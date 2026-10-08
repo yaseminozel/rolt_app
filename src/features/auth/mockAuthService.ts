@@ -273,4 +273,9 @@ export const mockAuthService: AuthService = {
   async signOut() {
     await wait();
   },
+
+  async deleteAccount(session) {
+    await wait();
+    accounts.delete(normalize(session.email));
+  },
 };

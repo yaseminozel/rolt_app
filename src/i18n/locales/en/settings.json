@@ -360,5 +360,42 @@
         }
       ]
     }
+  },
+  "deleteAccount": {
+    "title": "Delete account",
+    "heading": "You're about to delete your account",
+    "description": "When your account is deleted, the data below is removed for good and can't be restored.",
+    "items": {
+      "rides": "Your rides",
+      "ridesDetail_one": "{{value}} ride, route tracks and stats",
+      "ridesDetail_other": "{{value}} rides, route tracks and stats",
+      "routes": "Routes you suggested",
+      "routesDetail_one": "{{value}} route is removed from Discover",
+      "routesDetail_other": "{{value}} routes are removed from Discover",
+      "saved": "Your saved routes",
+      "savedDetail_one": "{{value}} saved route",
+      "savedDetail_other": "{{value}} saved routes",
+      "profile": "Your profile",
+      "profileDetail": "Photo, followers and people you follow"
+    },
+    "reasonLabel": "Why are you leaving?",
+    "optional": "Optional",
+    "reasonPlaceholder": "Choose a reason",
+    "reasons": {
+      "notRiding": "I don't ride anymore",
+      "otherApp": "I use another app",
+      "privacy": "I have privacy concerns",
+      "notUseful": "The app wasn't useful to me",
+      "other": "Other"
+    },
+    "acknowledge": "I understand this can't be undone and my data will be deleted for good.",
+    "submit": "Delete my account for good",
+    "cancel": "Cancel",
+    "failed": "Your account couldn't be deleted. Try again.",
+    "confirm": {
+      "title": "Delete your account for good?",
+      "description": "The {{email}} account and all your data will be deleted. This can't be undone.",
+      "delete": "Yes, delete my account"
+    }
   }
 }
