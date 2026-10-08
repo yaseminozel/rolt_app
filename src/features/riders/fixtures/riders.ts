@@ -169,6 +169,7 @@ export const RIDE_FIXTURES: readonly RideSummary[] = [
     id: 'mert-geyikbayiri',
     riderId: 'mert-kaya',
     title: 'Geyikbayırı Virajları',
+    description: 'Sabah serinliğinde virajlar bomboştu, asfalt yeni.',
     rideType: 'curves',
     startedAt: '2026-10-08T08:15:00+03:00',
     distanceKm: 46.3,
