@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 
 import type { Session } from './types';
 
@@ -21,8 +22,15 @@ export type PersistedAuthState = {
   permissionPromptsPending: boolean;
 };
 
+// expo-secure-store has no web implementation; the web preview keeps the mock session in
+// localStorage so a reload doesn't sign out.
+const webStorage = Platform.OS === 'web' ? globalThis.localStorage : undefined;
+
 async function read(key: string) {
   try {
+    if (webStorage) {
+      return webStorage.getItem(key);
+    }
     return await SecureStore.getItemAsync(key);
   } catch {
     return null;
@@ -31,6 +39,14 @@ async function read(key: string) {
 
 async function write(key: string, value: string | null) {
   try {
+    if (webStorage) {
+      if (value === null) {
+        webStorage.removeItem(key);
+      } else {
+        webStorage.setItem(key, value);
+      }
+      return;
+    }
     if (value === null) {
       await SecureStore.deleteItemAsync(key);
     } else {
