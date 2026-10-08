@@ -41,5 +41,14 @@
     "milesShort": "mi",
     "kmhShort": "km/h",
     "mphShort": "mph"
+  },
+  "time": {
+    "today": "Today, {{time}}",
+    "yesterday": "Yesterday, {{time}}",
+    "dayTime": "{{day}}, {{time}}",
+    "agoMinutes": "{{value}}m",
+    "agoHours": "{{value}}h",
+    "agoDays": "{{value}}d",
+    "justNow": "now"
   }
 }

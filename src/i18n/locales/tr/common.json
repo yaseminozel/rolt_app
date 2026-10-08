@@ -41,5 +41,14 @@
     "milesShort": "mi",
     "kmhShort": "km/sa",
     "mphShort": "mph"
+  },
+  "time": {
+    "today": "Bugün, {{time}}",
+    "yesterday": "Dün, {{time}}",
+    "dayTime": "{{day}}, {{time}}",
+    "agoMinutes": "{{value}} dk",
+    "agoHours": "{{value}} sa",
+    "agoDays": "{{value}} g",
+    "justNow": "şimdi"
   }
 }

@@ -180,3 +180,37 @@ export function turkishAccusativeSuffix(name: string) {
 function isTurkishCompoundPossessive(name: string) {
   return /\s/.test(name) && 'ıiuü'.includes(name.toLocaleLowerCase('tr').slice(-1));
 }
+
+/** Post time in feeds (13.01): "Bugün, 08:15", "Dün, 17:40", otherwise "28 Eyl, 10:05". */
+export function formatPostTime(date: Date, now = Date.now()) {
+  const time = formatClockTime(date);
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  const dayMs = 24 * 3600 * 1000;
+  if (date.getTime() >= startOfToday.getTime()) {
+    return i18n.t('time.today', { time });
+  }
+  if (date.getTime() >= startOfToday.getTime() - dayMs) {
+    return i18n.t('time.yesterday', { time });
+  }
+  const day = new Intl.DateTimeFormat(activeDateLocale(), { day: 'numeric', month: 'short' }).format(
+    date,
+  );
+  return i18n.t('time.dayTime', { day, time });
+}
+
+/** Compact age of a comment (13.02): "35 dk", "2 sa", "3 g". */
+export function formatShortAgo(date: Date, now = Date.now()) {
+  const minutes = Math.floor((now - date.getTime()) / 60_000);
+  if (minutes < 1) {
+    return i18n.t('time.justNow');
+  }
+  if (minutes < 60) {
+    return i18n.t('time.agoMinutes', { value: formatNumber(minutes) });
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return i18n.t('time.agoHours', { value: formatNumber(hours) });
+  }
+  return i18n.t('time.agoDays', { value: formatNumber(Math.floor(hours / 24)) });
+}
