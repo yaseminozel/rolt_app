@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["6YGCVJV7BA.com.roltapp.rolt"],
+        "components": [
+          { "/": "/u/*", "comment": "Profile share links (09.02)" },
+          { "/": "/r/*", "comment": "Ride share links (08.11)" }
+        ]
+      }
+    ]
+  }
+}

@@ -147,6 +147,8 @@ function RootNavigator() {
         <Stack.Screen name="rider/[id]" />
         {/* Profile share link (roltapp.com/u/<handle> → rolt://u/<handle>). */}
         <Stack.Screen name="u/[handle]" options={{ animation: 'none' }} />
+        {/* Ride share link opened as a universal link (roltapp.com/r/<id>). */}
+        <Stack.Screen name="r/[id]" options={{ animation: 'none' }} />
         <Stack.Screen
           name="ride-together/[id]"
           options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
