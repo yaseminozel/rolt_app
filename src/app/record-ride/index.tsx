@@ -30,13 +30,14 @@ import { RECORD_SHEET_TOP_GAP, useSheetTopInset } from '@/components/record/reco
 import { RideTypeSelector } from '@/components/ride/RideTypeSelector';
 import { Button } from '@/components/ui/Button';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
+import { useLowBattery } from '@/features/device/useLowBattery';
 import { haptics, withHaptic } from '@/features/haptics/haptics';
 import { useHapticOnChange, useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { wasBackgroundPromptShown } from '@/features/navigation/backgroundPrompt';
 import { isSimulatedNavigation } from '@/features/navigation/location';
 import { MIN_SAVE_DISTANCE_M, useRideRecording } from '@/features/rides/RideRecordingProvider';
 import type { RideType } from '@/features/rides/rideTypes';
-import { formatDistance } from '@/i18n/format';
+import { formatDistance, formatNumber } from '@/i18n/format';
 import { useNow } from '@/lib/useNow';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
 import { calibrationFlow, usePendingCalibrationStart } from '@/features/lean/calibrationFlow';
@@ -250,8 +251,11 @@ export default function RecordScreen() {
 
   // While a ride is being recorded with this sheet open the screen stays on (the phone sits in
   // the mount, as in navigation); paused, closed or locked by hand, the phone sleeps as usual.
+  // On a low battery the screen is let go too: the ride outlasting the phone matters more.
   const focused = useIsFocused();
-  const keepAwake = focused && phase === 'recording';
+  const lowBattery = useLowBattery();
+  const keepAwake = focused && phase === 'recording' && !lowBattery;
+  useHapticOnSet(active ? lowBattery?.tier : null, 'warning');
   useEffect(() => {
     if (!keepAwake) {
       return;
@@ -278,6 +282,13 @@ export default function RecordScreen() {
     banner = { tone: 'info', message: t('record.recovery.banner') };
   } else if (active && autoPaused) {
     banner = { tone: 'warning', message: t('record.gps.weak') };
+  } else if (active && lowBattery) {
+    banner = {
+      tone: lowBattery.tier === 'critical' ? 'danger' : 'warning',
+      message: t(`record.battery.${lowBattery.tier}`, {
+        percent: formatNumber(lowBattery.percent),
+      }),
+    };
   } else if (previewing && !gpsReady) {
     banner = { tone: 'success', message: t('record.gps.searching'), busy: true };
   } else if (

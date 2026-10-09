@@ -79,6 +79,10 @@
       "distance": "Distance",
       "duration": "Time",
       "averageSpeed": "Avg. speed"
+    },
+    "battery": {
+      "low": "Battery {{percent}}%. The screen no longer stays on; recording continues.",
+      "critical": "Battery {{percent}}%. If the phone dies, the ride is safe on the device and picks up where it stopped."
     }
   },
   "share": {

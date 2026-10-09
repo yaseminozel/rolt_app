@@ -170,7 +170,8 @@
     "liveActivity": {
       "status": "Rotayı sürüyorsun",
       "weak": "GPS zayıf"
-    }
+    },
+    "batteryCritical": "Pil çok az. Ekran artık açık tutulmuyor; sesli yönlendirme sürüyor."
   },
   "exit": {
     "title": "Navigasyonu kapatmak istiyor musun?",

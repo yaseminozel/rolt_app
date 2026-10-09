@@ -79,6 +79,10 @@
       "distance": "Mesafe",
       "duration": "Süre",
       "averageSpeed": "Ort. hız"
+    },
+    "battery": {
+      "low": "Pil %{{percent}}. Ekran artık açık tutulmuyor, kayıt sürüyor.",
+      "critical": "Pil %{{percent}}. Telefon kapanırsa sürüş cihazında güvende ve kaldığı yerden devam eder."
     }
   },
   "share": {

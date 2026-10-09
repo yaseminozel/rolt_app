@@ -34,6 +34,7 @@ import {
   type SimulationScenario,
 } from '@/features/navigation/location';
 import type { NavigationSnapshot } from '@/features/navigation/navigationTracker';
+import { useLowBattery } from '@/features/device/useLowBattery';
 import { haptics } from '@/features/haptics/haptics';
 import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { navigationActivityProps } from '@/features/liveActivity/rideActivityProps';
@@ -124,15 +125,25 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
   // 06.07: arrival is felt; nothing else buzzes on the move (the phone sits in a vibrating mount).
   useHapticOnSet(snapshot.finished, 'success');
 
+  // Below 10 % on battery the screen may sleep: voice guidance carries on with it locked.
+  const criticalBattery = useLowBattery()?.tier === 'critical';
+  const awake = keepScreenOn && !criticalBattery;
   useEffect(() => {
-    if (!keepScreenOn) {
+    if (!awake) {
       return;
     }
     activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => undefined);
     return () => {
       deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => undefined);
     };
-  }, [keepScreenOn]);
+  }, [awake]);
+  useEffect(() => {
+    if (criticalBattery && keepScreenOn) {
+      showToast({ variant: 'info', message: t('navigation.batteryCritical') });
+    }
+    // Once per drop below the threshold, not on every toggle of the setting.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [criticalBattery]);
 
   const finishRide = useCallback(
     (current: NavigationSnapshot, completed: boolean) => {

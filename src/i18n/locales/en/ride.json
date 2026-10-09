@@ -170,7 +170,8 @@
     "liveActivity": {
       "status": "Riding the route",
       "weak": "Weak GPS"
-    }
+    },
+    "batteryCritical": "Battery very low. The screen no longer stays on; voice guidance continues."
   },
   "exit": {
     "title": "Do you want to end navigation?",
