@@ -24,6 +24,7 @@ import { FilterChip } from '@/components/ui/FilterChip';
 import { useCommunityFeed, useFollowAuthor, useSetPostLiked } from '@/features/community/queries';
 import type { CommunityPost, FeedFilter } from '@/features/community/types';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
+import { haptics, hapticToggle } from '@/features/haptics/haptics';
 import { colors, fontFamily, layout, radius, spacing } from '@/theme';
 
 /** Room for the floating tab bar under the last post. */
@@ -47,7 +48,10 @@ export default function CommunityScreen() {
   const empty = !feed.isPending && posts.length === 0;
 
   const like = (post: CommunityPost) =>
-    requireAccount('likeRide', () => setLiked.mutate({ postId: post.id, liked: !post.isLiked }));
+    requireAccount('likeRide', () => {
+      hapticToggle(!post.isLiked);
+      setLiked.mutate({ postId: post.id, liked: !post.isLiked });
+    });
   const comment = (post: CommunityPost) =>
     router.push({ pathname: '/community/comments', params: { postId: post.id } });
   const share = (post: CommunityPost) =>
@@ -69,7 +73,13 @@ export default function CommunityScreen() {
         ]}
         keyboardShouldPersistTaps="handled"
         refreshControl={
-          <RefreshControl refreshing={feed.isRefetching} onRefresh={() => feed.refetch()} />
+          <RefreshControl
+            refreshing={feed.isRefetching}
+            onRefresh={() => {
+              haptics.tap();
+              feed.refetch();
+            }}
+          />
         }>
         <View style={styles.top}>
           <View style={styles.titleRow}>
@@ -131,7 +141,10 @@ export default function CommunityScreen() {
                     router.push({ pathname: '/rider/[id]', params: { id: post.author.id } })
                   }
                   onFollowPress={() =>
-                    requireAccount('followRider', () => followAuthor.mutate(post.author.id))
+                    requireAccount('followRider', () => {
+                      hapticToggle(true);
+                      followAuthor.mutate(post.author.id);
+                    })
                   }
                   onLikePress={() => like(post)}
                   onCommentPress={() => comment(post)}

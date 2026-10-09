@@ -10,6 +10,7 @@ import {
   useSetRideLiked,
   useSetRideSaved,
 } from '@/features/riders/queries';
+import { hapticToggle } from '@/features/haptics/haptics';
 import type { RideSummary } from '@/features/riders/types';
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
@@ -72,7 +73,10 @@ export function RiderRidesFeed({
 
   const toggleLike = (ride: RideSummary) => {
     const liked = !ride.isLiked;
-    requireAccount('likeRide', () => setLiked.mutate({ rideId: ride.id, liked }));
+    requireAccount('likeRide', () => {
+      hapticToggle(liked);
+      setLiked.mutate({ rideId: ride.id, liked });
+    });
   };
 
   const toggleSave = (ride: RideSummary) => {

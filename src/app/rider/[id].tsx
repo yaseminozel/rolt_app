@@ -22,6 +22,7 @@ import {
   useRiderMatch,
   useSetFollowing,
 } from '@/features/riders/queries';
+import { hapticToggle } from '@/features/haptics/haptics';
 import type { Rider, RiderBike } from '@/features/riders/types';
 import { formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
@@ -163,7 +164,10 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
 
   const toggleFollow = () => {
     const following = !rider.isFollowing;
-    requireAccount('followRider', () => setFollowing.mutate({ riderId: rider.id, following }));
+    requireAccount('followRider', () => {
+      hapticToggle(following);
+      setFollowing.mutate({ riderId: rider.id, following });
+    });
   };
 
   return (

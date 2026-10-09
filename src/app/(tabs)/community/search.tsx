@@ -17,6 +17,7 @@ import {
 } from '@/features/community/queries';
 import { useCommunityRecentSearches } from '@/features/community/recentSearches';
 import type { SearchKind, SearchResult } from '@/features/community/types';
+import { hapticToggle } from '@/features/haptics/haptics';
 import { useSetFollowing } from '@/features/riders/queries';
 import { formatNumber } from '@/i18n/format';
 import { colors, fontFamily, layout, spacing } from '@/theme';
@@ -179,6 +180,7 @@ function Results({
 
   const toggleFollow = (riderId: string, following: boolean) =>
     requireAccount('followRider', () => {
+      hapticToggle(!following);
       setFollowed((current) => ({ ...current, [riderId]: !following }));
       setFollowing.mutate({ riderId, following: !following });
     });

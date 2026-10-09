@@ -55,3 +55,12 @@ export function withHaptic<Args extends unknown[]>(
     handler(...args);
   };
 }
+
+/** An on/off action (like, follow): turning it on is a light tap, turning it off a tick. */
+export function hapticToggle(on: boolean) {
+  if (on) {
+    haptics.tap();
+  } else {
+    haptics.select();
+  }
+}
