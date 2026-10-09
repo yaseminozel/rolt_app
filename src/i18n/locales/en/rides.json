@@ -26,6 +26,7 @@
     "pause": "Pause",
     "resume": "Resume",
     "finish": "Finish",
+    "cancel": "Cancel",
     "delete": "Delete ride",
     "expand": "Full screen",
     "collapse": "Minimize",
@@ -40,7 +41,7 @@
       "banner": "Unfinished ride found",
       "description": "Your ride is safe on your device. Continue where you left off or finish at the last valid point."
     },
-    "tooShort": "Ride too short. Ride at least {{distance}} to save it.",
+    "tooShort": "Ride too short. Ride at least {{distance}} to save it, or cancel the ride.",
     "permission": {
       "title": "Location off",
       "heading": "Location access is needed to record rides",
@@ -54,6 +55,12 @@
       "description": "The route, stats and photos of this ride will be deleted permanently. This can't be undone.",
       "confirm": "Delete ride",
       "cancel": "Cancel"
+    },
+    "cancelDialog": {
+      "title": "Cancel this ride?",
+      "description": "Rides under {{distance}} aren't saved. This recording will be deleted and can't be restored.",
+      "confirm": "Cancel ride",
+      "keep": "Keep ride"
     },
     "locationRequired": "Location access is needed to record.",
     "closeSheet": "Close",

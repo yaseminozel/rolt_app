@@ -26,6 +26,7 @@
     "pause": "Duraklat",
     "resume": "Devam et",
     "finish": "Bitir",
+    "cancel": "İptal et",
     "delete": "Sürüşü sil",
     "expand": "Tam ekran",
     "collapse": "Küçült",
@@ -40,7 +41,7 @@
       "banner": "Yarım kalan sürüş bulundu",
       "description": "Sürüş cihazında güvende. Kaldığın yerden devam edebilir veya son geçerli noktada bitirebilirsin."
     },
-    "tooShort": "Sürüş çok kısa. Kaydetmek için en az {{distance}} sür.",
+    "tooShort": "Sürüş çok kısa. Kaydetmek için en az {{distance}} sür ya da sürüşü iptal et.",
     "permission": {
       "title": "Konum kapalı",
       "heading": "Sürüş kaydı için konum izni gerekli",
@@ -54,6 +55,12 @@
       "description": "Bu sürüşe ait rota, istatistikler ve görseller kalıcı olarak silinir. Bu işlem geri alınamaz.",
       "confirm": "Sürüşü sil",
       "cancel": "Vazgeç"
+    },
+    "cancelDialog": {
+      "title": "Sürüş iptal edilsin mi?",
+      "description": "{{distance}} altındaki sürüşler kaydedilmez. Bu kayıt silinir ve geri alınamaz.",
+      "confirm": "Sürüşü iptal et",
+      "keep": "Vazgeç"
     },
     "locationRequired": "Kayıt için konum izni gerekli.",
     "closeSheet": "Kapat",

@@ -52,7 +52,7 @@ export type StartOptions = {
   route?: { id: string; name: string; line: LngLat[] };
 };
 
-export type FinishResult = { kind: 'tooShort' } | { kind: 'draft'; rideId: string };
+export type FinishResult = { kind: 'tooShort'; rideId: string } | { kind: 'draft'; rideId: string };
 
 type RideRecordingValue = {
   /** `undefined` until the device storage has been checked for an interrupted ride. */
@@ -339,7 +339,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     publish();
     if (snapshot.stats.distanceM < MIN_SAVE_DISTANCE_M) {
       persist().catch(() => undefined);
-      return { kind: 'tooShort' };
+      return { kind: 'tooShort', rideId: record.id };
     }
     const draft: RideRecord = {
       ...record,

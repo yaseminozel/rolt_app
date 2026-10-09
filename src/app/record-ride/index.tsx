@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 import { router, useFocusEffect } from 'expo-router';
-import { Collapse, Expand, MapsArrow, NavArrowDown } from 'iconoir-react-native';
+import { Collapse, Expand, NavArrowDown, NavigatorAlt } from 'iconoir-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -18,11 +18,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LayersIcon } from '@/components/explore/LayersIcon';
 import { DialogModal } from '@/components/feedback/DialogModal';
+import { useToast } from '@/components/feedback/ToastProvider';
 import { isNativeMapAvailable } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
 import type { MapStyle } from '@/components/map/mapStyles';
 import { MapStatusBanner, type MapStatusBannerTone } from '@/components/record/MapStatusBanner';
-import { RecordMapView } from '@/components/record/RecordMapView';
+import { RecordMapView, type RecenterRequest } from '@/components/record/RecordMapView';
 import { RecordMetrics } from '@/components/record/RecordMetrics';
 import { RECORD_SHEET_TOP_GAP, useSheetTopInset } from '@/components/record/recordSheetLayout';
 import { RideTypeSelector } from '@/components/ride/RideTypeSelector';
@@ -46,6 +47,8 @@ const illustration = require('../../../assets/images/location-off-illustration.p
 const READY_BANNER_MS = 3_000;
 /** "Sürüş çok kısa" (08.04) disappears after this long. */
 const TOO_SHORT_BANNER_MS = 4_000;
+/** "Konumum" before the first fix accepts a system fix this recent. */
+const LOCATE_MAX_AGE_MS = 10_000;
 /** Timed banners are checked this often. */
 const BANNER_TICK_MS = 500;
 const EXPAND_BUTTON = 36;
@@ -91,9 +94,15 @@ export default function RecordScreen() {
   );
   const [fullScreen, setFullScreen] = useState(false);
   const [follow, setFollow] = useState(true);
+  const [recenter, setRecenter] = useState<RecenterRequest | null>(null);
+  const { showToast } = useToast();
   const [mapStyle, setMapStyle] = useState<MapStyle>('default');
   const now = useNow(BANNER_TICK_MS);
   const [tooShortUntil, setTooShortUntil] = useState(0);
+  // 08.04: after "Bitir" turned out too short, the ride can be cancelled instead (it may have
+  // been started by mistake) until it passes the minimum distance.
+  const [tooShortRideId, setTooShortRideId] = useState<string | null>(null);
+  const [cancelVisible, setCancelVisible] = useState(false);
   const [deleteVisible, setDeleteVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   // Flow B: after the background permission sheet, the start the rider asked for goes ahead.
@@ -183,6 +192,7 @@ export default function RecordScreen() {
       const result = await recording.finish();
       if (result.kind === 'tooShort') {
         haptics.warning();
+        setTooShortRideId(result.rideId);
         setTooShortUntil(Date.now() + TOO_SHORT_BANNER_MS);
         return;
       }
@@ -212,6 +222,13 @@ export default function RecordScreen() {
 
   const confirmDelete = async () => {
     setDeleteVisible(false);
+    await recording.discard();
+    haptics.press();
+  };
+
+  const confirmCancel = async () => {
+    setCancelVisible(false);
+    setTooShortUntil(0);
     await recording.discard();
     haptics.press();
   };
@@ -298,7 +315,24 @@ export default function RecordScreen() {
     </Animated.Text>
   );
 
-  const secondaryFinish = (
+  const cancelMode =
+    !!active &&
+    active.rideId === tooShortRideId &&
+    (snapshot?.stats.distanceM ?? 0) < MIN_SAVE_DISTANCE_M;
+  const secondaryFinish = cancelMode ? (
+    <Button
+      variant="outlined"
+      destructive
+      size="xl"
+      label={t('record.cancel')}
+      onPress={() => {
+        haptics.warning();
+        setCancelVisible(true);
+      }}
+      disabled={busy}
+      style={styles.flex}
+    />
+  ) : (
     <Button
       variant="outlined"
       size="xl"
@@ -425,6 +459,31 @@ export default function RecordScreen() {
   const position = snapshot?.position ?? preview.position;
   const heading = snapshot?.headingDeg ?? preview.headingDeg;
 
+  // "Konumum": back on the rider at once and following again. The live fix is used as is; only
+  // before the first fix does it ask the system for one.
+  const handleLocate = async () => {
+    haptics.tap();
+    setFollow(true);
+    let to = position;
+    if (!to && !isSimulatedNavigation) {
+      const fix =
+        (await Location.getLastKnownPositionAsync({ maxAge: LOCATE_MAX_AGE_MS }).catch(() => null)) ??
+        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }).catch(
+          () => null,
+        ));
+      to = fix ? [fix.coords.longitude, fix.coords.latitude] : null;
+    }
+    if (!to) {
+      showToast({
+        variant: 'failure',
+        message: t('explore:map.locationUnavailable'),
+        bottomOffset: panelHeight - insets.bottom + spacing.sm,
+      });
+      return;
+    }
+    setRecenter({ key: Date.now(), to });
+  };
+
   return (
     <View style={styles.screen}>
       <RecordMapView
@@ -433,6 +492,7 @@ export default function RecordScreen() {
         track={snapshot?.track ?? []}
         follow={follow}
         onUserGesture={() => setFollow(false)}
+        recenter={recenter}
         mapStyle={mapStyle}
         weakSignal={autoPaused}
         detail={collapsed && !fullScreen}
@@ -461,9 +521,11 @@ export default function RecordScreen() {
             }
           />
           <MapActionButton
-            icon={MapsArrow}
-            accessibilityLabel={t('explore:map.locateMe')}
-            onPress={() => setFollow(true)}
+            icon={NavigatorAlt}
+            accessibilityLabel={t('explore:map.myLocation')}
+            selected={follow}
+            iconColor={follow ? colors.brand : colors.textPrimary}
+            onPress={handleLocate}
             disabled={!isNativeMapAvailable}
           />
         </View>
@@ -508,6 +570,31 @@ export default function RecordScreen() {
           </View>
         </View>
       </Animated.View>
+
+      <DialogModal
+        visible={cancelVisible}
+        onRequestClose={() => setCancelVisible(false)}
+        status="error"
+        title={t('record.cancelDialog.title')}
+        description={t('record.cancelDialog.description', {
+          distance: formatDistance(MIN_SAVE_DISTANCE_M / 1000, 1),
+        })}
+        actionsLayout="column"
+        actions={[
+          <Button
+            key="cancel-ride"
+            destructive
+            label={t('record.cancelDialog.confirm')}
+            onPress={confirmCancel}
+          />,
+          <Button
+            key="keep"
+            variant="text"
+            label={t('record.cancelDialog.keep')}
+            onPress={() => setCancelVisible(false)}
+          />,
+        ]}
+      />
 
       <DialogModal
         visible={deleteVisible}

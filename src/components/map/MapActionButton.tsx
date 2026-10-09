@@ -23,6 +23,8 @@ export type MapActionButtonProps = {
   size?: keyof typeof SIZES;
   /** Toggle buttons (bookmark, layers) report their state to assistive tech. */
   selected?: boolean;
+  /** Icon tint, e.g. brand while "Konumum" keeps the map on the rider. */
+  iconColor?: string;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -34,6 +36,7 @@ export function MapActionButton({
   onPress,
   size = 'action',
   selected,
+  iconColor = colors.textPrimary,
   disabled = false,
   style,
 }: MapActionButtonProps) {
@@ -55,7 +58,7 @@ export function MapActionButton({
         },
         style,
       ]}>
-      <Icon width={spec.icon} height={spec.icon} color={colors.textPrimary} strokeWidth={1.5} />
+      <Icon width={spec.icon} height={spec.icon} color={iconColor} strokeWidth={1.5} />
     </Pressable>
   );
 }
