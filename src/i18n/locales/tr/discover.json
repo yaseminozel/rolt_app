@@ -23,7 +23,8 @@
     "locationOffTitle": "Konum iznin kapalı",
     "locationOffDescription": "Yakınındaki rotaları haritada görmek için konum iznini aç ya da bir şehir seç.",
     "locationOffAction": "İzin ver",
-    "expandMap": "Haritayı genişlet"
+    "expandMap": "Haritayı genişlet",
+    "downloadedTitle": "İndirdiğin rotalar"
   },
   "search": {
     "placeholder": "Rota ara",

@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/BaseMap';
 import { MapActionButton } from '@/components/map/MapActionButton';
+import { OfflineMapButton } from '@/components/route/OfflineMapButton';
 import { cameraBoundsFor } from '@/components/map/mapGeometry';
 import type { MapboxModule } from '@/components/map/NativeBaseMap';
 import { RouteLineLayers } from '@/components/map/RouteLineLayers';
@@ -114,12 +115,15 @@ function TopBar({ route }: { route?: Route }) {
     <View style={styles.topBar} pointerEvents="box-none">
       <MapActionButton icon={NavArrowLeft} accessibilityLabel={t('actions.back')} onPress={goBack} />
       {route ? (
-        <MapActionButton
-          icon={saved ? BookmarkSolid : Bookmark}
-          accessibilityLabel={t('actions.save')}
-          selected={saved}
-          onPress={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_BOTTOM_OFFSET })}
-        />
+        <View style={styles.topActions}>
+          <OfflineMapButton route={route} toastBottomOffset={TOAST_BOTTOM_OFFSET} />
+          <MapActionButton
+            icon={saved ? BookmarkSolid : Bookmark}
+            accessibilityLabel={t('actions.save')}
+            selected={saved}
+            onPress={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_BOTTOM_OFFSET })}
+          />
+        </View>
       ) : null}
     </View>
   );
@@ -358,6 +362,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: layout.screenGutter,
+  },
+  topActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
   },
   mapButton: {
     position: 'absolute',

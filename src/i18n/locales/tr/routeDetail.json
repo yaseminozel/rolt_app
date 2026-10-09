@@ -41,5 +41,18 @@
       "end": "Bitiş"
     }
   },
-  "previewRoute": "Rotayı önizle"
+  "previewRoute": "Rotayı önizle",
+  "offline": {
+    "download": "Haritayı çevrimdışı kullan",
+    "ready": "Harita indirildi. Sinyal olmadan da görünür.",
+    "failed": "Harita indirilemedi. Bağlantını kontrol edip tekrar dene.",
+    "readyTitle": "Bu rotanın haritası cihazında",
+    "readyA11y": "Çevrimdışı harita indirildi",
+    "remove": "Çevrimdışı haritayı sil",
+    "cancel": "Vazgeç",
+    "downloadingTitle": "Harita indiriliyor · %{{percent}}",
+    "downloadingA11y": "Harita indiriliyor, yüzde {{percent}}",
+    "stop": "İndirmeyi durdur",
+    "keepDownloading": "Devam etsin"
+  }
 }

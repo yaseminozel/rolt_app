@@ -14,6 +14,7 @@ import { MapExpandProvider } from '@/components/map/MapExpandTransition';
 import '@/features/navigation/location/backgroundLocationTask';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { takePendingAccountAction } from '@/features/auth/pendingAccountAction';
+import { offlineMaps } from '@/features/offlineMaps/offlineMaps';
 import { RideRecordingProvider } from '@/features/rides/RideRecordingProvider';
 import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
 import '@/i18n';
@@ -105,6 +106,8 @@ function RootNavigator() {
   useEffect(() => {
     if (ready) {
       SplashScreen.hideAsync();
+      // An offline map download the app was killed in the middle of carries on.
+      offlineMaps.restore();
     }
   }, [ready]);
 

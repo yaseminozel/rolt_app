@@ -29,7 +29,8 @@
     "recommend": "Arkadaşına öner",
     "instagram": "Instagram",
     "signOut": "Çıkış yap",
-    "sensors": "Sensörler"
+    "sensors": "Sensörler",
+    "offlineMaps": "Çevrimdışı haritalar"
   },
   "values": {
     "visibility": {
@@ -64,7 +65,10 @@
     "noBike": "Ekle",
     "unitsImperial": "Imperial (mi, mph)",
     "sensorsCalibrated": "Kalibre edildi",
-    "sensorsNotCalibrated": "Kalibre edilmedi"
+    "sensorsNotCalibrated": "Kalibre edilmedi",
+    "offlineMaps_one": "{{count}} rota",
+    "offlineMaps_other": "{{count}} rota",
+    "offlineMapsNone": "Yok"
   },
   "rateHint": {
     "ios": "App Store’da puan ver",
@@ -435,5 +439,18 @@
       "changed": "Motorun güncellendi.",
       "deleted": "Motorun silindi."
     }
+  },
+  "offlineMaps": {
+    "title": "Çevrimdışı haritalar",
+    "description": "İndirdiğin rota haritaları sinyal olmadan da görünür. Rota detayındaki bulut butonuyla indirebilirsin.",
+    "count_one": "{{count}} harita · {{size}}",
+    "count_other": "{{count}} harita · {{size}}",
+    "emptyTitle": "İndirilmiş harita yok",
+    "emptyDescription": "Bir rotanın detayında bulut butonuna dokun; o rotanın haritası cihazına iner.",
+    "downloadedAt": "{{date}} · {{size}}",
+    "downloading": "İndiriliyor · %{{percent}}",
+    "remove": "Sil",
+    "removed": "{{name}} haritası silindi",
+    "megabytes": "{{value}} MB"
   }
 }

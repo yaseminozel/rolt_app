@@ -16,6 +16,7 @@ export type SettingsItemId =
   | 'language'
   | 'units'
   | 'sensors'
+  | 'offlineMaps'
   | 'help'
   | 'feedback'
   | 'privacyPolicy'

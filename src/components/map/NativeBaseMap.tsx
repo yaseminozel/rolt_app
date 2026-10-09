@@ -9,6 +9,16 @@ import type { MapStyle } from './mapStyles';
 initMapbox();
 
 export type MapboxModule = typeof Mapbox;
+
+/**
+ * Offline packs (`src/features/offlineMaps`), lazily required like the map itself so that this
+ * stays the only file importing `@rnmapbox/maps`.
+ */
+export const mapboxOffline = {
+  manager: Mapbox.offlineManager,
+  completeState: Mapbox.OfflinePackDownloadState.Complete,
+  styleURL: mapStyleUrl,
+};
 export type NativeMapViewProps = ComponentProps<typeof Mapbox.MapView>;
 
 type NativeBaseMapProps = NativeMapViewProps & {

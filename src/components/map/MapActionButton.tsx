@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
@@ -25,6 +25,8 @@ export type MapActionButtonProps = {
   selected?: boolean;
   /** Icon tint, e.g. brand while "Konumum" keeps the map on the rider. */
   iconColor?: string;
+  /** Drawn instead of `icon`, e.g. a download progress ring. */
+  content?: ReactNode;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -37,6 +39,7 @@ export function MapActionButton({
   size = 'action',
   selected,
   iconColor = colors.textPrimary,
+  content,
   disabled = false,
   style,
 }: MapActionButtonProps) {
@@ -58,7 +61,7 @@ export function MapActionButton({
         },
         style,
       ]}>
-      <Icon width={spec.icon} height={spec.icon} color={iconColor} strokeWidth={1.5} />
+      {content ?? <Icon width={spec.icon} height={spec.icon} color={iconColor} strokeWidth={1.5} />}
     </Pressable>
   );
 }

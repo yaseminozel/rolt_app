@@ -29,7 +29,8 @@
     "recommend": "Recommend to a friend",
     "instagram": "Instagram",
     "signOut": "Sign out",
-    "sensors": "Sensors"
+    "sensors": "Sensors",
+    "offlineMaps": "Offline maps"
   },
   "values": {
     "visibility": {
@@ -64,7 +65,10 @@
     "noBike": "Add",
     "unitsImperial": "Imperial (mi, mph)",
     "sensorsCalibrated": "Calibrated",
-    "sensorsNotCalibrated": "Not calibrated"
+    "sensorsNotCalibrated": "Not calibrated",
+    "offlineMaps_one": "{{count}} route",
+    "offlineMaps_other": "{{count}} routes",
+    "offlineMapsNone": "None"
   },
   "rateHint": {
     "ios": "Rate us on the App Store",
@@ -435,5 +439,18 @@
       "changed": "Your bike was updated.",
       "deleted": "Your bike was deleted."
     }
+  },
+  "offlineMaps": {
+    "title": "Offline maps",
+    "description": "Route maps you download show without signal too. Download one with the cloud button on a route.",
+    "count_one": "{{count}} map · {{size}}",
+    "count_other": "{{count}} maps · {{size}}",
+    "emptyTitle": "No downloaded maps",
+    "emptyDescription": "Tap the cloud button on a route to download its map to your device.",
+    "downloadedAt": "{{date}} · {{size}}",
+    "downloading": "Downloading · {{percent}}%",
+    "remove": "Delete",
+    "removed": "Map of {{name}} deleted",
+    "megabytes": "{{value}} MB"
   }
 }

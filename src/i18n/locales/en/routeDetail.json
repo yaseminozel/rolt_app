@@ -41,5 +41,18 @@
       "end": "Finish"
     }
   },
-  "previewRoute": "Preview route"
+  "previewRoute": "Preview route",
+  "offline": {
+    "download": "Use map offline",
+    "ready": "Map downloaded. It shows without signal too.",
+    "failed": "Couldn't download the map. Check your connection and try again.",
+    "readyTitle": "This route's map is on your device",
+    "readyA11y": "Offline map downloaded",
+    "remove": "Delete offline map",
+    "cancel": "Cancel",
+    "downloadingTitle": "Downloading map · {{percent}}%",
+    "downloadingA11y": "Downloading map, {{percent}} percent",
+    "stop": "Stop download",
+    "keepDownloading": "Keep downloading"
+  }
 }
