@@ -1,7 +1,7 @@
 import { isNativeMapAvailable } from '@/components/map/BaseMap';
 import type { LngLat } from '@/features/routes/types';
 
-import type { LocationSource } from '../types';
+import type { LocationProfile, LocationSource } from '../types';
 import { createDeviceLocationSource } from './deviceLocationSource';
 import { createSimulatedLocationSource, type SimulationScenario } from './simulatedLocationSource';
 
@@ -23,15 +23,17 @@ export function createNavigationLocationSource({
   stops,
   scenario,
   notification,
+  profile = 'navigation',
 }: {
   line: LngLat[];
   stops: LngLat[];
   scenario?: SimulationScenario;
   notification: { title: string; body: string };
+  profile?: LocationProfile;
 }): LocationSource {
   return isSimulatedNavigation
     ? createSimulatedLocationSource({ line, stops, scenario: scenario ?? envScenario, timeScale: envTimeScale })
-    : createDeviceLocationSource(notification);
+    : createDeviceLocationSource(notification, profile);
 }
 
 export type { SimulationScenario };

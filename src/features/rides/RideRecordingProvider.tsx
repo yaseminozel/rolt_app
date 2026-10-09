@@ -112,6 +112,7 @@ function locationSource(line: LngLat[] | undefined): LocationSource {
       title: i18n.t('rides:record.notificationTitle'),
       body: i18n.t('rides:record.notificationBody'),
     },
+    profile: 'recording',
   });
 }
 
@@ -366,6 +367,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const pause = useCallback(() => {
     const now = sourceRef.current?.now() ?? Date.now();
     recorderRef.current?.pause(now);
+    sourceRef.current?.setPowerMode?.('idle').catch(() => undefined);
     publish();
     persist().catch(() => undefined);
   }, [persist, publish]);
@@ -385,6 +387,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const resume = useCallback(() => {
     const now = sourceRef.current?.now() ?? Date.now();
     recorderRef.current?.resume(now);
+    sourceRef.current?.setPowerMode?.('active').catch(() => undefined);
     publish();
     persist().catch(() => undefined);
   }, [persist, publish]);
@@ -405,6 +408,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       throw new Error('No recording to finish');
     }
     recorder.pause(sourceRef.current?.now() ?? Date.now());
+    sourceRef.current?.setPowerMode?.('idle').catch(() => undefined);
     const snapshot = recorder.snapshot();
     publish();
     if (snapshot.stats.distanceM < MIN_SAVE_DISTANCE_M) {
@@ -458,6 +462,8 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     // Only the simulator needs the line (it drives along it); real GPS ignores it.
     const route = ROUTE_FIXTURES.find((item) => item.id === interrupted.routeId);
     await startTracking(route?.coordinates);
+    // A restored ride waits paused for "Devam et".
+    sourceRef.current?.setPowerMode?.('idle').catch(() => undefined);
   }, [enqueueWrite, interrupted, publish, startTracking]);
 
   const isRecording = active !== null;
