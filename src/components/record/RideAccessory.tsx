@@ -3,7 +3,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { ActiveRecording } from '@/features/rides/RideRecordingProvider';
+import { useActiveRide, type ActiveRecording } from '@/features/rides/RideRecordingProvider';
 import { formatDistance, formatRideClock } from '@/i18n/format';
 import { colors, fontFamily, spacing, typography } from '@/theme';
 
@@ -23,9 +23,18 @@ const DOT_COLORS: Record<RideStatus, string> = {
  * 2026-10-09): with the record sheet closed the ride carries on, and this shows it — status dot,
  * time and distance (JetBrains Mono like the record screen). Tapping reopens the sheet. The
  * system draws the glass; inline (tab bar minimised) shows the dot and the time only. The
- * accessory renders twice (one per placement), so everything comes from `recording`.
+ * accessory renders twice (one per placement), so everything comes from the recording context;
+ * only this re-renders with the live numbers, not the tab bar.
  */
-export function RideAccessory({ recording }: { recording: ActiveRecording }) {
+export function RideAccessory() {
+  const recording = useActiveRide();
+  if (!recording) {
+    return null;
+  }
+  return <RideAccessoryContent recording={recording} />;
+}
+
+function RideAccessoryContent({ recording }: { recording: ActiveRecording }) {
   const { t } = useTranslation('rides');
   const placement = NativeTabs.BottomAccessory.usePlacement();
   const status = statusOf(recording);

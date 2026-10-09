@@ -25,6 +25,7 @@ import { LIVE_ACTIVITY_INTERVAL_MS, rideLiveActivity } from '@/features/liveActi
 import { i18n } from '@/i18n';
 
 import { RECORDER_RULES, RideRecorder, type RecorderSnapshot } from './rideRecorder';
+import { TrackView, type TrackViewState } from './trackView';
 import { ridesRepository } from './ridesRepository';
 import { nearestCityName } from './rideTitle';
 import type { RideType } from './rideTypes';
@@ -37,6 +38,9 @@ const PERSIST_INTERVAL_MS = 10_000;
 /** Deep link of the Kaydet sheet (`/record-ride`). */
 const RECORD_SHEET_URL = 'rolt://record-ride';
 const TICK_MS = 1_000;
+/** A tick right after a fix has nothing new to show; skipping it halves the renders. */
+const TICK_PUBLISH_GAP_MS = 900;
+const EMPTY_TRACK_VIEW: TrackViewState = { committed: [], commits: 0, tail: [] };
 /** Lean readings while recording (10 Hz is plenty for peak lean). */
 const LEAN_RECORD_INTERVAL_MS = 100;
 /** The web preview and Expo Go ride along this route when no route is attached. */
@@ -59,10 +63,16 @@ export type StartOptions = {
 
 export type FinishResult = { kind: 'tooShort'; rideId: string } | { kind: 'draft'; rideId: string };
 
+/**
+ * The recording's controls and slow-changing state. It doesn't change while riding, so the tab
+ * bar and other screens don't re-render on every fix; live numbers come from `useActiveRide`, the
+ * map's track from `useRideTrack` (CLAUDE.md "Uzun sürüş performansı").
+ */
 type RideRecordingValue = {
   /** `undefined` until the device storage has been checked for an interrupted ride. */
   interrupted: RideRecord | null | undefined;
-  active: ActiveRecording | null;
+  /** A ride is being recorded (running or paused). */
+  isRecording: boolean;
   preview: {
     gps: PreviewGps;
     /** When GPS became ready, for the short "GPS hazır" banner. */
@@ -86,6 +96,10 @@ type RideRecordingValue = {
 };
 
 const RideRecordingContext = createContext<RideRecordingValue | null>(null);
+/** Totals and state of the running recording, about once a second. */
+const ActiveRideContext = createContext<ActiveRecording | null>(null);
+/** The running recording's track for the map: a committed part and a live tail. */
+const RideTrackContext = createContext<TrackViewState>(EMPTY_TRACK_VIEW);
 
 const newRideId = () => `ride-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
@@ -109,6 +123,7 @@ function locationSource(line: LngLat[] | undefined): LocationSource {
 export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const [interrupted, setInterrupted] = useState<RideRecord | null | undefined>(undefined);
   const [active, setActive] = useState<ActiveRecording | null>(null);
+  const [track, setTrack] = useState<TrackViewState>(EMPTY_TRACK_VIEW);
   const [preview, setPreview] = useState<RideRecordingValue['preview']>({
     gps: 'searching',
     readySince: null,
@@ -123,6 +138,12 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const leanSubscriptionRef = useRef<{ remove: () => void } | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastPersistRef = useRef(0);
+  const lastPublishRef = useRef(0);
+  const trackViewRef = useRef<TrackView | null>(null);
+  /** Points with a `seq` below this are on the device. */
+  const persistedSeqRef = useRef(0);
+  /** Writes run one after another, so appended points never overtake each other. */
+  const writeChainRef = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
     ridesRepository
@@ -131,23 +152,37 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       .catch(() => setInterrupted(null));
   }, []);
 
-  const persist = useCallback(async () => {
-    const recorder = recorderRef.current;
-    const record = recordRef.current;
-    if (!recorder || !record) {
-      return;
-    }
-    const snapshot = recorder.snapshot();
-    const next: RideRecord = {
-      ...record,
-      stats: snapshot.stats,
-      track: snapshot.track,
-      updatedAt: Date.now(),
-    };
-    recordRef.current = next;
-    lastPersistRef.current = Date.now();
-    await ridesRepository.put(next);
+  /** Queues a device write after the ones before it. */
+  const enqueueWrite = useCallback((write: () => Promise<void>) => {
+    const next = writeChainRef.current.then(write, write);
+    writeChainRef.current = next.catch(() => undefined);
+    return next;
   }, []);
+
+  /** Stats plus only the points since the last write (P0: small, so it stays quick on long rides). */
+  const persist = useCallback(
+    () =>
+      enqueueWrite(async () => {
+        const recorder = recorderRef.current;
+        const record = recordRef.current;
+        if (!recorder || !record) {
+          return;
+        }
+        const points = recorder.pointsSince(persistedSeqRef.current);
+        const next: RideRecord = {
+          ...record,
+          stats: recorder.snapshot().stats,
+          updatedAt: Date.now(),
+        };
+        recordRef.current = next;
+        lastPersistRef.current = Date.now();
+        await ridesRepository.appendRecording(next, points);
+        if (points.length > 0) {
+          persistedSeqRef.current = points[points.length - 1].seq + 1;
+        }
+      }),
+    [enqueueWrite],
+  );
 
   const publish = useCallback(() => {
     const recorder = recorderRef.current;
@@ -155,12 +190,18 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     if (!recorder || !record) {
       return;
     }
+    lastPublishRef.current = Date.now();
     setActive({
       rideId: record.id,
       rideType: record.rideType,
       routeId: record.routeId,
       snapshot: recorder.snapshot(),
     });
+    const view = trackViewRef.current;
+    if (view) {
+      // Same object while nothing new was drawn, so the map doesn't re-render for it.
+      setTrack(view.update((seq) => recorder.pointsSince(seq), Date.now()));
+    }
   }, []);
 
   const handleFix = useCallback(
@@ -202,7 +243,9 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       stopSourceRef.current = await source.start(handleFix);
       tickRef.current = setInterval(() => {
         recorderRef.current?.tick(source.now());
-        publish();
+        if (Date.now() - lastPublishRef.current >= TICK_PUBLISH_GAP_MS) {
+          publish();
+        }
       }, TICK_MS);
       // Calibrated phones measure lean with the motion sensors (08.00); others keep the GPS estimate.
       const calibration = leanCalibration.get();
@@ -307,15 +350,17 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
         synced: false,
       };
       recordRef.current = record;
-      await ridesRepository.put(record);
+      persistedSeqRef.current = 0;
+      await enqueueWrite(() => ridesRepository.appendRecording(record, []));
       setInterrupted(null);
       recorderRef.current = new RideRecorder(now, undefined, {
         sensorLean: leanCalibration.get() !== null,
       });
+      trackViewRef.current = new TrackView();
       publish();
       await startTracking(route?.line);
     },
-    [publish, startTracking],
+    [enqueueWrite, publish, startTracking],
   );
 
   const pause = useCallback(() => {
@@ -348,7 +393,9 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     stopTracking();
     recorderRef.current = null;
     recordRef.current = null;
+    trackViewRef.current = null;
     setActive(null);
+    setTrack(EMPTY_TRACK_VIEW);
   }, [stopTracking]);
 
   const finish = useCallback(async (): Promise<FinishResult> => {
@@ -364,49 +411,60 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       persist().catch(() => undefined);
       return { kind: 'tooShort', rideId: record.id };
     }
+    // The draft carries the whole track; the appended points go once it is written.
     const draft: RideRecord = {
-      ...record,
+      ...(recordRef.current ?? record),
       status: 'draft',
       stats: snapshot.stats,
-      track: snapshot.track,
+      track: recorder.track(),
       endedAt: Date.now(),
       updatedAt: Date.now(),
     };
-    await ridesRepository.put(draft);
+    await enqueueWrite(() => ridesRepository.put(draft));
     clear();
     return { kind: 'draft', rideId: draft.id };
-  }, [clear, persist, publish]);
+  }, [clear, enqueueWrite, persist, publish]);
 
   const discard = useCallback(async () => {
     const id = recordRef.current?.id ?? interrupted?.id;
     clear();
     setInterrupted(null);
     if (id) {
-      await ridesRepository.remove(id);
+      // After any write still running, so it can't bring the ride back.
+      await enqueueWrite(() => ridesRepository.remove(id));
     }
-  }, [clear, interrupted]);
+  }, [clear, enqueueWrite, interrupted]);
 
   const restoreInterrupted = useCallback(async () => {
     if (!interrupted) {
       return;
     }
-    recordRef.current = interrupted;
+    const record: RideRecord = { ...interrupted, track: [] };
+    recordRef.current = record;
     setInterrupted(null);
-    recorderRef.current = new RideRecorder(
+    const recorder = new RideRecorder(
       Date.now(),
       { stats: interrupted.stats, track: interrupted.track },
       { sensorLean: leanCalibration.get() !== null },
     );
+    recorderRef.current = recorder;
+    trackViewRef.current = new TrackView();
+    // Its track goes into the point table once (also converting a ride written whole by an
+    // older version), before any new point is appended after it.
+    const points = recorder.pointsSince(0);
+    persistedSeqRef.current = points.length;
+    await enqueueWrite(() => ridesRepository.replaceRecording(record, points));
     publish();
     // Only the simulator needs the line (it drives along it); real GPS ignores it.
     const route = ROUTE_FIXTURES.find((item) => item.id === interrupted.routeId);
     await startTracking(route?.coordinates);
-  }, [interrupted, publish, startTracking]);
+  }, [enqueueWrite, interrupted, publish, startTracking]);
 
+  const isRecording = active !== null;
   const value = useMemo<RideRecordingValue>(
     () => ({
       interrupted,
-      active,
+      isRecording,
       preview,
       startPreview,
       start,
@@ -418,7 +476,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       restoreInterrupted,
     }),
     [
-      active,
+      isRecording,
       setRideType,
       discard,
       finish,
@@ -432,13 +490,41 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     ],
   );
 
-  return <RideRecordingContext.Provider value={value}>{children}</RideRecordingContext.Provider>;
+  return (
+    <RideRecordingContext.Provider value={value}>
+      <ActiveRideContext.Provider value={active}>
+        <RideTrackContext.Provider value={track}>{children}</RideTrackContext.Provider>
+      </ActiveRideContext.Provider>
+    </RideRecordingContext.Provider>
+  );
 }
 
-export function useRideRecording() {
+function useRecordingControls() {
   const value = useContext(RideRecordingContext);
   if (!value) {
-    throw new Error('useRideRecording must be used inside RideRecordingProvider');
+    throw new Error('Ride recording hooks must be used inside RideRecordingProvider');
   }
   return value;
+}
+
+/** Controls, state and the live totals together, for the record sheet itself. */
+export function useRideRecording() {
+  const controls = useRecordingControls();
+  const active = useContext(ActiveRideContext);
+  return useMemo(() => ({ ...controls, active }), [active, controls]);
+}
+
+/** Whether a ride is being recorded; changes only on start and finish. */
+export function useIsRecording() {
+  return useRecordingControls().isRecording;
+}
+
+/** Live totals of the running recording (about once a second), `null` when none. */
+export function useActiveRide() {
+  return useContext(ActiveRideContext);
+}
+
+/** The running recording's track for the map (`TrackView`). */
+export function useRideTrack() {
+  return useContext(RideTrackContext);
 }

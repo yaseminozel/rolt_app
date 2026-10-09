@@ -5,10 +5,17 @@ import { BaseMap, isNativeMapAvailable, mapFallbacks } from '@/components/map/Ba
 import type { MapStyle } from '@/components/map/mapStyles';
 import type { MapboxModule } from '@/components/map/NativeBaseMap';
 import { RIDER_BOX, RiderMarker } from '@/components/navigation/NavigationMapView';
+import type { TrackViewState } from '@/features/rides/trackView';
 import type { LngLat } from '@/features/routes/types';
 import { colors } from '@/theme';
 
 const TRACK_WIDTH = 5;
+const TRACK_STYLE = {
+  lineColor: colors.accentStrong,
+  lineWidth: TRACK_WIDTH,
+  lineCap: 'round',
+  lineJoin: 'round',
+} as const;
 const FOLLOW_ZOOM = 15.5;
 /** The collapsed panel shows the map closer (`un0E9` dragged down). */
 const DETAIL_ZOOM_STEP = 1;
@@ -31,8 +38,11 @@ const FALLBACK_RIDER = { x: 0.63, y: 0.3 };
 type RecordMapViewProps = {
   position: LngLat | null;
   headingDeg: number | null;
-  /** Recorded track, one segment per uninterrupted stretch. */
-  track: LngLat[][];
+  /**
+   * Recorded track as `TrackView` gives it: the committed part (rebuilt only on a new commit) and
+   * the live tail, so a long ride doesn't send its whole line to the map on every fix.
+   */
+  track: TrackViewState;
   /** Keep the camera on the rider; turns off when the rider pans the map. */
   follow: boolean;
   onUserGesture?: () => void;
@@ -65,16 +75,30 @@ export function RecordMapView({
   overlay,
   style,
 }: RecordMapViewProps) {
-  const shape = useMemo<GeoJSON.Feature<GeoJSON.MultiLineString>>(
+  const { committed, commits, tail } = track;
+  const committedShape = useMemo<GeoJSON.Feature<GeoJSON.MultiLineString>>(
     () => ({
       type: 'Feature',
       properties: {},
       geometry: {
         type: 'MultiLineString',
-        coordinates: track.filter((segment) => segment.length > 1),
+        coordinates: committed.filter((segment) => segment.length > 1),
       },
     }),
-    [track],
+    // `commits` changes exactly when `committed` does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [commits],
+  );
+  const tailShape = useMemo<GeoJSON.FeatureCollection<GeoJSON.LineString>>(
+    () => ({
+      type: 'FeatureCollection',
+      // Under two points there is no line yet (an empty LineString isn't valid GeoJSON).
+      features:
+        tail.length > 1
+          ? [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: tail } }]
+          : [],
+    }),
+    [tail],
   );
 
   const cameraRef = useRef<CameraRef>(null);
@@ -155,16 +179,11 @@ export function RecordMapView({
                 position ? { centerCoordinate: position, zoomLevel, padding } : undefined
               }
             />
-            <Mapbox.ShapeSource id="record-track" shape={shape}>
-              <Mapbox.LineLayer
-                id="record-track-line"
-                style={{
-                  lineColor: colors.accentStrong,
-                  lineWidth: TRACK_WIDTH,
-                  lineCap: 'round',
-                  lineJoin: 'round',
-                }}
-              />
+            <Mapbox.ShapeSource id="record-track" shape={committedShape}>
+              <Mapbox.LineLayer id="record-track-line" style={TRACK_STYLE} />
+            </Mapbox.ShapeSource>
+            <Mapbox.ShapeSource id="record-track-tail" shape={tailShape}>
+              <Mapbox.LineLayer id="record-track-tail-line" style={TRACK_STYLE} />
             </Mapbox.ShapeSource>
             {position ? (
               <Mapbox.MarkerView coordinate={position} anchor={{ x: 0.5, y: 0.5 }} allowOverlap>

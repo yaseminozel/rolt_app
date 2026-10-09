@@ -7,7 +7,7 @@ import { TabBarVisibilityProvider } from '@/components/layout/TabBarVisibility';
 import { RideAccessory } from '@/components/record/RideAccessory';
 import { usePermissionPromptSheet } from '@/features/auth/usePermissionPromptSheet';
 import { rememberTab } from '@/features/rides/recordSheet';
-import { useRideRecording } from '@/features/rides/RideRecordingProvider';
+import { useIsRecording } from '@/features/rides/RideRecordingProvider';
 import { colors } from '@/theme';
 
 /**
@@ -36,7 +36,8 @@ export default function TabsLayout() {
   const { t } = useTranslation();
   // Normally answered during registration; catches a sheet still due after it (e.g. app killed).
   usePermissionPromptSheet();
-  const { active } = useRideRecording();
+  // Changes only on start / finish: the live numbers re-render the accessory alone.
+  const recording = useIsRecording();
 
   return (
     <TabBarVisibilityProvider>
@@ -46,9 +47,9 @@ export default function TabsLayout() {
           hidden={hidden}
           screenListeners={({ route }) => ({ focus: () => rememberTab(route.name) })}>
           {/* A ride still recording with the sheet closed shows above the tab bar (iOS 26). */}
-          {active ? (
+          {recording ? (
             <NativeTabs.BottomAccessory>
-              <RideAccessory recording={active} />
+              <RideAccessory />
             </NativeTabs.BottomAccessory>
           ) : null}
           <NativeTabs.Trigger name="discover">

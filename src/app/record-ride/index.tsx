@@ -35,7 +35,7 @@ import { haptics, withHaptic } from '@/features/haptics/haptics';
 import { useHapticOnChange, useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { wasBackgroundPromptShown } from '@/features/navigation/backgroundPrompt';
 import { isSimulatedNavigation } from '@/features/navigation/location';
-import { MIN_SAVE_DISTANCE_M, useRideRecording } from '@/features/rides/RideRecordingProvider';
+import { MIN_SAVE_DISTANCE_M, useRideRecording, useRideTrack } from '@/features/rides/RideRecordingProvider';
 import type { RideType } from '@/features/rides/rideTypes';
 import { formatDistance, formatNumber } from '@/i18n/format';
 import { useNow } from '@/lib/useNow';
@@ -85,6 +85,7 @@ export default function RecordScreen() {
   const insets = useSafeAreaInsets();
   const requireAccount = useRequireAccount();
   const recording = useRideRecording();
+  const track = useRideTrack();
   const topOffset = useSheetTopInset() + RECORD_SHEET_TOP_GAP;
   const [collapsed, setCollapsed] = useState(false);
   const [panelHeight, setPanelHeight] = useState(0);
@@ -516,7 +517,7 @@ export default function RecordScreen() {
       <RecordMapView
         position={position}
         headingDeg={heading}
-        track={snapshot?.track ?? []}
+        track={track}
         follow={follow}
         onUserGesture={() => setFollow(false)}
         recenter={recenter}

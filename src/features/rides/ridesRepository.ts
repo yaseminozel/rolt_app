@@ -1,5 +1,5 @@
 import type { CompletedRide } from './completedRide';
-import { countCurves } from './rideRecorder';
+import { countCurves, type TrackPoint } from './rideRecorder';
 import { nearestCityName } from './rideTitle';
 import type { RideType } from './rideTypes';
 import { rideStorage } from './storage';
@@ -41,6 +41,10 @@ export const ridesRepository = {
     return ride ?? null;
   },
   put: (ride: RideRecord) => rideStorage.put(ride),
+  /** While recording: the record (stats, state) plus only the new track points (P0, small writes). */
+  appendRecording: (ride: RideRecord, points: TrackPoint[]) => rideStorage.appendRecording(ride, points),
+  /** Continuing an interrupted ride: its whole track as points, once. */
+  replaceRecording: (ride: RideRecord, points: TrackPoint[]) => rideStorage.replaceRecording(ride, points),
 
   async update(id: string, patch: Partial<RideRecord>) {
     const ride = await rideStorage.get(id);
