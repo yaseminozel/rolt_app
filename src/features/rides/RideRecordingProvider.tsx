@@ -33,6 +33,8 @@ import { EMPTY_RIDE_STATS, type RideRecord } from './types';
 export const MIN_SAVE_DISTANCE_M = 1_000;
 /** The recording row is rewritten this often, so a crash loses at most this much (08.03). */
 const PERSIST_INTERVAL_MS = 10_000;
+/** Deep link of the Kaydet sheet (`/record-ride`). */
+const RECORD_SHEET_URL = 'rolt://record-ride';
 const TICK_MS = 1_000;
 /** Lean readings while recording (10 Hz is plenty for peak lean). */
 const LEAN_RECORD_INTERVAL_MS = 100;
@@ -231,6 +233,8 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     rideLiveActivity.show(
       recordingActivityProps(active.snapshot, Date.now()),
       LIVE_ACTIVITY_INTERVAL_MS.recording,
+      // Tapping it opens the Kaydet sheet (from a killed app too: 08.03 recovery shows there).
+      RECORD_SHEET_URL,
     );
   }, [active]);
 

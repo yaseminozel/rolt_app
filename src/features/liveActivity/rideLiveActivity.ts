@@ -49,8 +49,11 @@ const stateKey = (props: RideActivityProps) =>
 const ignore = () => {};
 
 export const rideLiveActivity = {
-  /** Shows or refreshes the activity; cheap to call on every snapshot (throttled here). */
-  show(props: RideActivityProps, intervalMs: number) {
+  /**
+   * Shows or refreshes the activity; cheap to call on every snapshot (throttled here). `url` is
+   * opened when the activity is tapped; without it the app comes back where it was.
+   */
+  show(props: RideActivityProps, intervalMs: number, url?: string) {
     const activities = getFactory();
     if (!activities) {
       return;
@@ -58,8 +61,7 @@ export const rideLiveActivity = {
     const now = Date.now();
     try {
       if (!current) {
-        // No URL: tapping just brings the app back where the rider left it.
-        current = activities.start(props);
+        current = activities.start(props, url);
       } else {
         const key = stateKey(props);
         if (key === lastKey && now - lastSentAt < intervalMs) {
