@@ -1,17 +1,13 @@
+import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Share, StyleSheet, View, type ImageSourcePropType } from 'react-native';
 
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
-import {
-  useReport,
-  useRiderRides,
-  useSetRideLiked,
-  useSetRideSaved,
-} from '@/features/riders/queries';
-import { hapticToggle } from '@/features/haptics/haptics';
+import { useReport, useRiderRides } from '@/features/riders/queries';
 import type { RideSummary } from '@/features/riders/types';
+import { useRideActions } from '@/features/riders/useRideActions';
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, spacing } from '@/theme';
@@ -38,8 +34,8 @@ type RiderRidesFeedProps = {
 
 /**
  * "Sürüşler" feed of a rider profile (01.8 `gKG8D`, 09.01 `Ct2Yd`): ride activity cards with
- * like, comment, save, share and, on another rider's rides, report. Account-only actions go
- * through `useRequireAccount`.
+ * like, comment, save, share and, on another rider's rides, report; another rider's ride opens
+ * its detail (09.06, read-only). Account-only actions go through `useRequireAccount`.
  */
 export function RiderRidesFeed({
   riderId,
@@ -53,8 +49,7 @@ export function RiderRidesFeed({
   const requireAccount = useRequireAccount();
   const { showToast } = useToast();
   const ridesQuery = useRiderRides(riderId);
-  const setLiked = useSetRideLiked();
-  const setSaved = useSetRideSaved();
+  const { toggleLike, toggleSave } = useRideActions({ toastBottomOffset });
   const report = useReport();
 
   if (ridesQuery.isPending) {
@@ -71,34 +66,21 @@ export function RiderRidesFeed({
     );
   }
 
-  const toggleLike = (ride: RideSummary) => {
-    const liked = !ride.isLiked;
-    requireAccount('likeRide', () => {
-      hapticToggle(liked);
-      setLiked.mutate({ rideId: ride.id, liked });
-    });
-  };
+  // The own sample rides (mock account) have no detail screen; other riders' rides do.
+  const openRide = own
+    ? undefined
+    : (ride: RideSummary) =>
+        router.push({ pathname: '/rides/[rideId]', params: { rideId: ride.id } });
 
-  const toggleSave = (ride: RideSummary) => {
-    const saved = !ride.isSaved;
-    requireAccount('saveRide', () => {
-      setSaved.mutate({ rideId: ride.id, saved });
-      showToast(
-        saved
-          ? { variant: 'saved', message: t('activity.saved'), bottomOffset: toastBottomOffset }
-          : {
-              variant: 'removed',
-              message: t('activity.removed'),
-              actionLabel: t('common:actions.undo'),
-              onActionPress: () => setSaved.mutate({ rideId: ride.id, saved: true }),
-              bottomOffset: toastBottomOffset,
-            },
-      );
-    });
+  // Another rider's rides open the comments sheet over their profile (reading is open to
+  // guests; writing is gated in the sheet). The own sample rides have no thread to open.
+  const openComments = (ride: RideSummary) => {
+    if (own) {
+      requireAccount('commentRide', () => undefined);
+      return;
+    }
+    router.push({ pathname: '/rider/[id]/comments', params: { id: riderId, rideId: ride.id } });
   };
-
-  // Comments have no screen yet; the gate still applies so guests see the sign-in prompt.
-  const openComments = () => requireAccount('commentRide', () => undefined);
 
   const shareRide = (ride: RideSummary) => {
     // The own sample rides get the share templates (09.03); others' rides share as text.
@@ -166,8 +148,9 @@ export function RiderRidesFeed({
               }}
               onAuthorPress={() => undefined}
               onLikePress={() => toggleLike(ride)}
-              onCommentPress={openComments}
+              onCommentPress={() => openComments(ride)}
               onSharePress={() => shareRide(ride)}
+              onRidePress={openRide ? () => openRide(ride) : undefined}
             />
           ) : (
           <RideActivityCard
@@ -189,10 +172,11 @@ export function RiderRidesFeed({
             liked={ride.isLiked}
             saved={ride.isSaved}
             onLikePress={() => toggleLike(ride)}
-            onCommentPress={openComments}
+            onCommentPress={() => openComments(ride)}
             onSavePress={() => toggleSave(ride)}
             onSharePress={() => shareRide(ride)}
             onMorePress={own ? undefined : () => openRideMenu(ride)}
+            onPress={openRide ? () => openRide(ride) : undefined}
           />
           )}
         </View>

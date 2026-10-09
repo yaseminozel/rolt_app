@@ -13,12 +13,17 @@ import {
   createNavigationLocationSource,
   isSimulatedNavigation,
 } from '@/features/navigation/location';
+import { GpsTelemetry } from '@/features/analytics/gpsTelemetry';
 import { leanCalibration } from '@/features/lean/leanCalibration';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
 import { createLeanLogger } from '@/features/lean/leanLog';
 import { subscribeLean } from '@/features/lean/leanSensor';
+import { fixArrival } from '@/features/navigation/gpsHealth';
+import { gpsDiagnostics } from '@/features/navigation/gpsDiagnostics';
+import { LocationPowerController } from '@/features/navigation/standingPower';
 import type { LocationFix, LocationSource } from '@/features/navigation/types';
 import { ROUTE_FIXTURES } from '@/features/routes/fixtures/routes';
+import { routesRepository } from '@/features/routes/queries';
 import type { LngLat } from '@/features/routes/types';
 import { recordingActivityProps } from '@/features/liveActivity/rideActivityProps';
 import { LIVE_ACTIVITY_INTERVAL_MS, rideLiveActivity } from '@/features/liveActivity/rideLiveActivity';
@@ -28,6 +33,7 @@ import { RECORDER_RULES, RideRecorder, type RecorderSnapshot } from './rideRecor
 import { TrackView, type TrackViewState } from './trackView';
 import { ridesRepository } from './ridesRepository';
 import { nearestCityName } from './rideTitle';
+import { useRideSync } from './sync/useRideSync';
 import type { RideType } from './rideTypes';
 import { EMPTY_RIDE_STATS, type RideRecord } from './types';
 
@@ -37,6 +43,8 @@ export const MIN_SAVE_DISTANCE_M = 1_000;
 const PERSIST_INTERVAL_MS = 10_000;
 /** Deep link of the Kaydet sheet (`/record-ride`). */
 const RECORD_SHEET_URL = 'rolt://record-ride';
+/** The simulator's route lookup when continuing an interrupted ride waits this long at most. */
+const ROUTE_LOOKUP_MS = 3_000;
 const TICK_MS = 1_000;
 /** A tick right after a fix has nothing new to show; skipping it halves the renders. */
 const TICK_PUBLISH_GAP_MS = 900;
@@ -62,6 +70,19 @@ export type StartOptions = {
 };
 
 export type FinishResult = { kind: 'tooShort'; rideId: string } | { kind: 'draft'; rideId: string };
+
+/** A route's line for the simulator, or undefined (it then drives the fallback route). */
+async function routeLine(routeId: string): Promise<LngLat[] | undefined> {
+  try {
+    const route = await Promise.race([
+      routesRepository.getById(routeId),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), ROUTE_LOOKUP_MS)),
+    ]);
+    return route?.coordinates;
+  } catch {
+    return undefined;
+  }
+}
 
 /**
  * The recording's controls and slow-changing state. It doesn't change while riding, so the tab
@@ -133,8 +154,12 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   });
 
   const recorderRef = useRef<RideRecorder | null>(null);
+  /** GPS health events of the running ride (`app_events`). */
+  const gpsTelemetryRef = useRef<GpsTelemetry | null>(null);
   const recordRef = useRef<RideRecord | null>(null);
   const sourceRef = useRef<LocationSource | null>(null);
+  /** Power mode of the source: `idle` on a manual pause, `standing` on a long stop. */
+  const powerRef = useRef<LocationPowerController | null>(null);
   const stopSourceRef = useRef<(() => void) | null>(null);
   const leanSubscriptionRef = useRef<{ remove: () => void } | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -192,11 +217,13 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       return;
     }
     lastPublishRef.current = Date.now();
+    const snapshot = recorder.snapshot();
+    gpsTelemetryRef.current?.observe(snapshot.gps, { paused: snapshot.phase === 'paused' });
     setActive({
       rideId: record.id,
       rideType: record.rideType,
       routeId: record.routeId,
-      snapshot: recorder.snapshot(),
+      snapshot,
     });
     const view = trackViewRef.current;
     if (view) {
@@ -213,6 +240,11 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
         return;
       }
       recorder.addFix(fix);
+      gpsTelemetryRef.current?.observeFix(fix);
+      powerRef.current?.addFix(fix, recorder.gpsQuality === 'good');
+      if (__DEV__) {
+        gpsDiagnostics.health(recorder.gpsDiagnostics(fixArrival(fix)));
+      }
       if (!record.city && fix.accuracyM <= RECORDER_RULES.weakAccuracyM) {
         recordRef.current = { ...record, city: nearestCityName(fix.coordinates) };
       }
@@ -230,6 +262,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     stopSourceRef.current?.();
     stopSourceRef.current = null;
     sourceRef.current = null;
+    powerRef.current = null;
     if (tickRef.current) {
       clearInterval(tickRef.current);
       tickRef.current = null;
@@ -241,9 +274,20 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       stopTracking();
       const source = locationSource(line);
       sourceRef.current = source;
+      powerRef.current = new LocationPowerController((mode) => {
+        source.setPowerMode?.(mode).catch(() => undefined);
+      });
       stopSourceRef.current = await source.start(handleFix);
       tickRef.current = setInterval(() => {
-        recorderRef.current?.tick(source.now());
+        const now = source.now();
+        const recorder = recorderRef.current;
+        if (recorder) {
+          recorder.tick(now);
+          powerRef.current?.tick(now, recorder.gpsQuality === 'good');
+          if (__DEV__) {
+            gpsDiagnostics.health(recorder.gpsDiagnostics(now));
+          }
+        }
         if (Date.now() - lastPublishRef.current >= TICK_PUBLISH_GAP_MS) {
           publish();
         }
@@ -357,6 +401,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       recorderRef.current = new RideRecorder(now, undefined, {
         sensorLean: leanCalibration.get() !== null,
       });
+      gpsTelemetryRef.current = new GpsTelemetry('record');
       trackViewRef.current = new TrackView();
       publish();
       await startTracking(route?.line);
@@ -367,7 +412,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const pause = useCallback(() => {
     const now = sourceRef.current?.now() ?? Date.now();
     recorderRef.current?.pause(now);
-    sourceRef.current?.setPowerMode?.('idle').catch(() => undefined);
+    powerRef.current?.setPaused(true, now);
     publish();
     persist().catch(() => undefined);
   }, [persist, publish]);
@@ -387,13 +432,15 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   const resume = useCallback(() => {
     const now = sourceRef.current?.now() ?? Date.now();
     recorderRef.current?.resume(now);
-    sourceRef.current?.setPowerMode?.('active').catch(() => undefined);
+    powerRef.current?.setPaused(false, now);
     publish();
     persist().catch(() => undefined);
   }, [persist, publish]);
 
   const clear = useCallback(() => {
     stopTracking();
+    gpsTelemetryRef.current?.finish();
+    gpsTelemetryRef.current = null;
     recorderRef.current = null;
     recordRef.current = null;
     trackViewRef.current = null;
@@ -407,8 +454,9 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     if (!recorder || !record) {
       throw new Error('No recording to finish');
     }
-    recorder.pause(sourceRef.current?.now() ?? Date.now());
-    sourceRef.current?.setPowerMode?.('idle').catch(() => undefined);
+    const pausedAt = sourceRef.current?.now() ?? Date.now();
+    recorder.pause(pausedAt);
+    powerRef.current?.setPaused(true, pausedAt);
     const snapshot = recorder.snapshot();
     publish();
     if (snapshot.stats.distanceM < MIN_SAVE_DISTANCE_M) {
@@ -452,6 +500,7 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       { sensorLean: leanCalibration.get() !== null },
     );
     recorderRef.current = recorder;
+    gpsTelemetryRef.current = new GpsTelemetry('record');
     trackViewRef.current = new TrackView();
     // Its track goes into the point table once (also converting a ride written whole by an
     // older version), before any new point is appended after it.
@@ -459,14 +508,20 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
     persistedSeqRef.current = points.length;
     await enqueueWrite(() => ridesRepository.replaceRecording(record, points));
     publish();
-    // Only the simulator needs the line (it drives along it); real GPS ignores it.
-    const route = ROUTE_FIXTURES.find((item) => item.id === interrupted.routeId);
-    await startTracking(route?.coordinates);
+    // Only the simulator needs the line (it drives along it); real GPS ignores it, so recovery
+    // never waits on the network for it. The repository also knows routes stored offline.
+    const line =
+      isSimulatedNavigation && interrupted.routeId
+        ? await routeLine(interrupted.routeId)
+        : undefined;
+    await startTracking(line);
     // A restored ride waits paused for "Devam et".
-    sourceRef.current?.setPowerMode?.('idle').catch(() => undefined);
+    powerRef.current?.setPaused(true, sourceRef.current?.now() ?? Date.now());
   }, [enqueueWrite, interrupted, publish, startTracking]);
 
   const isRecording = active !== null;
+  // Saved rides go to the server in the background, never next to a running recording.
+  useRideSync(isRecording);
   const value = useMemo<RideRecordingValue>(
     () => ({
       interrupted,

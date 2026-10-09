@@ -23,6 +23,7 @@
     },
     "addPhoto": "Fotoğraf ekle",
     "removePhoto": "Fotoğrafı kaldır",
+    "removeRide": "Sürüşü kaldır",
     "cancel": "Vazgeç",
     "posted": "Paylaşıldı.",
     "failed": "Paylaşılamadı. Tekrar dene."
@@ -33,6 +34,7 @@
     "comment": "Yorumlar",
     "share": "Paylaş",
     "readMore": "Devamını gör",
+    "openRide": "Sürüşü açar",
     "map": "Sürüş haritası",
     "photo": "Fotoğraf {{index}}",
     "photoCounter": "{{index}}/{{total}}",
@@ -48,7 +50,11 @@
     "title": "Yorumlar · {{count}}",
     "placeholder": "Yorum yaz…",
     "send": "Gönder",
-    "empty": "İlk yorumu sen yaz."
+    "empty": "İlk yorumu sen yaz.",
+    "delete": "Yorumu sil",
+    "cancel": "Vazgeç",
+    "sendFailed": "Yorum gönderilemedi. Tekrar dene.",
+    "deleteFailed": "Yorum silinemedi. Tekrar dene."
   },
   "search": {
     "open": "Ara",

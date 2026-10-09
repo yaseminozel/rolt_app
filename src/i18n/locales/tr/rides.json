@@ -19,7 +19,7 @@
     "metrics": {
       "distance": "Mesafe ({{unit}})",
       "duration": "Süre",
-      "averageSpeed": "Ort. hız ({{unit}})"
+      "speed": "Hız ({{unit}})"
     },
     "rideType": "Sürüş tipi",
     "start": "Başlat",
@@ -78,7 +78,7 @@
       "title": "ROLT",
       "distance": "Mesafe",
       "duration": "Süre",
-      "averageSpeed": "Ort. hız"
+      "speed": "Hız"
     },
     "battery": {
       "low": "Pil %{{percent}}. Ekran artık açık tutulmuyor, kayıt sürüyor.",
@@ -124,6 +124,8 @@
       "cancel": "Vazgeç",
       "failed_one": "{{count}} görsel yüklenemedi. Tekrar denemek için görsele dokun.",
       "failed_other": "{{count}} görsel yüklenemedi. Tekrar denemek için görsellere dokun.",
+      "pending_one": "{{count}} görsel bağlantı gelince yüklenecek. Sürüşünü şimdi kaydedebilirsin.",
+      "pending_other": "{{count}} görsel bağlantı gelince yüklenecek. Sürüşünü şimdi kaydedebilirsin.",
       "photoA11y": "{{index}}. görsel",
       "uploadingA11y": "{{index}}. görsel yükleniyor",
       "failedA11y": "{{index}}. görsel yüklenemedi, tekrar denemek için dokun",
@@ -189,6 +191,7 @@
     "description": "Profiline eklendi",
     "shareTitle": "Hemen paylaş",
     "targets": {
+      "community": "Toplulukta Paylaş",
       "instagramStory": "Instagram Hikaye",
       "instagramPost": "Instagram Gönderi",
       "whatsapp": "WhatsApp",
@@ -210,6 +213,15 @@
       "title": "Sürüş bulunamadı",
       "description": "Bu sürüş silinmiş olabilir."
     },
+    "unavailable": {
+      "title": "Sürüş görüntülenemiyor",
+      "description": "Bu sürüş silinmiş ya da yalnızca sürücünün seçtiği kişilere açık olabilir."
+    },
+    "loadFailed": {
+      "title": "Sürüş yüklenemedi",
+      "description": "Bağlantını kontrol edip tekrar dene.",
+      "retry": "Tekrar dene"
+    },
     "deleteDescription": "Rota, istatistikler, görseller, beğeni ve yorumlar kalıcı olarak silinir. Bu işlem geri alınamaz.",
     "leanAngle": "Yatış açısı",
     "leanLeft": "Sol maks.",
@@ -227,6 +239,7 @@
     "edit": "Sürüşü düzenle",
     "visibility": "Görünürlük",
     "share": "Paylaş",
+    "shareToCommunity": "Toplulukta paylaş",
     "delete": "Sürüşü sil"
   },
   "shareSheet": {
@@ -238,6 +251,59 @@
       "transparent": "Şeffaf şablon",
       "photo": "Fotoğraf şablonu",
       "brand": "ROLT şablonu"
+    }
+  },
+  "sync": {
+    "pending": "Sürüş cihazına kaydedildi. Bağlantı gelince senkronize edilecek.",
+    "failed": "Sürüş buluta yüklenemedi. Cihazında güvende; düzenleyip yeniden kaydederek tekrar deneyebilirsin."
+  },
+  "dev": {
+    "toggle": "GPS",
+    "toggleA11y": "Geliştirici GPS panelini aç veya kapat",
+    "title": "GPS tanılama",
+    "accuracy": "Doğruluk",
+    "sinceLastFix": "Son konumdan beri",
+    "interval": "Konum aralığı (son 10 ort.)",
+    "speed": "GPS hızı",
+    "health": "GPS durumu",
+    "weakIn": "zayıfa {{seconds}} sn",
+    "source": "Kaynak",
+    "power": "Güç modu",
+    "log": "Durum geçişleri",
+    "empty": "Henüz geçiş yok",
+    "none": "—",
+    "metres": "{{value}} m",
+    "seconds": "{{value}} sn",
+    "kmh": "{{value}} km/sa",
+    "healthStates": {
+      "good": "İyi",
+      "weak": "Zayıf",
+      "lost": "Kayıp"
+    },
+    "motion": {
+      "moving": "Hareket ediyor",
+      "standing": "Duruyor"
+    },
+    "kinds": {
+      "backgroundTask": "Arka plan görevi",
+      "foregroundWatch": "Ön plan izleme",
+      "simulator": "Simülatör"
+    },
+    "powerModes": {
+      "active": "Aktif",
+      "standing": "Duruş",
+      "idle": "Boşta"
+    },
+    "profiles": {
+      "navigation": "Navigasyon",
+      "recording": "Kayıt"
+    },
+    "entries": {
+      "health": "GPS: {{state}}",
+      "motion": "Hareket: {{state}}",
+      "power": "Güç modu: {{mode}}",
+      "sourceStarted": "Kaynak başladı: {{kind}}",
+      "sourceStopped": "Kaynak durdu"
     }
   }
 }

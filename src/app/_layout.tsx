@@ -1,23 +1,28 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LogBox, Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+// Also installs JS error reporting (global handler, unhandled rejections) at launch.
+import { AppErrorBoundary } from '@/components/feedback/AppErrorBoundary';
 import { ToastProvider } from '@/components/feedback/ToastProvider';
 import { MapExpandProvider } from '@/components/map/MapExpandTransition';
 // Defines the background navigation location task at launch (it must exist before any update arrives).
 import '@/features/navigation/location/backgroundLocationTask';
+// Notification banner handler, Android channels and push token hooks, before any screen loads.
+import '@/features/notifications/setup';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { takePendingAccountAction } from '@/features/auth/pendingAccountAction';
 import { offlineMaps } from '@/features/offlineMaps/offlineMaps';
 import { RideRecordingProvider } from '@/features/rides/RideRecordingProvider';
 import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
 import '@/i18n';
+import { createQueryClient } from '@/lib/queryClient';
 import { appFonts, colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -45,7 +50,7 @@ const navigationTheme: Theme = {
 };
 
 export default function RootLayout() {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(createQueryClient);
 
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -56,9 +61,11 @@ export default function RootLayout() {
               <ThemeProvider value={navigationTheme}>
                 <BottomSheetModalProvider>
                   <ToastProvider>
-                    <MapExpandProvider>
-                      <RootNavigator />
-                    </MapExpandProvider>
+                    <AppErrorBoundary>
+                      <MapExpandProvider>
+                        <RootNavigator />
+                      </MapExpandProvider>
+                    </AppErrorBoundary>
                     <StatusBar style="dark" />
                   </ToastProvider>
                 </BottomSheetModalProvider>
@@ -93,6 +100,17 @@ function RootNavigator() {
     isGuest,
   } = useAuth();
   const ready = (fontsLoaded || fontError !== null) && isReady;
+  const queryClient = useQueryClient();
+  const userId = session?.userId ?? null;
+  const previousUserId = useRef(userId);
+
+  // Another account (or none) sees nothing cached for the previous one: likes, follows, feeds.
+  useEffect(() => {
+    if (previousUserId.current !== userId) {
+      previousUserId.current = userId;
+      queryClient.clear();
+    }
+  }, [queryClient, userId]);
   const signedOut = session === null && !isGuest;
   const signedInToApp = canUseApp && session !== null && !needsPermissionPrompts;
 
@@ -127,6 +145,8 @@ function RootNavigator() {
         <Stack.Screen name="explore" options={{ animation: 'none', gestureEnabled: false }} />
         {/* Another rider's profile (01.8): opened from the route detail, draws its own top bar. */}
         <Stack.Screen name="rider/[id]" />
+        {/* Profile share link (roltapp.com/u/<handle> → rolt://u/<handle>). */}
+        <Stack.Screen name="u/[handle]" options={{ animation: 'none' }} />
         <Stack.Screen
           name="ride-together/[id]"
           options={{ headerShown: true, headerBackButtonDisplayMode: 'minimal', title: '' }}
@@ -140,6 +160,11 @@ function RootNavigator() {
         <Stack.Screen
           name="share-profile"
           options={{ presentation: 'transparentModal', animation: 'fade' }}
+        />
+        {/* Full-screen photos (route / ride detail): fades itself, its pans close it. */}
+        <Stack.Screen
+          name="photo-viewer"
+          options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false }}
         />
         {/* 08.x Kayıt: a page sheet over the tabs, opened by the Kaydet tab (Pencil `w90Kk`). */}
         <Stack.Screen
@@ -198,6 +223,8 @@ function RootNavigator() {
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
       <Stack.Screen name="legal" />
+      {/* Google / Apple browser sign-in returns here (rolt://auth/callback). */}
+      <Stack.Screen name="auth/callback" options={{ animation: 'none' }} />
     </Stack>
   );
 }

@@ -35,13 +35,14 @@ type RideFormScreenProps = {
 /**
  * "Sürüşü kaydet" (08.05) and "Sürüşü düzenle" (09.07). Saving waits for photo uploads, writes
  * the ride to the device and only then reports success (P0); a failure keeps the form with
- * "Sürüş kaydedilemedi". Closing a new ride asks first (08.10), deleting always does (08.09).
+ * "Sürüş kaydedilemedi". A failed photo blocks saving only online and when the server refused
+ * it; one that failed on the connection is saved with the ride and uploaded by its sync. Closing a new ride asks first (08.10), deleting always does (08.09).
  */
 export function RideFormScreen({ mode }: RideFormScreenProps) {
   const { t } = useTranslation('rides');
   const insets = useSafeAreaInsets();
   const { showToast } = useToast();
-  const { ride, values, reset } = useRideForm();
+  const { ride, values, reset, failedPhotosCanWait } = useRideForm();
   const saveRide = useSaveRide();
   const deleteRide = useDeleteRide();
   const [dialog, setDialog] = useState<'exit' | 'delete' | null>(null);
@@ -148,7 +149,7 @@ export function RideFormScreen({ mode }: RideFormScreenProps) {
             label={mode === 'save' ? t('form.save') : t('form.saveChanges')}
             loading={saving}
             loadingLabel={t('form.saving')}
-            disabled={failed && !saving}
+            disabled={failed && !failedPhotosCanWait && !saving}
             onPress={() => setSaveRequested(true)}
           />
         </View>

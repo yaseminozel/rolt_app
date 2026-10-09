@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { ChatBubbleEmpty, Heart, HeartSolid, Plus, ShareAndroid } from 'iconoir-react-native';
-import { useState, type ComponentType } from 'react';
+import { useState, type ComponentType, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Pressable,
@@ -17,7 +17,7 @@ import type { SvgProps } from 'react-native-svg';
 
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { RideTypeBadge } from '@/components/ride/RideTypeBadge';
-import type { CommunityPost } from '@/features/community/types';
+import type { CommunityPost, PostRide } from '@/features/community/types';
 import {
   formatCompactDuration,
   formatDistance,
@@ -48,6 +48,8 @@ type CommunityPostCardProps = {
   onLikePress: () => void;
   onCommentPress: () => void;
   onSharePress: () => void;
+  /** Opens the shared ride (09.06) when the post links one; the ride block isn't tappable otherwise. */
+  onRidePress?: () => void;
 };
 
 /**
@@ -64,6 +66,7 @@ export function CommunityPostCard({
   onLikePress,
   onCommentPress,
   onSharePress,
+  onRidePress,
 }: CommunityPostCardProps) {
   const { t } = useTranslation('community');
   const { ride, text, photos, author } = post;
@@ -111,51 +114,7 @@ export function CommunityPostCard({
         ) : null}
       </View>
 
-      {ride ? (
-        <View style={styles.ride}>
-          <View style={styles.rideCopy}>
-            <Text style={styles.rideTitle} numberOfLines={2}>
-              {ride.title}
-            </Text>
-            {ride.description ? <Text style={styles.rideNote}>{ride.description}</Text> : null}
-          </View>
-          <RideTypeBadge type={ride.rideType} />
-          <View style={styles.metrics}>
-            <Metric label={t('post.metrics.distance')} value={formatDistance(ride.distanceKm, 1)} />
-            <Metric
-              label={t('post.metrics.duration')}
-              value={formatCompactDuration(ride.durationMinutes)}
-            />
-            {ride.averageSpeedKmh !== undefined ? (
-              <Metric label={t('post.metrics.averageSpeed')} value={formatSpeed(ride.averageSpeedKmh)} />
-            ) : null}
-            {ride.curveCount !== undefined ? (
-              <Metric label={t('post.metrics.curves')} value={formatNumber(ride.curveCount)} />
-            ) : null}
-          </View>
-          {photos.length === 0 && ride.mapImage ? (
-            <Media source={ride.mapImage} label={t('post.map')} style={styles.mapWide} />
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.mediaStrip}
-              contentContainerStyle={styles.mediaContent}>
-              {ride.mapImage ? (
-                <Media source={ride.mapImage} label={t('post.map')} style={{ width: MAP_WIDTH }} />
-              ) : null}
-              {photos.map((photo, index) => (
-                <Media
-                  key={index}
-                  source={photo}
-                  label={t('post.photo', { index: index + 1 })}
-                  style={{ width: PHOTO_WIDTH }}
-                />
-              ))}
-            </ScrollView>
-          )}
-        </View>
-      ) : null}
+      {ride ? <PostRideBlock ride={ride} photos={photos} onPress={onRidePress} /> : null}
 
       {!ride && text ? <PostText text={text} folded={photos.length === 0} /> : null}
       {!ride && photos.length > 0 ? <PhotoCarousel photos={photos} /> : null}
@@ -187,6 +146,85 @@ export function CommunityPostCard({
         </Pressable>
       </View>
     </View>
+  );
+}
+
+type PostRideBlockProps = {
+  ride: PostRide;
+  /** The post's photos, after the map in a strip that bleeds to the screen edge. */
+  photos: readonly ImageSourcePropType[];
+  /** Makes the whole block open the ride. */
+  onPress?: () => void;
+  /** Next to the title, e.g. the composer's remove button. */
+  trailing?: ReactNode;
+};
+
+/**
+ * The shared ride of a post ("Sürüş / rota paylaşımı"): title and note, ride type, distance /
+ * time / speed / bends, and the map picture (alone, wide) or the map followed by photos. Also
+ * shows the ride attached in the composer.
+ */
+export function PostRideBlock({ ride, photos, onPress, trailing }: PostRideBlockProps) {
+  const { t } = useTranslation('community');
+  const content = (
+    <>
+      <View style={styles.rideHeading}>
+        <View style={styles.rideCopy}>
+          <Text style={styles.rideTitle} numberOfLines={2}>
+            {ride.title}
+          </Text>
+          {ride.description ? <Text style={styles.rideNote}>{ride.description}</Text> : null}
+        </View>
+        {trailing}
+      </View>
+      <RideTypeBadge type={ride.rideType} />
+      <View style={styles.metrics}>
+        <Metric label={t('post.metrics.distance')} value={formatDistance(ride.distanceKm, 1)} />
+        <Metric
+          label={t('post.metrics.duration')}
+          value={formatCompactDuration(ride.durationMinutes)}
+        />
+        {ride.averageSpeedKmh !== undefined ? (
+          <Metric label={t('post.metrics.averageSpeed')} value={formatSpeed(ride.averageSpeedKmh)} />
+        ) : null}
+        {ride.curveCount !== undefined ? (
+          <Metric label={t('post.metrics.curves')} value={formatNumber(ride.curveCount)} />
+        ) : null}
+      </View>
+      {photos.length === 0 && ride.mapImage ? (
+        <Media source={ride.mapImage} label={t('post.map')} style={styles.mapWide} />
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.mediaStrip}
+          contentContainerStyle={styles.mediaContent}>
+          {ride.mapImage ? (
+            <Media source={ride.mapImage} label={t('post.map')} style={{ width: MAP_WIDTH }} />
+          ) : null}
+          {photos.map((photo, index) => (
+            <Media
+              key={index}
+              source={photo}
+              label={t('post.photo', { index: index + 1 })}
+              style={{ width: PHOTO_WIDTH }}
+            />
+          ))}
+        </ScrollView>
+      )}
+    </>
+  );
+
+  return onPress ? (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityHint={t('post.openRide')}
+      style={({ pressed }) => [styles.ride, pressed && styles.ridePressed]}>
+      {content}
+    </Pressable>
+  ) : (
+    <View style={styles.ride}>{content}</View>
   );
 }
 
@@ -300,10 +338,11 @@ type CountActionProps = {
   count: number;
   label: string;
   selected?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
 };
 
-function CountAction({
+/** Like / comment / save glyph with its count (Mono); without `onPress` it only shows the count. */
+export function CountAction({
   icon: Icon,
   iconColor = colors.textPrimary,
   count,
@@ -316,10 +355,11 @@ function CountAction({
     <Pressable
       onPress={onPress}
       hitSlop={ACTION_HIT_SLOP}
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={label}
       accessibilityValue={{ text: value }}
       accessibilityState={selected === undefined ? undefined : { selected }}
+      disabled={!onPress}
       style={styles.action}>
       <Icon width={ACTION_ICON_SIZE} height={ACTION_ICON_SIZE} color={iconColor} />
       <Text style={styles.count}>{value}</Text>
@@ -389,7 +429,16 @@ const styles = StyleSheet.create({
   ride: {
     gap: spacing.md,
   },
+  ridePressed: {
+    opacity: 0.85,
+  },
+  rideHeading: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
   rideCopy: {
+    flex: 1,
     gap: spacing.xs,
   },
   rideTitle: {

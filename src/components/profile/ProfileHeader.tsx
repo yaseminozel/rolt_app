@@ -63,12 +63,17 @@ export function ProfileHeader({
       <View style={styles.identity}>
         <View style={styles.nameRow}>
           <View style={styles.nameColumn}>
-            <Text style={styles.name} accessibilityRole="header" numberOfLines={2}>
-              {name}
-            </Text>
-            <Text style={styles.handle} numberOfLines={1}>
-              {t('handle', { handle })}
-            </Text>
+            {/* Both may be empty on an own profile whose registration steps were skipped. */}
+            {name ? (
+              <Text style={styles.name} accessibilityRole="header" numberOfLines={2}>
+                {name}
+              </Text>
+            ) : null}
+            {handle ? (
+              <Text style={styles.handle} numberOfLines={1}>
+                {t('handle', { handle })}
+              </Text>
+            ) : null}
           </View>
           <ProfileAvatar source={avatar} size={AVATAR_SIZE} initials={avatarInitials} />
         </View>

@@ -18,7 +18,8 @@
         "UIBackgroundModes": [
           "audio"
         ]
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -99,7 +100,17 @@
         }
       ],
       "@bacons/apple-targets",
-      "expo-widgets"
+      "expo-widgets",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#1515FF",
+          "defaultChannel": "default"
+        }
+      ],
+      "expo-apple-authentication"
     ],
     "scheme": "rolt",
     "experiments": {

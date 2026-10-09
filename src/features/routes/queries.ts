@@ -1,22 +1,25 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import { RECOMMENDED_LIST_IDS, ROUTE_FIXTURES } from './fixtures/routes';
+import { hasSupabase } from '@/lib/supabase/client';
+
 import { mockRoutesRepository } from './mockRoutesRepository';
+import { supabaseRoutesRepository } from './supabaseRoutesRepository';
 import { travelTimes } from './travelTime';
 import type {
   Bounds,
   LngLat,
   ReachableRoute,
   ReachWindow,
-  Route,
   RouteFilter,
   RouteSearchFilters,
   RoutesRepository,
   RouteSort,
 } from './types';
 
-/** Swap for the Supabase implementation later; screens only use the hooks below. */
-export const routesRepository: RoutesRepository = mockRoutesRepository;
+/** Self-hosted Supabase when configured, the fixtures otherwise; screens only use the hooks below. */
+export const routesRepository: RoutesRepository = hasSupabase
+  ? supabaseRoutesRepository
+  : mockRoutesRepository;
 
 export const routeKeys = {
   all: ['routes'] as const,
@@ -27,6 +30,7 @@ export const routeKeys = {
   suggestions: (query: string) => ['routes', 'suggestions', query] as const,
   area: (bounds: Bounds, filter: RouteFilter, query = '') =>
     ['routes', 'area', bounds, filter, query] as const,
+  featured: () => ['routes', 'recommended-list'] as const,
   detail: (id: string) => ['routes', 'detail', id] as const,
   reachable: (origin: LngLat | null) => ['routes', 'reachable', origin] as const,
 };
@@ -36,6 +40,8 @@ export const REACH_WINDOWS: readonly [ReachWindow, ReachWindow, ReachWindow] = [
 const LONGEST_REACH_MINUTES = 120;
 /** Nothing farther than this in a straight line can be driven to within two hours. */
 const REACH_SEARCH_RADIUS_KM = 220;
+/** The curated catalog changes rarely; screens revisited within this window reuse the cache. */
+const CATALOG_STALE_TIME_MS = 5 * 60 * 1000;
 /** Driving times barely change while the rider stays around; don't refetch on every visit. */
 const REACH_STALE_TIME_MS = 10 * 60 * 1000;
 
@@ -85,17 +91,16 @@ export function useRecommendedRoutes(city: string, filter: RouteFilter) {
   return useQuery({
     queryKey: routeKeys.recommended(city, filter),
     queryFn: () => routesRepository.listRecommended({ city, filter }),
+    staleTime: CATALOG_STALE_TIME_MS,
   });
 }
 
 /** "Önerilen Rotalar — Tümü" (01.4): the curated list, filtered locally by the header search. */
 export function useRecommendedList() {
   return useQuery({
-    queryKey: ['routes', 'recommended-list'],
-    queryFn: async () =>
-      RECOMMENDED_LIST_IDS.map((id) => ROUTE_FIXTURES.find((route) => route.id === id)).filter(
-        (route): route is Route => route !== undefined,
-      ),
+    queryKey: routeKeys.featured(),
+    queryFn: () => routesRepository.listFeatured(),
+    staleTime: CATALOG_STALE_TIME_MS,
   });
 }
 
@@ -110,6 +115,7 @@ export function useRouteSearch(
   return useQuery({
     queryKey: routeKeys.search(trimmed, sort, city, filters),
     queryFn: () => routesRepository.search({ query: trimmed, sort, city, filters }),
+    staleTime: CATALOG_STALE_TIME_MS,
     enabled: trimmed.length > 0,
   });
 }
@@ -129,6 +135,7 @@ export function useRouteSearchPreview(
   return useQuery({
     queryKey: routeKeys.search(trimmed, sort, city, filters),
     queryFn: () => routesRepository.search({ query: trimmed, sort, city, filters }),
+    staleTime: CATALOG_STALE_TIME_MS,
     enabled: trimmed.length > 0,
     placeholderData: keepPreviousData,
   });
@@ -143,6 +150,7 @@ export function useSearchSuggestions(query: string) {
   return useQuery({
     queryKey: routeKeys.suggestions(trimmed),
     queryFn: () => routesRepository.suggest({ query: trimmed }),
+    staleTime: CATALOG_STALE_TIME_MS,
     enabled: trimmed.length > 0,
     placeholderData: keepPreviousData,
   });
@@ -152,6 +160,7 @@ export function useRoutesInArea(bounds: Bounds, filter: RouteFilter, query = '')
   return useQuery({
     queryKey: routeKeys.area(bounds, filter, query),
     queryFn: () => routesRepository.listInArea({ bounds, filter, query }),
+    staleTime: CATALOG_STALE_TIME_MS,
   });
 }
 
@@ -168,6 +177,7 @@ export function useRoute(id: string | undefined) {
   return useQuery({
     queryKey: routeKeys.detail(id ?? ''),
     queryFn: () => routesRepository.getById(id ?? ''),
+    staleTime: CATALOG_STALE_TIME_MS,
     enabled: Boolean(id),
   });
 }

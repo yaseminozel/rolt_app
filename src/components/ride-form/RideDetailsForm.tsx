@@ -32,7 +32,7 @@ type RideDetailsFormProps = {
  */
 export function RideDetailsForm({ locked = false, onDelete }: RideDetailsFormProps) {
   const { t } = useTranslation(['rides', 'routes']);
-  const { ride, values, setValue, retryPhoto, removePhoto } = useRideForm();
+  const { ride, values, setValue, retryPhoto, removePhoto, failedPhotosCanWait } = useRideForm();
   const open = (sheet: 'ride-type' | 'visibility' | 'photo-source' | 'difficulty' | 'surface') =>
     router.push({ pathname: `/rides/[rideId]/${sheet}`, params: { rideId: ride.id } });
 
@@ -89,6 +89,7 @@ export function RideDetailsForm({ locked = false, onDelete }: RideDetailsFormPro
         onAdd={() => open('photo-source')}
         onRetry={retryPhoto}
         onRemove={removePhoto}
+        failedCanWait={failedPhotosCanWait}
         disabled={locked}
         label={ride.routeId ? t('form.photos.routeLabel') : undefined}
       />

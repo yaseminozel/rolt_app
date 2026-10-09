@@ -128,11 +128,13 @@ export type SearchSuggestions = {
 };
 
 /**
- * Data access for routes. Screens use the React Query hooks in `queries.ts`; the mock
- * implementation is replaced by self-hosted Supabase (PostGIS) later.
+ * Data access for routes. Screens use the React Query hooks in `queries.ts`; the Supabase
+ * (PostGIS) implementation is used when the app is configured for it, the mock otherwise.
  */
 export interface RoutesRepository {
   listRecommended(params: { city: string; filter: RouteFilter }): Promise<Route[]>;
+  /** "Önerilen Rotalar — Tümü" (01.4): the curated list, in its own order. */
+  listFeatured(): Promise<Route[]>;
   search(params: {
     query: string;
     sort: RouteSort;
@@ -148,4 +150,10 @@ export interface RoutesRepository {
   getById(id: string): Promise<Route | null>;
   /** Routes in the order of `ids`; missing ones are skipped ("Kaydettiklerim"). */
   listByIds(ids: readonly string[]): Promise<Route[]>;
+  /** Rider profile "Rotalar" tab: routes the rider published, newest first. */
+  listByAuthor(authorId: string): Promise<Route[]>;
+  /** The signed-in rider's bookmarked route ids, most recently saved first. */
+  listSavedIds(): Promise<string[]>;
+  /** Bookmarks or un-bookmarks a route for the signed-in rider; repeating a state is a no-op. */
+  setSaved(routeId: string, saved: boolean): Promise<void>;
 }

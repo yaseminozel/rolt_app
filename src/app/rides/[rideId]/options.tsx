@@ -1,23 +1,27 @@
 import { router } from 'expo-router';
-import { EditPencil, Globe, ShareAndroid, Trash } from 'iconoir-react-native';
+import { EditPencil, Globe, Group, ShareAndroid, Trash } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { SheetHeader } from '@/components/feedback/SheetHeader';
 import { SettingsRow } from '@/components/settings/SettingsRow';
+import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useRideForm } from '@/features/rides/RideFormProvider';
+import { shareRideToCommunity } from '@/features/rides/shareToCommunity';
 import { colors, layout, radius, spacing } from '@/theme';
 import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 import { openShareRide } from '@/features/rides/openShareRide';
 
 /**
- * 09.06 Sürüş detayı — Seçenekler (Pencil `W8Hilq`): edit, visibility, share and delete. The
+ * 09.06 Sürüş detayı — Seçenekler (Pencil `W8Hilq`): edit, visibility, share, "Toplulukta paylaş"
+ * (opens the Topluluk composer with the ride; not in the design's sheet) and delete. The
  * delete confirmation opens on the detail screen (`?confirm=delete`) once this sheet is closed.
  */
 export default function RideOptionsSheet() {
   const { t } = useTranslation('rides');
   const bottomPadding = useSheetBottomPadding((bottom) => bottom + spacing.lg);
   const { ride } = useRideForm();
+  const requireAccount = useRequireAccount();
   const params = { rideId: ride.id };
 
   return (
@@ -55,6 +59,16 @@ export default function RideOptionsSheet() {
           onPress={() => {
             router.back();
             openShareRide(ride.id);
+          }}
+        />
+        <View style={styles.divider} />
+        <SettingsRow
+          icon={Group}
+          label={t('options.shareToCommunity')}
+          trailing="chevron"
+          onPress={() => {
+            router.back();
+            requireAccount('sharePost', () => shareRideToCommunity(ride));
           }}
         />
         <View style={styles.divider} />

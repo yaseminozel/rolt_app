@@ -17,6 +17,7 @@ import Animated, {
 import { scheduleOnRN } from 'react-native-worklets';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { GpsDevPanel } from '@/components/dev/GpsDevPanel';
 import { LayersIcon } from '@/components/explore/LayersIcon';
 import { DialogModal } from '@/components/feedback/DialogModal';
 import { useToast } from '@/components/feedback/ToastProvider';
@@ -55,6 +56,8 @@ const LOCATE_MAX_AGE_MS = 10_000;
 /** Timed banners are checked this often. */
 const BANNER_TICK_MS = 500;
 const EXPAND_BUTTON = 36;
+/** The developer GPS pill sits under the 48 pt close button. */
+const DEV_PANEL_OFFSET = 48 + spacing.md;
 /** "Top fade" (`iz6RG`): 64 pt of white over the map under the sheet's top edge. */
 const TOP_FADE_HEIGHT = 64;
 /** Grabber (`un0E9`): 40 × 5, 15 pt under the panel's top, the title row right below it. */
@@ -306,7 +309,7 @@ export default function RecordScreen() {
     <RecordMetrics
       distanceM={metricsSource?.stats.distanceM ?? 0}
       durationS={metricsSource?.stats.durationS ?? 0}
-      averageSpeedMps={metricsSource?.averageSpeedMps ?? 0}
+      speedMps={metricsSource?.speedMps ?? 0}
       layout={fullScreen ? 'stacked' : 'row'}
       muted={!metricsSource}
     />
@@ -559,6 +562,10 @@ export default function RecordScreen() {
         </View>
       </View>
 
+      {fullScreen ? null : (
+        <GpsDevPanel style={[styles.devPanel, { top: topOffset + DEV_PANEL_OFFSET }]} />
+      )}
+
       {/* The dock has no padding, so the banner (bottom 100%) sits 12 pt above the panel. */}
       <Animated.View
         layout={PANEL_LAYOUT}
@@ -671,8 +678,8 @@ function RideTypeStrip({
 function interruptedMetrics(ride: {
   stats: { distanceM: number; durationS: number; breakS: number };
 }) {
-  const ridingS = Math.max(ride.stats.durationS - ride.stats.breakS, 0);
-  return { stats: ride.stats, averageSpeedMps: ridingS > 0 ? ride.stats.distanceM / ridingS : 0 };
+  // An interrupted ride isn't moving.
+  return { stats: ride.stats, speedMps: 0 };
 }
 
 const styles = StyleSheet.create({
@@ -693,6 +700,9 @@ const styles = StyleSheet.create({
   },
   mapControls: {
     gap: spacing.md,
+  },
+  devPanel: {
+    left: layout.screenGutter,
   },
   topFade: {
     position: 'absolute',

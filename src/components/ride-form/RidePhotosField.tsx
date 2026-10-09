@@ -18,6 +18,11 @@ type RidePhotosFieldProps = {
   onAdd: () => void;
   onRetry: (photoId: string) => void;
   onRemove: (photoId: string) => void;
+  /**
+   * Failed photos will go up with the ride's sync (offline / connection failures): the note
+   * under the tiles says so instead of the error. Tiles keep "Tekrar dene".
+   */
+  failedCanWait?: boolean;
   disabled?: boolean;
   /** Rides recorded on a route call them "Rota görselleri" (08.05 `1083:20403`). */
   label?: string;
@@ -34,6 +39,7 @@ export function RidePhotosField({
   onAdd,
   onRetry,
   onRemove,
+  failedCanWait,
   disabled,
   label,
 }: RidePhotosFieldProps) {
@@ -120,7 +126,11 @@ export function RidePhotosField({
         </ScrollView>
       )}
       {failed > 0 ? (
-        <Text style={styles.error}>{t('form.photos.failed', { count: failed })}</Text>
+        failedCanWait ? (
+          <Text style={styles.note}>{t('form.photos.pending', { count: failed })}</Text>
+        ) : (
+          <Text style={styles.error}>{t('form.photos.failed', { count: failed })}</Text>
+        )
       ) : null}
     </View>
   );
@@ -215,5 +225,9 @@ const styles = StyleSheet.create({
   error: {
     ...typography.caption,
     color: colors.dangerText,
+  },
+  note: {
+    ...typography.caption,
+    color: colors.textSecondary,
   },
 });

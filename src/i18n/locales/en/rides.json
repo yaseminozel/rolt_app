@@ -19,7 +19,7 @@
     "metrics": {
       "distance": "Distance ({{unit}})",
       "duration": "Time",
-      "averageSpeed": "Avg. speed ({{unit}})"
+      "speed": "Speed ({{unit}})"
     },
     "rideType": "Ride type",
     "start": "Start",
@@ -78,7 +78,7 @@
       "title": "ROLT",
       "distance": "Distance",
       "duration": "Time",
-      "averageSpeed": "Avg. speed"
+      "speed": "Speed"
     },
     "battery": {
       "low": "Battery {{percent}}%. The screen no longer stays on; recording continues.",
@@ -124,6 +124,8 @@
       "cancel": "Cancel",
       "failed_one": "{{count}} photo couldn't be uploaded. Tap it to try again.",
       "failed_other": "{{count}} photos couldn't be uploaded. Tap them to try again.",
+      "pending_one": "{{count}} photo will upload when you're back online. You can save your ride now.",
+      "pending_other": "{{count}} photos will upload when you're back online. You can save your ride now.",
       "photoA11y": "Photo {{index}}",
       "uploadingA11y": "Photo {{index}} uploading",
       "failedA11y": "Photo {{index}} failed to upload, tap to try again",
@@ -189,6 +191,7 @@
     "description": "Added to your profile",
     "shareTitle": "Share now",
     "targets": {
+      "community": "Share to Community",
       "instagramStory": "Instagram Story",
       "instagramPost": "Instagram Post",
       "whatsapp": "WhatsApp",
@@ -210,6 +213,15 @@
       "title": "Ride not found",
       "description": "This ride may have been deleted."
     },
+    "unavailable": {
+      "title": "Can't show this ride",
+      "description": "It may have been deleted, or the rider shares it only with some people."
+    },
+    "loadFailed": {
+      "title": "Couldn't load the ride",
+      "description": "Check your connection and try again.",
+      "retry": "Try again"
+    },
     "deleteDescription": "The route, stats, photos, likes and comments will be deleted permanently. This can't be undone.",
     "leanAngle": "Lean angle",
     "leanLeft": "Left max.",
@@ -227,6 +239,7 @@
     "edit": "Edit ride",
     "visibility": "Visibility",
     "share": "Share",
+    "shareToCommunity": "Share to community",
     "delete": "Delete ride"
   },
   "shareSheet": {
@@ -238,6 +251,59 @@
       "transparent": "Transparent template",
       "photo": "Photo template",
       "brand": "ROLT template"
+    }
+  },
+  "sync": {
+    "pending": "Your ride is saved on your device. It will sync when you're back online.",
+    "failed": "Your ride couldn't be uploaded. It's safe on your device; edit and save it to try again."
+  },
+  "dev": {
+    "toggle": "GPS",
+    "toggleA11y": "Show or hide the developer GPS panel",
+    "title": "GPS diagnostics",
+    "accuracy": "Accuracy",
+    "sinceLastFix": "Since last fix",
+    "interval": "Fix interval (avg. of 10)",
+    "speed": "GPS speed",
+    "health": "GPS state",
+    "weakIn": "weak in {{seconds}} s",
+    "source": "Source",
+    "power": "Power mode",
+    "log": "State changes",
+    "empty": "No changes yet",
+    "none": "—",
+    "metres": "{{value}} m",
+    "seconds": "{{value}} s",
+    "kmh": "{{value}} km/h",
+    "healthStates": {
+      "good": "Good",
+      "weak": "Weak",
+      "lost": "Lost"
+    },
+    "motion": {
+      "moving": "Moving",
+      "standing": "Standing"
+    },
+    "kinds": {
+      "backgroundTask": "Background task",
+      "foregroundWatch": "Foreground watch",
+      "simulator": "Simulator"
+    },
+    "powerModes": {
+      "active": "Active",
+      "standing": "Standing",
+      "idle": "Idle"
+    },
+    "profiles": {
+      "navigation": "Navigation",
+      "recording": "Recording"
+    },
+    "entries": {
+      "health": "GPS: {{state}}",
+      "motion": "Motion: {{state}}",
+      "power": "Power mode: {{mode}}",
+      "sourceStarted": "Source started: {{kind}}",
+      "sourceStopped": "Source stopped"
     }
   }
 }

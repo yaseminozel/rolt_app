@@ -1,6 +1,7 @@
 import type { ImageSourcePropType } from 'react-native';
 
 import type { RideType } from '@/features/rides/rideTypes';
+import type { LngLat } from '@/features/routes/types';
 
 /** Who wrote a post or comment. Names and bikes are user content. */
 export type CommunityAuthor = {
@@ -26,6 +27,11 @@ export type PostRide = {
   curveCount?: number;
   /** Static map thumbnail with the ride trace. */
   mapImage?: ImageSourcePropType;
+  /**
+   * The shared trace (privacy-trimmed and simplified, as others see it), as line segments. Kept
+   * in the stored post so the thumbnail can be drawn again (`staticTrackImage`).
+   */
+  preview?: LngLat[][];
 };
 
 /**
@@ -40,6 +46,8 @@ export type CommunityPost = {
   createdAt: string;
   text?: string;
   ride?: PostRide;
+  /** The shared ride's id while it still exists (opens 09.06); the card stays as posted. */
+  rideId?: string;
   photos: ImageSourcePropType[];
   likeCount: number;
   commentCount: number;
@@ -52,8 +60,12 @@ export type CommunityPost = {
 
 export type PostAudience = 'public' | 'followers';
 
+/** What a comment thread belongs to: a community post, or a recorded ride on a profile. */
+export type CommentTarget = { type: 'post'; id: string } | { type: 'ride'; id: string };
+
 export type CommunityComment = {
   id: string;
+  /** Id of the post or ride the comment is on (see `CommentTarget`). */
   postId: string;
   author: CommunityAuthor;
   createdAt: string;
@@ -62,6 +74,9 @@ export type CommunityComment = {
 
 /** "Son paylaşılanlar" filter: everyone, or only riders the viewer follows. */
 export type FeedFilter = 'all' | 'following';
+
+/** Posts loaded per feed request (pull to refresh reloads them). */
+export const FEED_LIMIT = 50;
 
 /** 13.04 search tabs: "Tümü", "Sürücüler", "Sürüşler", "Konumlar". */
 export type SearchKind = 'rider' | 'ride' | 'place';
@@ -102,21 +117,28 @@ export type NewPost = {
   photoUris: string[];
   /** One of the viewer's saved rides, shared with the post. */
   ride?: PostRide;
+  /** The shared ride's id once it is uploaded (links the post to the ride). */
+  rideId?: string;
   audience: PostAudience;
 };
 
 /**
  * Data access for the community feed (Akış 22). Screens use the hooks in `queries.ts`; the mock
- * is replaced by self-hosted Supabase later (no Realtime: the feed refreshes on pull and focus).
+ * serves Expo Go and builds without Supabase. The feed refreshes on pull and focus; only an open
+ * comments sheet listens for new comments (Realtime).
  */
 export interface CommunityRepository {
+  /** Newest first, at most `FEED_LIMIT` posts. */
   listFeed(filter: FeedFilter): Promise<CommunityPost[]>;
   getPost(id: string): Promise<CommunityPost | null>;
   createPost(post: NewPost): Promise<CommunityPost>;
   setLiked(postId: string, liked: boolean): Promise<void>;
   followAuthor(authorId: string): Promise<void>;
-  listComments(postId: string): Promise<CommunityComment[]>;
-  addComment(postId: string, text: string): Promise<CommunityComment>;
+  /** Oldest first. */
+  listComments(target: CommentTarget): Promise<CommunityComment[]>;
+  addComment(target: CommentTarget, text: string): Promise<CommunityComment>;
+  /** Own comments, or any comment on the viewer's own post / ride. */
+  deleteComment(target: CommentTarget, commentId: string): Promise<void>;
   /** Up to 4 mixed suggestions while typing (13.04 "Öneriler"). */
   suggest(query: string): Promise<SearchResult[]>;
   search(query: string): Promise<SearchResult[]>;

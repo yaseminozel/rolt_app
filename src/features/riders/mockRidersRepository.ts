@@ -1,5 +1,7 @@
+import { motorcycleBrandNames } from '@/components/brand/MotorcycleBrandLogo';
+
 import { MATCH_FIXTURES, RIDE_FIXTURES, RIDER_FIXTURES } from './fixtures/riders';
-import type { BlockedRider, RideSummary, Rider, RidersRepository } from './types';
+import type { BlockedRider, RideDetail, RideSummary, Rider, RidersRepository } from './types';
 
 const NETWORK_DELAY_MS = 400;
 const wait = () => new Promise((resolve) => setTimeout(resolve, NETWORK_DELAY_MS));
@@ -15,6 +17,33 @@ const BLOCKED_FIXTURES: BlockedRider[] = [
 ];
 let blocked: BlockedRider[] = [...BLOCKED_FIXTURES];
 const isBlocked = (riderId: string) => blocked.some((rider) => rider.id === riderId);
+/** Bookmarked ride ids, most recent first ("Kaydettiklerim"). */
+let savedOrder: string[] = RIDE_FIXTURES.filter((ride) => ride.isSaved).map((ride) => ride.id);
+
+/** A fixture ride with its rider; fixtures have a map picture but no trace. */
+function rideDetail(ride: RideSummary): RideDetail | null {
+  const rider = riders.get(ride.riderId);
+  if (!rider || isBlocked(rider.id)) {
+    return null;
+  }
+  const primary = rider.bikes.find((bike) => bike.isPrimary);
+  return {
+    ...ride,
+    author: {
+      id: rider.id,
+      name: rider.name,
+      handle: rider.handle,
+      avatar: rider.avatar,
+      bike: primary ? `${motorcycleBrandNames[primary.brand]} ${primary.model}` : undefined,
+    },
+    visibility: 'public',
+    durationS: ride.durationMinutes * 60,
+    maxSpeedKmh: ride.averageSpeedKmh * 1.7,
+    difficulty: 'moderate',
+    surface: 'asphalt',
+    preview: [],
+  };
+}
 
 function updateRide(rideId: string, update: (ride: RideSummary) => RideSummary) {
   const ride = rides.get(rideId);
@@ -70,6 +99,21 @@ export const mockRidersRepository: RidersRepository = {
         ? ride
         : { ...ride, isSaved: saved, saveCount: ride.saveCount + (saved ? 1 : -1) },
     );
+    savedOrder = [...(saved ? [rideId] : []), ...savedOrder.filter((id) => id !== rideId)];
+  },
+
+  async getRide(rideId) {
+    await wait();
+    const ride = rides.get(rideId);
+    return ride ? rideDetail(ride) : null;
+  },
+
+  async listSavedRides() {
+    await wait();
+    return savedOrder
+      .map((id) => rides.get(id))
+      .map((ride) => (ride ? rideDetail(ride) : null))
+      .filter((ride): ride is RideDetail => ride !== null);
   },
 
   async report() {

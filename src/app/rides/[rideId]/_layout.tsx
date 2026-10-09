@@ -1,9 +1,7 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import type { ComponentProps } from 'react';
-import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { EmptyState } from '@/components/feedback/EmptyState';
 import { useRideRecord } from '@/features/rides/queries';
 import { RideFormProvider } from '@/features/rides/RideFormProvider';
 import { colors, layout } from '@/theme';
@@ -17,39 +15,51 @@ const sheet = (detents: number[] | 'fitToContents' = 'fitToContents'): ScreenOpt
   sheetGrabberVisible: true,
 });
 
+const commentsSheet: ScreenOptions = {
+  presentation: 'formSheet',
+  headerShown: false,
+  sheetAllowedDetents: [0.7, 1],
+  sheetGrabberVisible: true,
+};
+
+const screenOptions: ScreenOptions = {
+  headerShown: false,
+  headerBackButtonDisplayMode: 'minimal',
+  contentStyle: { backgroundColor: colors.surface },
+};
+
 /**
  * A recorded ride: save form (08.05) and its sheets (08.06–08.08), saved (08.11), detail
- * (09.06) with its options, and edit (09.07). One `RideFormProvider` holds the editable details.
+ * (09.06) with its options and comments, and edit (09.07). One `RideFormProvider` holds the
+ * editable details. A ride that isn't on this device (another rider's, a shared link, a saved
+ * ride) opens read-only from the server: only the detail and its comments.
  */
 export default function RideLayout() {
   const { rideId } = useLocalSearchParams<{ rideId: string }>();
-  const { t } = useTranslation('rides');
   const { data: ride, isPending } = useRideRecord(rideId);
+
+  if (isPending) {
+    return (
+      <View style={styles.state}>
+        <ActivityIndicator color={colors.textSecondary} />
+      </View>
+    );
+  }
 
   if (!ride) {
     return (
-      <View style={styles.state}>
-        {isPending ? (
-          <ActivityIndicator color={colors.textSecondary} />
-        ) : (
-          <EmptyState
-            title={t('detail.notFound.title')}
-            description={t('detail.notFound.description')}
-          />
-        )}
-      </View>
+      <Stack screenOptions={screenOptions}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="comments" options={commentsSheet} />
+      </Stack>
     );
   }
 
   return (
     <RideFormProvider ride={ride}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          headerBackButtonDisplayMode: 'minimal',
-          contentStyle: { backgroundColor: colors.surface },
-        }}>
+      <Stack screenOptions={screenOptions}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="comments" options={commentsSheet} />
         <Stack.Screen name="save" />
         <Stack.Screen name="edit" />
         <Stack.Screen name="saved" options={{ animation: 'fade' }} />

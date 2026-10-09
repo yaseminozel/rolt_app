@@ -15,7 +15,7 @@ import type { RideActivityProps } from './rideActivityTypes';
 /**
  * Lock Screen and Dynamic Island for a ride in progress (user decision 2026-10-09; not drawn in
  * Pencil, derived from 08.02 Kayıt): status dot (accent / warning / muted), the time as a system
- * timer that runs and pauses by itself, distance and average speed; in navigation the next
+ * timer that runs and pauses by itself, distance and current speed; in navigation the next
  * maneuver as well. Runs in the widget extension's isolated runtime: everything, including the
  * translated labels and the theme colors, arrives through props (see `rideLiveActivity.ts`).
  * Never import this file statically — `expo-widgets` is not in Expo Go.

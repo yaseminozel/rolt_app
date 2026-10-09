@@ -11,11 +11,13 @@ import { ShareTargets } from '@/components/ride-form/ShareTargets';
 import { MetricsCard } from '@/components/route-detail/MetricsCard';
 import type { BoxPadding } from '@/components/route-builder/routeProjection';
 import { Button } from '@/components/ui/Button';
+import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { shareRide, type ShareTarget } from '@/features/rides/shareRide';
 import { formatDistance, formatRideClock, formatSpeed } from '@/i18n/format';
 import { colors, fontFamily, layout, radius, shadows, spacing, typography } from '@/theme';
 import { openShareRide } from '@/features/rides/openShareRide';
+import { shareRideToCommunity } from '@/features/rides/shareToCommunity';
 
 /** The track stays in the open map above the panel. */
 const MAP_PADDING: BoxPadding = { top: 80, right: 40, bottom: 470, left: 40 };
@@ -31,8 +33,13 @@ export default function RideSavedScreen() {
   const insets = useSafeAreaInsets();
   const { showToast } = useToast();
   const { ride } = useRideForm();
+  const requireAccount = useRequireAccount();
 
   const handleShare = async (target: ShareTarget) => {
+    if (target === 'community') {
+      requireAccount('sharePost', () => shareRideToCommunity(ride));
+      return;
+    }
     const result = await shareRide(ride, target).catch(() => null);
     if (result === 'copied') {
       showToast({ variant: 'success', message: t('saved.linkCopied'), bottomOffset: 120 });
@@ -83,7 +90,7 @@ export default function RideSavedScreen() {
           <Text style={styles.shareTitle} accessibilityRole="header">
             {t('saved.shareTitle')}
           </Text>
-          <ShareTargets onShare={handleShare} />
+          <ShareTargets onShare={handleShare} withCommunity />
         </View>
         <Button size="lg" label={t('saved.createImage')} onPress={() => openShareRide(ride.id)} />
         <Button

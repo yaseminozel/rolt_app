@@ -15,6 +15,7 @@ export const SIGN_IN_PROMPT_REASONS = [
   'reportContent',
   'blockRider',
   'suggestRoute',
+  'sharePost',
 ] as const;
 
 export type SignInPromptReason = (typeof SIGN_IN_PROMPT_REASONS)[number];

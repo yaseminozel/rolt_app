@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { isValidEmail } from '@/features/auth/credentials';
-import type { SocialProvider } from '@/features/auth/types';
+import { isAuthError, type SocialProvider } from '@/features/auth/types';
 import { spacing } from '@/theme';
 
 type PendingAction = SocialProvider | 'email' | null;
@@ -76,8 +76,10 @@ export default function SignInScreen() {
           params: { email: normalized, mode: result.status === 'password' ? 'existing' : 'new' },
         });
       }
-    } catch {
-      setError(t('errors.network'));
+    } catch (lookupError) {
+      setError(
+        isAuthError(lookupError, 'rate-limited') ? t('errors.tooManyRequests') : t('errors.network'),
+      );
     } finally {
       setPending(null);
     }

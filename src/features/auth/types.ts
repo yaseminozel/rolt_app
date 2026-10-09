@@ -38,6 +38,8 @@ export type AuthErrorDetailsMap = {
   /** Reset or verification link past its validity window; carries the address it was sent to. */
   'expired-token': { email: string; sentAt: Date };
   network: undefined;
+  /** The backend refused because this device asked too often (email lookup: 30 per 10 min). */
+  'rate-limited': undefined;
 };
 
 export type AuthErrorCode = keyof AuthErrorDetailsMap;
@@ -74,8 +76,8 @@ export type ProviderSignInOptions = {
 };
 
 /**
- * Backend contract for authentication. The app talks only to this interface;
- * the mock implementation is swapped for self-hosted Supabase later.
+ * Backend contract for authentication. The app talks only to this interface: the self-hosted
+ * Supabase implementation (`supabaseAuthService`) when `.env` points at it, otherwise the mock.
  */
 export interface AuthService {
   lookupEmail(email: string): Promise<EmailLookupResult>;
@@ -93,9 +95,11 @@ export interface AuthService {
   requestEmailVerification(email: string): Promise<void>;
   /**
    * Opens a verification link (`rolt://email-verification/confirm?token=…`) and returns the
-   * verified session. Throws `expired-token` (with `email`, `sentAt`) or `invalid-token`.
+   * verified session, or `null` when the address was confirmed but this device can't sign in
+   * by itself (the rider signs in with the password). Throws `expired-token` (with `email`,
+   * `sentAt`) or `invalid-token`.
    */
-  verifyEmail(token: string): Promise<Session>;
+  verifyEmail(token: string): Promise<Session | null>;
   /** Re-reads the account, e.g. to see a verification done in another app or device. */
   refreshSession(session: Session): Promise<Session>;
   completeProfile(session: Session): Promise<Session>;

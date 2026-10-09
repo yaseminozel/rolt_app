@@ -40,7 +40,10 @@ export default function GarageScreen() {
 
   useEffect(() => {
     if (result) {
-      showToast({ variant: 'success', message: t(`garage.toast.${result}`) });
+      showToast({
+        variant: result === 'failed' ? 'failure' : 'success',
+        message: t(`garage.toast.${result}`),
+      });
       garageResult.set(null);
     }
   }, [result, showToast, t]);
@@ -49,18 +52,25 @@ export default function GarageScreen() {
   const model = bike
     ? MOTORCYCLE_MODELS.find((item) => item.brand === bike.brand && item.name === bike.model)
     : undefined;
-  const rideCount = deviceRides.length + sampleRides.length;
-  const distanceKm =
+  const localRideCount = deviceRides.length + sampleRides.length;
+  const localDistanceKm =
     deviceRides.reduce((sum, ride) => sum + ride.stats.distanceM / 1000, 0) +
     sampleRides.reduce((sum, ride) => sum + ride.distanceKm, 0);
+  // Supabase counts the synced rides; rides still waiting on this device may not be in it yet.
+  const rideCount = Math.max(profile?.rideCount ?? 0, localRideCount);
+  const distanceKm = Math.max((profile?.rideDistanceM ?? 0) / 1000, localDistanceKm);
 
   const openAdd = (mode: 'add' | 'change', step?: 'brand' | 'model' | 'year') =>
     router.push({ pathname: '/settings/garage-add', params: { mode, step } });
 
   const deleteBike = async () => {
     setConfirmDelete(false);
-    await update.mutateAsync({ bike: undefined });
-    showToast({ variant: 'success', message: t('garage.toast.deleted') });
+    try {
+      await update.mutateAsync({ bike: undefined });
+      showToast({ variant: 'success', message: t('garage.toast.deleted') });
+    } catch {
+      showToast({ variant: 'failure', message: t('garage.toast.failed') });
+    }
   };
 
   return (

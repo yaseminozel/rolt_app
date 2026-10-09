@@ -102,4 +102,54 @@ export const rideStorage: RideStorage = {
       // Privacy mode: the preference just isn't remembered.
     }
   },
+  async ids() {
+    return Object.keys(read());
+  },
+  async listUnsynced(ownerId) {
+    return Object.values(read())
+      .filter(
+        (ride) => ride.status === 'saved' && ride.ownerId === ownerId && !ride.synced && !ride.syncError,
+      )
+      .sort((a, b) => a.startedAt - b.startedAt);
+  },
+  async putIfPresent(ride) {
+    const rides = read();
+    if (!rides[ride.id]) {
+      return false;
+    }
+    write({ ...rides, [ride.id]: ride });
+    return true;
+  },
+  async insertIfAbsent(ride) {
+    const rides = read();
+    if (rides[ride.id]) {
+      return false;
+    }
+    write({ ...rides, [ride.id]: ride });
+    return true;
+  },
+  async adoptUnowned(ownerId) {
+    const rides = read();
+    const unowned = Object.values(rides).filter((ride) => ride.status === 'saved' && !ride.ownerId);
+    if (unowned.length > 0) {
+      write({
+        ...rides,
+        ...Object.fromEntries(unowned.map((ride) => [ride.id, { ...ride, ownerId, synced: false }])),
+      });
+    }
+    return unowned.length;
+  },
+  async clearSyncErrors(ownerId) {
+    const rides = read();
+    const refused = Object.values(rides).filter(
+      (ride) => ride.status === 'saved' && ride.ownerId === ownerId && ride.syncError,
+    );
+    if (refused.length > 0) {
+      write({
+        ...rides,
+        ...Object.fromEntries(refused.map(({ syncError: _error, ...ride }) => [ride.id, ride])),
+      });
+    }
+    return refused.length;
+  },
 };

@@ -1,4 +1,4 @@
-import { Link, MoreHoriz } from 'iconoir-react-native';
+import { Group, Link, MoreHoriz } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -12,6 +12,7 @@ const icons = {
 };
 
 const TARGETS: readonly ShareTarget[] = [
+  'community',
   'instagramStory',
   'instagramPost',
   'whatsapp',
@@ -19,28 +20,43 @@ const TARGETS: readonly ShareTarget[] = [
   'other',
 ];
 
+const neutralIcons = { community: Group, copyLink: Link, other: MoreHoriz } as const;
+const isNeutral = (target: ShareTarget): target is keyof typeof neutralIcons => target in neutralIcons;
+
+type ShareTargetsProps = {
+  onShare: (target: ShareTarget) => void;
+  /**
+   * "Toplulukta paylaş" first, with the Topluluk tab's glyph on the neutral tile (not in the
+   * design's row; added for the in-app share, decision 2026-10-09). Only for the rider's own
+   * recorded rides.
+   */
+  withCommunity?: boolean;
+};
+
 /**
- * "Hemen paylaş" row (08.11 `f78naq`): Instagram Hikaye, Instagram Gönderi, WhatsApp,
- * Bağlantı Kopyala, Diğer. App tiles are the design's exports (brand artwork, not redrawn).
+ * "Hemen paylaş" row (08.11 `f78naq`): (Toplulukta paylaş,) Instagram Hikaye, Instagram Gönderi,
+ * WhatsApp, Bağlantı Kopyala, Diğer. App tiles are the design's exports (brand artwork, not
+ * redrawn). With six targets the columns share the width.
  */
-export function ShareTargets({ onShare }: { onShare: (target: ShareTarget) => void }) {
+export function ShareTargets({ onShare, withCommunity = false }: ShareTargetsProps) {
   const { t } = useTranslation('rides');
+  const targets = withCommunity ? TARGETS : TARGETS.filter((target) => target !== 'community');
   return (
     <View style={styles.row}>
-      {TARGETS.map((target) => (
+      {targets.map((target) => (
         <Pressable
           key={target}
           onPress={() => onShare(target)}
           accessibilityRole="button"
           accessibilityLabel={t(`saved.targets.${target}`)}
-          style={({ pressed }) => [styles.target, pressed && styles.pressed]}>
-          {target === 'copyLink' || target === 'other' ? (
+          style={({ pressed }) => [
+            styles.target,
+            withCommunity && styles.targetShared,
+            pressed && styles.pressed,
+          ]}>
+          {isNeutral(target) ? (
             <View style={styles.neutralTile}>
-              {target === 'copyLink' ? (
-                <Link width={28} height={28} color={colors.textPrimary} strokeWidth={1.5} />
-              ) : (
-                <MoreHoriz width={28} height={28} color={colors.textPrimary} strokeWidth={1.5} />
-              )}
+              <NeutralIcon target={target} />
             </View>
           ) : (
             <Image
@@ -57,6 +73,11 @@ export function ShareTargets({ onShare }: { onShare: (target: ShareTarget) => vo
   );
 }
 
+function NeutralIcon({ target }: { target: keyof typeof neutralIcons }) {
+  const Icon = neutralIcons[target];
+  return <Icon width={28} height={28} color={colors.textPrimary} strokeWidth={1.5} />;
+}
+
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -66,6 +87,11 @@ const styles = StyleSheet.create({
     width: 68,
     alignItems: 'center',
     gap: spacing.sm,
+  },
+  targetShared: {
+    flex: 1,
+    width: undefined,
+    maxWidth: 68,
   },
   pressed: {
     opacity: 0.6,

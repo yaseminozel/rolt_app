@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 
+import { reanchorRidePhotos } from '../ridePhotoFiles';
 import type { TrackPoint } from '../rideRecorder';
 import type { RideRecord } from '../types';
 import type { RideStorage } from './rideStorage';
@@ -41,6 +42,9 @@ function open() {
 }
 
 type Db = SQLite.SQLiteDatabase;
+
+/** A stored record; photo copies are looked up in the current app container (iOS moves it). */
+const parse = (data: string) => reanchorRidePhotos(JSON.parse(data) as RideRecord);
 
 function writeRow(db: Db, ride: RideRecord) {
   return db.runAsync(
@@ -115,7 +119,7 @@ export const rideStorage: RideStorage = {
   async get(id) {
     const db = await open();
     const row = await db.getFirstAsync<{ data: string }>('SELECT data FROM rides WHERE id = ?', id);
-    return row ? withTrack(db, JSON.parse(row.data) as RideRecord) : null;
+    return row ? withTrack(db, parse(row.data)) : null;
   },
   async list(status) {
     const db = await open();
@@ -123,7 +127,7 @@ export const rideStorage: RideStorage = {
       'SELECT data FROM rides WHERE status = ? ORDER BY started_at DESC',
       status,
     );
-    return Promise.all(rows.map((row) => withTrack(db, JSON.parse(row.data) as RideRecord)));
+    return Promise.all(rows.map((row) => withTrack(db, parse(row.data))));
   },
   async remove(id) {
     const db = await open();
@@ -147,5 +151,66 @@ export const rideStorage: RideStorage = {
       key,
       value,
     );
+  },
+  async ids() {
+    const db = await open();
+    const rows = await db.getAllAsync<{ id: string }>('SELECT id FROM rides');
+    return rows.map((row) => row.id);
+  },
+  async listUnsynced(ownerId) {
+    const db = await open();
+    // JSON1 filters in SQLite, so a sync pass doesn't parse every saved ride's track in JS.
+    const rows = await db.getAllAsync<{ data: string }>(
+      `SELECT data FROM rides
+       WHERE status = 'saved'
+         AND json_extract(data, '$.ownerId') = ?
+         AND json_extract(data, '$.synced') IS NOT 1
+         AND json_extract(data, '$.syncError') IS NULL
+       ORDER BY started_at`,
+      ownerId,
+    );
+    return rows.map((row) => parse(row.data));
+  },
+  async putIfPresent(ride) {
+    const db = await open();
+    const result = await db.runAsync(
+      'UPDATE rides SET status = ?, started_at = ?, data = ? WHERE id = ?',
+      ride.status,
+      ride.startedAt,
+      JSON.stringify(ride),
+      ride.id,
+    );
+    return result.changes > 0;
+  },
+  async insertIfAbsent(ride) {
+    const db = await open();
+    const result = await db.runAsync(
+      'INSERT OR IGNORE INTO rides (id, status, started_at, data) VALUES (?, ?, ?, ?)',
+      ride.id,
+      ride.status,
+      ride.startedAt,
+      JSON.stringify(ride),
+    );
+    return result.changes > 0;
+  },
+  async adoptUnowned(ownerId) {
+    const db = await open();
+    const result = await db.runAsync(
+      `UPDATE rides SET data = json_set(data, '$.ownerId', ?, '$.synced', json('false'))
+       WHERE status = 'saved' AND json_extract(data, '$.ownerId') IS NULL`,
+      ownerId,
+    );
+    return result.changes;
+  },
+  async clearSyncErrors(ownerId) {
+    const db = await open();
+    const result = await db.runAsync(
+      `UPDATE rides SET data = json_remove(data, '$.syncError')
+       WHERE status = 'saved'
+         AND json_extract(data, '$.ownerId') = ?
+         AND json_extract(data, '$.syncError') IS NOT NULL`,
+      ownerId,
+    );
+    return result.changes;
   },
 };

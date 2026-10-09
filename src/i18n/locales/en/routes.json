@@ -34,6 +34,8 @@
     "saved": "Route saved",
     "removed": "Route removed from saved",
     "view": "View",
-    "undo": "Undo"
+    "undo": "Undo",
+    "saveFailed": "Couldn't save the route. Please try again.",
+    "removeFailed": "Couldn't remove the route from saved. Please try again."
   }
 }

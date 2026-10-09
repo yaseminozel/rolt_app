@@ -30,8 +30,8 @@ export type UsernameAvailability =
   | { available: false; suggestions: string[] };
 
 /**
- * Backend contract for username availability. The mock below is swapped for the
- * self-hosted Supabase implementation later (which can check all candidates in one query).
+ * Backend contract for username availability: the mock below (no Supabase configured) and
+ * `supabaseUsernameService`, which checks all candidates in one query.
  */
 export interface UsernameService {
   checkAvailability(username: string, hints?: UsernameSuggestionHints): Promise<UsernameAvailability>;
@@ -95,7 +95,7 @@ function toSlug(value: string): string {
 }
 
 const NETWORK_DELAY_MS = 400;
-/** MOCK: usernames treated as taken until a real profile table exists. */
+/** MOCK: usernames treated as taken without a backend. */
 const TAKEN_USERNAMES = new Set(['yasemin', 'rolt', 'admin']);
 
 export const mockUsernameService: UsernameService = {

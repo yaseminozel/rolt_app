@@ -8,18 +8,23 @@ import { colors, fontFamily, spacing, typography } from '@/theme';
 type RecordMetricsProps = {
   distanceM: number;
   durationS: number;
-  averageSpeedMps: number;
+  /** Current GPS speed while riding (the average belongs to the ride summary). */
+  speedMps: number;
   /** `row`: the sheet (08.01–08.03); `stacked`: "Tam ekran" (08.02 `CYh2I`) with large values. */
   layout?: 'row' | 'stacked';
   /** Before "Başlat" the zero values are muted (08.01). */
   muted?: boolean;
 };
 
-/** Mesafe (km) · Süre · Ort. hız (km/sa) of the recording, in JetBrains Mono so digits don't jitter. */
+/**
+ * Mesafe (km) · Süre · Hız (km/sa) of the recording, in JetBrains Mono so digits don't jitter.
+ * User decision (2026-10-09): while riding the third metric is the current speed, not the
+ * average (which includes every stop and read far below the speedometer).
+ */
 export function RecordMetrics({
   distanceM,
   durationS,
-  averageSpeedMps,
+  speedMps,
   layout = 'row',
   muted = false,
 }: RecordMetricsProps) {
@@ -37,8 +42,8 @@ export function RecordMetrics({
     { key: 'duration', value: formatRideClock(durationS), label: t('record.metrics.duration') },
     {
       key: 'speed',
-      value: formatNumber(toDisplaySpeed(averageSpeedMps * 3.6), { maximumFractionDigits: 0 }),
-      label: t('record.metrics.averageSpeed', { unit: units.speed }),
+      value: formatNumber(toDisplaySpeed(speedMps * 3.6), { maximumFractionDigits: 0 }),
+      label: t('record.metrics.speed', { unit: units.speed }),
     },
   ];
   const stacked = layout === 'stacked';

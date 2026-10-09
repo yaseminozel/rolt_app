@@ -36,6 +36,8 @@ export type RoutePhoto = {
   id: string;
   uri: string;
   uploadStatus: PhotoUploadStatus;
+  /** Where the uploaded file is stored (`suggestion-photos/<user id>/…`); set once uploaded. */
+  storagePath?: string;
 };
 
 /** Everything the user enters across 04.1–04.3; persisted as the draft if sending fails. */

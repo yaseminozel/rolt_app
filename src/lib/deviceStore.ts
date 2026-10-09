@@ -9,5 +9,7 @@ export const deviceStore = {
   /** Synchronous read, for preferences needed before the first render (language, units). */
   getSync: (key: string) => Storage.getItemSync(key),
   set: (key: string, value: string) => Storage.setItem(key, value),
+  /** Synchronous write, for data that must be on disk before the app may die (fatal JS errors). */
+  setSync: (key: string, value: string) => Storage.setItemSync(key, value),
   remove: (key: string) => Storage.removeItem(key),
 };

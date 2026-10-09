@@ -48,6 +48,7 @@ export function createSimulatedLocationSource({
   const clock = () => realStart + (Date.now() - realStart) * timeScale;
   return {
     now: clock,
+    kind: () => 'simulator',
     async start(onFix) {
       const cumulative = cumulativeDistances(line);
       const total = cumulative[cumulative.length - 1] ?? 0;

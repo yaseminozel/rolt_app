@@ -13,7 +13,7 @@ import { TextField } from '@/components/ui/TextField';
 import { editProfileCity, usePickedCity } from '@/features/profile/EditProfileDraft';
 import { profileLinkLabel } from '@/features/profile/profileLink';
 import { useOwnProfile, useUpdateOwnProfile } from '@/features/profile/queries';
-import type { OwnProfile } from '@/features/profile/types';
+import { UsernameTakenError, type OwnProfile } from '@/features/profile/types';
 import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from '@/features/registration/usernameService';
 import { useUsernameAvailability } from '@/features/registration/useUsernameAvailability';
 import { colors, layout, spacing, typography } from '@/theme';
@@ -96,8 +96,10 @@ function EditProfileForm({ profile }: { profile: OwnProfile }) {
       });
       showToast({ variant: 'success', message: t('edit.saved') });
       router.back();
-    } catch {
-      showToast({ variant: 'failure', message: t('edit.failed') });
+    } catch (error) {
+      // Someone may have taken the username since it was checked.
+      const message = error instanceof UsernameTakenError ? t('edit.usernameTaken') : t('edit.failed');
+      showToast({ variant: 'failure', message });
     }
   };
 

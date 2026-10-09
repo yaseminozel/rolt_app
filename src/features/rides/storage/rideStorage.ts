@@ -22,4 +22,21 @@ export interface RideStorage {
   /** Small device-only settings of the record flow, e.g. the last visibility choice. */
   getPreference(key: string): Promise<string | null>;
   setPreference(key: string, value: string): Promise<void>;
+
+  // Cloud sync (`../sync`): these never touch a ride being recorded.
+  /** Ids of every ride on the device, whatever its state or owner. */
+  ids(): Promise<string[]>;
+  /**
+   * Saved rides of `ownerId` the server doesn't have in their current state, oldest first; rides
+   * the server refused (`syncError`) wait for an edit.
+   */
+  listUnsynced(ownerId: string): Promise<RideRecord[]>;
+  /** Rewrites a ride only if it is still on the device (never brings a deleted ride back). */
+  putIfPresent(ride: RideRecord): Promise<boolean>;
+  /** Writes a ride only if its id is new here (a restore never overwrites a ride). */
+  insertIfAbsent(ride: RideRecord): Promise<boolean>;
+  /** Gives saved rides without an owner (saved before accounts) to `ownerId`. */
+  adoptUnowned(ownerId: string): Promise<number>;
+  /** Lets refused rides of `ownerId` try again (e.g. after signing in anew). */
+  clearSyncErrors(ownerId: string): Promise<number>;
 }

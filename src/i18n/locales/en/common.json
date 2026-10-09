@@ -16,6 +16,11 @@
     "view": "View",
     "clear": "Clear"
   },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. You can try again.",
+    "retry": "Try again"
+  },
   "a11y": {
     "showPassword": "Show password",
     "hidePassword": "Hide password",
@@ -67,5 +72,18 @@
     "agoHours": "{{value}}h",
     "agoDays": "{{value}}d",
     "justNow": "now"
+  },
+  "profileLink": {
+    "notFound": {
+      "title": "Rider not found",
+      "description": "The username in this link has changed or the account no longer exists."
+    }
+  },
+  "photoViewer": {
+    "counter": "{{index}} / {{total}}",
+    "a11y": {
+      "photo": "Photo {{index}} of {{total}}",
+      "failed": "The photo couldn't load"
+    }
   }
 }

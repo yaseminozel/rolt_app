@@ -171,7 +171,10 @@
       "status": "Rotayı sürüyorsun",
       "weak": "GPS zayıf"
     },
-    "batteryCritical": "Pil çok az. Ekran artık açık tutulmuyor; sesli yönlendirme sürüyor."
+    "batteryCritical": "Pil çok az. Ekran artık açık tutulmuyor; sesli yönlendirme sürüyor.",
+    "speedUnknown": "—",
+    "speedA11y": "Hız: {{speed}}",
+    "speedUnknownA11y": "Hız: GPS bekleniyor"
   },
   "exit": {
     "title": "Navigasyonu kapatmak istiyor musun?",

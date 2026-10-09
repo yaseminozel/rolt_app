@@ -16,8 +16,15 @@ import {
   savePermissionPromptsPending,
   saveSession,
 } from './authStorage';
+import { hasSupabase, supabase } from '@/lib/supabase/client';
+
 import { mockAuthService } from './mockAuthService';
+import { runAfterSignIn } from './sessionHooks';
+import { supabaseAuthService } from './supabaseAuthService';
 import type { AuthService, ProviderSignInOptions, Session, SocialProvider } from './types';
+
+/** Supabase Auth when `.env` points at the backend; the mock otherwise (Expo Go demos). */
+const defaultService: AuthService = hasSupabase ? supabaseAuthService : mockAuthService;
 
 type AuthContextValue = {
   /** False until persisted state has been read; the root layout waits on it. */
@@ -64,7 +71,7 @@ type AuthProviderProps = {
   service?: AuthService;
 };
 
-export function AuthProvider({ children, service = mockAuthService }: AuthProviderProps) {
+export function AuthProvider({ children, service = defaultService }: AuthProviderProps) {
   const [isReady, setIsReady] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
   const [isGuest, setIsGuest] = useState(false);
@@ -72,14 +79,54 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
   const [permissionPromptsPending, setPermissionPromptsPending] = useState(false);
 
   useEffect(() => {
-    loadAuthState().then((state) => {
-      setSession(state.session);
+    loadAuthState().then(async (state) => {
+      let stored = state.session;
+      if (stored && hasSupabase && service === supabaseAuthService && stored.emailVerified !== false) {
+        // The app session mirrors Supabase's: without a stored Supabase session (e.g. signed in
+        // with the mock before the backend existed) the rider signs in again.
+        const { data } = await supabase.auth.getSession();
+        if (!data.session || data.session.user.id !== stored.userId) {
+          stored = null;
+          saveSession(null);
+        }
+      }
+      setSession(stored);
       setIsGuest(state.isGuest);
       setHasSeenOnboarding(state.hasSeenOnboarding);
       setPermissionPromptsPending(state.permissionPromptsPending);
       setIsReady(true);
+      if (stored) {
+        if (stored.emailVerified !== false) {
+          runAfterSignIn();
+        }
+        // Offline is fine: the stored session stays; flags (and a verification done meanwhile)
+        // refresh when the backend answers.
+        service.refreshSession(stored).then((fresh) => {
+          setSession(fresh);
+          saveSession(fresh);
+        }, () => undefined);
+      }
     });
-  }, []);
+  }, [service]);
+
+  // A session ended on the server (refresh token revoked, account deleted elsewhere) signs out here.
+  useEffect(() => {
+    if (!hasSupabase || service !== supabaseAuthService) {
+      return;
+    }
+    const { data } = supabase.auth.onAuthStateChange((event, supabaseSession) => {
+      if (event === 'SIGNED_OUT' && !supabaseSession) {
+        setSession((current) => {
+          if (current && current.emailVerified !== false) {
+            saveSession(null);
+            return null;
+          }
+          return current;
+        });
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, [service]);
 
   const applySession = useCallback((next: Session | null) => {
     setSession(next);
@@ -138,7 +185,11 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
   );
 
   const verifyEmail = useCallback(
-    async (token: string) => applySession(await service.verifyEmail(token)),
+    async (token: string) => {
+      const verified = await service.verifyEmail(token);
+      // Confirmed, but this device has no password to sign in with: back to sign-in (02.01).
+      applySession(verified);
+    },
     [applySession, service],
   );
 

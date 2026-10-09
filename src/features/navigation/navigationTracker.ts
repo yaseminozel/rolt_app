@@ -4,6 +4,7 @@ import type { LngLat } from '@/features/routes/types';
 
 import { distanceM, pointAlong, projectOnLine, sliceLine } from './geometry';
 import { buildPlan } from './directions/planBuilder';
+import { fixArrival, GPS_HEALTH_RULES, GpsHealth } from './gpsHealth';
 import type { LocationFix, NavigationPlan, NavigationStep } from './types';
 
 /** Thresholds from the design notes (`h3UnyC`, `O5EZ3F`, `wdREi`, `W0nTTe`). */
@@ -22,10 +23,11 @@ export const NAVIGATION_RULES = {
   standingSpeedMps: 1,
   /** Above this speed a break ends. */
   movingSpeedMps: 2,
-  /** Worse accuracy than this shows "GPS sinyali zayıf". */
-  weakAccuracyM: 50,
-  /** No fix for this long shows "GPS sinyali kayboldu". */
-  lostAfterMs: 30_000,
+  /**
+   * Lasting inaccuracy shows "GPS sinyali zayıf", lasting silence "GPS sinyali kayboldu"; the
+   * thresholds (and why standing at a light isn't either) are in `GPS_HEALTH_RULES`.
+   */
+  weakAccuracyM: GPS_HEALTH_RULES.weakAccuracyM,
   /** Further than this from the line (for `offRouteFixes` fixes in a row) means off route. */
   offRouteM: 40,
   offRouteFixes: 2,
@@ -37,6 +39,8 @@ export const NAVIGATION_RULES = {
   maxUsableAccuracyM: 50,
   /** Smaller moves are GPS jitter, not riding. */
   minMoveM: 2,
+  /** While GPS speed says standing, moves shorter than this are drift, not riding. */
+  standingDriftM: 20,
   /**
    * A fix is matched at most this far ahead of the rider (or `maxAdvanceMps` × seconds since the
    * last match, if more): a nearer part of the line further on is the route passing itself
@@ -70,6 +74,8 @@ export type RideStats = {
 export type GpsState = 'ok' | 'weak' | 'lost';
 
 export type NavigationSnapshot = {
+  /** Current GPS speed, m/s; 0 while standing or without good GPS. */
+  speedMps: number;
   /** Position on the route (raw position while off route); `null` before the first fix. */
   position: LngLat | null;
   headingDeg: number;
@@ -115,7 +121,7 @@ export class NavigationTracker {
   private position: LngLat | null = null;
   private headingDeg = 0;
   private accuracyM: number | null = null;
-  private lastFixAt: number;
+  private health: GpsHealth;
   private lastRaw: LocationFix | null = null;
   private lastMatchedAt: number | null = null;
   private offRouteCount = 0;
@@ -140,7 +146,8 @@ export class NavigationTracker {
     this.reached = stops.map(() => false);
     this.stopAlongM = this.alongForStops();
     this.now = now;
-    this.lastFixAt = now;
+    // No fix at all for a while after the start is lost GPS too.
+    this.health = new GpsHealth(now);
     this.ride = {
       distanceM: 0,
       movingS: 0,
@@ -163,8 +170,8 @@ export class NavigationTracker {
 
   /** A new position report. */
   update(fix: LocationFix) {
-    this.now = fix.timestamp;
-    this.lastFixAt = fix.timestamp;
+    this.now = fixArrival(fix);
+    this.health.addFix(fix, this.now);
     this.accuracyM = fix.accuracyM;
     if (this.finished) {
       return this.snapshot();
@@ -291,6 +298,11 @@ export class NavigationTracker {
     this.reconnectedAt = this.now;
   }
 
+  /** GPS health inner state at `now`, for the developer GPS panel. */
+  gpsDiagnostics(now: number) {
+    return this.health.diagnostics(now);
+  }
+
   /** The plan in use (changes after a reconnection). */
   currentPlan() {
     return this.plan;
@@ -376,6 +388,9 @@ export class NavigationTracker {
     }
     const speed = fix.speedMps ?? this.speedFromLast(fix);
     this.lastSpeedMps = speed;
+    if (fix.speedMps === null) {
+      this.health.setSpeed(speed, fixArrival(fix));
+    }
     this.ride.maxSpeedMps = Math.max(this.ride.maxSpeedMps, speed);
     if (!previous) {
       this.ride.track.push(fix.coordinates);
@@ -383,7 +398,12 @@ export class NavigationTracker {
     }
     const seconds = Math.max(0, (fix.timestamp - previous.timestamp) / 1000);
     const moved = distanceM(previous.coordinates, fix.coordinates);
-    if (moved >= NAVIGATION_RULES.minMoveM) {
+    // Standing at a light, fixes still drift a few metres; GPS speed says the bike isn't moving.
+    const drifting =
+      fix.speedMps !== null &&
+      fix.speedMps < NAVIGATION_RULES.standingSpeedMps &&
+      moved < NAVIGATION_RULES.standingDriftM;
+    if (moved >= NAVIGATION_RULES.minMoveM && !drifting) {
       this.ride.distanceM += moved;
       this.ride.track.push(fix.coordinates);
       if (!this.sensorLean) {
@@ -406,13 +426,8 @@ export class NavigationTracker {
     const followingStep = nextIndex >= 0 ? (steps[nextIndex + 1] ?? null) : null;
     const remainingS = this.remainingSeconds();
     const nextStopIndex = this.reached.indexOf(false);
-    const sinceFix = this.now - this.lastFixAt;
-    const gps: GpsState =
-      sinceFix >= NAVIGATION_RULES.lostAfterMs
-        ? 'lost'
-        : this.accuracyM !== null && this.accuracyM > NAVIGATION_RULES.weakAccuracyM
-          ? 'weak'
-          : 'ok';
+    const health = this.health.evaluate(this.now);
+    const gps: GpsState = health === 'good' ? 'ok' : health;
     if (
       this.reconnectedAddedMinutes !== null &&
       this.now - this.reconnectedAt > NAVIGATION_RULES.reconnectedCardMs
@@ -425,6 +440,7 @@ export class NavigationTracker {
       headingDeg: this.headingDeg,
       accuracyM: this.accuracyM,
       gps,
+      speedMps: this.finished ? 0 : this.health.shownSpeedMps(this.now),
       traveledM: this.traveledM,
       remainingM: Math.max(0, this.plan.distanceM - this.traveledM),
       remainingS,

@@ -9,7 +9,7 @@ import type { RideActivityProps, RideActivityStatus } from './rideActivityTypes'
 const shared = () => ({
   distanceLabel: i18n.t('rides:record.liveActivity.distance'),
   durationLabel: i18n.t('rides:record.liveActivity.duration'),
-  speedLabel: i18n.t('rides:record.liveActivity.averageSpeed'),
+  speedLabel: i18n.t('rides:record.liveActivity.speed'),
   accent: colors.accent,
   warning: colors.leanWarn,
   muted: colors.textTertiary,
@@ -28,7 +28,7 @@ export function recordingActivityProps(snapshot: RecorderSnapshot, now: number):
     timerRunning: status === 'recording',
     pausedAtMs: now,
     distance: formatDistance(snapshot.stats.distanceM / 1000, 1),
-    speed: formatSpeed(snapshot.averageSpeedMps * 3.6),
+    speed: formatSpeed(snapshot.speedMps * 3.6),
     instruction: '',
     instructionDetail: '',
   };
@@ -53,7 +53,7 @@ export function navigationActivityProps(
     timerRunning: true,
     pausedAtMs: ride.startedAt,
     distance: formatDistance(ride.distanceM / 1000, 1),
-    speed: formatSpeed(ride.movingS > 0 ? (ride.distanceM / ride.movingS) * 3.6 : 0),
+    speed: formatSpeed(snapshot.speedMps * 3.6),
     instruction: guidance.title,
     instructionDetail: guidance.subtitle,
   };

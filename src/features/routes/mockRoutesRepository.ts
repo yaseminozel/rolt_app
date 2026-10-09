@@ -1,12 +1,12 @@
-import { findCityByName } from '@/features/location/turkishCities';
 import { matchesSearch } from '@/lib/searchText';
 
 import { PLACE_FIXTURES } from './fixtures/places';
-import { RECOMMENDED_ROUTE_IDS, ROUTE_FIXTURES } from './fixtures/routes';
+import { RECOMMENDED_LIST_IDS, RECOMMENDED_ROUTE_IDS, ROUTE_FIXTURES } from './fixtures/routes';
 import { distanceKm, isInBounds } from './geo';
 import { filterRoutes } from './routeFilter';
+import { sortRoutes } from './routeSort';
 import { matchesSearchFilters } from './searchFilters';
-import type { LngLat, Route, RoutesRepository, RouteSort } from './types';
+import type { Route, RoutesRepository } from './types';
 
 const NETWORK_DELAY_MS = 500;
 
@@ -16,39 +16,23 @@ const SUGGESTION_LIMIT = 3;
 
 const wait = (ms = NETWORK_DELAY_MS) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function cityCentre(city: string): LngLat | null {
-  const match = findCityByName(city);
-  return match ? [match.longitude, match.latitude] : null;
-}
-
 const startOf = (route: Route) => route.coordinates[0];
 
-function applySort(routes: Route[], sort: RouteSort, city: string) {
-  const sorted = [...routes];
-  const centre = cityCentre(city);
-  switch (sort) {
-    case 'nearest':
-      return centre
-        ? sorted.sort((a, b) => distanceKm(startOf(a), centre) - distanceKm(startOf(b), centre))
-        : sorted;
-    case 'shortest':
-      return sorted.sort((a, b) => a.distanceKm - b.distanceKm);
-    case 'longest':
-      return sorted.sort((a, b) => b.distanceKm - a.distanceKm);
-    case 'popular':
-    case 'recommended':
-      return sorted.sort((a, b) => b.popularity - a.popularity);
-  }
-}
+const routesByIds = (ids: readonly string[]) =>
+  ids.flatMap((id) => ROUTE_FIXTURES.find((route) => route.id === id) ?? []);
+
+/** Bookmarks of this app session, most recent first (one shared list: the mock has no users). */
+let savedIds: string[] = [];
 
 /** In-memory RoutesRepository backed by the design fixtures. */
 export const mockRoutesRepository: RoutesRepository = {
   async listRecommended({ city, filter }) {
     await wait();
-    const recommended = RECOMMENDED_ROUTE_IDS.map((id) =>
-      ROUTE_FIXTURES.find((route) => route.id === id),
-    ).filter((route): route is Route => route !== undefined);
-    return filterRoutes(recommended, filter, city);
+    return filterRoutes(routesByIds(RECOMMENDED_ROUTE_IDS), filter, city);
+  },
+
+  async listFeatured() {
+    return routesByIds(RECOMMENDED_LIST_IDS);
   },
 
   async search({ query, sort, city, filters }) {
@@ -58,7 +42,7 @@ export const mockRoutesRepository: RoutesRepository = {
         (matchesSearch(route.name, query) || matchesSearch(route.summary, query)) &&
         (!filters || matchesSearchFilters(route, filters)),
     );
-    return applySort(matches, sort, city);
+    return sortRoutes(matches, sort, city);
   },
 
   async suggest({ query }) {
@@ -92,11 +76,24 @@ export const mockRoutesRepository: RoutesRepository = {
 
   async listByIds(ids) {
     await wait();
-    return ids.flatMap((id) => ROUTE_FIXTURES.find((route) => route.id === id) ?? []);
+    return routesByIds(ids);
   },
 
   async getById(id) {
     await wait();
     return ROUTE_FIXTURES.find((route) => route.id === id) ?? null;
+  },
+
+  async listByAuthor(authorId) {
+    return ROUTE_FIXTURES.filter((route) => route.author.id === authorId);
+  },
+
+  async listSavedIds() {
+    return savedIds;
+  },
+
+  async setSaved(routeId, saved) {
+    const rest = savedIds.filter((id) => id !== routeId);
+    savedIds = saved ? [routeId, ...rest] : rest;
   },
 };

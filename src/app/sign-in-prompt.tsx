@@ -8,6 +8,7 @@ import {
   Prohibition,
   UserPlus,
   WarningTriangle,
+  EditPencil,
 } from 'iconoir-react-native';
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,7 @@ const reasonIcons: Record<SignInPromptReason, ComponentType<SvgProps>> = {
   reportContent: WarningTriangle,
   blockRider: Prohibition,
   suggestRoute: MapsArrowDiagonal,
+  sharePost: EditPencil,
 };
 const GenericIcon = LogIn;
 

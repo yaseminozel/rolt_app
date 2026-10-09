@@ -56,6 +56,20 @@ export class SubmissionError extends Error {
   }
 }
 
+/**
+ * Uploads suggestion photos as soon as they are added (04.2), so sending (04.4) only has to
+ * upload what is still missing.
+ */
+export interface RoutePhotoUploader {
+  /** Resolves with the stored file's path. `isRetry` is set for "Tekrar" on a failed photo. */
+  upload(
+    uri: string,
+    options: { isRetry: boolean; onProgress?: (fraction: number) => void },
+  ): Promise<string>;
+  /** Deletes an uploaded photo the rider removed again. */
+  remove(storagePath: string): Promise<void>;
+}
+
 /** Sends a suggestion for review (04.4 → 04.5 / 04.6). */
 export interface RouteSuggestionSubmitter {
   submit(draft: RouteSuggestionDraft, onProgress: (progress: SubmissionProgress) => void): Promise<SubmissionResult>;

@@ -21,7 +21,7 @@
   "morePhotos": "+{{count}}",
   "a11y": {
     "authorProfile": "{{name}}, profili aç",
-    "photo": "Rota görseli {{index}} / {{total}}",
+    "openPhoto": "Görseli aç, {{index}} / {{total}}",
     "morePhotos_one": "{{count}} görsel daha",
     "morePhotos_other": "{{count}} görsel daha",
     "loading": "Rota yükleniyor"

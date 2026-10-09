@@ -32,19 +32,39 @@ export type RideStats = {
 /** A ride photo copied into the app; `failed` until "Tekrar dene" succeeds (08.07). */
 export type RidePhoto = {
   id: string;
+  /**
+   * Shown on this device: the app's own copy (`ridePhotoFiles`), or the public URL of a
+   * restored photo.
+   */
   uri: string;
   status: 'uploading' | 'uploaded' | 'failed';
   /** 0–1 while uploading. */
   progress: number;
+  /** Object path in the `ride-photos` bucket once uploaded (none in the mock). */
+  path?: string;
+  /**
+   * Why the last upload of a `failed` photo failed: `connection` (offline, timeout, busy server)
+   * may be saved anyway and goes up with the ride's sync; `rejected` keeps "Sürüşü kaydet" off.
+   */
+  failure?: 'connection' | 'rejected';
 };
+
+/** A sync failure retrying can't fix (e.g. the server refused the data); kept until the next edit. */
+export type RideSyncError = { code?: string; message: string; at: number };
 
 /**
  * A recorded ride (CLAUDE.md: Ride ≠ Route). Stored on the device first (P0); `synced` turns
- * true once the backend has it. Title and notes are user content.
+ * true once the backend has it (row and photos) and false again after every edit. Title and
+ * notes are user content.
  */
 export type RideRecord = {
   id: string;
   status: RideStatus;
+  /**
+   * The account that saved it ("Sürüşü kaydet"). Recordings and drafts have none (a guest can
+   * record), nor do rides saved before accounts existed (adopted by the next signed-in rider).
+   */
+  ownerId?: string;
   rideType: RideType;
   /** Set when recorded while riding a route (Akış 09); "Rotayı tekrar sür" needs it. */
   routeId?: string;
@@ -65,6 +85,12 @@ export type RideRecord = {
   /** GPS track; a new segment starts after every pause so gaps aren't drawn as straight lines. */
   track: LngLat[][];
   synced: boolean;
+  /** Last successful upload. Once set the ride exists on the server, so deleting it goes there too. */
+  uploadedAt?: number;
+  /** Uploaded photos removed in an edit; their files are deleted after the next upload. */
+  removedPhotoPaths?: string[];
+  /** Set when the server refused the ride; sync leaves it alone until the rider edits it. */
+  syncError?: RideSyncError;
 };
 
 export const EMPTY_RIDE_STATS: RideStats = {

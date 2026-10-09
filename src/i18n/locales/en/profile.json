@@ -119,6 +119,10 @@
     }
   },
   "saved": {
+    "sections": {
+      "routes": "Routes",
+      "rides": "Rides"
+    },
     "empty": {
       "title": "No saved routes yet",
       "description": "Save routes you like and find them here later."

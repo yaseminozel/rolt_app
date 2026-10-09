@@ -16,6 +16,14 @@ export const deviceStore = {
       return memory.get(key) ?? null;
     }
   },
+  setSync(key: string, value: string) {
+    memory.set(key, value);
+    try {
+      globalThis.localStorage?.setItem(key, value);
+    } catch {
+      // Privacy mode: memory only.
+    }
+  },
   async set(key: string, value: string) {
     memory.set(key, value);
     try {

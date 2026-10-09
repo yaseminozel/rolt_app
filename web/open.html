@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>ROLT</title>
+<link rel="icon" href="/favicon.png" />
+<meta property="og:title" content="ROLT" />
+<meta property="og:description" content="Rota bul, sürüşünü kaydet, paylaş." />
+<meta property="og:image" content="https://roltapp.com/og.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bakbak+One&family=Inter:wght@400;500;600&display=swap" />
+<style>
+  :root { --ink: #0b0b13; --white: #ffffff; --brand: #1515ff; --brand-pressed: #1111d9; --muted: rgba(255,255,255,.72); }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--brand); color: var(--white); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { width: 100%; max-width: 400px; padding: 40px 24px; text-align: center; }
+  .logo { font-family: "Bakbak One", sans-serif; font-size: 56px; letter-spacing: 1px; margin: 0 0 28px; }
+  h1 { font-size: 22px; line-height: 28px; font-weight: 600; margin: 0 0 8px; }
+  p { font-size: 15px; line-height: 22px; color: var(--muted); margin: 0 0 28px; }
+  .button { display: block; width: 100%; padding: 14px 24px; border-radius: 12px; background: var(--white); color: var(--ink); font-size: 15px; font-weight: 600; text-decoration: none; }
+  .button:active { opacity: .85; }
+  .link { display: inline-block; margin-top: 18px; color: var(--white); font-size: 14px; font-weight: 500; }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">ROLT</div>
+  <h1 id="title"></h1>
+  <p id="text"></p>
+  <a id="open" class="button" href="rolt://"></a>
+  <a id="site" class="link" href="/"></a>
+</main>
+<script>
+  // Share links: /u/<username> (profile, 09.02) and /r/<ride id> (ride, 08.11). The page opens the
+  // app (rolt://u/… or rolt://rides/…) and otherwise points to the site.
+  (function () {
+    var en = !/^tr\b/i.test(navigator.language || 'tr');
+    var parts = location.pathname.split('/').filter(Boolean);
+    var kind = parts[0];
+    var id = decodeURIComponent(parts[1] || '').replace(/[^A-Za-z0-9_.\-]/g, '');
+    var deepLink = 'rolt://';
+    var copy;
+    if (kind === 'u' && id) {
+      deepLink = 'rolt://u/' + encodeURIComponent(id);
+      copy = en
+        ? { title: '@' + id + ' on ROLT', text: 'Open the profile in the ROLT app to see their rides and routes.' }
+        : { title: "@" + id + " ROLT'ta", text: "Sürüşlerini ve rotalarını görmek için profili ROLT uygulamasında aç." };
+    } else if (kind === 'r' && id) {
+      deepLink = 'rolt://rides/' + encodeURIComponent(id);
+      copy = en
+        ? { title: 'A ride on ROLT', text: 'Open the ride in the ROLT app to see the route, stats and photos.' }
+        : { title: "ROLT'ta bir sürüş", text: 'Rotayı, istatistikleri ve fotoğrafları görmek için sürüşü ROLT uygulamasında aç.' };
+    } else {
+      location.replace('/');
+      return;
+    }
+    document.documentElement.lang = en ? 'en' : 'tr';
+    document.getElementById('title').textContent = copy.title;
+    document.getElementById('text').textContent = copy.text;
+    var open = document.getElementById('open');
+    open.href = deepLink;
+    open.textContent = en ? 'Open in ROLT' : "ROLT'ta aç";
+    var site = document.getElementById('site');
+    site.textContent = en ? "Don't have the app? Join the waitlist" : 'Uygulama yok mu? Bekleme listesine katıl';
+    // Phones with the app installed switch over at once; others stay on this page.
+    if (/iPhone|iPad|Android/i.test(navigator.userAgent)) {
+      setTimeout(function () { location.href = deepLink; }, 120);
+    }
+  })();
+</script>
+</body>
+</html>

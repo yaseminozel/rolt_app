@@ -15,7 +15,8 @@ type ToggleOptions = {
 /**
  * Bookmark toggle shared by route cards and the route detail (CLAUDE.md "Kaydetme"):
  * guests get the sign-in prompt and the save completes after sign-in; saving shows
- * "Rota kaydedildi · Görüntüle", removing shows "… çıkarıldı · Geri al".
+ * "Rota kaydedildi · Görüntüle", removing shows "… çıkarıldı · Geri al". The change shows at
+ * once; if it can't be stored it is rolled back with a failure toast.
  */
 export function useRouteBookmark() {
   const { t } = useTranslation('routes');
@@ -25,10 +26,21 @@ export function useRouteBookmark() {
 
   const toggleBookmark = useCallback(
     (routeId: string, { toastBottomOffset }: ToggleOptions = {}) => {
+      const store = (save: boolean) =>
+        setSaved(routeId, save).then((stored) => {
+          if (!stored) {
+            showToast({
+              variant: 'failure',
+              message: save ? t('saved.saveFailed') : t('saved.removeFailed'),
+              bottomOffset: toastBottomOffset,
+            });
+          }
+        });
+
       requireAccount('saveRoute', () => {
         // A guest's replayed action always saves (they tapped an empty bookmark).
         const save = !isSaved(routeId);
-        setSaved(routeId, save);
+        void store(save);
         showToast(
           save
             ? {
@@ -43,7 +55,7 @@ export function useRouteBookmark() {
                 variant: 'removed',
                 message: t('saved.removed'),
                 actionLabel: t('saved.undo'),
-                onActionPress: () => setSaved(routeId, true),
+                onActionPress: () => void store(true),
                 bottomOffset: toastBottomOffset,
               },
         );

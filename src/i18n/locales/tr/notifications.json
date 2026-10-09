@@ -36,5 +36,10 @@
       "title": "Rota önerin onaylandı",
       "body": "“Çıralı – Adrasan Rotası” artık Keşfet’te yayında."
     }
+  },
+  "channels": {
+    "default": "Genel",
+    "social": "Sosyal",
+    "socialDescription": "Beğeniler, yorumlar, takipçiler ve mesajlar"
   }
 }

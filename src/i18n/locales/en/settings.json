@@ -437,7 +437,8 @@
     "toast": {
       "added": "Your bike was added.",
       "changed": "Your bike was updated.",
-      "deleted": "Your bike was deleted."
+      "deleted": "Your bike was deleted.",
+      "failed": "Your bike couldn't be saved. Try again."
     }
   },
   "offlineMaps": {

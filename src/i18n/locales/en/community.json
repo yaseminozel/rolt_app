@@ -23,6 +23,7 @@
     },
     "addPhoto": "Add photos",
     "removePhoto": "Remove photo",
+    "removeRide": "Remove ride",
     "cancel": "Cancel",
     "posted": "Shared.",
     "failed": "Couldn't share. Try again."
@@ -33,6 +34,7 @@
     "comment": "Comments",
     "share": "Share",
     "readMore": "See more",
+    "openRide": "Opens the ride",
     "map": "Ride map",
     "photo": "Photo {{index}}",
     "photoCounter": "{{index}}/{{total}}",
@@ -48,7 +50,11 @@
     "title": "Comments · {{count}}",
     "placeholder": "Write a comment…",
     "send": "Send",
-    "empty": "Be the first to comment."
+    "empty": "Be the first to comment.",
+    "delete": "Delete comment",
+    "cancel": "Cancel",
+    "sendFailed": "Couldn't send your comment. Try again.",
+    "deleteFailed": "Couldn't delete the comment. Try again."
   },
   "search": {
     "open": "Search",

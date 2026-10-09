@@ -1,6 +1,7 @@
 import { isNativeMapAvailable } from '@/components/map/BaseMap';
 import type { LngLat } from '@/features/routes/types';
 
+import { withGpsDiagnostics } from '../gpsDiagnostics';
 import type { LocationProfile, LocationSource } from '../types';
 import { createDeviceLocationSource } from './deviceLocationSource';
 import { createSimulatedLocationSource, type SimulationScenario } from './simulatedLocationSource';
@@ -31,9 +32,11 @@ export function createNavigationLocationSource({
   notification: { title: string; body: string };
   profile?: LocationProfile;
 }): LocationSource {
-  return isSimulatedNavigation
+  const source = isSimulatedNavigation
     ? createSimulatedLocationSource({ line, stops, scenario: scenario ?? envScenario, timeScale: envTimeScale })
     : createDeviceLocationSource(notification, profile);
+  // Development builds show it in the GPS panel; production uses the source as is.
+  return __DEV__ ? withGpsDiagnostics(source, profile) : source;
 }
 
 export type { SimulationScenario };

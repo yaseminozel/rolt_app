@@ -14,12 +14,14 @@ import {
   type ShareTemplate,
 } from '@/components/share/ShareTemplateCard';
 import { Button } from '@/components/ui/Button';
+import { useRequireAccount } from '@/features/auth/useRequireAccount';
 import { haptics } from '@/features/haptics/haptics';
 import { useRiderRides } from '@/features/riders/queries';
 import { useRideRecord } from '@/features/rides/queries';
 import { rideTitle } from '@/features/rides/rideTitle';
 import { shareTemplateImage, SHARE_IMAGE_SIZE } from '@/features/rides/shareImage';
 import { rideLink, type ShareTarget } from '@/features/rides/shareRide';
+import { shareRideToCommunity } from '@/features/rides/shareToCommunity';
 import { formatCompactDuration, formatDistance } from '@/i18n/format';
 import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 import { colors, fontFamily, layout, spacing } from '@/theme';
@@ -48,6 +50,7 @@ export default function ShareRideSheet() {
   const exportRef = useRef<View>(null);
   const [template, setTemplate] = useState<ShareTemplate>('map');
   const [sharing, setSharing] = useState(false);
+  const requireAccount = useRequireAccount();
 
   const data = useMemo<ShareRideData | null>(() => {
     if (source === 'sample') {
@@ -66,7 +69,8 @@ export default function ShareRideSheet() {
     if (!ride) {
       return null;
     }
-    const photo = ride.photos.find((item) => item.status === 'uploaded');
+    // Photos that failed to upload are still on the device and show from there.
+    const photo = ride.photos.find((item) => item.status !== 'uploading');
     return {
       title: rideTitle(ride),
       distanceKm: ride.stats.distanceM / 1000,
@@ -98,6 +102,13 @@ export default function ShareRideSheet() {
   };
 
   const onTarget = async (target: ShareTarget) => {
+    if (target === 'community') {
+      const ride = deviceRide.data;
+      if (ride) {
+        requireAccount('sharePost', () => shareRideToCommunity(ride));
+      }
+      return;
+    }
     if (target === 'copyLink') {
       await Clipboard.setStringAsync(rideLink(rideId));
       showToast({ variant: 'success', message: t('saved.linkCopied') });
@@ -135,7 +146,7 @@ export default function ShareRideSheet() {
             ))}
           </ScrollView>
           <View style={styles.targets}>
-            <ShareTargets onShare={onTarget} />
+            <ShareTargets onShare={onTarget} withCommunity={source !== 'sample'} />
           </View>
           <View style={styles.action}>
             <Button size="lg" label={t('shareSheet.share')} loading={sharing} onPress={shareImage} />

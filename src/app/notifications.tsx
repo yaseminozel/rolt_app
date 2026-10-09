@@ -1,5 +1,14 @@
-import { router, Stack } from 'expo-router';
-import { ChatBubble, Check, CheckCircle, Group, Heart, PathArrow } from 'iconoir-react-native';
+import { Stack } from 'expo-router';
+import {
+  Bell,
+  ChatBubble,
+  ChatLines,
+  Check,
+  CheckCircle,
+  Group,
+  Heart,
+  PathArrow,
+} from 'iconoir-react-native';
 import type { ComponentType } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,6 +24,7 @@ import type { SvgProps } from 'react-native-svg';
 
 import { Button } from '@/components/ui/Button';
 import { haptics } from '@/features/haptics/haptics';
+import { openNotificationTarget } from '@/features/notifications/notificationTarget';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -33,6 +43,10 @@ const ICONS: Record<NotificationKind, ComponentType<SvgProps>> = {
   routeSuggestion: PathArrow,
   follower: Group,
   suggestionApproved: CheckCircle,
+  // Not drawn: a follow request reads like a follower; messages and product news get their own glyph.
+  followRequest: Group,
+  message: ChatLines,
+  productUpdate: Bell,
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -46,22 +60,6 @@ function sectionOf(createdAt: string, now: number): Section {
     return 'today';
   }
   return time >= startOfToday.getTime() - 6 * DAY_MS ? 'thisWeek' : 'earlier';
-}
-
-/** Where a notification leads (not drawn): rides and followers → profile, routes → Discover / the route. */
-function open(notification: AppNotification) {
-  switch (notification.kind) {
-    case 'routeSuggestion':
-      router.navigate('/discover');
-      return;
-    case 'suggestionApproved':
-      if (notification.routeId) {
-        router.push({ pathname: '/route/[id]', params: { id: notification.routeId } });
-      }
-      return;
-    default:
-      router.navigate('/profile');
-  }
 }
 
 /**
@@ -136,7 +134,7 @@ export default function NotificationsScreen() {
                     if (!item.read) {
                       markRead.mutate(item.id);
                     }
-                    open(item);
+                    openNotificationTarget(item);
                   }}
                 />
               ))}

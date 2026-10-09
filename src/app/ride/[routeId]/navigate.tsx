@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { GpsDevPanel } from '@/components/dev/GpsDevPanel';
 import { Dialog } from '@/components/feedback/Dialog';
 import { MapActionButton } from '@/components/map/MapActionButton';
 import { ArrivalPanel } from '@/components/navigation/ArrivalPanel';
@@ -20,6 +21,7 @@ import { GuidanceCard, type GuidanceIcon } from '@/components/navigation/Guidanc
 import { NavigationBanner } from '@/components/navigation/NavigationBanner';
 import { NavigationChip } from '@/components/navigation/NavigationChip';
 import { NavigationMapView } from '@/components/navigation/NavigationMapView';
+import { NavigationSpeedBadge } from '@/components/navigation/NavigationSpeedBadge';
 import { NavigationSummary } from '@/components/navigation/NavigationSummary';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { Button } from '@/components/ui/Button';
@@ -58,6 +60,10 @@ import { colors, layout, radius, spacing } from '@/theme';
 const KEEP_AWAKE_TAG = 'rolt-navigation';
 /** Guidance sits 7 pt under the status bar (06.06 "Yönlendirme" at y 56). */
 const GUIDANCE_TOP = 7;
+/** Map buttons and the speed badge sit this far above the screen bottom (over the summary panel). */
+const MAP_CONTROLS_BOTTOM = 160;
+/** 52 pt speed badge + 12 pt gap: the developer GPS pill sits above it. */
+const DEV_PANEL_BOTTOM = MAP_CONTROLS_BOTTOM + 52 + spacing.md;
 const SCENARIOS: readonly SimulationScenario[] = [
   'normal',
   'offRoute',
@@ -386,6 +392,15 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
       )}
 
       {snapshot.finished ? null : (
+        <NavigationSpeedBadge
+          speedMps={snapshot.speedMps}
+          known={snapshot.gps === 'ok'}
+          style={styles.speed}
+        />
+      )}
+      {snapshot.finished ? null : <GpsDevPanel opensUpward style={styles.devPanel} />}
+
+      {snapshot.finished ? null : (
         <View style={styles.mapActions} pointerEvents="box-none">
           <MapSquareButton
             onPress={() => setFollowing(true)}
@@ -506,8 +521,17 @@ const styles = StyleSheet.create({
   mapActions: {
     position: 'absolute',
     right: layout.screenGutter,
-    bottom: 160,
+    bottom: MAP_CONTROLS_BOTTOM,
     gap: spacing.md,
+  },
+  speed: {
+    position: 'absolute',
+    left: layout.screenGutter,
+    bottom: MAP_CONTROLS_BOTTOM,
+  },
+  devPanel: {
+    left: layout.screenGutter,
+    bottom: DEV_PANEL_BOTTOM,
   },
   squareButton: {
     width: 48,

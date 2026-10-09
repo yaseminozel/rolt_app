@@ -68,14 +68,25 @@ export type LocationFix = {
   speedMps: number | null;
   /** Degrees clockwise from north; `null` when unknown. */
   headingDeg: number | null;
+  /** When the fix was taken (device GPS time). */
   timestamp: number;
+  /**
+   * Wall-clock time the app received it (same clock as the ticks). GPS time can lag or drift on
+   * some phones, so silence ("GPS kayboldu") is measured on this; missing → `timestamp`.
+   */
+  receivedAt?: number;
 };
 
 /** Where fixes come from during navigation. */
 /** Navigation asks for every fix; a free ride for what the recorder keeps. */
 export type LocationProfile = 'navigation' | 'recording';
-/** `idle` while the rider has paused by hand (coarse and slow, to save battery). */
-export type LocationPowerMode = 'active' | 'idle';
+/**
+ * `standing` once the rider has stood still for a while (`STANDING_POWER_RULES`), `idle` while
+ * the rider has paused by hand (coarse and slow, to save battery).
+ */
+export type LocationPowerMode = 'active' | 'standing' | 'idle';
+/** Where fixes come from (developer GPS panel). */
+export type LocationSourceKind = 'backgroundTask' | 'foregroundWatch' | 'simulator';
 
 export interface LocationSource {
   /** Starts delivering fixes; resolves to a stop function. */
@@ -84,6 +95,8 @@ export interface LocationSource {
   now(): number;
   /** Changes how hard the GPS works while started; the simulator ignores it. */
   setPowerMode?(mode: LocationPowerMode): Promise<void>;
+  /** Where fixes come from (developer GPS panel); known once started. */
+  kind?(): LocationSourceKind;
 }
 
 /** A stop the rider added (06.02–06.03), in riding order. */

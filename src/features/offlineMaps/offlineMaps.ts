@@ -198,3 +198,8 @@ export function useOfflineMaps() {
     (a, b) => (b.downloadedAt ?? Number.MAX_SAFE_INTEGER) - (a.downloadedAt ?? Number.MAX_SAFE_INTEGER),
   );
 }
+
+/** The route record kept with an offline map, so the route opens without a connection. */
+export function offlineRoute(routeId: string): Route | undefined {
+  return maps[routeId]?.route;
+}

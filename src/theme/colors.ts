@@ -262,6 +262,12 @@ export const colors = {
   /** Unfilled part of a photo's upload bar (08.07 "Progress track"). */
   mediaProgressTrack: 'rgba(255, 255, 255, 0.35)',
   mediaBadge: 'rgba(16, 19, 24, 0.8)',
+  // Full-screen photo viewer (no design; user decision 2026-10-09).
+  mediaViewerBackground: palette.black,
+  /** Disc behind the close button and the counter, legible over bright photos. */
+  mediaViewerControl: 'rgba(16, 19, 24, 0.56)',
+  /** Glyph shown when a photo can't load. */
+  mediaViewerMuted: palette.gray450,
 
   // Turn-by-turn navigation (06.06): status banners, deviation badges, route line.
   /** "GPS sinyali zayıf" banner fill and icon disc. */

@@ -437,7 +437,8 @@
     "toast": {
       "added": "Motorun eklendi.",
       "changed": "Motorun güncellendi.",
-      "deleted": "Motorun silindi."
+      "deleted": "Motorun silindi.",
+      "failed": "Motorun kaydedilemedi. Tekrar dene."
     }
   },
   "offlineMaps": {

@@ -182,7 +182,10 @@ function Results({
     requireAccount('followRider', () => {
       hapticToggle(!following);
       setFollowed((current) => ({ ...current, [riderId]: !following }));
-      setFollowing.mutate({ riderId, following: !following });
+      setFollowing.mutate(
+        { riderId, following: !following },
+        { onError: () => setFollowed((current) => ({ ...current, [riderId]: following })) },
+      );
     });
 
   const kinds: SearchKind[] = tab === 'all' ? ['rider', 'ride', 'place'] : [tab];

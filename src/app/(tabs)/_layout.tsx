@@ -6,6 +6,7 @@ import { Platform } from 'react-native';
 import { TabBarVisibilityProvider } from '@/components/layout/TabBarVisibility';
 import { RideAccessory } from '@/components/record/RideAccessory';
 import { usePermissionPromptSheet } from '@/features/auth/usePermissionPromptSheet';
+import { useLiveNotifications } from '@/features/notifications/useLiveNotifications';
 import { rememberTab } from '@/features/rides/recordSheet';
 import { useIsRecording } from '@/features/rides/RideRecordingProvider';
 import { colors } from '@/theme';
@@ -36,6 +37,8 @@ export default function TabsLayout() {
   const { t } = useTranslation();
   // Normally answered during registration; catches a sheet still due after it (e.g. app killed).
   usePermissionPromptSheet();
+  // Realtime list + badge, push token and push taps for the signed-in rider (mounted once).
+  useLiveNotifications();
   // Changes only on start / finish: the live numbers re-render the accessory alone.
   const recording = useIsRecording();
 

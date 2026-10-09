@@ -16,6 +16,11 @@
     "view": "Görüntüle",
     "clear": "Temizle"
   },
+  "errorBoundary": {
+    "title": "Bir şeyler ters gitti",
+    "description": "Beklenmedik bir hata oluştu. Tekrar deneyebilirsin.",
+    "retry": "Yeniden dene"
+  },
   "a11y": {
     "showPassword": "Şifreyi göster",
     "hidePassword": "Şifreyi gizle",
@@ -67,5 +72,18 @@
     "agoHours": "{{value}} sa",
     "agoDays": "{{value}} g",
     "justNow": "şimdi"
+  },
+  "profileLink": {
+    "notFound": {
+      "title": "Sürücü bulunamadı",
+      "description": "Bu bağlantıdaki kullanıcı adı değişmiş ya da hesap artık yok."
+    }
+  },
+  "photoViewer": {
+    "counter": "{{index}} / {{total}}",
+    "a11y": {
+      "photo": "Görsel {{index}} / {{total}}",
+      "failed": "Görsel yüklenemedi"
+    }
   }
 }

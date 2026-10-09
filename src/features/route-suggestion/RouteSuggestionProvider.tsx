@@ -3,8 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { LngLat } from '@/features/routes/types';
 
 import { deleteDraft, rememberPlace, saveDraft } from './draftStore';
-import { routing } from './services';
-import { uploadRoutePhoto } from './services/mockPhotoUploader';
+import { photoUploader, routing } from './services';
 import type { NoRouteError } from './services/types';
 import {
   MAX_STOPS,
@@ -197,16 +196,26 @@ export function RouteSuggestionProvider({ children, initialDraft }: { children: 
     setDraft((current) => ({ ...current, ...changes }));
   }, []);
 
-  const setPhotoStatus = (photoId: string, uploadStatus: 'uploading' | 'uploaded' | 'failed') =>
+  // Photos removed while uploading: their file is deleted once the upload lands.
+  const removedPhotoIds = useRef(new Set<string>());
+
+  const setPhotoStatus = (photoId: string, uploadStatus: 'uploading' | 'uploaded' | 'failed', storagePath?: string) =>
     setDraft((current) => ({
       ...current,
-      photos: current.photos.map((photo) => (photo.id === photoId ? { ...photo, uploadStatus } : photo)),
+      photos: current.photos.map((photo) => (photo.id === photoId ? { ...photo, uploadStatus, storagePath } : photo)),
     }));
 
   const startUpload = useCallback((photoId: string, uri: string, isRetry: boolean) => {
     setPhotoStatus(photoId, 'uploading');
-    uploadRoutePhoto(uri, isRetry)
-      .then(() => setPhotoStatus(photoId, 'uploaded'))
+    photoUploader
+      .upload(uri, { isRetry })
+      .then((storagePath) => {
+        if (removedPhotoIds.current.has(photoId)) {
+          photoUploader.remove(storagePath).catch(() => undefined);
+          return;
+        }
+        setPhotoStatus(photoId, 'uploaded', storagePath);
+      })
       .catch(() => setPhotoStatus(photoId, 'failed'));
   }, []);
 
@@ -230,9 +239,17 @@ export function RouteSuggestionProvider({ children, initialDraft }: { children: 
     [draft.photos, startUpload],
   );
 
-  const removePhoto = useCallback((photoId: string) => {
-    setDraft((current) => ({ ...current, photos: current.photos.filter((photo) => photo.id !== photoId) }));
-  }, []);
+  const removePhoto = useCallback(
+    (photoId: string) => {
+      removedPhotoIds.current.add(photoId);
+      const storagePath = draft.photos.find((photo) => photo.id === photoId)?.storagePath;
+      if (storagePath) {
+        photoUploader.remove(storagePath).catch(() => undefined);
+      }
+      setDraft((current) => ({ ...current, photos: current.photos.filter((photo) => photo.id !== photoId) }));
+    },
+    [draft.photos],
+  );
 
   const setCoverPhoto = useCallback((photoId: string) => {
     setDraft((current) => {

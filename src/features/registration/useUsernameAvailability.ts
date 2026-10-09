@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import { hasSupabase } from '@/lib/supabase/client';
+
+import { supabaseUsernameService } from './supabaseUsernameService';
 import {
   mockUsernameService,
   validateUsernameFormat,
@@ -7,6 +10,9 @@ import {
   type UsernameService,
   type UsernameSuggestionHints,
 } from './usernameService';
+
+/** Supabase when configured, otherwise the mock. */
+const defaultUsernameService = hasSupabase ? supabaseUsernameService : mockUsernameService;
 
 export type UsernameStatus =
   | { state: 'idle' }
@@ -32,7 +38,7 @@ type Result = { username: string; status: UsernameStatus };
 export function useUsernameAvailability(
   username: string,
   hints: UsernameSuggestionHints = {},
-  service: UsernameService = mockUsernameService,
+  service: UsernameService = defaultUsernameService,
 ): UsernameStatus {
   const [result, setResult] = useState<Result>({ username: '', status: { state: 'idle' } });
   /** Value whose availability request is in flight (set once the debounce has elapsed). */

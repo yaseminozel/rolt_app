@@ -14,11 +14,14 @@ import {
 } from 'react-native';
 
 import { useToast } from '@/components/feedback/ToastProvider';
-import { composeIntent } from '@/features/community/composeIntent';
+import { useRequireAccount } from '@/features/auth/useRequireAccount';
+import { composeIntent, type ComposeIntent } from '@/features/community/composeIntent';
 import { useCreatePost } from '@/features/community/queries';
 import type { PostAudience } from '@/features/community/types';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, fontFamily, radius, spacing } from '@/theme';
+
+import { PostRideBlock } from './CommunityPostCard';
 
 const MAX_PHOTOS = 4;
 const TEXT_MAX = 500;
@@ -28,7 +31,9 @@ const THUMB_SIZE = 56;
 /**
  * "Paylaşım alanı / Topluluk" (13.01 Pencil `uV7oN`, typing `T0ZMr`): a bordered field (dark
  * border while typing), a photo button, the audience and a pill "Paylaş" that turns dark once
- * there is something to share. Ride posts are shared from the ride itself.
+ * there is something to share. A ride shared from the ride itself ("Toplulukta paylaş") arrives
+ * attached and shows as the post card will, with × to take it off; the post keeps the ride's
+ * card as shared (snapshot) and links the ride once it is on the server.
  */
 export function PostComposer() {
   const { t } = useTranslation('community');
@@ -41,6 +46,7 @@ export function PostComposer() {
   const [photoUris, setPhotoUris] = useState<string[]>(
     () => initialIntent?.photoUris.slice(0, MAX_PHOTOS) ?? [],
   );
+  const [ride, setRide] = useState<ComposeIntent['ride']>(() => initialIntent?.ride);
   const [audience, setAudience] = useState<PostAudience>('public');
   const inputRef = useRef<TextInput>(null);
   // From the profile "+" menu: focus, with any picked photos attached. An intent set before
@@ -51,11 +57,14 @@ export function PostComposer() {
     }
     return composeIntent.subscribe((next) => {
       setPhotoUris((current) => [...current, ...next.photoUris].slice(0, MAX_PHOTOS));
+      if (next.ride) {
+        setRide(next.ride);
+      }
       requestAnimationFrame(() => inputRef.current?.focus());
     });
   }, [initialIntent]);
 
-  const canPost = Boolean(text.trim() || photoUris.length > 0) && !createPost.isPending;
+  const canPost = Boolean(text.trim() || photoUris.length > 0 || ride) && !createPost.isPending;
 
   const addPhotos = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -81,16 +90,28 @@ export function PostComposer() {
       cancelLabel: t('composer.cancel'),
     });
 
-  const share = async () => {
+  const requireAccount = useRequireAccount();
+
+  const publish = async () => {
     try {
-      await createPost.mutateAsync({ text: text.trim() || undefined, photoUris, audience });
+      await createPost.mutateAsync({
+        text: text.trim() || undefined,
+        photoUris,
+        ride: ride?.snapshot,
+        rideId: ride?.rideId,
+        audience,
+      });
       setText('');
       setPhotoUris([]);
+      setRide(undefined);
       showToast({ variant: 'success', message: t('composer.posted') });
     } catch {
       showToast({ variant: 'failure', message: t('composer.failed') });
     }
   };
+
+  // Posting needs an account; a guest's post goes out once they are signed in.
+  const share = () => requireAccount('sharePost', publish);
 
   return (
     <View style={[styles.card, focused && styles.cardFocused]}>
@@ -108,6 +129,23 @@ export function PostComposer() {
         style={styles.input}
         accessibilityLabel={t('composer.placeholder')}
       />
+
+      {ride ? (
+        <PostRideBlock
+          ride={ride.snapshot}
+          photos={[]}
+          trailing={
+            <Pressable
+              onPress={() => setRide(undefined)}
+              hitSlop={12}
+              accessibilityRole="button"
+              accessibilityLabel={t('composer.removeRide')}
+              style={styles.rideRemove}>
+              <Xmark width={12} height={12} color={colors.textInverse} strokeWidth={2} />
+            </Pressable>
+          }
+        />
+      ) : null}
 
       {photoUris.length > 0 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.thumbs}>
@@ -207,6 +245,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 2,
     right: 2,
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: colors.mapScrim,
+  },
+  rideRemove: {
     width: 20,
     height: 20,
     alignItems: 'center',

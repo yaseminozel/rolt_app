@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Search } from 'iconoir-react-native';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -21,6 +21,7 @@ import { PostComposer } from '@/components/community/PostComposer';
 import { StackedCardsIllustration } from '@/components/illustrations/StackedCardsIllustration';
 import { Button } from '@/components/ui/Button';
 import { FilterChip } from '@/components/ui/FilterChip';
+import { composeIntent } from '@/features/community/composeIntent';
 import { useCommunityFeed, useFollowAuthor, useSetPostLiked } from '@/features/community/queries';
 import type { CommunityPost, FeedFilter } from '@/features/community/types';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
@@ -46,6 +47,18 @@ export default function CommunityScreen() {
   const followAuthor = useFollowAuthor();
   const posts = feed.data ?? [];
   const empty = !feed.isPending && posts.length === 0;
+  const scrollRef = useRef<ScrollView>(null);
+  // A post started elsewhere (a ride's "Toplulukta paylaş", the profile "+") brings the
+  // composer back to the top, even over the empty feed.
+  const [composing, setComposing] = useState(() => composeIntent.isPending());
+  useEffect(
+    () =>
+      composeIntent.watch(() => {
+        setComposing(true);
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+      }),
+    [],
+  );
 
   const like = (post: CommunityPost) =>
     requireAccount('likeRide', () => {
@@ -66,6 +79,7 @@ export default function CommunityScreen() {
       style={styles.screen}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={[
           styles.content,
           { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + TAB_BAR_ROOM },
@@ -94,7 +108,7 @@ export default function CommunityScreen() {
               <Search width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
             </Pressable>
           </View>
-          {empty ? null : <PostComposer />}
+          {empty && !composing ? null : <PostComposer />}
         </View>
 
         <View style={styles.section}>
@@ -149,6 +163,15 @@ export default function CommunityScreen() {
                   onLikePress={() => like(post)}
                   onCommentPress={() => comment(post)}
                   onSharePress={() => share(post)}
+                  onRidePress={
+                    post.rideId
+                      ? () =>
+                          router.push({
+                            pathname: '/rides/[rideId]',
+                            params: { rideId: post.rideId! },
+                          })
+                      : undefined
+                  }
                 />
               </Fragment>
             ))

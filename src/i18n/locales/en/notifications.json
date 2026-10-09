@@ -36,5 +36,10 @@
       "title": "Your route suggestion was approved",
       "body": "“Çıralı – Adrasan Rotası” is now live in Discover."
     }
+  },
+  "channels": {
+    "default": "General",
+    "social": "Social",
+    "socialDescription": "Likes, comments, followers and messages"
   }
 }

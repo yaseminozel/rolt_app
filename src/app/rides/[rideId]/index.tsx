@@ -1,5 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { MoreVert, NavArrowLeft, Play, ShareAndroid } from 'iconoir-react-native';
+import {
+  CloudSync,
+  CloudXmark,
+  MoreVert,
+  NavArrowLeft,
+  Play,
+  ShareAndroid,
+} from 'iconoir-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -11,7 +18,12 @@ import { FADED_ACTION_BAR_HEIGHT, FadedActionBar } from '@/components/layout/Fad
 import { MapActionButton } from '@/components/map/MapActionButton';
 import { RideMapPreview } from '@/components/record/RideMapPreview';
 import { LeanAngleCard } from '@/components/ride-detail/LeanAngleCard';
+import { RemoteRideDetail } from '@/components/ride-detail/RemoteRideDetail';
 import { RideEndpointsCard } from '@/components/ride-detail/RideEndpointsCard';
+import { RideSocialBar } from '@/components/ride-detail/RideSocialBar';
+import { InfoNote } from '@/components/feedback/InfoNote';
+import { useIsOffline } from '@/features/network/useIsOffline';
+import { useRideSyncState, type RideSyncStatus } from '@/features/rides/sync/useRideSyncState';
 import { averageSpeedKmh } from '@/components/ride-form/RideSummaryCard';
 import { DifficultyIcon, RoadIcon } from '@/components/route-detail/icons';
 import { MetricsCard } from '@/components/route-detail/MetricsCard';
@@ -22,13 +34,16 @@ import { RoutePhotoStrip } from '@/components/route-detail/RoutePhotoStrip';
 import type { BoxPadding } from '@/components/route-builder/routeProjection';
 import { Button } from '@/components/ui/Button';
 import { useOwnRider } from '@/features/riders/ownRider';
-import { useDeleteRide, useRideEndpoints } from '@/features/rides/queries';
+import { useRideDetail } from '@/features/riders/queries';
+import { useRideActions } from '@/features/riders/useRideActions';
+import { useDeleteRide, useRideEndpoints, useRideRecord } from '@/features/rides/queries';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { rideTitle } from '@/features/rides/rideTitle';
 import { useRoute } from '@/features/routes/queries';
 import { formatClockTime, formatDistance, formatNumber, formatRideClock, formatSpeed } from '@/i18n/format';
 import { colors, layout, radius, spacing, typography } from '@/theme';
 import { openShareRide } from '@/features/rides/openShareRide';
+import { hasSupabase } from '@/lib/supabase/client';
 
 const MAP_HEIGHT = 360;
 /** The sheet starts at 252 pt over a 360 pt map (09.06 `1005:37957`). */
@@ -38,13 +53,24 @@ const PLAY_BUTTON_TOP = 188;
 const MAP_PADDING: BoxPadding = { top: 96, right: 72, bottom: SHEET_OVERLAP + 24, left: 32 };
 
 /**
+ * 09.06 Sürüş detayı: the rider's own ride from this device, or — when it isn't here (another
+ * rider's ride, a shared link, a saved ride) — the server's copy, read-only.
+ */
+export default function RideDetailScreen() {
+  const { rideId } = useLocalSearchParams<{ rideId: string }>();
+  const { data: ride } = useRideRecord(rideId);
+  return ride ? <OwnRideDetail /> : <RemoteRideDetail rideId={rideId} />;
+}
+
+/**
  * 09.06 Sürüş detayı — Kendi sürüşüm (Figma `1005:37957`): the ride on a map picture with a
  * replay button, title and rider, six metrics (max lean instead of breaks), the lean angle
  * gauge, start and finish, photos, details and notes, then "Paylaş" (and "Rotayı tekrar sür"
  * for rides recorded on a route, Ride ≠ Route). "…" opens the ride options; deleting asks first
- * and returns to the profile.
+ * and returns to the profile. Once uploaded, likes and comments show under the title (comments
+ * open the sheet).
  */
-export default function RideDetailScreen() {
+function OwnRideDetail() {
   const { t } = useTranslation(['rides', 'routes', 'common']);
   const insets = useSafeAreaInsets();
   const { showToast } = useToast();
@@ -55,6 +81,20 @@ export default function RideDetailScreen() {
   const { data: route, isFetched: routeFetched } = useRoute(ride.routeId);
   const { data: endpoints } = useRideEndpoints(ride, route, routeFetched);
   const [replayToken, setReplayToken] = useState(0);
+  const sync = useRideSyncState(ride.id);
+  const offline = useIsOffline();
+  // Reactions only for a synced ride; until then it is local-only.
+  const { data: serverRide } = useRideDetail(ride.id, {
+    enabled: hasSupabase && sync.status === 'synced' && Boolean(rider),
+  });
+  // Quiet unless it matters: photos still waiting, no connection, or the server refused it.
+  const syncNote =
+    sync.status === 'failed'
+      ? t('sync.failed')
+      : sync.status === 'pending' && (sync.pendingPhotos > 0 || offline)
+        ? t('sync.pending')
+        : undefined;
+  const { toggleLike } = useRideActions();
   const leftLean = ride.stats.maxLeanLeftDeg ?? 0;
   const rightLean = ride.stats.maxLeanRightDeg ?? 0;
 
@@ -104,8 +144,9 @@ export default function RideDetailScreen() {
       value: t(`routes:surface.${ride.surface}`),
     },
   ];
+  // Photos that failed to upload are still on the device and show from there.
   const photos = ride.photos
-    .filter((photo) => photo.status === 'uploaded')
+    .filter((photo) => photo.status !== 'uploading')
     .map((photo) => ({ uri: photo.uri }));
 
   const closeDeleteDialog = () => router.setParams({ confirm: undefined });
@@ -150,6 +191,18 @@ export default function RideDetailScreen() {
               <RouteAuthorRow
                 author={{ id: rider.id, name: rider.name, avatar: rider.avatar }}
                 publishedAt={new Date(ride.startedAt).toISOString()}
+              />
+            ) : null}
+            {syncNote ? <InfoNote text={syncNote} icon={syncNoteIcon(sync.status)} /> : null}
+            {serverRide && sync.status === 'synced' ? (
+              <RideSocialBar
+                likeCount={serverRide.likeCount}
+                commentCount={serverRide.commentCount}
+                liked={serverRide.isLiked}
+                onLikePress={() => toggleLike(serverRide)}
+                onCommentPress={() =>
+                  router.push({ pathname: '/rides/[rideId]/comments', params: { rideId: ride.id } })
+                }
               />
             ) : null}
           </View>
@@ -248,6 +301,8 @@ export default function RideDetailScreen() {
     </View>
   );
 }
+
+const syncNoteIcon = (status: RideSyncStatus) => (status === 'failed' ? CloudXmark : CloudSync);
 
 const styles = StyleSheet.create({
   screen: {

@@ -10,5 +10,6 @@ export function fixFromLocation({ coords, timestamp }: Location.LocationObject):
     speedMps: coords.speed !== null && coords.speed >= 0 ? coords.speed : null,
     headingDeg: coords.heading !== null && coords.heading >= 0 ? coords.heading : null,
     timestamp,
+    receivedAt: Date.now(),
   };
 }

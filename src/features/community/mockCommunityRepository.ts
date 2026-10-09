@@ -10,6 +10,7 @@ import {
   initialPosts,
 } from './fixtures/posts';
 import type {
+  CommentTarget,
   CommunityAuthor,
   CommunityComment,
   CommunityPost,
@@ -22,7 +23,27 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, NETWORK_DELAY_MS
 const SUGGESTION_LIMIT = 4;
 
 let posts = initialPosts();
-const comments = initialComments();
+let comments = initialComments();
+/** Comments on profile rides (none in the samples). */
+let rideComments: CommunityComment[] = [];
+
+const commentsOf = (target: CommentTarget) => (target.type === 'post' ? comments : rideComments);
+
+function setCommentsOf(target: CommentTarget, next: CommunityComment[]) {
+  if (target.type === 'post') {
+    comments = next;
+  } else {
+    rideComments = next;
+  }
+}
+
+function changeCommentCount(target: CommentTarget, delta: number) {
+  if (target.type === 'post') {
+    posts = posts.map((post) =>
+      post.id === target.id ? { ...post, commentCount: Math.max(post.commentCount + delta, 0) } : post,
+    );
+  }
+}
 
 /** MOCK: the viewer, as the author of new posts and comments (the sample account). */
 function viewer(): CommunityAuthor {
@@ -82,7 +103,7 @@ export const mockCommunityRepository: CommunityRepository = {
     return posts.find((post) => post.id === id) ?? null;
   },
 
-  async createPost({ text, photoUris, ride, audience }) {
+  async createPost({ text, photoUris, ride, rideId, audience }) {
     await wait();
     const post: CommunityPost = {
       id: `post-${Date.now().toString(36)}`,
@@ -90,6 +111,7 @@ export const mockCommunityRepository: CommunityRepository = {
       createdAt: new Date().toISOString(),
       text: text?.trim() || undefined,
       ride,
+      rideId,
       photos: photoUris.map((uri) => ({ uri })),
       likeCount: 0,
       commentCount: 0,
@@ -117,25 +139,32 @@ export const mockCommunityRepository: CommunityRepository = {
     );
   },
 
-  async listComments(postId) {
+  async listComments(target) {
     await wait();
-    return comments.filter((comment) => comment.postId === postId);
+    return commentsOf(target).filter((comment) => comment.postId === target.id);
   },
 
-  async addComment(postId, text) {
+  async addComment(target, text) {
     await wait();
     const comment: CommunityComment = {
       id: `comment-${Date.now().toString(36)}`,
-      postId,
+      postId: target.id,
       author: viewer(),
       createdAt: new Date().toISOString(),
       text: text.trim(),
     };
-    comments.push(comment);
-    posts = posts.map((post) =>
-      post.id === postId ? { ...post, commentCount: post.commentCount + 1 } : post,
-    );
+    setCommentsOf(target, [...commentsOf(target), comment]);
+    changeCommentCount(target, 1);
     return comment;
+  },
+
+  async deleteComment(target, commentId) {
+    await wait();
+    setCommentsOf(
+      target,
+      commentsOf(target).filter((comment) => comment.id !== commentId),
+    );
+    changeCommentCount(target, -1);
   },
 
   async suggest(query) {

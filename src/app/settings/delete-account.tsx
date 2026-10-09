@@ -15,7 +15,7 @@ import { ownProfileRepository } from '@/features/profile/ownProfileRepository';
 import { useOwnProfile } from '@/features/profile/queries';
 import { useRiderRides, useRiderRoutes } from '@/features/riders/queries';
 import { useSavedRides } from '@/features/rides/queries';
-import { ridesRepository } from '@/features/rides/ridesRepository';
+import { forgetAccountRides } from '@/features/rides/sync/localCleanup';
 import { useSavedRoutes } from '@/features/routes/SavedRoutesProvider';
 import { formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
@@ -45,7 +45,8 @@ export default function DeleteAccountScreen() {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const rideCount = deviceRides.length + sampleRides.length;
+  // Supabase counts synced rides; rides still waiting on this device may not be in it yet.
+  const rideCount = Math.max(profile?.rideCount ?? 0, deviceRides.length + sampleRides.length);
 
   const chooseReason = () =>
     showActionSheet({
@@ -66,10 +67,8 @@ export default function DeleteAccountScreen() {
       // The account goes first; this device's copies of its data follow.
       await deleteAccount(reason ?? undefined);
       await Promise.all([
-        ...deviceRides.map((ride) => ridesRepository.remove(ride.id)),
-        ridesRepository.listDrafts().then((drafts) =>
-          Promise.all(drafts.map((ride) => ridesRepository.remove(ride.id))),
-        ),
+        // Best effort: the account is already gone, a local leftover isn't a failed deletion.
+        forgetAccountRides(session.userId).catch(() => undefined),
         ownProfileRepository.remove(session.userId),
       ]);
       savedIds.forEach((id) => setSaved(id, false));

@@ -2,10 +2,16 @@ import { i18n } from '@/i18n';
 import { storeLanguagePreference, type AppLanguage } from '@/i18n/language';
 import { storeUnitSystem, type UnitSystem } from '@/i18n/units';
 
-/** "Dil" (10.10): switches the interface language at once and remembers it. */
+import { syncLocaleToServer } from './userSettings';
+
+/**
+ * "Dil" (10.10): switches the interface language at once and remembers it; the server's texts
+ * (notifications, pushes, emails) follow in the background.
+ */
 export async function applyLanguage(language: AppLanguage) {
   await storeLanguagePreference(language);
   await i18n.changeLanguage(language);
+  syncLocaleToServer(language);
 }
 
 /**

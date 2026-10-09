@@ -119,6 +119,10 @@
     }
   },
   "saved": {
+    "sections": {
+      "routes": "Rotalar",
+      "rides": "Sürüşler"
+    },
     "empty": {
       "title": "Henüz kaydedilen rota yok",
       "description": "Beğendiğin rotaları kaydet; daha sonra burada kolayca bul."

@@ -69,8 +69,21 @@ export default function GarageAddSheet() {
     if (!brand || !model) {
       return;
     }
-    await update.mutateAsync({ bike: { brand, model: model.name, year: year ?? undefined } });
-    garageResult.set(mode === 'change' ? 'changed' : 'added');
+    try {
+      await update.mutateAsync({
+        bike: {
+          brand,
+          model: model.name,
+          year: year ?? undefined,
+          modelId: model.id,
+          displacementCc: model.displacementCc,
+          category: model.category,
+        },
+      });
+      garageResult.set(mode === 'change' ? 'changed' : 'added');
+    } catch {
+      garageResult.set('failed');
+    }
     router.back();
   };
 

@@ -21,7 +21,7 @@
   "morePhotos": "+{{count}}",
   "a11y": {
     "authorProfile": "{{name}}, open profile",
-    "photo": "Route photo {{index}} of {{total}}",
+    "openPhoto": "Open photo, {{index}} of {{total}}",
     "morePhotos_one": "{{count}} more photo",
     "morePhotos_other": "{{count}} more photos",
     "loading": "Loading route"

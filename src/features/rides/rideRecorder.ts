@@ -1,4 +1,5 @@
 import { bearingDeg, distanceM } from '@/features/navigation/geometry';
+import { fixArrival, GPS_HEALTH_RULES, GpsHealth } from '@/features/navigation/gpsHealth';
 import type { LocationFix } from '@/features/navigation/types';
 import type { LngLat } from '@/features/routes/types';
 
@@ -9,18 +10,21 @@ import { EMPTY_RIDE_STATS, type RideStats } from './types';
 
 /** Thresholds of the ride recorder; written to CLAUDE.md's decision table. */
 export const RECORDER_RULES = {
-  /** Fixes worse than this pause the recording ("GPS zayıf, kayıt duraklatıldı"), like navigation. */
-  weakAccuracyM: 50,
-  /** No fix for this long also pauses it (GPS lost). */
-  lostAfterMs: 30_000,
+  /**
+   * Fixes worse than this are not recorded; if inaccuracy lasts, the recording pauses ("GPS zayıf,
+   * kayıt duraklatıldı"). How long it must last and when silence means lost GPS: `GPS_HEALTH_RULES`.
+   */
+  weakAccuracyM: GPS_HEALTH_RULES.weakAccuracyM,
   /** Before "Başlat", a fix this accurate means "GPS hazır". */
   readyAccuracyM: 30,
   /** Track points closer than this are dropped (standing jitter). */
   minStepM: 5,
+  /** While GPS speed says standing, steps shorter than this are drift, not riding. */
+  standingDriftM: 20,
   /** Faster than this between two fixes is a GPS jump, not riding (~250 km/h). */
   maxPlausibleSpeedMps: 70,
   /** Below this speed the rider counts as standing. */
-  standingSpeedMps: 1,
+  standingSpeedMps: GPS_HEALTH_RULES.standingSpeedMps,
   /** Standing this long while recording is one break ("Mola"). */
   breakAfterS: 60,
   /** Bends are measured on track points resampled this far apart. */
@@ -49,6 +53,8 @@ export type RecorderSnapshot = {
   stats: RideStats;
   /** Average over riding time (recorded time minus breaks), m/s. */
   averageSpeedMps: number;
+  /** Current GPS speed, m/s; 0 while standing, paused or without good GPS. */
+  speedMps: number;
   position: LngLat | null;
   headingDeg: number | null;
   /** Bumped whenever a point or segment is added. */
@@ -157,7 +163,9 @@ export class RideRecorder {
   private points: TrackPoint[] = [];
   private trackVersion = 0;
   private lastCountedAt: number;
-  private lastFixAt: number | null = null;
+  /** Latest clock reading (ticks and fixes), for the shown speed. */
+  private clock: number;
+  private health = new GpsHealth();
   private lastGood: { coordinates: LngLat; timestamp: number } | null = null;
   private gps: GpsQuality = 'searching';
   private position: LngLat | null = null;
@@ -185,6 +193,7 @@ export class RideRecorder {
       ),
     );
     this.lastCountedAt = now;
+    this.clock = now;
     // A restored recording waits for the rider's "Devam et".
     if (resume) {
       this.phase = 'paused';
@@ -228,35 +237,53 @@ export class RideRecorder {
   resume(now: number) {
     this.advance(now);
     this.phase = 'recording';
+    // While paused by hand fixes come slowly (battery); that silence isn't lost GPS.
+    this.health.restart(now);
+    if (this.gps !== 'searching') {
+      this.gps = this.health.state;
+    }
     this.startSegment();
   }
 
-  /** Clock tick (about once a second): advances time and notices lost GPS. */
+  /** Clock tick (about once a second): advances time, notices lost GPS and breaks without fixes. */
   tick(now: number) {
+    this.clock = now;
     this.advance(now);
+    if (this.gps !== 'searching' && this.phase === 'recording') {
+      this.gps = this.health.evaluate(now);
+    }
+    // Standing still, the phone may send no fixes at all: the break still counts.
     if (
-      this.lastFixAt !== null &&
-      now - this.lastFixAt >= RECORDER_RULES.lostAfterMs &&
-      this.gps !== 'lost'
+      this.counting &&
+      this.standingSince !== null &&
+      !this.breakCounted &&
+      (now - this.standingSince) / 1000 >= RECORDER_RULES.breakAfterS
     ) {
-      this.gps = 'lost';
+      this.stats.breakCount += 1;
+      this.stats.breakS += RECORDER_RULES.breakAfterS;
+      this.breakCounted = true;
     }
   }
 
   addFix(fix: LocationFix) {
-    this.advance(fix.timestamp);
-    this.lastFixAt = fix.timestamp;
-    this.position = fix.coordinates;
-    if (fix.headingDeg !== null) {
-      this.headingDeg = fix.headingDeg;
+    const at = fixArrival(fix);
+    this.clock = at;
+    this.advance(at);
+    const usable = this.health.addFix(fix, at);
+    const previous = this.gps;
+    // Until the first accurate fix the recorder is still looking for GPS.
+    this.gps = previous === 'searching' && !usable ? 'searching' : this.health.state;
+    // A single inaccurate fix doesn't move the dot or the track; lasting inaccuracy turns "weak".
+    if (usable || this.position === null) {
+      this.position = fix.coordinates;
+      if (fix.headingDeg !== null) {
+        this.headingDeg = fix.headingDeg;
+      }
     }
-
-    const quality: GpsQuality = fix.accuracyM <= RECORDER_RULES.weakAccuracyM ? 'good' : 'weak';
-    const regained = quality === 'good' && this.gps !== 'good' && this.gps !== 'searching';
-    this.gps = quality;
-    if (quality !== 'good' || this.phase !== 'recording') {
+    if (!usable || this.phase !== 'recording') {
       return;
     }
+    const regained = previous === 'weak' || previous === 'lost';
     if (regained || this.segments.length === 0) {
       // Back from an automatic pause: the gap isn't drawn or counted.
       this.startSegment();
@@ -278,11 +305,17 @@ export class RideRecorder {
     }
     const speed = fix.speedMps ?? derivedSpeed;
     this.lastSpeedMps = speed;
+    if (fix.speedMps === null) {
+      this.health.setSpeed(derivedSpeed, at);
+    }
     if (speed <= RECORDER_RULES.maxPlausibleSpeedMps) {
       this.stats.maxSpeedMps = Math.max(this.stats.maxSpeedMps, speed);
     }
     this.trackStanding(fix, speed);
-    if (step < RECORDER_RULES.minStepM) {
+    // Standing at a light, fixes still drift a few metres; GPS speed says the bike isn't moving.
+    const drifting =
+      fix.speedMps !== null && fix.speedMps < RECORDER_RULES.standingSpeedMps && step < RECORDER_RULES.standingDriftM;
+    if (step < RECORDER_RULES.minStepM || drifting) {
       return;
     }
     this.stats.distanceM += step;
@@ -316,11 +349,12 @@ export class RideRecorder {
   }
 
   private trackStanding(fix: LocationFix, speed: number) {
+    const at = fixArrival(fix);
     if (speed < RECORDER_RULES.standingSpeedMps) {
-      this.standingSince ??= fix.timestamp;
+      this.standingSince ??= at;
       if (
         !this.breakCounted &&
-        (fix.timestamp - this.standingSince) / 1000 >= RECORDER_RULES.breakAfterS
+        (at - this.standingSince) / 1000 >= RECORDER_RULES.breakAfterS
       ) {
         this.stats.breakCount += 1;
         // The standing time before the break was recognised belongs to it too.
@@ -341,6 +375,7 @@ export class RideRecorder {
       gps: this.gps,
       stats: { ...this.stats },
       averageSpeedMps: ridingS > 0 ? this.stats.distanceM / ridingS : 0,
+      speedMps: this.phase === 'recording' ? this.health.shownSpeedMps(this.clock) : 0,
       position: this.position,
       headingDeg: this.headingDeg,
       trackVersion: this.trackVersion,
@@ -356,6 +391,16 @@ export class RideRecorder {
   /** Points from `seq` on (O(new points)): storage appends them, the map draws them as its tail. */
   pointsSince(seq: number): TrackPoint[] {
     return this.points.slice(Math.max(0, seq));
+  }
+
+  /** GPS state as the snapshot would report it, without taking one. */
+  get gpsQuality(): GpsQuality {
+    return this.gps;
+  }
+
+  /** GPS health inner state at `now`, for the developer GPS panel. */
+  gpsDiagnostics(now: number) {
+    return this.health.diagnostics(now);
   }
 
   /** Index of the segment new points go into. */

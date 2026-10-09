@@ -171,7 +171,10 @@
       "status": "Riding the route",
       "weak": "Weak GPS"
     },
-    "batteryCritical": "Battery very low. The screen no longer stays on; voice guidance continues."
+    "batteryCritical": "Battery very low. The screen no longer stays on; voice guidance continues.",
+    "speedUnknown": "—",
+    "speedA11y": "Speed: {{speed}}",
+    "speedUnknownA11y": "Speed: waiting for GPS"
   },
   "exit": {
     "title": "Do you want to end navigation?",

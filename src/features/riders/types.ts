@@ -3,7 +3,10 @@ import type { ImageSourcePropType } from 'react-native';
 import type { MotorcycleBrand } from '@/components/brand/MotorcycleBrandLogo';
 import type { MotorcycleCategory } from '@/features/garage/types';
 import type { RoadPreference } from '@/features/registration/types';
+import type { CommunityAuthor } from '@/features/community/types';
 import type { RideType } from '@/features/rides/rideTypes';
+import type { RideVisibility } from '@/features/rides/types';
+import type { LngLat, RoadSurface, RouteDifficulty } from '@/features/routes/types';
 
 /** A motorcycle in a rider's garage ("Garaj" tab, header bike line). */
 export type RiderBike = {
@@ -67,6 +70,27 @@ export type RideSummary = {
   mapImage: ImageSourcePropType;
 };
 
+/**
+ * A ride as its detail screen shows it when it isn't on this device (09.06 read-only, shared
+ * ride links, saved rides): the card's data plus the rider and the shared trace — the track
+ * with the owner's start / finish cut (10.05), simplified. Never the full GPS track.
+ */
+export type RideDetail = RideSummary & {
+  author: CommunityAuthor;
+  routeId?: string;
+  visibility: RideVisibility;
+  /** ISO date-time. */
+  endedAt?: string;
+  durationS: number;
+  maxSpeedKmh: number;
+  maxLeanLeftDeg?: number;
+  maxLeanRightDeg?: number;
+  difficulty: RouteDifficulty;
+  surface: RoadSurface;
+  /** Segments of the shared trace (empty when the ride is too short to show any). */
+  preview: LngLat[][];
+};
+
 /** "Ortak noktalar" note on another rider's profile: how well the viewer and the rider match. */
 export type RiderMatch = {
   /** Match percentage 0–100. */
@@ -91,6 +115,10 @@ export interface RidersRepository {
   setFollowing(riderId: string, following: boolean): Promise<void>;
   setRideLiked(rideId: string, liked: boolean): Promise<void>;
   setRideSaved(rideId: string, saved: boolean): Promise<void>;
+  /** One ride the viewer may see (any rider's, own included); `null` when missing or hidden. */
+  getRide(rideId: string): Promise<RideDetail | null>;
+  /** Rides the viewer bookmarked, most recently saved first (empty for guests). */
+  listSavedRides(): Promise<RideDetail[]>;
   report(target: ReportTarget): Promise<void>;
   block(riderId: string): Promise<void>;
   /** "Engellenen kullanıcılar" (10.06), most recently blocked first. */

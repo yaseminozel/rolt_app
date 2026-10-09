@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { navigationDirections } from './directions';
+import { gpsDiagnostics } from './gpsDiagnostics';
+import { fixArrival } from './gpsHealth';
 import { maneuverTitle } from './instructions';
 import { NavigationTracker, type NavigationSnapshot, type TrackedStop } from './navigationTracker';
 import type { LocationSource, NavigationPlan } from './types';
+import { LocationPowerController } from './standingPower';
 import { speak, stopSpeaking, VOICE_THRESHOLDS_M } from './voiceGuidance';
+import { GpsTelemetry } from '@/features/analytics/gpsTelemetry';
 import { leanCalibration } from '@/features/lean/leanCalibration';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
 import { createLeanLogger } from '@/features/lean/leanLog';
@@ -51,6 +55,7 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
     let cancelled = false;
     const announced = new Set<string>();
     let lastStatus = { offRoute: false, reconnected: false, arrived: null as number | null, finished: false };
+    const gpsTelemetry = new GpsTelemetry('navigation');
 
     const announce = (key: string, text: string) => {
       if (voiceRef.current && !announced.has(key)) {
@@ -61,6 +66,7 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
 
     const handle = (next: NavigationSnapshot) => {
       setSnapshot(next);
+      gpsTelemetry.observe(next.gps);
       const translate = tRef.current;
 
       // Maneuver call-outs at the voice thresholds, once per step and threshold.
@@ -122,10 +128,21 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
       }
     };
 
+    // A long stop (lights, a break at a stop) lets the GPS slow down; the first move wakes it.
+    const power = new LocationPowerController((mode) => {
+      source.setPowerMode?.(mode).catch(() => undefined);
+    });
+
     source
       .start((fix) => {
         if (!cancelled) {
-          handle(tracker.update(fix));
+          const next = tracker.update(fix);
+          gpsTelemetry.observeFix(fix);
+          power.addFix(fix, next.gps === 'ok');
+          if (__DEV__) {
+            gpsDiagnostics.health(tracker.gpsDiagnostics(fixArrival(fix)));
+          }
+          handle(next);
         }
       })
       .then((stop) => {
@@ -139,7 +156,13 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
 
     const timer = setInterval(() => {
       if (!cancelled) {
-        handle(tracker.tick(source.now()));
+        const now = source.now();
+        const next = tracker.tick(now);
+        power.tick(now, next.gps === 'ok');
+        if (__DEV__) {
+          gpsDiagnostics.health(tracker.gpsDiagnostics(now));
+        }
+        handle(next);
       }
     }, TICK_MS);
 
@@ -163,6 +186,7 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
       clearInterval(timer);
       stopSource?.();
       stopSpeaking();
+      gpsTelemetry.finish();
     };
   }, [source, tracker]);
 

@@ -7,11 +7,20 @@ import { i18n } from '@/i18n';
 import { rideTitle } from './rideTitle';
 import type { RideRecord } from './types';
 
-/** "Hemen paylaş" targets (08.11). */
-export type ShareTarget = 'instagramStory' | 'instagramPost' | 'whatsapp' | 'copyLink' | 'other';
+/**
+ * "Hemen paylaş" targets (08.11). `community` ("Toplulukta paylaş") opens the Topluluk composer
+ * with the ride (`shareRideToCommunity`) and isn't handled by `shareRide`.
+ */
+export type ShareTarget =
+  | 'community'
+  | 'instagramStory'
+  | 'instagramPost'
+  | 'whatsapp'
+  | 'copyLink'
+  | 'other';
 
-/** Deep link to the ride (decision 2026-10-07; a web page can replace it once rides are online). */
-export const rideLink = (rideId: string) => `rolt://ride/${rideId}`;
+/** Share link of a ride: roltapp.com/r/<id> opens the app (rolt://rides/<id>) or the site. */
+export const rideLink = (rideId: string) => `https://roltapp.com/r/${rideId}`;
 
 export function rideShareMessage(ride: RideRecord) {
   return i18n.t('rides:share.message', {

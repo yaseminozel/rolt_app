@@ -3,11 +3,12 @@ import { router } from 'expo-router';
 import { Bookmark, Camera, Motorcycle, Plus, Settings } from 'iconoir-react-native';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { motorcycleBrandNames } from '@/components/brand/MotorcycleBrandLogo';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { StatusIcon } from '@/components/feedback/StatusIcon';
+import { useToast } from '@/components/feedback/ToastProvider';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileTabs, type ProfileTab } from '@/components/profile/ProfileTabs';
 import { ProfileTopBar } from '@/components/profile/ProfileTopBar';
@@ -18,16 +19,21 @@ import { RouteCard } from '@/components/route/RouteCard';
 import { Button } from '@/components/ui/Button';
 import { useOwnProfile, useUpdateOwnProfile } from '@/features/profile/queries';
 import type { OwnProfile } from '@/features/profile/types';
-import { useRiderRides } from '@/features/riders/queries';
+import { useOwnRiderId } from '@/features/riders/ownRider';
+import { useRiderRides, useSavedRideList } from '@/features/riders/queries';
+import type { RideDetail } from '@/features/riders/types';
+import { useRideActions } from '@/features/riders/useRideActions';
 import { useSavedRides } from '@/features/rides/queries';
 import { rideTitle } from '@/features/rides/rideTitle';
+import { rideSyncState } from '@/features/rides/sync/useRideSyncState';
 import { useRoutesByIds } from '@/features/routes/queries';
 import { useSavedRoutes } from '@/features/routes/SavedRoutesProvider';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { initialsOf } from '@/lib/initials';
 import { showActionSheet } from '@/lib/showActionSheet';
-import { colors, layout, spacing } from '@/theme';
+import { hasSupabase } from '@/lib/supabase/client';
+import { colors, layout, spacing, typography } from '@/theme';
 import { openShareRide } from '@/features/rides/openShareRide';
 import { AddMenu } from '@/components/profile/AddMenu';
 import { composeIntent } from '@/features/community/composeIntent';
@@ -44,21 +50,33 @@ const HEADER_TOP_PADDING = 14;
  * 09.01 Profil / Genel (Pencil `Ct2Yd`, scrolled `TDo7W`, new rider `rvUtZ`): the own profile with
  * camera (profile photo) and settings, identity, "Profili düzenle" / "Profili paylaş", and the
  * Sürüşler / Kaydettiklerim tabs. Rides recorded on this device come first and open their detail
- * (09.06); a rider without rides gets "İlk sürüşünü kaydet". "Alt. Paylaşım odaklı" (`ED8bv`) is an
- * alternative and not implemented.
+ * (09.06); once uploaded they carry the server's likes, comments and bookmarks. A rider without
+ * rides gets "İlk sürüşünü kaydet". "Alt. Paylaşım odaklı" (`ED8bv`) is an alternative and not
+ * implemented.
  */
 export default function ProfileScreen() {
   const { t } = useTranslation(['profile', 'common']);
   const [menuOpen, setMenuOpen] = useState(false);
   const profileQuery = useOwnProfile();
   const updateProfile = useUpdateOwnProfile();
+  const { showToast } = useToast();
   const profile = profileQuery.data;
 
   const pickPhoto = () => {
     const apply = (result: ImagePicker.ImagePickerResult) => {
       const uri = result.canceled ? undefined : result.assets[0]?.uri;
       if (uri) {
-        updateProfile.mutate({ photoUri: uri });
+        updateProfile.mutate(
+          { photoUri: uri },
+          {
+            onError: () =>
+              showToast({
+                variant: 'failure',
+                message: t('edit.failed'),
+                bottomOffset: TOAST_OFFSET,
+              }),
+          },
+        );
       }
     };
     showActionSheet({
@@ -206,7 +224,8 @@ function ProfileContent({ profile }: { profile: OwnProfile }) {
               <Button
                 variant="tonal"
                 label={t('actions.share')}
-                onPress={() => router.push('/share-profile')}
+                // The link is the username's; without one the rider picks it first.
+                onPress={() => router.push(profile.handle ? '/share-profile' : '/edit-profile')}
                 style={styles.action}
               />
             </View>
@@ -222,7 +241,7 @@ function ProfileContent({ profile }: { profile: OwnProfile }) {
       />
 
       <View style={styles.section}>
-        {section === 'rides' ? <OwnRides profile={profile} avatar={avatar} /> : <SavedRoutes />}
+        {section === 'rides' ? <OwnRides profile={profile} avatar={avatar} /> : <SavedItems />}
       </View>
     </ScrollView>
   );
@@ -239,6 +258,11 @@ function OwnRides({
   const savedRides = useSavedRides();
   const sampleRides = useRiderRides(profile.sampleRiderId);
   const rides = savedRides.data ?? [];
+  // The server's copy of the uploaded rides: likes, comments and bookmarks by id.
+  const ownRiderId = useOwnRiderId();
+  const serverRides = useRiderRides(hasSupabase ? ownRiderId : undefined);
+  const serverById = new Map((serverRides.data ?? []).map((ride) => [ride.id, ride]));
+  const { toggleLike, toggleSave } = useRideActions({ toastBottomOffset: TOAST_OFFSET });
 
   if (savedRides.isPending) {
     return <ActivityIndicator color={colors.textSecondary} style={styles.loading} />;
@@ -267,41 +291,50 @@ function OwnRides({
 
   return (
     <View style={styles.feed}>
-      {rides.map((ride, index) => (
-        <View key={ride.id} style={styles.feed}>
-          {index > 0 ? <View style={styles.divider} /> : null}
-          <RideActivityCard
-            riderName={profile.name}
-            riderAvatar={avatar}
-            date={formatDateTime(new Date(ride.startedAt))}
-            title={rideTitle(ride)}
-            rideType={ride.rideType}
-            metrics={{
-              distance: formatDistance(ride.stats.distanceM / 1000, 1),
-              duration: formatDuration(ride.stats.durationS / 60),
-              averageSpeed: formatSpeed(averageSpeedKmh(ride)),
-            }}
-            track={ride.track}
-            photos={ride.photos
-              .filter((photo) => photo.status === 'uploaded')
-              .map((photo) => ({ uri: photo.uri }))}
-            likeCount={0}
-            commentCount={0}
-            saveCount={0}
-            liked={false}
-            saved={false}
-            // Rides aren't online yet, so nobody can react to them: the actions open the ride.
-            onLikePress={() => openRide(ride.id)}
-            onCommentPress={() => openRide(ride.id)}
-            onSavePress={() => openRide(ride.id)}
-            onSharePress={() => openShareRide(ride.id)}
-            onMorePress={() =>
-              router.push({ pathname: '/rides/[rideId]/options', params: { rideId: ride.id } })
-            }
-            onPress={() => openRide(ride.id)}
-          />
-        </View>
-      ))}
+      {rides.map((ride, index) => {
+        // Only a synced ride shows the server's reactions; until then it is local-only.
+        const server =
+          rideSyncState(ride).status === 'synced' ? serverById.get(ride.id) : undefined;
+        return (
+          <View key={ride.id} style={styles.feed}>
+            {index > 0 ? <View style={styles.divider} /> : null}
+            <RideActivityCard
+              riderName={profile.name}
+              riderAvatar={avatar}
+              date={formatDateTime(new Date(ride.startedAt))}
+              title={rideTitle(ride)}
+              rideType={ride.rideType}
+              metrics={{
+                distance: formatDistance(ride.stats.distanceM / 1000, 1),
+                duration: formatDuration(ride.stats.durationS / 60),
+                averageSpeed: formatSpeed(averageSpeedKmh(ride)),
+              }}
+              track={ride.track}
+              photos={ride.photos
+                .filter((photo) => photo.status !== 'uploading')
+                .map((photo) => ({ uri: photo.uri }))}
+              likeCount={server?.likeCount ?? 0}
+              commentCount={server?.commentCount ?? 0}
+              saveCount={server?.saveCount ?? 0}
+              liked={server?.isLiked ?? false}
+              saved={server?.isSaved ?? false}
+              // Not synced, nobody can react to the ride: the actions open it instead.
+              onLikePress={() => (server ? toggleLike(server) : openRide(ride.id))}
+              onCommentPress={() =>
+                server
+                  ? router.push({ pathname: '/profile/comments', params: { rideId: ride.id } })
+                  : openRide(ride.id)
+              }
+              onSavePress={() => (server ? toggleSave(server) : openRide(ride.id))}
+              onSharePress={() => openShareRide(ride.id)}
+              onMorePress={() =>
+                router.push({ pathname: '/rides/[rideId]/options', params: { rideId: ride.id } })
+              }
+              onPress={() => openRide(ride.id)}
+            />
+          </View>
+        );
+      })}
       {profile.sampleRiderId ? (
         <>
           {rides.length > 0 && hasSample ? <View style={styles.divider} /> : null}
@@ -320,22 +353,84 @@ function OwnRides({
 
 /**
  * 09.04 Kaydettiklerim (Pencil `tBE7w` list, `iGC1m` empty): saved routes as row cards with
- * distance and time, divided by hairlines; newest first.
+ * distance and time, divided by hairlines; newest first. Bookmarked rides follow as the same row
+ * cards (the design has none: picture, title, rider, type, distance and time) and open their
+ * detail; with both, each list gets a heading. The empty state shows when neither has any.
  */
-function SavedRoutes() {
-  const { t } = useTranslation(['profile', 'routes']);
+function SavedItems() {
+  const { t } = useTranslation('profile');
   const { savedIds } = useSavedRoutes();
-  const { isSaved, toggleBookmark } = useRouteBookmark();
-  const routesQuery = useRoutesByIds(savedIds);
-  const routes = routesQuery.data ?? [];
+  const savedRides = useSavedRideList();
+  const rides = savedRides.data ?? [];
 
-  if (savedIds.length === 0) {
-    return (
+  if (savedIds.length === 0 && rides.length === 0) {
+    return savedRides.isLoading ? (
+      <ActivityIndicator color={colors.textSecondary} style={styles.loading} />
+    ) : (
       <View style={styles.savedEmpty}>
         <EmptyState title={t('saved.empty.title')} description={t('saved.empty.description')} />
       </View>
     );
   }
+  const headings = savedIds.length > 0 && rides.length > 0;
+  return (
+    <View style={styles.savedSections}>
+      {savedIds.length > 0 ? (
+        <View style={styles.savedSection}>
+          {headings ? <SavedHeading label={t('saved.sections.routes')} /> : null}
+          <SavedRoutes savedIds={savedIds} />
+        </View>
+      ) : null}
+      {rides.length > 0 ? (
+        <View style={styles.savedSection}>
+          {headings ? <SavedHeading label={t('saved.sections.rides')} /> : null}
+          <SavedRides rides={rides} />
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function SavedHeading({ label }: { label: string }) {
+  return (
+    <Text style={styles.savedHeading} accessibilityRole="header">
+      {label}
+    </Text>
+  );
+}
+
+function SavedRides({ rides }: { rides: RideDetail[] }) {
+  const { t } = useTranslation('rides');
+  const { toggleSave } = useRideActions({ toastBottomOffset: TOAST_OFFSET });
+  return (
+    <View style={styles.savedList}>
+      {rides.map((ride, index) => (
+        <Fragment key={ride.id}>
+          {index > 0 ? <View style={styles.divider} /> : null}
+          <RouteCard
+            variant="row"
+            image={ride.photos[0] ?? ride.mapImage}
+            title={ride.title}
+            subtitle={ride.author.name}
+            distance={formatDistance(ride.distanceKm)}
+            duration={formatDuration(ride.durationMinutes)}
+            badgeLabel={t(`types.${ride.rideType}`)}
+            saved={ride.isSaved}
+            onToggleSave={() => toggleSave(ride)}
+            onPress={() => router.push({ pathname: '/rides/[rideId]', params: { rideId: ride.id } })}
+          />
+        </Fragment>
+      ))}
+    </View>
+  );
+}
+
+function SavedRoutes({ savedIds }: { savedIds: readonly string[] }) {
+  const { t } = useTranslation(['profile', 'routes']);
+  const { isSaved, toggleBookmark } = useRouteBookmark();
+  const routesQuery = useRoutesByIds(savedIds);
+  const routes = routesQuery.data ?? [];
+
   return (
     <View style={styles.savedList}>
       {routes.map((route, index) => (
@@ -398,6 +493,18 @@ const styles = StyleSheet.create({
   // 8 pt either side of the hairline between saved route cards.
   savedList: {
     gap: spacing.sm,
+  },
+  savedSections: {
+    gap: spacing.xxl,
+  },
+  savedSection: {
+    gap: spacing.md,
+  },
+  // The section title of the ride detail (09.06).
+  savedHeading: {
+    ...typography.bodyLargeSemibold,
+    lineHeight: 24,
+    color: colors.textPrimary,
   },
   // The empty state sits 116 pt under the tabs (09.04 `1005:35792` at y 506, tabs end at 390).
   savedEmpty: {

@@ -34,6 +34,8 @@
     "saved": "Rota kaydedildi",
     "removed": "Rota kaydedilenlerden çıkarıldı",
     "view": "Görüntüle",
-    "undo": "Geri al"
+    "undo": "Geri al",
+    "saveFailed": "Rota kaydedilemedi. Tekrar dene.",
+    "removeFailed": "Rota kaydedilenlerden çıkarılamadı. Tekrar dene."
   }
 }
