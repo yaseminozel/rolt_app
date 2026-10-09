@@ -2,7 +2,7 @@ import { Image } from 'expo-image';
 import { User } from 'iconoir-react-native';
 import { StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
 
-import { colors, fontFamily, shadows } from '@/theme';
+import { colors, fontFamily, shadows, type AvatarTone } from '@/theme';
 
 type ProfileAvatarProps = {
   source?: ImageSourcePropType;
@@ -12,6 +12,8 @@ type ProfileAvatarProps = {
   accessibilityLabel?: string;
   /** Shown on a teal disc when there is no photo ("Baş harfler", 09.01 new rider "YA"). */
   initials?: string;
+  /** Initials colours ("Avatar / Token Colors"); teal when omitted. */
+  tone?: AvatarTone;
 };
 
 const STROKE_WIDTH = 1.5;
@@ -21,7 +23,7 @@ const STROKE_WIDTH = 1.5;
  * (gKG8D "Avatar"). Without a photo: the rider's initials on teal, or a muted disc with a user
  * glyph.
  */
-export function ProfileAvatar({ source, size, accessibilityLabel, initials }: ProfileAvatarProps) {
+export function ProfileAvatar({ source, size, accessibilityLabel, initials, tone }: ProfileAvatarProps) {
   const round = { width: size, height: size, borderRadius: size / 2 };
 
   return (
@@ -34,8 +36,11 @@ export function ProfileAvatar({ source, size, accessibilityLabel, initials }: Pr
       {source ? (
         <Image source={source} contentFit="cover" style={[StyleSheet.absoluteFill, round]} />
       ) : initials ? (
-        <View style={[styles.fallback, styles.initialsDisc, round]}>
-          <Text style={[styles.initials, { fontSize: Math.round(size * 0.35) }]} numberOfLines={1}>
+        <View
+          style={[styles.fallback, styles.initialsDisc, round, tone && { backgroundColor: tone.background }]}>
+          <Text
+            style={[styles.initials, { fontSize: Math.round(size * 0.375) }, tone && { color: tone.text }]}
+            numberOfLines={1}>
             {initials}
           </Text>
         </View>

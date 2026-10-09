@@ -46,12 +46,16 @@ export type RideSummary = {
   id: string;
   riderId: string;
   title: string;
+  /** The rider's note, shown under the title on community-style cards (13.03). */
+  description?: string;
   rideType: RideType;
   /** ISO date-time with offset, e.g. "2026-09-12T19:30:00+03:00". */
   startedAt: string;
   distanceKm: number;
   durationMinutes: number;
   averageSpeedKmh: number;
+  /** "Viraj" on community-style cards (13.03); older fixtures omit it. */
+  curveCount?: number;
   likeCount: number;
   commentCount: number;
   /** Bookmark count ("Aksiyon / Kaydet" in the design). */

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
 import { RadioButton } from '@/components/ui/RadioButton';
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, fontFamily, spacing } from '@/theme';
 
 type ChoiceRowProps = {
@@ -29,7 +30,7 @@ export function ChoiceRow({
 }: ChoiceRowProps) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
       accessibilityLabel={description ? `${label}, ${description}` : label}

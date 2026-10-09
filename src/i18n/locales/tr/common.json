@@ -40,6 +40,32 @@
     "kmShort": "km",
     "milesShort": "mi",
     "kmhShort": "km/sa",
-    "mphShort": "mph"
+    "mphShort": "mph",
+    "compactHoursMinutes": "{{hours}}sa{{minutes}}dk",
+    "compactHours": "{{hours}}sa",
+    "compactMinutes": "{{minutes}}dk",
+    "ago": {
+      "minute_one": "{{count}} dakika önce",
+      "minute_other": "{{count}} dakika önce",
+      "hour_one": "{{count}} saat önce",
+      "hour_other": "{{count}} saat önce",
+      "day_one": "{{count}} gün önce",
+      "day_other": "{{count}} gün önce",
+      "week_one": "{{count}} hafta önce",
+      "week_other": "{{count}} hafta önce",
+      "month_one": "{{count}} ay önce",
+      "month_other": "{{count}} ay önce",
+      "year_one": "{{count}} yıl önce",
+      "year_other": "{{count}} yıl önce"
+    }
+  },
+  "time": {
+    "today": "Bugün, {{time}}",
+    "yesterday": "Dün, {{time}}",
+    "dayTime": "{{day}}, {{time}}",
+    "agoMinutes": "{{value}} dk",
+    "agoHours": "{{value}} sa",
+    "agoDays": "{{value}} g",
+    "justNow": "şimdi"
   }
 }

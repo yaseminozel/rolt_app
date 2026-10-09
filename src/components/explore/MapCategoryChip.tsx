@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
 
 const CHIP_HEIGHT = 32;
@@ -22,7 +23,7 @@ export function MapCategoryChip({ label, icon: Icon, selected, onPress }: MapCat
   const ink = selected ? colors.textInverse : colors.textPrimary;
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       accessibilityRole="tab"
       accessibilityState={{ selected }}
       hitSlop={{

@@ -12,6 +12,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { colors, radius, spacing, typography } from '@/theme';
 
 /** Design "Type": Standard · Multi-line · Currency · Select. Currency and Select render identically. */
@@ -31,6 +32,8 @@ export type TextFieldProps = Omit<
   helperText?: string;
   /** Puts the field in its error state and replaces the helper and success text. */
   errorText?: string;
+  /** An error appearing buzzes; off for errors checked live while typing (username). */
+  errorHaptic?: boolean;
   /**
    * Positive validation (UZpFX "Bu kullanıcı adı müsait"): green message plus a trailing
    * check-circle. Replaces the helper text; `errorText` wins over it.
@@ -50,6 +53,8 @@ export type TextFieldProps = Omit<
   onSuffixPress?: () => void;
   /** Outer layout only (margins, flex). */
   containerStyle?: StyleProp<ViewStyle>;
+  /** Box height of a `multiline` field when a screen draws it shorter (08.05 "Field / Notlar": 79). */
+  multilineHeight?: number;
 };
 
 const FIELD_HEIGHT = 44;
@@ -73,6 +78,7 @@ export function TextField({
   optionalText,
   helperText,
   errorText,
+  errorHaptic = true,
   successText,
   prefix,
   secureToggle = false,
@@ -80,6 +86,7 @@ export function TextField({
   suffix,
   onSuffixPress,
   containerStyle,
+  multilineHeight,
   maxLength,
   onFocus,
   onBlur,
@@ -91,6 +98,7 @@ export function TextField({
   const [revealed, setRevealed] = useState(false);
   const multiline = type === 'multiline';
   const hasError = !!errorText;
+  useHapticOnSet(errorHaptic && errorText, 'error');
   const hasSuccess = !hasError && !!successText;
   // One trailing slot: secure toggle > success check > suffix selector.
   const showSecureToggle = secureToggle && !multiline;
@@ -150,6 +158,7 @@ export function TextField({
         style={[
           styles.field,
           multiline && styles.fieldMultiline,
+          multiline && multilineHeight !== undefined ? { height: multilineHeight } : null,
           { borderColor, backgroundColor: disabled ? colors.surfaceMuted : colors.surface },
         ]}
       >

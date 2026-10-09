@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { placeNameAt } from '@/features/location/placeName';
+import type { Route } from '@/features/routes/types';
+
 import { ridesRepository, type RideDetailsInput } from './ridesRepository';
 import type { RideRecord } from './types';
 
@@ -64,5 +67,35 @@ export function useDeleteRide() {
   return useMutation({
     mutationFn: (id: string) => ridesRepository.remove(id).then(() => id),
     onSuccess: (id) => updateCache(null, id),
+  });
+}
+
+/**
+ * Start and finish names of a ride (09.06 "Sürüş güzergahı"): a route ride uses the route's
+ * own names, a free ride the area around its first and last track point.
+ */
+export function useRideEndpoints(
+  ride: RideRecord,
+  route: Route | null | undefined,
+  routeSettled: boolean,
+) {
+  const first = ride.track[0]?.[0];
+  const lastSegment = ride.track[ride.track.length - 1];
+  const last = lastSegment?.[lastSegment.length - 1];
+  return useQuery({
+    queryKey: [...rideKeys.detail(ride.id), 'endpoints', route?.id ?? null],
+    queryFn: async () => {
+      if (route) {
+        return { start: route.startName, end: route.endName };
+      }
+      const [start, end] = await Promise.all([
+        first ? placeNameAt(first) : undefined,
+        last ? placeNameAt(last) : undefined,
+      ]);
+      return { start, end };
+    },
+    // A route ride waits for its route; an unknown (deleted) route falls back to geocoding.
+    enabled: Boolean(first) && (!ride.routeId || routeSettled),
+    staleTime: Infinity,
   });
 }

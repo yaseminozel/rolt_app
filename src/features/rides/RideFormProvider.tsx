@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
+import { haptics } from '@/features/haptics/haptics';
+
 import { uploadRidePhoto } from './mockRidePhotoUploader';
 import { formValuesFromRide, RIDE_PHOTOS_MAX, type RideFormValues } from './rideForm';
 import type { RidePhoto, RideRecord } from './types';
@@ -61,7 +63,10 @@ export function RideFormProvider({ ride, children }: { ride: RideRecord; childre
       setPhoto(photoId, { status: 'uploading', progress: 0 });
       uploadRidePhoto(uri, (progress) => setPhoto(photoId, { progress }), isRetry)
         .then(() => setPhoto(photoId, { status: 'uploaded', progress: 1 }))
-        .catch(() => setPhoto(photoId, { status: 'failed' }));
+        .catch(() => {
+          haptics.error();
+          setPhoto(photoId, { status: 'failed' });
+        });
     },
     [setPhoto],
   );

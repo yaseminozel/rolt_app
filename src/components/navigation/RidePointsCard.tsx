@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
+import { createSlotTicker, haptics, withHaptic } from '@/features/haptics/haptics';
 import type { RideStop } from '@/features/navigation/types';
 import { colors, fontFamily, layout, radius, shadows, spacing } from '@/theme';
 
@@ -44,6 +45,8 @@ export function RidePointsCard({
 }: RidePointsCardProps) {
   const { t } = useTranslation(['ride', 'common']);
   const [drag, setDrag] = useState<{ index: number; dy: number } | null>(null);
+  // Each new slot the dragged stop would drop into is a tick.
+  const [slotTicker] = useState(createSlotTicker);
 
   const startMarker =
     start.kind === 'device' ? (
@@ -103,7 +106,7 @@ export function RidePointsCard({
           {closeButton}
           {onSwap ? (
             <Pressable
-              onPress={onSwap}
+              onPress={withHaptic(onSwap)}
               accessibilityRole="button"
               accessibilityLabel={t('prepare.a11y.swap')}
               style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}>
@@ -130,11 +133,21 @@ export function RidePointsCard({
         const pan = Gesture.Pan()
           .runOnJS(true)
           .activeOffsetY([-4, 4])
-          .onUpdate((event) => setDrag({ index, dy: event.translationY }))
+          .onStart(() => {
+            slotTicker.reset(index);
+            haptics.press();
+          })
+          .onUpdate((event) => {
+            slotTicker.move(
+              Math.max(0, Math.min(stops.length - 1, index + Math.round(event.translationY / ROW_PITCH))),
+            );
+            setDrag({ index, dy: event.translationY });
+          })
           .onEnd((event) => {
             const target = Math.max(0, Math.min(stops.length - 1, index + Math.round(event.translationY / ROW_PITCH)));
             setDrag(null);
             if (target !== index) {
+              haptics.tap();
               onMoveStop(index, target);
             }
           })

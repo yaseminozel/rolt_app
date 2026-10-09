@@ -2,6 +2,9 @@ import { bearingDeg, distanceM } from '@/features/navigation/geometry';
 import type { LocationFix } from '@/features/navigation/types';
 import type { LngLat } from '@/features/routes/types';
 
+import { SensorLeanTracker } from '@/features/lean/leanMath';
+
+import { LeanEstimator } from './leanAngle';
 import { EMPTY_RIDE_STATS, type RideStats } from './types';
 
 /** Thresholds of the ride recorder; written to CLAUDE.md's decision table. */
@@ -34,6 +37,10 @@ export type RecorderPhase = 'recording' | 'paused';
 
 export type GpsQuality = 'searching' | 'good' | 'weak' | 'lost';
 
+/**
+ * Totals and state of a recording, cheap to take on every fix: the track is not in it (read it
+ * with `track()` / `pointsSince()`; `trackVersion` says when it changed).
+ */
 export type RecorderSnapshot = {
   phase: RecorderPhase;
   /** Recording but not counting because GPS is weak or lost (rule E: never pretend to record). */
@@ -44,8 +51,14 @@ export type RecorderSnapshot = {
   averageSpeedMps: number;
   position: LngLat | null;
   headingDeg: number | null;
-  track: LngLat[][];
+  /** Bumped whenever a point or segment is added. */
+  trackVersion: number;
+  /** Points recorded so far (also the `seq` the next point gets). */
+  pointCount: number;
 };
+
+/** A track point in recording order: `seq` counts from 0, `segment` indexes `track()` gaps. */
+export type TrackPoint = { seq: number; segment: number; coordinates: LngLat };
 
 /** What a recording restored after a crash continues from (08.03). */
 export type RecorderResumeState = {
@@ -138,7 +151,11 @@ export function countCurves(track: LngLat[][]) {
 export class RideRecorder {
   private phase: RecorderPhase = 'recording';
   private stats: RideStats;
-  private track: LngLat[][];
+  /** Segments as recorded, empty ones included (their indexes are the points' `segment`). */
+  private segments: LngLat[][];
+  /** Every point in order, for `pointsSince` (storage appends, the map's live tail). */
+  private points: TrackPoint[] = [];
+  private trackVersion = 0;
   private lastCountedAt: number;
   private lastFixAt: number | null = null;
   private lastGood: { coordinates: LngLat; timestamp: number } | null = null;
@@ -148,10 +165,25 @@ export class RideRecorder {
   private standingSince: number | null = null;
   private breakCounted = false;
   private curves = new CurveCounter();
+  private lean = new LeanEstimator();
+  /** Calibrated motion-sensor lean (08.00); replaces the GPS estimate when present. */
+  private sensorLean: SensorLeanTracker | null = null;
+  private lastSpeedMps = 0;
 
-  constructor(now: number, resume?: RecorderResumeState) {
+  constructor(now: number, resume?: RecorderResumeState, options?: { sensorLean?: boolean }) {
+    if (options?.sensorLean) {
+      this.sensorLean = new SensorLeanTracker();
+      // A restored ride keeps the extremes it already had.
+      this.sensorLean.maxLeftDeg = resume?.stats.maxLeanLeftDeg ?? 0;
+      this.sensorLean.maxRightDeg = resume?.stats.maxLeanRightDeg ?? 0;
+    }
     this.stats = resume ? { ...resume.stats } : { ...EMPTY_RIDE_STATS };
-    this.track = resume ? resume.track.map((segment) => [...segment]) : [];
+    this.segments = resume ? resume.track.map((segment) => [...segment]) : [];
+    this.segments.forEach((segment, index) =>
+      segment.forEach((coordinates) =>
+        this.points.push({ seq: this.points.length, segment: index, coordinates }),
+      ),
+    );
     this.lastCountedAt = now;
     // A restored recording waits for the rider's "Devam et".
     if (resume) {
@@ -180,9 +212,11 @@ export class RideRecorder {
   }
 
   private startSegment() {
-    this.track.push([]);
+    this.segments.push([]);
+    this.trackVersion += 1;
     this.lastGood = null;
     this.curves.breakTrack();
+    this.lean.breakTrack();
     this.standingSince = null;
   }
 
@@ -223,15 +257,14 @@ export class RideRecorder {
     if (quality !== 'good' || this.phase !== 'recording') {
       return;
     }
-    if (regained || this.track.length === 0) {
+    if (regained || this.segments.length === 0) {
       // Back from an automatic pause: the gap isn't drawn or counted.
       this.startSegment();
     }
 
-    const segment = this.track[this.track.length - 1];
     const last = this.lastGood;
     if (!last) {
-      segment.push(fix.coordinates);
+      this.pushPoint(fix.coordinates);
       this.lastGood = { coordinates: fix.coordinates, timestamp: fix.timestamp };
       this.trackStanding(fix, 0);
       return;
@@ -244,6 +277,7 @@ export class RideRecorder {
       return;
     }
     const speed = fix.speedMps ?? derivedSpeed;
+    this.lastSpeedMps = speed;
     if (speed <= RECORDER_RULES.maxPlausibleSpeedMps) {
       this.stats.maxSpeedMps = Math.max(this.stats.maxSpeedMps, speed);
     }
@@ -252,11 +286,33 @@ export class RideRecorder {
       return;
     }
     this.stats.distanceM += step;
-    segment.push(fix.coordinates);
+    this.pushPoint(fix.coordinates);
     this.lastGood = { coordinates: fix.coordinates, timestamp: fix.timestamp };
     if (this.curves.add(fix.coordinates)) {
       this.stats.curveCount += 1;
     }
+    if (!this.sensorLean) {
+      this.lean.add(fix.coordinates, fix.timestamp);
+      this.stats.maxLeanLeftDeg = Math.max(this.stats.maxLeanLeftDeg ?? 0, this.lean.maxLeftDeg);
+      this.stats.maxLeanRightDeg = Math.max(this.stats.maxLeanRightDeg ?? 0, this.lean.maxRightDeg);
+    }
+  }
+
+  private pushPoint(coordinates: LngLat) {
+    const segment = this.segments.length - 1;
+    this.segments[segment].push(coordinates);
+    this.points.push({ seq: this.points.length, segment, coordinates });
+    this.trackVersion += 1;
+  }
+
+  /** A calibrated lean reading (degrees, right positive); counts only while riding. */
+  addSensorLean(leanDeg: number) {
+    if (!this.sensorLean || !this.counting) {
+      return;
+    }
+    this.sensorLean.add(leanDeg, this.lastSpeedMps);
+    this.stats.maxLeanLeftDeg = this.sensorLean.maxLeftDeg;
+    this.stats.maxLeanRightDeg = this.sensorLean.maxRightDeg;
   }
 
   private trackStanding(fix: LocationFix, speed: number) {
@@ -287,7 +343,23 @@ export class RideRecorder {
       averageSpeedMps: ridingS > 0 ? this.stats.distanceM / ridingS : 0,
       position: this.position,
       headingDeg: this.headingDeg,
-      track: this.track.filter((segment) => segment.length > 0).map((segment) => [...segment]),
+      trackVersion: this.trackVersion,
+      pointCount: this.points.length,
     };
+  }
+
+  /** The whole track without empty segments, as a copy: for finishing or persisting it whole. */
+  track(): LngLat[][] {
+    return this.segments.filter((segment) => segment.length > 0).map((segment) => [...segment]);
+  }
+
+  /** Points from `seq` on (O(new points)): storage appends them, the map draws them as its tail. */
+  pointsSince(seq: number): TrackPoint[] {
+    return this.points.slice(Math.max(0, seq));
+  }
+
+  /** Index of the segment new points go into. */
+  get currentSegment() {
+    return this.segments.length - 1;
   }
 }

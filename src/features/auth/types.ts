@@ -102,4 +102,6 @@ export interface AuthService {
   /** 10.03 Şifre değiştir. Throws `invalid-credentials` when `currentPassword` is wrong. */
   changePassword(session: Session, currentPassword: string, newPassword: string): Promise<Session>;
   signOut(): Promise<void>;
+  /** 10.16 Hesabı sil: removes the account for good; `reason` is the optional "Neden ayrılıyorsun?". */
+  deleteAccount(session: Session, reason?: string): Promise<void>;
 }

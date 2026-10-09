@@ -23,7 +23,8 @@
     "locationOffTitle": "Location access is off",
     "locationOffDescription": "Turn on location access or pick a city to see routes near you on the map.",
     "locationOffAction": "Allow",
-    "expandMap": "Expand map"
+    "expandMap": "Expand map",
+    "downloadedTitle": "Your downloaded routes"
   },
   "search": {
     "placeholder": "Search routes",

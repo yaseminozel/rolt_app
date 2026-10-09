@@ -1,4 +1,4 @@
-import { Image } from 'expo-image';
+import { Image, type ImageContentPosition, type ImageSource } from 'expo-image';
 import {
   createContext,
   use,
@@ -30,8 +30,13 @@ type Rect = { x: number; y: number; width: number; height: number };
 
 type ExpandSource = {
   ref: RefObject<View | null>;
-  /** The card's map artwork; the clone grows with it (cover, so it zooms in as it grows). */
-  image: number;
+  /**
+   * The card's map picture; the clone grows with it (cover). A full-screen picture of the
+   * target's first view (`exploreInitialView`) lands exactly on the live map.
+   */
+  image: ImageSource;
+  /** Where the card crops the picture, so the clone starts on the same crop. */
+  contentPosition?: ImageContentPosition;
   /** Card chrome (pill, buttons) drawn on the clone at first and faded out as it grows. */
   decorations?: ReactNode;
 };
@@ -268,7 +273,12 @@ function CloneOverlay({
     <View style={StyleSheet.absoluteFill}>
       <Animated.View style={[styles.frame, frameStyle]}>
         <Animated.View style={[styles.media, mediaStyle]}>
-          <Image source={clone.image} contentFit="cover" style={StyleSheet.absoluteFill} />
+          <Image
+            source={clone.image}
+            contentFit="cover"
+            contentPosition={clone.contentPosition}
+            style={StyleSheet.absoluteFill}
+          />
         </Animated.View>
         <Animated.View style={[StyleSheet.absoluteFill, chromeStyle]} pointerEvents="none">
           <View style={styles.stroke} />

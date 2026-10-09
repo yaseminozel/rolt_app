@@ -11,6 +11,8 @@ type SelectFieldProps = {
   onPress: () => void;
   accessibilityLabel: string;
   disabled?: boolean;
+  /** Grey prompt while `value` is empty (10.16 "Bir neden seç"). */
+  placeholder?: string;
 };
 
 /**
@@ -23,17 +25,19 @@ export function SelectField({
   onPress,
   accessibilityLabel,
   disabled,
+  placeholder,
 }: SelectFieldProps) {
+  const empty = !value && Boolean(placeholder);
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
-      accessibilityLabel={`${accessibilityLabel}: ${value}`}
+      accessibilityLabel={`${accessibilityLabel}: ${value || placeholder || ''}`}
       style={({ pressed }) => [styles.field, pressed && styles.pressed]}>
       {leading}
-      <Text style={styles.value} numberOfLines={1}>
-        {value}
+      <Text style={[styles.value, empty && styles.placeholder]} numberOfLines={1}>
+        {empty ? placeholder : value}
       </Text>
       <NavArrowDown width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />
     </Pressable>
@@ -60,5 +64,8 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     flex: 1,
     color: colors.textPrimary,
+  },
+  placeholder: {
+    color: colors.textTertiary,
   },
 });

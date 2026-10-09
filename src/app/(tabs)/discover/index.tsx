@@ -49,6 +49,7 @@ import {
   EMPTY_ROUTE_SEARCH_FILTERS,
 } from '@/features/routes/searchFilters';
 import { useIsOffline } from '@/features/network/useIsOffline';
+import { useOfflineMaps } from '@/features/offlineMaps/offlineMaps';
 import type { Route } from '@/features/routes/types';
 import { formatApproxDuration, formatDistance } from '@/i18n/format';
 import { colors, layout, spacing, typography } from '@/theme';
@@ -124,6 +125,10 @@ export default function DiscoverHomeScreen() {
   const area = useRoutesInArea(areaBounds, filter);
   const reachable = useReachableRoutes(origin);
   const offline = useIsOffline();
+  // 05.01 `INwLr` "İndirdiğin rotalar": offline, the routes whose map is on the device come first.
+  const downloadedRoutes = useOfflineMaps()
+    .filter((map) => map.state === 'ready')
+    .map((map) => map.route);
 
   const locationGranted = locationPermission === Location.PermissionStatus.GRANTED;
   // No permission and no picked region: the region is unknown ("Konum belirlenmedi"), the map
@@ -256,6 +261,19 @@ export default function DiscoverHomeScreen() {
               }
             />
           )}
+          {offline && downloadedRoutes.length > 0 ? (
+            <RecommendedRoutesSection
+              title={t('home.downloadedTitle')}
+              emptyMessage={t('home.recommendedEmpty')}
+              routes={downloadedRoutes}
+              isLoading={false}
+              isError={false}
+              onRetry={() => undefined}
+              onRoutePress={openRoute}
+              isSaved={isSaved}
+              onToggleSave={toggleBookmark}
+            />
+          ) : null}
           <RecommendedRoutesSection
             title={regionUnknown ? t('home.popularTitle') : t('home.recommendedTitle')}
             filters={<RouteFilterChips value={filter} onChange={setFilter} />}

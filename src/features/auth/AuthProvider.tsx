@@ -53,6 +53,8 @@ type AuthContextValue = {
   /** 10.03: throws `invalid-credentials` for a wrong current password. */
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** 10.16: deletes the account, then starts over from onboarding like signing out. */
+  deleteAccount: (reason?: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -175,6 +177,20 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
     applySession(null);
   }, [applySession, service, setPromptsPending]);
 
+  const deleteAccount = useCallback(
+    async (reason?: string) => {
+      if (!session) {
+        return;
+      }
+      await service.deleteAccount(session, reason);
+      setPromptsPending(false);
+      setHasSeenOnboarding(false);
+      clearOnboardingSeen();
+      applySession(null);
+    },
+    [applySession, service, session, setPromptsPending],
+  );
+
   // Sessions stored before verification existed have no flag and count as verified.
   const verified = session !== null && session.emailVerified !== false;
 
@@ -201,6 +217,7 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       completeProfile,
       changePassword,
       signOut,
+      deleteAccount,
     }),
     [
       verified,
@@ -222,6 +239,7 @@ export function AuthProvider({ children, service = mockAuthService }: AuthProvid
       completeProfile,
       changePassword,
       signOut,
+      deleteAccount,
     ],
   );
 

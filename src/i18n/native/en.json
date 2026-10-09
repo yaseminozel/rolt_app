@@ -6,7 +6,8 @@
     "NSLocationAlwaysUsageDescription": "ROLT always uses your location so it can keep recording your ride while the screen is off.",
     "NSPhotoLibraryUsageDescription": "ROLT accesses the photos you choose so you can add them to your profile, rides and suggested routes.",
     "NSCameraUsageDescription": "ROLT uses the camera so you can add photos to your routes and rides.",
-    "NSPhotoLibraryAddUsageDescription": "ROLT adds images to your library so you can save your profile card."
+    "NSPhotoLibraryAddUsageDescription": "ROLT adds images to your library so you can save your profile card.",
+    "NSMotionUsageDescription": "ROLT uses your phone's motion sensors to measure your lean angle while you ride."
   },
   "android": {
     "app_name": "ROLT"

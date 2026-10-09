@@ -1,5 +1,6 @@
 import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
+import enCommunity from './locales/en/community.json';
 import enDiscover from './locales/en/discover.json';
 import enExplore from './locales/en/explore.json';
 import enGarage from './locales/en/garage.json';
@@ -17,6 +18,7 @@ import enRouteSuggestionReview from './locales/en/routeSuggestionReview.json';
 import enRouteSuggestionDetails from './locales/en/routeSuggestionDetails.json';
 import trAuth from './locales/tr/auth.json';
 import trCommon from './locales/tr/common.json';
+import trCommunity from './locales/tr/community.json';
 import trDiscover from './locales/tr/discover.json';
 import trExplore from './locales/tr/explore.json';
 import trGarage from './locales/tr/garage.json';
@@ -54,6 +56,7 @@ export const trResources = {
   profile: trProfile,
   settings: trSettings,
   notifications: trNotifications,
+  community: trCommunity,
 };
 
 type LocaleResources = typeof trResources;
@@ -76,6 +79,7 @@ const enResources: LocaleResources = {
   profile: enProfile,
   settings: enSettings,
   notifications: enNotifications,
+  community: enCommunity,
 };
 
 export const resources: Record<AppLanguage, LocaleResources> = {

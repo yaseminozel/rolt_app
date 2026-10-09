@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { Bookmark, Camera, Motorcycle, Settings } from 'iconoir-react-native';
-import { useState } from 'react';
+import { Bookmark, Camera, Motorcycle, Plus, Settings } from 'iconoir-react-native';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Linking, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -24,16 +24,13 @@ import { rideTitle } from '@/features/rides/rideTitle';
 import { useRoutesByIds } from '@/features/routes/queries';
 import { useSavedRoutes } from '@/features/routes/SavedRoutesProvider';
 import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import {
-  formatApproxDuration,
-  formatDateTime,
-  formatDistance,
-  formatDuration,
-  formatSpeed,
-} from '@/i18n/format';
+import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { initialsOf } from '@/lib/initials';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
+import { openShareRide } from '@/features/rides/openShareRide';
+import { AddMenu } from '@/components/profile/AddMenu';
+import { composeIntent } from '@/features/community/composeIntent';
 
 type Section = 'rides' | 'saved';
 
@@ -52,6 +49,7 @@ const HEADER_TOP_PADDING = 14;
  */
 export default function ProfileScreen() {
   const { t } = useTranslation(['profile', 'common']);
+  const [menuOpen, setMenuOpen] = useState(false);
   const profileQuery = useOwnProfile();
   const updateProfile = useUpdateOwnProfile();
   const profile = profileQuery.data;
@@ -108,9 +106,28 @@ export default function ProfileScreen() {
     });
   };
 
+  // 09.01 "+" menu: start a community post here, finish it in the Topluluk composer.
+  const startPost = () => {
+    composeIntent.set({ photoUris: [] });
+    router.navigate('/community');
+  };
+  const startPhotoPost = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsMultipleSelection: true,
+      selectionLimit: 4,
+      quality: PHOTO_QUALITY,
+    });
+    if (!result.canceled && result.assets.length > 0) {
+      composeIntent.set({ photoUris: result.assets.map((asset) => asset.uri) });
+      router.navigate('/community');
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <ProfileTopBar
+        leading={{ icon: Plus, accessibilityLabel: t('addMenu.open'), onPress: () => setMenuOpen(true) }}
         actions={[
           { icon: Camera, accessibilityLabel: t('actions.changePhoto'), onPress: pickPhoto },
           {
@@ -135,6 +152,12 @@ export default function ProfileScreen() {
           )}
         </View>
       )}
+      <AddMenu
+        visible={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onPost={startPost}
+        onPhotos={startPhotoPost}
+      />
     </View>
   );
 }
@@ -177,8 +200,7 @@ function ProfileContent({ profile }: { profile: OwnProfile }) {
               <Button
                 variant="tonal"
                 label={t('actions.editProfile')}
-                // "Profili düzenle" (09.05) comes with Akış 20.
-                onPress={() => undefined}
+                onPress={() => router.push('/edit-profile')}
                 style={styles.action}
               />
               <Button
@@ -234,7 +256,7 @@ function OwnRides({
         <Button
           size="lg"
           label={t('own.empty.action')}
-          onPress={() => router.navigate('/record')}
+          onPress={() => router.push('/record-ride')}
         />
       </View>
     );
@@ -272,7 +294,7 @@ function OwnRides({
             onLikePress={() => openRide(ride.id)}
             onCommentPress={() => openRide(ride.id)}
             onSavePress={() => openRide(ride.id)}
-            onSharePress={() => openRide(ride.id)}
+            onSharePress={() => openShareRide(ride.id)}
             onMorePress={() =>
               router.push({ pathname: '/rides/[rideId]/options', params: { rideId: ride.id } })
             }
@@ -296,6 +318,10 @@ function OwnRides({
   );
 }
 
+/**
+ * 09.04 Kaydettiklerim (Pencil `tBE7w` list, `iGC1m` empty): saved routes as row cards with
+ * distance and time, divided by hairlines; newest first.
+ */
 function SavedRoutes() {
   const { t } = useTranslation(['profile', 'routes']);
   const { savedIds } = useSavedRoutes();
@@ -304,24 +330,30 @@ function SavedRoutes() {
   const routes = routesQuery.data ?? [];
 
   if (savedIds.length === 0) {
-    return <EmptyState title={t('saved.empty.title')} description={t('saved.empty.description')} />;
+    return (
+      <View style={styles.savedEmpty}>
+        <EmptyState title={t('saved.empty.title')} description={t('saved.empty.description')} />
+      </View>
+    );
   }
   return (
-    <View style={styles.list}>
-      {routes.map((route) => (
-        <RouteCard
-          key={route.id}
-          variant="row"
-          image={route.coverImage}
-          title={route.name}
-          subtitle={route.summary}
-          distance={formatDistance(route.distanceKm)}
-          duration={formatApproxDuration(route.durationMinutes)}
-          badgeLabel={t(`routes:tags.${route.tag}`)}
-          saved={isSaved(route.id)}
-          onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_OFFSET })}
-          onPress={() => router.push({ pathname: '/route/[id]', params: { id: route.id } })}
-        />
+    <View style={styles.savedList}>
+      {routes.map((route, index) => (
+        <Fragment key={route.id}>
+          {index > 0 ? <View style={styles.divider} /> : null}
+          <RouteCard
+            variant="row"
+            image={route.coverImage}
+            title={route.name}
+            subtitle={route.summary}
+            distance={formatDistance(route.distanceKm)}
+            duration={formatDuration(route.durationMinutes)}
+            badgeLabel={t(`routes:tags.${route.tag}`)}
+            saved={isSaved(route.id)}
+            onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_OFFSET })}
+            onPress={() => router.push({ pathname: '/route/[id]', params: { id: route.id } })}
+          />
+        </Fragment>
       ))}
     </View>
   );
@@ -362,6 +394,14 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: spacing.lg,
+  },
+  // 8 pt either side of the hairline between saved route cards.
+  savedList: {
+    gap: spacing.sm,
+  },
+  // The empty state sits 116 pt under the tabs (09.04 `1005:35792` at y 506, tabs end at 390).
+  savedEmpty: {
+    paddingTop: 116 - spacing.lg,
   },
   divider: {
     height: 1,

@@ -2,6 +2,7 @@ import { Check } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { rideTypeLabelKey, type RideType } from '@/features/rides/rideTypes';
 import { colors, fontFamily, radius, spacing } from '@/theme';
 
@@ -37,7 +38,7 @@ export function RideTypeListItem({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       disabled={disabled}
       accessibilityRole="radio"
       accessibilityLabel={label}

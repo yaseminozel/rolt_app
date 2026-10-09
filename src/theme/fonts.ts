@@ -6,7 +6,7 @@ import {
   Inter_700Bold,
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
-import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
+import { JetBrainsMono_500Medium, JetBrainsMono_700Bold } from '@expo-google-fonts/jetbrains-mono';
 
 /** Font map passed to `useFonts`; keys must match `fontFamily` in `typography.ts`. */
 export const appFonts = {
@@ -16,5 +16,6 @@ export const appFonts = {
   Inter_700Bold,
   Inter_800ExtraBold,
   JetBrainsMono_500Medium,
+  JetBrainsMono_700Bold,
   BakbakOne_400Regular,
 };

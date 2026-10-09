@@ -14,6 +14,7 @@ import {
 import type { SvgProps } from 'react-native-svg';
 
 import { Button } from '@/components/ui/Button';
+import { haptics } from '@/features/haptics/haptics';
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -112,7 +113,10 @@ export default function NotificationsScreen() {
             <Button
               icon={Check}
               label={t('markAllRead')}
-              onPress={() => markAllRead.mutate()}
+              onPress={() => {
+                haptics.success();
+                markAllRead.mutate();
+              }}
               disabled={unread === 0}
             />
           </View>

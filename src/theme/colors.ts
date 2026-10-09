@@ -77,6 +77,40 @@ export const palette = {
   green750: '#1F7A57',
   orange75: '#FFF4E5',
   orange850: '#8A4B08',
+  // "Avatar / Token Colors" initials discs (13.01–13.04)
+  lime100: '#EEF9A4',
+  lime800: '#687009',
+  pink150: '#FFB8DF',
+  pink600: '#E60079',
+  rose150: '#FFC7C9',
+  rose600: '#E60004',
+  yellow200: '#FFF685',
+  yellow800: '#837500',
+  // Stacked placeholder cards of empty states ("Silüet / Motor yığını")
+  gray105: '#F6F6F6',
+  gray115: '#F1F1F1',
+  gray130: '#EBEBEB',
+  gray135: '#EAEAEA',
+  gray145: '#E8E8E8',
+  gray120: '#EFEFEF',
+  gray110: '#F3F4F6',
+  // Lean calibration (08.00): upright zone, steady chip, shaking (amber)
+  teal150: '#A0F5E5',
+  teal25: '#E6FBF6',
+  teal550: '#14A88A',
+  teal850: '#0B6B58',
+  amber550: '#D97706',
+  // Share template selection (09.03 "Seçim çerçevesi")
+  blue550: '#0043FF',
+  // Search row subtitles (13.04 "Açıklama")
+  gray650: '#373A40',
+  // Lean angle gauge (09.06 `1092:18290` "Kademeli yarım daire göstergesi")
+  gray140: '#ECEEF1',
+  gray160: '#E5E7EB',
+  gray180: '#E4E4E4',
+  gray260: '#CDD1D7',
+  gray280: '#C7CBD1',
+  slate550: '#59616E',
   // Ride points card (06.01 "Map / Rota noktaları"): rider position halo, start → finish dots
   blue75: '#DCE0FF',
   gray450: '#8C8C8C',
@@ -270,6 +304,11 @@ export const colors = {
   skeleton: palette.gray125,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
+  /** Handle of the record panel ("Sheet grabber", `un0E9`, #10131873). */
+  sheetGrabber: 'rgba(16, 19, 24, 0.45)',
+  /** White fade over the top of the record sheet's map ("Top fade", `iz6RG`). */
+  mapTopFade: 'rgba(255, 255, 255, 0.9)',
+  mapTopFadeEnd: 'rgba(255, 255, 255, 0)',
   /** Over the ride map behind the countdown and sheets (06.05 "Overlay / Scrim", #0000005C). */
   mapScrim: 'rgba(0, 0, 0, 0.36)',
   /** Behind centered dialogs over a screen ("04.x Çıkış — Taslak kaydet", `zMCLP`). */
@@ -280,6 +319,74 @@ export const colors = {
   /** Over the blurred profile behind the QR card (09.02). */
   shareVeil: 'rgba(16, 19, 24, 0.12)',
   transparent: 'transparent',
+  /** Lean angle gauge (09.06 "Yatış açısı"): arc track, ticks, centre axis, base line, labels. */
+  gaugeTrack: palette.gray140,
+  gaugeTick: palette.gray160,
+  gaugeTickMajor: palette.gray280,
+  gaugeAxis: palette.gray260,
+  gaugeBase: palette.gray180,
+  gaugeLabel: palette.slate550,
+  /** Second line of community search rows (13.04 "Açıklama"). */
+  textSubtle: palette.gray650,
+  /** Lean calibration (08.00 Kalibrasyon): dial zone, step done, status chips, needle states. */
+  leanZone: palette.teal150,
+  leanOkSurface: palette.teal25,
+  leanOkDot: palette.teal550,
+  leanOkText: palette.teal850,
+  leanWarn: palette.amber550,
+  /** Behind the profile "+" menu (09.01 `niGQX` "Scrim", over a 10 pt blur). */
+  menuVeil: 'rgba(255, 255, 255, 0.5)',
+  /** Between "+" menu rows ("Divider" #F0F1F2). */
+  menuDivider: palette.gray150,
+  /** Selected share template outline and check (09.03). */
+  shareSelected: palette.blue550,
+  /** "Şablon / Marka" stripes (09.03), full and 55 %. */
+  shareStripe: palette.blue700,
+  shareStripeSoft: 'rgba(29, 78, 216, 0.55)',
+  /** Transparent template preview squares (09.03 "Şeffaflık deseni"). */
+  shareChecker: 'rgba(229, 230, 232, 0.75)',
+  /** Readability gradient at the bottom of image templates (09.03 "Okunabilirlik gradyanı"). */
+  shareShade: 'rgba(0, 0, 0, 0.82)',
+  shareShadeClear: 'rgba(0, 0, 0, 0)',
+  /** Empty selection ring over light / dark templates (09.03 "Seçim işareti / Boş"). */
+  shareRingLight: 'rgba(16, 19, 24, 0.35)',
+  shareRingLightFill: 'rgba(0, 0, 0, 0.04)',
+  shareRingDark: 'rgba(255, 255, 255, 0.9)',
+  shareRingDarkFill: 'rgba(0, 0, 0, 0.28)',
+  /** Liked heart in community posts. */
+  like: palette.red450,
+  /** Icon tiles: composer photo button, search row tiles (13.01, 13.04). */
+  tile: palette.gray110,
+  /** Stacked placeholder cards of empty states (11.01, 13.01, 13.04): back, right, front. */
+  stackBackTile: palette.gray110,
+  stackBackBarLong: palette.gray100,
+  stackBackBarShort: palette.gray105,
+  stackRightTile: palette.gray135,
+  stackRightBarLong: palette.gray115,
+  stackRightBarShort: palette.gray100,
+  stackFrontTile: palette.gray130,
+  stackFrontBarLong: palette.gray145,
+  stackFrontBarShort: palette.gray120,
 } as const;
+
+/** Initials disc tones ("Avatar / Token Colors"), picked per person by `avatarTone`. */
+export const avatarTones = [
+  { background: palette.lime100, text: palette.lime800 },
+  { background: palette.teal100, text: palette.teal600 },
+  { background: palette.pink150, text: palette.pink600 },
+  { background: palette.rose150, text: palette.rose600 },
+  { background: palette.yellow200, text: palette.yellow800 },
+] as const;
+
+export type AvatarTone = (typeof avatarTones)[number];
+
+/** Stable tone for a person id, so the same rider always gets the same colours. */
+export function avatarTone(id: string): AvatarTone {
+  let hash = 0;
+  for (const char of id) {
+    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  }
+  return avatarTones[hash % avatarTones.length];
+}
 
 export type ColorToken = keyof typeof colors;

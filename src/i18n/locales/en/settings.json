@@ -28,7 +28,9 @@
     "rate": "Rate ROLT",
     "recommend": "Recommend to a friend",
     "instagram": "Instagram",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "sensors": "Sensors",
+    "offlineMaps": "Offline maps"
   },
   "values": {
     "visibility": {
@@ -61,7 +63,12 @@
     "units": "Metric (km, km/h)",
     "instagram": "@roltapp",
     "noBike": "Add",
-    "unitsImperial": "Imperial (mi, mph)"
+    "unitsImperial": "Imperial (mi, mph)",
+    "sensorsCalibrated": "Calibrated",
+    "sensorsNotCalibrated": "Not calibrated",
+    "offlineMaps_one": "{{count}} route",
+    "offlineMaps_other": "{{count}} routes",
+    "offlineMapsNone": "None"
   },
   "rateHint": {
     "ios": "Rate us on the App Store",
@@ -360,5 +367,90 @@
         }
       ]
     }
+  },
+  "deleteAccount": {
+    "title": "Delete account",
+    "heading": "You're about to delete your account",
+    "description": "When your account is deleted, the data below is removed for good and can't be restored.",
+    "items": {
+      "rides": "Your rides",
+      "ridesDetail_one": "{{value}} ride, route tracks and stats",
+      "ridesDetail_other": "{{value}} rides, route tracks and stats",
+      "routes": "Routes you suggested",
+      "routesDetail_one": "{{value}} route is removed from Discover",
+      "routesDetail_other": "{{value}} routes are removed from Discover",
+      "saved": "Your saved routes",
+      "savedDetail_one": "{{value}} saved route",
+      "savedDetail_other": "{{value}} saved routes",
+      "profile": "Your profile",
+      "profileDetail": "Photo, followers and people you follow"
+    },
+    "reasonLabel": "Why are you leaving?",
+    "optional": "Optional",
+    "reasonPlaceholder": "Choose a reason",
+    "reasons": {
+      "notRiding": "I don't ride anymore",
+      "otherApp": "I use another app",
+      "privacy": "I have privacy concerns",
+      "notUseful": "The app wasn't useful to me",
+      "other": "Other"
+    },
+    "acknowledge": "I understand this can't be undone and my data will be deleted for good.",
+    "submit": "Delete my account for good",
+    "cancel": "Cancel",
+    "failed": "Your account couldn't be deleted. Try again.",
+    "confirm": {
+      "title": "Delete your account for good?",
+      "description": "The {{email}} account and all your data will be deleted. This can't be undone.",
+      "delete": "Yes, delete my account"
+    }
+  },
+  "garage": {
+    "title": "My bike",
+    "rides": "rides",
+    "km": "km",
+    "infoSection": "BIKE DETAILS",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "modelWithCc": "{{model}} {{cc}} cc",
+    "note": "Rides are grouped by bike. If you change your bike, earlier rides stay with the old one.",
+    "change": "Change bike",
+    "delete": "Delete bike",
+    "productionYear": "Model year",
+    "save": "Save",
+    "empty": {
+      "title": "No bike added yet",
+      "description": "Add the bike you ride to your garage.",
+      "add": "Add your bike"
+    },
+    "confirm": {
+      "title": "Confirm your bike",
+      "subtitle": "Check the details before adding it to your garage."
+    },
+    "deleteDialog": {
+      "title": "Delete this bike?",
+      "description": "Your profile will show without bike details. This can't be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
+    "toast": {
+      "added": "Your bike was added.",
+      "changed": "Your bike was updated.",
+      "deleted": "Your bike was deleted."
+    }
+  },
+  "offlineMaps": {
+    "title": "Offline maps",
+    "description": "Route maps you download show without signal too. Download one with the cloud button on a route.",
+    "count_one": "{{count}} map · {{size}}",
+    "count_other": "{{count}} maps · {{size}}",
+    "emptyTitle": "No downloaded maps",
+    "emptyDescription": "Tap the cloud button on a route to download its map to your device.",
+    "downloadedAt": "{{date}} · {{size}}",
+    "downloading": "Downloading · {{percent}}%",
+    "remove": "Delete",
+    "removed": "Map of {{name}} deleted",
+    "megabytes": "{{value}} MB"
   }
 }

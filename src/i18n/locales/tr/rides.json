@@ -26,6 +26,7 @@
     "pause": "Duraklat",
     "resume": "Devam et",
     "finish": "Bitir",
+    "cancel": "İptal et",
     "delete": "Sürüşü sil",
     "expand": "Tam ekran",
     "collapse": "Küçült",
@@ -40,7 +41,7 @@
       "banner": "Yarım kalan sürüş bulundu",
       "description": "Sürüş cihazında güvende. Kaldığın yerden devam edebilir veya son geçerli noktada bitirebilirsin."
     },
-    "tooShort": "Sürüş çok kısa. Kaydetmek için en az {{distance}} sür.",
+    "tooShort": "Sürüş çok kısa. Kaydetmek için en az {{distance}} sür ya da sürüşü iptal et.",
     "permission": {
       "title": "Konum kapalı",
       "heading": "Sürüş kaydı için konum izni gerekli",
@@ -55,7 +56,34 @@
       "confirm": "Sürüşü sil",
       "cancel": "Vazgeç"
     },
-    "locationRequired": "Kayıt için konum izni gerekli."
+    "cancelDialog": {
+      "title": "Sürüş iptal edilsin mi?",
+      "description": "{{distance}} altındaki sürüşler kaydedilmez. Bu kayıt silinir ve geri alınamaz.",
+      "confirm": "Sürüşü iptal et",
+      "keep": "Vazgeç"
+    },
+    "locationRequired": "Kayıt için konum izni gerekli.",
+    "closeSheet": "Kapat",
+    "panelCollapse": "Paneli küçült",
+    "panelExpand": "Paneli büyüt",
+    "accessory": {
+      "status": {
+        "recording": "Sürüş kaydediliyor",
+        "weak": "GPS zayıf, duraklatıldı",
+        "paused": "Duraklatıldı"
+      },
+      "a11y": "{{status}}, {{time}}, {{distance}}. Kayda dön."
+    },
+    "liveActivity": {
+      "title": "ROLT",
+      "distance": "Mesafe",
+      "duration": "Süre",
+      "averageSpeed": "Ort. hız"
+    },
+    "battery": {
+      "low": "Pil %{{percent}}. Ekran artık açık tutulmuyor, kayıt sürüyor.",
+      "critical": "Pil %{{percent}}. Telefon kapanırsa sürüş cihazında güvende ve kaldığı yerden devam eder."
+    }
   },
   "share": {
     "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"
@@ -66,7 +94,8 @@
     "averageSpeed": "Ort. hız",
     "maxSpeed": "Maks. hız",
     "curves": "Viraj",
-    "breaks": "Mola"
+    "breaks": "Mola",
+    "maxLean": "Maks. yatış"
   },
   "form": {
     "title": "Sürüşü Kaydet",
@@ -97,7 +126,8 @@
       "failed_other": "{{count}} görsel yüklenemedi. Tekrar denemek için görsellere dokun.",
       "photoA11y": "{{index}}. görsel",
       "uploadingA11y": "{{index}}. görsel yükleniyor",
-      "failedA11y": "{{index}}. görsel yüklenemedi, tekrar denemek için dokun"
+      "failedA11y": "{{index}}. görsel yüklenemedi, tekrar denemek için dokun",
+      "routeLabel": "Rota görselleri"
     },
     "visibility": {
       "label": "Görünürlük",
@@ -109,7 +139,7 @@
     "delete": "Sürüşü sil",
     "save": "Sürüşü kaydet",
     "saving": "Kaydediliyor…",
-    "saveChanges": "Değişiklikleri kaydet",
+    "saveChanges": "Kaydet",
     "uploadingPhotos": "Görseller yükleniyor · {{done}}/{{total}}",
     "saveFailed": "Sürüş kaydedilemedi. Lütfen tekrar dene.",
     "exitDialog": {
@@ -128,11 +158,6 @@
       "public": "ROLT’taki herkes görebilir, keşfette çıkabilir",
       "followers": "Yalnızca seni takip edenler görebilir",
       "private": "Yalnızca sen görebilirsin, profilinde gizli kalır"
-    },
-    "audience": {
-      "public": "Herkes görebilir",
-      "followers": "Takipçilerin görebilir",
-      "private": "Yalnızca sen görebilirsin"
     },
     "sheet": {
       "title": "Kimler görebilir?",
@@ -161,7 +186,7 @@
   },
   "saved": {
     "title": "Sürüşün kaydedildi",
-    "description": "Profiline eklendi · {{audience}}",
+    "description": "Profiline eklendi",
     "shareTitle": "Hemen paylaş",
     "targets": {
       "instagramStory": "Instagram Hikaye",
@@ -171,7 +196,8 @@
       "other": "Diğer"
     },
     "viewRide": "Sürüşü görüntüle",
-    "linkCopied": "Bağlantı kopyalandı"
+    "linkCopied": "Bağlantı kopyalandı",
+    "createImage": "Paylaşım görseli oluştur"
   },
   "detail": {
     "notes": "Notlar",
@@ -184,7 +210,17 @@
       "title": "Sürüş bulunamadı",
       "description": "Bu sürüş silinmiş olabilir."
     },
-    "deleteDescription": "Rota, istatistikler, görseller, beğeni ve yorumlar kalıcı olarak silinir. Bu işlem geri alınamaz."
+    "deleteDescription": "Rota, istatistikler, görseller, beğeni ve yorumlar kalıcı olarak silinir. Bu işlem geri alınamaz.",
+    "leanAngle": "Yatış açısı",
+    "leanLeft": "Sol maks.",
+    "leanRight": "Sağ maks.",
+    "degrees": "{{value}}°",
+    "replay": "Sürüşü oynat",
+    "route": {
+      "title": "Sürüş güzergahı",
+      "start": "Başlangıç",
+      "end": "Bitiş"
+    }
   },
   "options": {
     "title": "Sürüş seçenekleri",
@@ -192,5 +228,16 @@
     "visibility": "Görünürlük",
     "share": "Paylaş",
     "delete": "Sürüşü sil"
+  },
+  "shareSheet": {
+    "title": "Sürüşü paylaş",
+    "share": "Paylaş",
+    "failed": "Görsel paylaşılamadı. Tekrar dene.",
+    "templates": {
+      "map": "Harita şablonu",
+      "transparent": "Şeffaf şablon",
+      "photo": "Fotoğraf şablonu",
+      "brand": "ROLT şablonu"
+    }
   }
 }

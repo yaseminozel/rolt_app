@@ -28,7 +28,9 @@
     "rate": "ROLT’u değerlendir",
     "recommend": "Arkadaşına öner",
     "instagram": "Instagram",
-    "signOut": "Çıkış yap"
+    "signOut": "Çıkış yap",
+    "sensors": "Sensörler",
+    "offlineMaps": "Çevrimdışı haritalar"
   },
   "values": {
     "visibility": {
@@ -61,7 +63,12 @@
     "units": "Metrik (km, km/sa)",
     "instagram": "@roltapp",
     "noBike": "Ekle",
-    "unitsImperial": "Imperial (mi, mph)"
+    "unitsImperial": "Imperial (mi, mph)",
+    "sensorsCalibrated": "Kalibre edildi",
+    "sensorsNotCalibrated": "Kalibre edilmedi",
+    "offlineMaps_one": "{{count}} rota",
+    "offlineMaps_other": "{{count}} rota",
+    "offlineMapsNone": "Yok"
   },
   "rateHint": {
     "ios": "App Store’da puan ver",
@@ -360,5 +367,90 @@
         }
       ]
     }
+  },
+  "deleteAccount": {
+    "title": "Hesabı sil",
+    "heading": "Hesabını silmek üzeresin",
+    "description": "Hesabın silindiğinde aşağıdaki veriler kalıcı olarak silinir ve geri getirilemez.",
+    "items": {
+      "rides": "Sürüşlerin",
+      "ridesDetail_one": "{{value}} sürüş, rota izleri ve istatistikler",
+      "ridesDetail_other": "{{value}} sürüş, rota izleri ve istatistikler",
+      "routes": "Önerdiğin rotalar",
+      "routesDetail_one": "{{value}} rota keşfetten kaldırılır",
+      "routesDetail_other": "{{value}} rota keşfetten kaldırılır",
+      "saved": "Kaydettiklerin",
+      "savedDetail_one": "{{value}} kayıtlı rota",
+      "savedDetail_other": "{{value}} kayıtlı rota",
+      "profile": "Profilin",
+      "profileDetail": "Fotoğraf, takipçiler ve takip ettiklerin"
+    },
+    "reasonLabel": "Neden ayrılıyorsun?",
+    "optional": "Opsiyonel",
+    "reasonPlaceholder": "Bir neden seç",
+    "reasons": {
+      "notRiding": "Artık motor sürmüyorum",
+      "otherApp": "Başka bir uygulama kullanıyorum",
+      "privacy": "Gizlilik endişem var",
+      "notUseful": "Uygulama işime yaramadı",
+      "other": "Diğer"
+    },
+    "acknowledge": "Bu işlemin geri alınamayacağını ve verilerimin kalıcı olarak silineceğini anlıyorum.",
+    "submit": "Hesabımı kalıcı olarak sil",
+    "cancel": "Vazgeç",
+    "failed": "Hesabın silinemedi. Tekrar dene.",
+    "confirm": {
+      "title": "Hesabın kalıcı olarak silinsin mi?",
+      "description": "{{email}} hesabı ve tüm verilerin silinecek. Bu işlem geri alınamaz.",
+      "delete": "Evet, hesabımı sil"
+    }
+  },
+  "garage": {
+    "title": "Motorum",
+    "rides": "sürüş",
+    "km": "km",
+    "infoSection": "MOTOR BİLGİLERİ",
+    "brand": "Marka",
+    "model": "Model",
+    "year": "Yıl",
+    "modelWithCc": "{{model}} {{cc}} cc",
+    "note": "Sürüşlerin motoruna göre gruplanır. Motoru değiştirsen de eski sürüşlerin eski motorunda kalır.",
+    "change": "Motoru değiştir",
+    "delete": "Motoru sil",
+    "productionYear": "Üretim yılı",
+    "save": "Kaydet",
+    "empty": {
+      "title": "Henüz motor eklenmedi",
+      "description": "Sürüşlerinde kullanacağın motoru garajına ekle.",
+      "add": "Motorunu ekle"
+    },
+    "confirm": {
+      "title": "Motorunu onayla",
+      "subtitle": "Garajına eklemeden önce bilgileri kontrol et."
+    },
+    "deleteDialog": {
+      "title": "Motoru silmek istediğine emin misin?",
+      "description": "Profilinde motor bilgisi olmadan görünmeye devam eder. Bu işlem geri alınamaz.",
+      "confirm": "Sil",
+      "cancel": "Vazgeç"
+    },
+    "toast": {
+      "added": "Motorun eklendi.",
+      "changed": "Motorun güncellendi.",
+      "deleted": "Motorun silindi."
+    }
+  },
+  "offlineMaps": {
+    "title": "Çevrimdışı haritalar",
+    "description": "İndirdiğin rota haritaları sinyal olmadan da görünür. Rota detayındaki bulut butonuyla indirebilirsin.",
+    "count_one": "{{count}} harita · {{size}}",
+    "count_other": "{{count}} harita · {{size}}",
+    "emptyTitle": "İndirilmiş harita yok",
+    "emptyDescription": "Bir rotanın detayında bulut butonuna dokun; o rotanın haritası cihazına iner.",
+    "downloadedAt": "{{date}} · {{size}}",
+    "downloading": "İndiriliyor · %{{percent}}",
+    "remove": "Sil",
+    "removed": "{{name}} haritası silindi",
+    "megabytes": "{{value}} MB"
   }
 }

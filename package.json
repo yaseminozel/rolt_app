@@ -7,15 +7,18 @@
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo/metro-runtime": "~57.0.16",
+    "@expo/ui": "~57.0.22",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@react-native-community/netinfo": "12.0.1",
     "@rnmapbox/maps": "^10.3.5",
     "@tanstack/react-query": "^5.104.0",
     "expo": "~57.0.27",
+    "expo-battery": "~57.0.3",
     "expo-blur": "~57.0.3",
     "expo-clipboard": "~57.0.2",
     "expo-constants": "~57.0.20",
     "expo-font": "~57.0.4",
+    "expo-haptics": "~57.0.3",
     "expo-image": "~57.0.5",
     "expo-image-picker": "~57.0.20",
     "expo-keep-awake": "~57.0.2",
@@ -26,12 +29,16 @@
     "expo-notifications": "~57.0.22",
     "expo-router": "~57.0.25",
     "expo-secure-store": "~57.0.4",
+    "expo-sensors": "~57.0.3",
+    "expo-sharing": "~57.0.22",
     "expo-speech": "~57.0.3",
     "expo-splash-screen": "~57.0.9",
     "expo-sqlite": "~57.0.4",
     "expo-status-bar": "~57.0.1",
     "expo-store-review": "~57.0.3",
     "expo-task-manager": "~57.0.21",
+    "expo-updates": "~57.0.25",
+    "expo-widgets": "~57.0.23",
     "i18next": "^26.4.2",
     "iconoir-react-native": "^7.12.1",
     "qrcode": "^1.5.4",
@@ -49,10 +56,12 @@
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
+    "@bacons/apple-targets": "5.0.0",
     "@types/qrcode": "^1.5.6",
     "@types/react": "~19.2.4",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.2",
+    "patch-package": "^8.0.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -61,7 +70,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "patch-package"
   },
   "private": true
 }

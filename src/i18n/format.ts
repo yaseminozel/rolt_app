@@ -25,27 +25,25 @@ export function formatClockTime(date: Date) {
 }
 
 /**
- * Time since `date` in words, e.g. "3 ay önce" / "3 months ago"; under a minute `justNow`
- * (10.02 "Son değişiklik: az önce").
+ * Time since `date` in words, e.g. "3 ay önce" / "3 months ago"; under a minute (or a date
+ * slightly ahead of the device clock) `justNow` (10.02 "Son değişiklik: az önce", 12.01).
+ * Spelled out from `units.ago.*` rather than `Intl.RelativeTimeFormat`, which Hermes lacks.
  */
 export function formatTimeAgo(date: Date, now: number, justNow: string) {
-  const seconds = Math.round((date.getTime() - now) / 1000);
-  if (Math.abs(seconds) < 60) {
+  const seconds = Math.round((now - date.getTime()) / 1000);
+  if (seconds < 60) {
     return justNow;
   }
-  const units: [Intl.RelativeTimeFormatUnit, number][] = [
+  const units = [
     ['year', 365 * 24 * 3600],
     ['month', 30 * 24 * 3600],
     ['week', 7 * 24 * 3600],
     ['day', 24 * 3600],
     ['hour', 3600],
     ['minute', 60],
-  ];
-  const [unit, size] = units.find(([, length]) => Math.abs(seconds) >= length) ?? ['minute', 60];
-  return new Intl.RelativeTimeFormat(activeDateLocale(), { numeric: 'always' }).format(
-    Math.round(seconds / size),
-    unit,
-  );
+  ] as const;
+  const [unit, size] = units.find(([, length]) => seconds >= length) ?? units[units.length - 1];
+  return i18n.t(`units.ago.${unit}`, { count: Math.round(seconds / size) });
 }
 
 /** Short date and time, e.g. "12 Eyl 2026, 19:30" / "12 Sept 2026, 19:30" (ride feed cards). */
@@ -179,4 +177,52 @@ export function turkishAccusativeSuffix(name: string) {
 /** "Bostancı İskelesi", "Ağva Sahili": several words, the last ending in a possessive ı/i/u/ü. */
 function isTurkishCompoundPossessive(name: string) {
   return /\s/.test(name) && 'ıiuü'.includes(name.toLocaleLowerCase('tr').slice(-1));
+}
+
+/** Post time in feeds (13.01): "Bugün, 08:15", "Dün, 17:40", otherwise "28 Eyl, 10:05". */
+export function formatPostTime(date: Date, now = Date.now()) {
+  const time = formatClockTime(date);
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  const dayMs = 24 * 3600 * 1000;
+  if (date.getTime() >= startOfToday.getTime()) {
+    return i18n.t('time.today', { time });
+  }
+  if (date.getTime() >= startOfToday.getTime() - dayMs) {
+    return i18n.t('time.yesterday', { time });
+  }
+  const day = new Intl.DateTimeFormat(activeDateLocale(), { day: 'numeric', month: 'short' }).format(
+    date,
+  );
+  return i18n.t('time.dayTime', { day, time });
+}
+
+/** Compact age of a comment (13.02): "35 dk", "2 sa", "3 g". */
+export function formatShortAgo(date: Date, now = Date.now()) {
+  const minutes = Math.floor((now - date.getTime()) / 60_000);
+  if (minutes < 1) {
+    return i18n.t('time.justNow');
+  }
+  if (minutes < 60) {
+    return i18n.t('time.agoMinutes', { value: formatNumber(minutes) });
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return i18n.t('time.agoHours', { value: formatNumber(hours) });
+  }
+  return i18n.t('time.agoDays', { value: formatNumber(Math.floor(hours / 24)) });
+}
+
+/** Compact duration in feed metrics (13.01): "1sa12dk", "41dk" (en: "1h12m", "41m"). */
+export function formatCompactDuration(totalMinutes: number) {
+  const rounded = Math.round(totalMinutes);
+  const hours = Math.floor(rounded / 60);
+  const minutes = rounded % 60;
+  if (hours === 0) {
+    return i18n.t('units.compactMinutes', { minutes });
+  }
+  if (minutes === 0) {
+    return i18n.t('units.compactHours', { hours });
+  }
+  return i18n.t('units.compactHoursMinutes', { hours, minutes: String(minutes).padStart(2, '0') });
 }

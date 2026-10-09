@@ -1,6 +1,7 @@
 import { Filter, NavArrowDown, NavArrowUp, Xmark } from 'iconoir-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, radius, spacing, typography } from '@/theme';
 
 export type FilterChipDropdownState = 'default' | 'open' | 'applied' | 'disabled' | 'removable';
@@ -96,7 +97,7 @@ function ToggleChip({
       accessibilityRole="togglebutton"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ checked: selected }}
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       hitSlop={{ top: 6, bottom: 6 }}
       style={[styles.chip, styles.toggle, selected ? styles.chipSelected : styles.chipDefault]}
     >

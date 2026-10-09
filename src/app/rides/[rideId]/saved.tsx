@@ -1,9 +1,9 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { StatusIcon } from '@/components/feedback/StatusIcon';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { RideMapPreview } from '@/components/record/RideMapPreview';
 import { averageSpeedKmh } from '@/components/ride-form/RideSummaryCard';
@@ -15,14 +15,16 @@ import { useRideForm } from '@/features/rides/RideFormProvider';
 import { shareRide, type ShareTarget } from '@/features/rides/shareRide';
 import { formatDistance, formatRideClock, formatSpeed } from '@/i18n/format';
 import { colors, fontFamily, layout, radius, shadows, spacing, typography } from '@/theme';
+import { openShareRide } from '@/features/rides/openShareRide';
 
 /** The track stays in the open map above the panel. */
 const MAP_PADDING: BoxPadding = { top: 80, right: 40, bottom: 470, left: 40 };
+const illustration = require('../../../../assets/images/ride/route-complete.png');
 
 /**
- * 08.11 Sürüş kaydedildi — Paylaş (Pencil `f78naq`): shown only once the ride is stored on the
- * device (P0). Share targets send text and link; "Paylaşım görseli oluştur" comes with the
- * share templates (decision 2026-10-07), so it isn't shown yet. Back goes to Record.
+ * 08.11 Sürüş kaydedildi — Paylaş (Figma `1005:37826`, illustration as on 06.07): shown only once the ride is stored on the
+ * device (P0). Share targets send text and link; "Paylaşım görseli oluştur" opens the share
+ * templates (09.03). Back goes to Record.
  */
 export default function RideSavedScreen() {
   const { t } = useTranslation('rides');
@@ -43,12 +45,17 @@ export default function RideSavedScreen() {
       <View style={[styles.panel, { paddingBottom: insets.bottom + spacing.lg }]}>
         <View style={styles.handle} />
         <View style={styles.heading}>
-          <StatusIcon status="success" />
+          <Image
+            source={illustration}
+            style={styles.illustration}
+            contentFit="cover"
+            accessibilityIgnoresInvertColors
+          />
           <Text style={styles.title} accessibilityRole="header">
             {t('saved.title')}
           </Text>
           <Text style={styles.description}>
-            {t('saved.description', { audience: t(`visibility.audience.${ride.visibility}`) })}
+            {t('saved.description')}
           </Text>
         </View>
         <MetricsCard
@@ -78,6 +85,7 @@ export default function RideSavedScreen() {
           </Text>
           <ShareTargets onShare={handleShare} />
         </View>
+        <Button size="lg" label={t('saved.createImage')} onPress={() => openShareRide(ride.id)} />
         <Button
           variant="text"
           size="lg"
@@ -92,6 +100,10 @@ export default function RideSavedScreen() {
 }
 
 const styles = StyleSheet.create({
+  illustration: {
+    width: 95,
+    height: 120,
+  },
   screen: {
     flex: 1,
     justifyContent: 'flex-end',

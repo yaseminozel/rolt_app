@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { RadioButton } from '@/components/ui/RadioButton';
+import { haptics } from '@/features/haptics/haptics';
 import { colors, layout, radius, spacing, typography } from '@/theme';
 
 const RADIO_CONTROL_SIZE = 24;
@@ -42,7 +43,10 @@ export function ChoiceGroup<T extends string | number>({
             accessibilityLabel={option.label}
             accessibilityState={{ checked: selected }}
             onPress={() => {
-              if (!selected) onChange(option.value);
+              if (!selected) {
+                haptics.select();
+                onChange(option.value);
+              }
             }}
             style={[styles.card, selected ? styles.cardSelected : styles.cardDefault]}
           >

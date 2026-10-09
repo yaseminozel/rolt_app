@@ -4,6 +4,7 @@ import * as StoreReview from 'expo-store-review';
 import {
   Bell,
   ChatLines,
+  CloudDownload,
   EyeClosed,
   Globe,
   Group,
@@ -14,6 +15,7 @@ import {
   MediaImage,
   Motorcycle,
   Page,
+  Position,
   Ruler,
   User,
   Xmark,
@@ -38,6 +40,8 @@ import { StatusIcon } from '@/components/feedback/StatusIcon';
 import { SettingsRow } from '@/components/settings/SettingsRow';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useLeanCalibration } from '@/features/lean/leanCalibration';
+import { offlineMapsSupported, useOfflineMaps } from '@/features/offlineMaps/offlineMaps';
 import { useOwnProfile } from '@/features/profile/queries';
 import { useDefaultRideVisibility } from '@/features/rides/queries';
 import { usePermissionStatuses } from '@/features/settings/permissionStatus';
@@ -53,6 +57,7 @@ import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme
 
 type SettingsPage =
   | 'account'
+  | 'garage'
   | 'ride-visibility'
   | 'endpoints'
   | 'blocked'
@@ -94,9 +99,9 @@ export default function SettingsScreen() {
   const permissions = usePermissionStatuses();
 
   // The React Compiler memoizes this list.
+  const leanCalibrated = useLeanCalibration() !== null;
+  const offlineCount = useOfflineMaps().filter((map) => map.state === 'ready').length;
   const items = ((): SettingsMenuItem[] => {
-    // "Motorum" (11.x) comes with Akış 17.
-    const pending = () => undefined;
     const go = (page: SettingsPage) => () => router.push(`/settings/${page}`);
     return [
       {
@@ -114,7 +119,7 @@ export default function SettingsScreen() {
         value: profile?.bike
           ? `${motorcycleBrandNames[profile.bike.brand]} ${profile.bike.model}`
           : t('values.noBike'),
-        onPress: pending,
+        onPress: go('garage'),
       },
       {
         id: 'rideVisibility',
@@ -181,6 +186,28 @@ export default function SettingsScreen() {
         value: t(getUnitSystem() === 'imperial' ? 'values.unitsImperial' : 'values.units'),
         onPress: go('units'),
       },
+      {
+        // 08.00 note: "İstediğin zaman Ayarlar › Sensörler'den yenileyebilirsin."
+        id: 'sensors',
+        section: 'app',
+        icon: Position,
+        label: t('items.sensors'),
+        value: t(leanCalibrated ? 'values.sensorsCalibrated' : 'values.sensorsNotCalibrated'),
+        onPress: () => router.push('/settings/calibrate'),
+      },
+      // Not drawn (user decision 2026-10-09): only where Mapbox runs (not Expo Go / web).
+      ...(offlineMapsSupported
+        ? [
+            {
+              id: 'offlineMaps' as const,
+              section: 'app' as const,
+              icon: CloudDownload,
+              label: t('items.offlineMaps'),
+              value: offlineCount > 0 ? t('values.offlineMaps', { count: offlineCount }) : t('values.offlineMapsNone'),
+              onPress: () => router.push('/settings/offline-maps'),
+            },
+          ]
+        : []),
       {
         id: 'help',
         section: 'support',

@@ -72,11 +72,18 @@ export type LocationFix = {
 };
 
 /** Where fixes come from during navigation. */
+/** Navigation asks for every fix; a free ride for what the recorder keeps. */
+export type LocationProfile = 'navigation' | 'recording';
+/** `idle` while the rider has paused by hand (coarse and slow, to save battery). */
+export type LocationPowerMode = 'active' | 'idle';
+
 export interface LocationSource {
   /** Starts delivering fixes; resolves to a stop function. */
   start(onFix: (fix: LocationFix) => void): Promise<() => void>;
   /** The clock fixes are stamped with (the simulator runs faster than real time). */
   now(): number;
+  /** Changes how hard the GPS works while started; the simulator ignores it. */
+  setPowerMode?(mode: LocationPowerMode): Promise<void>;
 }
 
 /** A stop the rider added (06.02–06.03), in riding order. */

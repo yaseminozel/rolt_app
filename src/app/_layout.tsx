@@ -14,6 +14,7 @@ import { MapExpandProvider } from '@/components/map/MapExpandTransition';
 import '@/features/navigation/location/backgroundLocationTask';
 import { AuthProvider, useAuth } from '@/features/auth/AuthProvider';
 import { takePendingAccountAction } from '@/features/auth/pendingAccountAction';
+import { offlineMaps } from '@/features/offlineMaps/offlineMaps';
 import { RideRecordingProvider } from '@/features/rides/RideRecordingProvider';
 import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
 import '@/i18n';
@@ -105,6 +106,8 @@ function RootNavigator() {
   useEffect(() => {
     if (ready) {
       SplashScreen.hideAsync();
+      // An offline map download the app was killed in the middle of carries on.
+      offlineMaps.restore();
     }
   }, [ready]);
 
@@ -138,6 +141,23 @@ function RootNavigator() {
           name="share-profile"
           options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
+        {/* 08.x Kayıt: a page sheet over the tabs, opened by the Kaydet tab (Pencil `w90Kk`). */}
+        <Stack.Screen
+          name="record-ride"
+          options={{ presentation: 'modal', gestureEnabled: false, contentStyle: { backgroundColor: colors.surface } }}
+        />
+        {/* 09.03 Sürüşü paylaş: share templates as a native sheet. */}
+        <Stack.Screen
+          name="share-ride"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: 'fitToContents',
+            sheetGrabberVisible: true,
+            contentStyle: { backgroundColor: colors.surface },
+          }}
+        />
+        {/* 09.05 Profili düzenle: own stack with a native header and the city sheet. */}
+        <Stack.Screen name="edit-profile" />
         {/* 10.x Ayarlar: modal stack closed with × (sub pages push inside it). */}
         <Stack.Screen name="settings" options={{ presentation: 'modal' }} />
         <Stack.Screen

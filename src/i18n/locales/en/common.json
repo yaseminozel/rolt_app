@@ -40,6 +40,32 @@
     "kmShort": "km",
     "milesShort": "mi",
     "kmhShort": "km/h",
-    "mphShort": "mph"
+    "mphShort": "mph",
+    "compactHoursMinutes": "{{hours}}h{{minutes}}m",
+    "compactHours": "{{hours}}h",
+    "compactMinutes": "{{minutes}}m",
+    "ago": {
+      "minute_one": "{{count}} minute ago",
+      "minute_other": "{{count}} minutes ago",
+      "hour_one": "{{count}} hour ago",
+      "hour_other": "{{count}} hours ago",
+      "day_one": "{{count}} day ago",
+      "day_other": "{{count}} days ago",
+      "week_one": "{{count}} week ago",
+      "week_other": "{{count}} weeks ago",
+      "month_one": "{{count}} month ago",
+      "month_other": "{{count}} months ago",
+      "year_one": "{{count}} year ago",
+      "year_other": "{{count}} years ago"
+    }
+  },
+  "time": {
+    "today": "Today, {{time}}",
+    "yesterday": "Yesterday, {{time}}",
+    "dayTime": "{{day}}, {{time}}",
+    "agoMinutes": "{{value}}m",
+    "agoHours": "{{value}}h",
+    "agoDays": "{{value}}d",
+    "justNow": "now"
   }
 }

@@ -76,6 +76,7 @@ import { RouteCard } from '@/components/route/RouteCard';
 import { createProjection, polylinePath } from '@/components/route-builder/routeProjection';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { SearchField } from '@/components/ui/SearchField';
+import { haptics } from '@/features/haptics/haptics';
 import { useDeviceLocation } from '@/features/location/useDeviceLocation';
 import { usePlacesInArea } from '@/features/places/queries';
 import type { ServicePlace, ServicePlaceCategory } from '@/features/places/types';
@@ -86,28 +87,30 @@ import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
 import { formatDistance, formatDuration } from '@/i18n/format';
 import { openDirections } from '@/lib/openDirections';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
+import {
+  EXPLORE_HEADER_HEIGHT,
+  EXPLORE_INITIAL_AREA,
+  EXPLORE_SHEET_LIST_HEIGHT,
+} from '@/features/discover/exploreInitialView';
 
 type CameraRef = ComponentRef<MapboxModule['Camera']>;
 type MapViewProps = ComponentProps<MapboxModule['MapView']>;
 type MapState = Parameters<NonNullable<MapViewProps['onMapIdle']>>[0];
 
 /** Antalya coast from Kaş to Antalya, where the mock routes are. */
-const INITIAL_AREA: Bounds = { southWest: [29.35, 36.15], northEast: [30.95, 37.12] };
+const INITIAL_AREA = EXPLORE_INITIAL_AREA;
 /** Sheet chips (07.01 "Rota kategorileri"): "Tümü" and the five tags the design lists. */
 const FILTERS: RouteFilter[] = ['all', 'coast', 'curvy', 'scenic', 'city', 'nature'];
 /** Markers closer than this on screen merge into one "N rota" badge (the cluster's 72 pt halo). */
 const CLUSTER_DISTANCE = ROUTE_CLUSTER_SIZE;
 
-/** Header (07.01 "MapExploreSearchBar + CategoryChips"): 4 top, 44 search row, 8, 44 chip row. */
-const HEADER_HEIGHT = 4 + 44 + spacing.sm + 44;
+const HEADER_HEIGHT = EXPLORE_HEADER_HEIGHT;
 /** Sheet handle area: 8 top + 4 grabber + 12 bottom. */
 const HANDLE_HEIGHT = 8 + 4 + 12;
 const TITLE_HEIGHT = 36;
-const CHIPS_HEIGHT = 34;
-const CARD_HEIGHT = 191;
 const SHEET_COLLAPSED_HEIGHT = HANDLE_HEIGHT + TITLE_HEIGHT + spacing.sm;
-const SHEET_LIST_HEIGHT =
-  HANDLE_HEIGHT + TITLE_HEIGHT + spacing.lg + CHIPS_HEIGHT + spacing.lg + CARD_HEIGHT + spacing.lg;
+// Shared with the Discover map card's static picture (`exploreInitialView`).
+const SHEET_LIST_HEIGHT = EXPLORE_SHEET_LIST_HEIGHT;
 /** "Benzinlikler" / "Tamirciler" sheet (07.02, 07.03): handle plus a 400 pt scrolling list. */
 const SHEET_PLACES_HEIGHT = HANDLE_HEIGHT + 400;
 /** "Sonuç yok" sheet (07.04 `B2drm`): 16 top, `EmptyState` (40 icon, 20 title, 2 × 20 text), 16. */
@@ -245,6 +248,7 @@ export default function ExploreMapScreen() {
 
   const selectRoute = useCallback(
     (route: Route) => {
+      haptics.select();
       setSelectedRoute(route);
       cameraRef.current?.setCamera({
         bounds: cameraBoundsFor(route.coordinates, cameraPadding(selectedSheetHeight)),
@@ -262,6 +266,7 @@ export default function ExploreMapScreen() {
   };
 
   const focusPlace = (place: ServicePlace) => {
+    haptics.select();
     cameraRef.current?.setCamera({
       centerCoordinate: place.coordinates,
       zoomLevel: CLUSTER_STREET_ZOOM,
@@ -286,6 +291,7 @@ export default function ExploreMapScreen() {
   );
 
   const openCluster = (members: Route[]) => {
+    haptics.tap();
     setSelectedRoute(null);
     const points = members.map(routeMidpoint);
     if (!isNativeMapAvailable) {

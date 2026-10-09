@@ -1,20 +1,16 @@
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
-import { Check, Garage, Motorcycle, MoreHoriz, PathArrow, ShareIos } from 'iconoir-react-native';
-import { useState } from 'react';
+import { MoreHoriz } from 'iconoir-react-native';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { motorcycleBrandNames } from '@/components/brand/MotorcycleBrandLogo';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useToast } from '@/components/feedback/ToastProvider';
-import { GarageBikeRow } from '@/components/profile/GarageBikeRow';
 import { ProfileHeader, type ProfileHeaderBike } from '@/components/profile/ProfileHeader';
-import { ProfileTabs, type ProfileTab } from '@/components/profile/ProfileTabs';
 import { ProfileTopBar } from '@/components/profile/ProfileTopBar';
 import { RiderRidesFeed } from '@/components/profile/RiderRidesFeed';
 import { RiderMatchNote } from '@/components/profile/RiderMatchNote';
-import { RouteCard } from '@/components/route/RouteCard';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { firstParam } from '@/features/auth/credentials';
@@ -24,16 +20,14 @@ import {
   useReport,
   useRider,
   useRiderMatch,
-  useRiderRoutes,
   useSetFollowing,
 } from '@/features/riders/queries';
+import { hapticToggle } from '@/features/haptics/haptics';
 import type { Rider, RiderBike } from '@/features/riders/types';
-import { useRouteBookmark } from '@/features/routes/useRouteBookmark';
-import { formatApproxDuration, formatDistance, formatNumber } from '@/i18n/format';
+import { formatNumber } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, layout, spacing } from '@/theme';
-
-type ProfileSection = 'rides' | 'routes' | 'garage';
+import { initialsOf } from '@/lib/initials';
 
 /** No tab bar on this root-stack screen, so toasts sit just above the bottom safe area. */
 const TOAST_BOTTOM_OFFSET = spacing.lg;
@@ -41,7 +35,9 @@ const TOAST_BOTTOM_OFFSET = spacing.lg;
 const HEADER_TOP_PADDING = 14;
 
 /**
- * 01.8 Discover / Sürücü profili (başkası) — Pencil `gKG8D`. Opened from the route detail's
+ * 13.03 Topluluk / Sürücü profili (Pencil `x913L`; was 01.8 `gKG8D`): identity, follow, then
+ * the rider's rides as community post cards — no tabs. The share button of the old design is
+ * gone; "…" (report / block) stays, as a UGC safety requirement. Opened from the route detail's
  * author row; a root-stack screen without the tab bar (the design draws the tab bar, but
  * pushing into the Discover tab's stack would break back navigation from the route detail).
  * Follow, like, comment, save, report and block are account-only (`useRequireAccount`).
@@ -61,9 +57,6 @@ export default function RiderProfileScreen() {
 
   const goBack = () => (router.canGoBack() ? router.back() : router.replace('/discover'));
 
-  const shareProfile = (profile: Rider) => {
-    Share.share({ message: t('share.message', { name: profile.name, handle: profile.handle }) });
-  };
 
   const confirmBlock = (profile: Rider) => {
     Alert.alert(t('block.title', { name: profile.name }), t('block.message'), [
@@ -124,11 +117,6 @@ export default function RiderProfileScreen() {
           rider
             ? [
                 {
-                  icon: ShareIos,
-                  accessibilityLabel: t('actions.share'),
-                  onPress: () => shareProfile(rider),
-                },
-                {
                   icon: MoreHoriz,
                   accessibilityLabel: t('actions.more'),
                   onPress: () => openMenu(rider),
@@ -169,25 +157,21 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
   const { session } = useAuth();
   const requireAccount = useRequireAccount();
   const setFollowing = useSetFollowing();
-  const [section, setSection] = useState<ProfileSection>('rides');
   // Guests have no riding preferences to compare, so the match note is for signed-in riders only.
   const matchQuery = useRiderMatch(rider.id, { enabled: session?.profileCompleted === true });
   const match = matchQuery.data;
 
-  const tabs: readonly ProfileTab<ProfileSection>[] = [
-    { value: 'rides', label: t('tabs.rides'), icon: Motorcycle },
-    { value: 'routes', label: t('tabs.routes'), icon: PathArrow },
-    { value: 'garage', label: t('tabs.garage'), icon: Garage },
-  ];
 
   const toggleFollow = () => {
     const following = !rider.isFollowing;
-    requireAccount('followRider', () => setFollowing.mutate({ riderId: rider.id, following }));
+    requireAccount('followRider', () => {
+      hapticToggle(following);
+      setFollowing.mutate({ riderId: rider.id, following });
+    });
   };
 
   return (
     <ScrollView
-      stickyHeaderIndices={[1]}
       contentContainerStyle={{ paddingBottom: bottomInset + spacing.xxl }}
       showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -195,6 +179,7 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
           name={rider.name}
           handle={rider.handle}
           avatar={rider.avatar}
+          avatarInitials={initialsOf(rider.name)}
           bio={rider.bio}
           city={rider.city}
           bike={primaryBikeLine(rider.bikes, t)}
@@ -214,43 +199,42 @@ function RiderProfileContent({ rider, bottomInset }: { rider: Rider; bottomInset
           actions={
             <View style={styles.actions}>
               {rider.isFollowing ? (
+                // 13.03 "Takip ediliyor" (Figma `1114:22157`): one full-width "Takibi bırak".
                 <Button
-                  label={t('actions.following')}
+                  label={t('actions.unfollow')}
                   variant="outlined"
-                  icon={Check}
                   onPress={toggleFollow}
-                  accessibilityLabel={t('actions.following')}
                   style={styles.action}
                 />
               ) : (
-                <Button label={t('actions.follow')} onPress={toggleFollow} style={styles.action} />
+                <>
+                  <Button label={t('actions.follow')} onPress={toggleFollow} style={styles.action} />
+                  <Button
+                    label={t('actions.rideTogether')}
+                    variant="outlined"
+                    onPress={() =>
+                      router.push({ pathname: '/ride-together/[id]', params: { id: rider.id } })
+                    }
+                    style={styles.action}
+                  />
+                </>
               )}
-              <Button
-                label={t('actions.rideTogether')}
-                variant="outlined"
-                onPress={() =>
-                  router.push({ pathname: '/ride-together/[id]', params: { id: rider.id } })
-                }
-                style={styles.action}
-              />
             </View>
           }
         />
       </View>
 
-      <ProfileTabs
-        tabs={tabs}
-        value={section}
-        onChange={setSection}
-        accessibilityLabel={t('tabs.label')}
-      />
-
       <View style={styles.section}>
-        {section === 'rides' ? (
-          <RiderRidesFeed riderId={rider.id} riderName={rider.name} riderAvatar={rider.avatar} />
-        ) : null}
-        {section === 'routes' ? <RoutesList riderId={rider.id} /> : null}
-        {section === 'garage' ? <GarageList bikes={rider.bikes} /> : null}
+        <RiderRidesFeed
+          riderId={rider.id}
+          riderName={rider.name}
+          riderAvatar={rider.avatar}
+          community={{
+            handle: rider.handle,
+            bike: primaryBikeLine(rider.bikes, t)?.label,
+            isFollowing: rider.isFollowing,
+          }}
+        />
       </View>
     </ScrollView>
   );
@@ -271,83 +255,8 @@ function primaryBikeLine(
   };
 }
 
-function RoutesList({ riderId }: { riderId: string }) {
-  const { t } = useTranslation(['profile', 'routes']);
-  const routesQuery = useRiderRoutes(riderId);
-  const { isSaved, toggleBookmark } = useRouteBookmark();
 
-  if (routesQuery.isPending) {
-    return <SectionLoading />;
-  }
-  const routes = routesQuery.data ?? [];
-  if (routes.length === 0) {
-    return (
-      <EmptyState title={t('empty.routes.title')} description={t('empty.routes.description')} />
-    );
-  }
 
-  return (
-    <View style={styles.list}>
-      {routes.map((route) => (
-        <RouteCard
-          key={route.id}
-          variant="row"
-          image={route.coverImage}
-          title={route.name}
-          subtitle={route.summary}
-          distance={formatDistance(route.distanceKm)}
-          duration={formatApproxDuration(route.durationMinutes)}
-          badgeLabel={t(`routes:tags.${route.tag}`)}
-          saved={isSaved(route.id)}
-          onToggleSave={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_BOTTOM_OFFSET })}
-          onPress={() => router.push({ pathname: '/route/[id]', params: { id: route.id } })}
-        />
-      ))}
-    </View>
-  );
-}
-
-function GarageList({ bikes }: { bikes: RiderBike[] }) {
-  const { t } = useTranslation(['profile', 'common', 'garage']);
-
-  if (bikes.length === 0) {
-    return (
-      <EmptyState title={t('empty.garage.title')} description={t('empty.garage.description')} />
-    );
-  }
-
-  const ordered = [...bikes].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
-  return (
-    <View style={styles.list}>
-      {ordered.map((bike, index) => (
-        <GarageBikeRow
-          key={bike.id}
-          brand={bike.brand}
-          title={`${motorcycleBrandNames[bike.brand]} ${bike.model}`}
-          detail={[
-            bike.year ? String(bike.year) : null,
-            bike.displacementCc
-              ? t('common:units.cc', { value: formatNumber(bike.displacementCc) })
-              : null,
-            bike.category ? t(`garage:categories.${bike.category}`) : null,
-          ]
-            .filter(Boolean)
-            .join(' · ')}
-          badgeLabel={bike.isPrimary && bikes.length > 1 ? t('garage.mainBike') : undefined}
-          divider={index < ordered.length - 1}
-        />
-      ))}
-    </View>
-  );
-}
-
-function SectionLoading() {
-  return (
-    <View style={styles.sectionLoading}>
-      <ActivityIndicator color={colors.textSecondary} />
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   screen: {
@@ -360,10 +269,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: layout.screenGutter,
   },
+  // A full-width hairline separates the identity from the rides (13.03 `x913L`).
   header: {
     paddingTop: HEADER_TOP_PADDING,
     paddingBottom: spacing.lg,
     paddingHorizontal: layout.screenGutter,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   actions: {
     flexDirection: 'row',

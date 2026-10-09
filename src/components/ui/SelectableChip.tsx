@@ -3,6 +3,7 @@ import type { ComponentType } from 'react';
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, radius, spacing, typography } from '@/theme';
 
 export type SelectableChipProps = {
@@ -48,7 +49,7 @@ export function SelectableChip({
       accessibilityRole={role}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ checked: selected }}
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       hitSlop={{ top: 4, bottom: 4 }}
       style={({ pressed }) => [
         styles.chip,

@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DialogModal } from '@/components/feedback/DialogModal';
 import { useToast } from '@/components/feedback/ToastProvider';
 import { Button } from '@/components/ui/Button';
+import { haptics } from '@/features/haptics/haptics';
 import { useDeleteRide, useSaveRide } from '@/features/rides/queries';
 import { useRideForm } from '@/features/rides/RideFormProvider';
 import { colors, layout, spacing, typography } from '@/theme';
@@ -61,6 +62,8 @@ export function RideFormScreen({ mode }: RideFormScreenProps) {
     saveRide
       .mutateAsync({ id: ride.id, details: values })
       .then((saved) => {
+        // Felt only once the ride is really on the device (P0).
+        haptics.success();
         if (mode === 'save') {
           router.replace({ pathname: '/rides/[rideId]/saved', params: { rideId: saved.id } });
         } else {

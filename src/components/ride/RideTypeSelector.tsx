@@ -1,5 +1,6 @@
 import { ScrollView, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { RIDE_TYPES, type RideType } from '@/features/rides/rideTypes';
 import { layout } from '@/theme';
 
@@ -34,7 +35,7 @@ export function RideTypeSelector({ value, onChange, disabled, style }: RideTypeS
           type={type}
           selected={type === value}
           disabled={disabled}
-          onPress={() => onChange(type)}
+          onPress={withHaptic(() => onChange(type))}
         />
       ))}
     </ScrollView>

@@ -1,0 +1,89 @@
+{
+  "title": "Topluluk",
+  "recent": "Son paylaşılanlar",
+  "handle": "@{{handle}}",
+  "shareSignature": "{{name}} ROLT'ta paylaştı",
+  "filter": {
+    "label": "Filtre",
+    "following": "Yalnız takip ettiklerim"
+  },
+  "empty": {
+    "title": "Henüz paylaşılmış bir sürüş yok",
+    "description": "Yeni rotalar keşfet veya ilk sürüşünü paylaş.",
+    "shareRide": "Sürüş paylaş",
+    "discover": "Rotaları keşfet"
+  },
+  "composer": {
+    "placeholder": "Toplulukla ne paylaşmak istersin?",
+    "share": "Paylaş",
+    "audienceTitle": "Kimler görebilir?",
+    "audience": {
+      "public": "Herkese açık",
+      "followers": "Takipçilerim"
+    },
+    "addPhoto": "Fotoğraf ekle",
+    "removePhoto": "Fotoğrafı kaldır",
+    "cancel": "Vazgeç",
+    "posted": "Paylaşıldı.",
+    "failed": "Paylaşılamadı. Tekrar dene."
+  },
+  "post": {
+    "authorA11y": "{{name}}, profili aç",
+    "like": "Beğen",
+    "comment": "Yorumlar",
+    "share": "Paylaş",
+    "readMore": "Devamını gör",
+    "map": "Sürüş haritası",
+    "photo": "Fotoğraf {{index}}",
+    "photoCounter": "{{index}}/{{total}}",
+    "metrics": {
+      "distance": "Mesafe",
+      "duration": "Süre",
+      "averageSpeed": "Ort. Hız",
+      "curves": "Viraj"
+    },
+    "follow": "Takip et: {{name}}"
+  },
+  "comments": {
+    "title": "Yorumlar · {{count}}",
+    "placeholder": "Yorum yaz…",
+    "send": "Gönder",
+    "empty": "İlk yorumu sen yaz."
+  },
+  "search": {
+    "open": "Ara",
+    "close": "Aramayı kapat",
+    "placeholder": "Sürücü, rota veya konum ara",
+    "recent": "Son aramalar",
+    "clearRecent": "Temizle",
+    "removeRecent": "Son aramalardan kaldır",
+    "suggestions": "Öneriler",
+    "seeAll": "“{{query}}” için tüm sonuçları gör",
+    "allCount": "Tümü ({{value}})",
+    "follow": "Takip et",
+    "following": "Takip ediliyor",
+    "tabs": {
+      "all": "Tümü",
+      "rider": "Sürücüler",
+      "ride": "Sürüşler",
+      "place": "Konumlar"
+    },
+    "groups": {
+      "rider": "Sürücüler",
+      "ride": "Paylaşılan sürüşler",
+      "place": "Konumlar"
+    },
+    "type": {
+      "rider": "Sürücü · @{{handle}}",
+      "ride": "Sürüş · {{name}}",
+      "place": "Konum",
+      "placeWithCount_one": "Konum · {{value}} sürüş",
+      "placeWithCount_other": "Konum · {{value}} sürüş",
+      "query": "Arama"
+    },
+    "noResults": {
+      "title": "“{{query}}” için sonuç bulunamadı",
+      "description": "Yazımı kontrol et ya da farklı bir kelime ile tekrar dene."
+    }
+  }
+}

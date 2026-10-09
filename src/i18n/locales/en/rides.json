@@ -26,6 +26,7 @@
     "pause": "Pause",
     "resume": "Resume",
     "finish": "Finish",
+    "cancel": "Cancel",
     "delete": "Delete ride",
     "expand": "Full screen",
     "collapse": "Minimize",
@@ -40,7 +41,7 @@
       "banner": "Unfinished ride found",
       "description": "Your ride is safe on your device. Continue where you left off or finish at the last valid point."
     },
-    "tooShort": "Ride too short. Ride at least {{distance}} to save it.",
+    "tooShort": "Ride too short. Ride at least {{distance}} to save it, or cancel the ride.",
     "permission": {
       "title": "Location off",
       "heading": "Location access is needed to record rides",
@@ -55,7 +56,34 @@
       "confirm": "Delete ride",
       "cancel": "Cancel"
     },
-    "locationRequired": "Location access is needed to record."
+    "cancelDialog": {
+      "title": "Cancel this ride?",
+      "description": "Rides under {{distance}} aren't saved. This recording will be deleted and can't be restored.",
+      "confirm": "Cancel ride",
+      "keep": "Keep ride"
+    },
+    "locationRequired": "Location access is needed to record.",
+    "closeSheet": "Close",
+    "panelCollapse": "Collapse panel",
+    "panelExpand": "Expand panel",
+    "accessory": {
+      "status": {
+        "recording": "Recording ride",
+        "weak": "Weak GPS, paused",
+        "paused": "Paused"
+      },
+      "a11y": "{{status}}, {{time}}, {{distance}}. Back to recording."
+    },
+    "liveActivity": {
+      "title": "ROLT",
+      "distance": "Distance",
+      "duration": "Time",
+      "averageSpeed": "Avg. speed"
+    },
+    "battery": {
+      "low": "Battery {{percent}}%. The screen no longer stays on; recording continues.",
+      "critical": "Battery {{percent}}%. If the phone dies, the ride is safe on the device and picks up where it stopped."
+    }
   },
   "share": {
     "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"
@@ -66,7 +94,8 @@
     "averageSpeed": "Avg. speed",
     "maxSpeed": "Max. speed",
     "curves": "Bends",
-    "breaks": "Breaks"
+    "breaks": "Breaks",
+    "maxLean": "Max. lean"
   },
   "form": {
     "title": "Save ride",
@@ -97,7 +126,8 @@
       "failed_other": "{{count}} photos couldn't be uploaded. Tap them to try again.",
       "photoA11y": "Photo {{index}}",
       "uploadingA11y": "Photo {{index}} uploading",
-      "failedA11y": "Photo {{index}} failed to upload, tap to try again"
+      "failedA11y": "Photo {{index}} failed to upload, tap to try again",
+      "routeLabel": "Route photos"
     },
     "visibility": {
       "label": "Visibility",
@@ -109,7 +139,7 @@
     "delete": "Delete ride",
     "save": "Save ride",
     "saving": "Saving…",
-    "saveChanges": "Save changes",
+    "saveChanges": "Save",
     "uploadingPhotos": "Uploading photos · {{done}}/{{total}}",
     "saveFailed": "Couldn't save the ride. Please try again.",
     "exitDialog": {
@@ -128,11 +158,6 @@
       "public": "Everyone on ROLT can see it; it can appear in Discover",
       "followers": "Only people who follow you can see it",
       "private": "Only you can see it; hidden on your profile"
-    },
-    "audience": {
-      "public": "Everyone can see it",
-      "followers": "Your followers can see it",
-      "private": "Only you can see it"
     },
     "sheet": {
       "title": "Who can see this?",
@@ -161,7 +186,7 @@
   },
   "saved": {
     "title": "Your ride is saved",
-    "description": "Added to your profile · {{audience}}",
+    "description": "Added to your profile",
     "shareTitle": "Share now",
     "targets": {
       "instagramStory": "Instagram Story",
@@ -171,7 +196,8 @@
       "other": "More"
     },
     "viewRide": "View ride",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "createImage": "Create share image"
   },
   "detail": {
     "notes": "Notes",
@@ -184,7 +210,17 @@
       "title": "Ride not found",
       "description": "This ride may have been deleted."
     },
-    "deleteDescription": "The route, stats, photos, likes and comments will be deleted permanently. This can't be undone."
+    "deleteDescription": "The route, stats, photos, likes and comments will be deleted permanently. This can't be undone.",
+    "leanAngle": "Lean angle",
+    "leanLeft": "Left max.",
+    "leanRight": "Right max.",
+    "degrees": "{{value}}°",
+    "replay": "Replay ride",
+    "route": {
+      "title": "Ride route",
+      "start": "Start",
+      "end": "Finish"
+    }
   },
   "options": {
     "title": "Ride options",
@@ -192,5 +228,16 @@
     "visibility": "Visibility",
     "share": "Share",
     "delete": "Delete ride"
+  },
+  "shareSheet": {
+    "title": "Share ride",
+    "share": "Share",
+    "failed": "The image couldn't be shared. Try again.",
+    "templates": {
+      "map": "Map template",
+      "transparent": "Transparent template",
+      "photo": "Photo template",
+      "brand": "ROLT template"
+    }
   }
 }

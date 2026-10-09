@@ -30,7 +30,8 @@
     "more": "Diğer seçenekler",
     "editProfile": "Profili düzenle",
     "changePhoto": "Profil fotoğrafını değiştir",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "unfollow": "Takibi bırak"
   },
   "tabs": {
     "label": "Profil bölümleri",
@@ -119,8 +120,8 @@
   },
   "saved": {
     "empty": {
-      "title": "Henüz kaydettiğin rota yok",
-      "description": "Beğendiğin rotaları yer imiyle kaydet, burada bulursun."
+      "title": "Henüz kaydedilen rota yok",
+      "description": "Beğendiğin rotaları kaydet; daha sonra burada kolayca bul."
     }
   },
   "shareSheet": {
@@ -145,5 +146,31 @@
       "message": "Görseli kaydetmek için Ayarlar'dan fotoğraflara ekleme iznini aç."
     },
     "message": "ROLT'ta beni takip et: {{link}}"
+  },
+  "edit": {
+    "title": "Profili düzenle",
+    "photoTitle": "Profil fotoğrafı",
+    "photoDescription": "Fotoğrafını değiştirmek için dokun. Kare, en az 400×400 px.",
+    "name": "Ad soyad",
+    "username": "Kullanıcı adı",
+    "profileLink": "Profil bağlantın: {{link}}",
+    "usernameTaken": "Bu kullanıcı adı alınmış.",
+    "usernameTakenExample": "Bu kullanıcı adı alınmış. Örn. @{{example}}",
+    "bio": "Biyografi",
+    "bioPlaceholder": "Kendinden kısaca bahset",
+    "city": "Konum",
+    "cityPlaceholder": "Şehir seç",
+    "cityTitle": "Konum",
+    "citySearch": "Şehir ara",
+    "cityNoResults": "Sonuç bulunamadı",
+    "save": "Kaydet",
+    "saved": "Profilin güncellendi.",
+    "failed": "Profilin kaydedilemedi. Tekrar dene."
+  },
+  "addMenu": {
+    "post": "Gönderi yayınla",
+    "photos": "Fotoğraf ekle",
+    "open": "Ekle",
+    "close": "Menüyü kapat"
   }
 }

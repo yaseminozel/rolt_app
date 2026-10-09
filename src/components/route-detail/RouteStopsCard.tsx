@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
+import Svg, { Line } from 'react-native-svg';
 
 import type { RouteStop } from '@/features/routes/types';
 import { formatApproxDuration, formatDistance, formatNumber } from '@/i18n/format';
@@ -8,10 +9,12 @@ import { colors, fontFamily, radius, spacing } from '@/theme';
 const ROW_HEIGHT = 76;
 const MARKER_SIZE = 24;
 const RAIL_WIDTH = 28;
-const LINE_WIDTH = 2;
+const LINE_WIDTH = 1.2;
+/** Dashed connector between stops (05.04 "Bağlantı çizgisi"). */
+const LINE_DASH = '3 3';
 
 /**
- * "Rota kartı" of 05.04 Uzun içerik (`w7AvU`): numbered stops on a vertical rail — filled
+ * "Rota kartı" of 05.04 Uzun içerik (`1005:36481`): numbered stops on a dashed rail — filled
  * markers for start and finish, outlined for the stops in between — with the stop type, name
  * and the distance and riding time from the start.
  */
@@ -42,8 +45,19 @@ export function RouteStopsCard({ stops }: { stops: RouteStop[] }) {
                   styles.line,
                   index === 0 && styles.lineFromMiddle,
                   index === last && styles.lineToMiddle,
-                ]}
-              />
+                ]}>
+                <Svg width={LINE_WIDTH} height="100%">
+                  <Line
+                    x1={LINE_WIDTH / 2}
+                    y1={0}
+                    x2={LINE_WIDTH / 2}
+                    y2="100%"
+                    stroke={colors.textSecondary}
+                    strokeWidth={LINE_WIDTH}
+                    strokeDasharray={LINE_DASH}
+                  />
+                </Svg>
+              </View>
               <View style={[styles.marker, filled ? styles.markerFilled : styles.markerOutlined]}>
                 <Text style={[styles.number, filled && styles.numberInverse]}>
                   {formatNumber(index + 1)}
@@ -88,7 +102,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: LINE_WIDTH,
-    backgroundColor: colors.textTertiary,
   },
   lineFromMiddle: {
     top: ROW_HEIGHT / 2,

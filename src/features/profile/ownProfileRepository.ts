@@ -43,6 +43,9 @@ async function write(profile: OwnProfile) {
  * registered accounts get their own from 04.01–04.03.
  */
 export const ownProfileRepository = {
+  /** 10.16 Hesabı sil: forgets the account's profile on this device. */
+  remove: (userId: string) => deviceStore.remove(key(userId)),
+
   async get(session: Session): Promise<OwnProfile> {
     const stored = await read(session.userId);
     const sample = sampleProfile(session);

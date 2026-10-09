@@ -1,0 +1,89 @@
+{
+  "title": "Community",
+  "recent": "Recently shared",
+  "handle": "@{{handle}}",
+  "shareSignature": "Shared by {{name}} on ROLT",
+  "filter": {
+    "label": "Filter",
+    "following": "Only people I follow"
+  },
+  "empty": {
+    "title": "No rides shared yet",
+    "description": "Discover new routes or share your first ride.",
+    "shareRide": "Share a ride",
+    "discover": "Discover routes"
+  },
+  "composer": {
+    "placeholder": "What would you like to share with the community?",
+    "share": "Share",
+    "audienceTitle": "Who can see it?",
+    "audience": {
+      "public": "Public",
+      "followers": "My followers"
+    },
+    "addPhoto": "Add photos",
+    "removePhoto": "Remove photo",
+    "cancel": "Cancel",
+    "posted": "Shared.",
+    "failed": "Couldn't share. Try again."
+  },
+  "post": {
+    "authorA11y": "{{name}}, open profile",
+    "like": "Like",
+    "comment": "Comments",
+    "share": "Share",
+    "readMore": "See more",
+    "map": "Ride map",
+    "photo": "Photo {{index}}",
+    "photoCounter": "{{index}}/{{total}}",
+    "metrics": {
+      "distance": "Distance",
+      "duration": "Time",
+      "averageSpeed": "Avg. speed",
+      "curves": "Bends"
+    },
+    "follow": "Follow {{name}}"
+  },
+  "comments": {
+    "title": "Comments · {{count}}",
+    "placeholder": "Write a comment…",
+    "send": "Send",
+    "empty": "Be the first to comment."
+  },
+  "search": {
+    "open": "Search",
+    "close": "Close search",
+    "placeholder": "Search riders, routes or places",
+    "recent": "Recent searches",
+    "clearRecent": "Clear",
+    "removeRecent": "Remove from recent searches",
+    "suggestions": "Suggestions",
+    "seeAll": "See all results for “{{query}}”",
+    "allCount": "All ({{value}})",
+    "follow": "Follow",
+    "following": "Following",
+    "tabs": {
+      "all": "All",
+      "rider": "Riders",
+      "ride": "Rides",
+      "place": "Places"
+    },
+    "groups": {
+      "rider": "Riders",
+      "ride": "Shared rides",
+      "place": "Places"
+    },
+    "type": {
+      "rider": "Rider · @{{handle}}",
+      "ride": "Ride · {{name}}",
+      "place": "Place",
+      "placeWithCount_one": "Place · {{value}} ride",
+      "placeWithCount_other": "Place · {{value}} rides",
+      "query": "Search"
+    },
+    "noResults": {
+      "title": "No results for “{{query}}”",
+      "description": "Check the spelling or try a different word."
+    }
+  }
+}

@@ -32,11 +32,18 @@ export default function SettingsLayout() {
         contentStyle: { backgroundColor: colors.surface },
       }}>
       <Stack.Screen name="index" />
+      {/* 08.00 Kalibrasyon draws its own top bar. */}
+      <Stack.Screen name="calibrate" options={{ headerShown: false }} />
       <Stack.Screen name="ride-visibility" options={sheet} />
       <Stack.Screen name="language" options={sheet} />
       <Stack.Screen name="units" options={sheet} />
       <Stack.Screen name="location" options={sheet} />
       <Stack.Screen name="photos" options={sheet} />
+      {/* 11.02–11.05: one sheet stepping brand → model → year → summary. */}
+      <Stack.Screen
+        name="garage-add"
+        options={{ ...sheet, sheetAllowedDetents: [0.76, 1] }}
+      />
     </Stack>
   );
 }

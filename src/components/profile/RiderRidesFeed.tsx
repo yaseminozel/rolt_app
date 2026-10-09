@@ -10,10 +10,14 @@ import {
   useSetRideLiked,
   useSetRideSaved,
 } from '@/features/riders/queries';
+import { hapticToggle } from '@/features/haptics/haptics';
 import type { RideSummary } from '@/features/riders/types';
 import { formatDateTime, formatDistance, formatDuration, formatSpeed } from '@/i18n/format';
 import { showActionSheet } from '@/lib/showActionSheet';
 import { colors, spacing } from '@/theme';
+
+import { CommunityPostCard } from '@/components/community/CommunityPostCard';
+import { openShareRide } from '@/features/rides/openShareRide';
 
 import { RideActivityCard } from './RideActivityCard';
 
@@ -25,6 +29,11 @@ type RiderRidesFeedProps = {
   own?: boolean;
   /** Toast offset above the screen bottom (the tab bar or the safe area). */
   toastBottomOffset?: number;
+  /**
+   * Another rider's profile (13.03): community post cards with the rider's handle and bike;
+   * the own profile keeps the ride activity cards.
+   */
+  community?: { handle: string; bike?: string; isFollowing: boolean };
 };
 
 /**
@@ -38,6 +47,7 @@ export function RiderRidesFeed({
   riderAvatar,
   own = false,
   toastBottomOffset = spacing.lg,
+  community,
 }: RiderRidesFeedProps) {
   const { t } = useTranslation(['profile', 'common']);
   const requireAccount = useRequireAccount();
@@ -63,7 +73,10 @@ export function RiderRidesFeed({
 
   const toggleLike = (ride: RideSummary) => {
     const liked = !ride.isLiked;
-    requireAccount('likeRide', () => setLiked.mutate({ rideId: ride.id, liked }));
+    requireAccount('likeRide', () => {
+      hapticToggle(liked);
+      setLiked.mutate({ rideId: ride.id, liked });
+    });
   };
 
   const toggleSave = (ride: RideSummary) => {
@@ -88,6 +101,11 @@ export function RiderRidesFeed({
   const openComments = () => requireAccount('commentRide', () => undefined);
 
   const shareRide = (ride: RideSummary) => {
+    // The own sample rides get the share templates (09.03); others' rides share as text.
+    if (own) {
+      openShareRide(ride.id, { riderId });
+      return;
+    }
     Share.share({
       message: t('share.rideMessage', {
         title: ride.title,
@@ -123,6 +141,35 @@ export function RiderRidesFeed({
       {rides.map((ride, index) => (
         <View key={ride.id} style={styles.feed}>
           {index > 0 ? <View style={styles.divider} /> : null}
+          {community ? (
+            <CommunityPostCard
+              post={{
+                id: ride.id,
+                author: { id: riderId, name: riderName, handle: community.handle, avatar: riderAvatar, bike: community.bike },
+                createdAt: ride.startedAt,
+                ride: {
+                  title: ride.title,
+                  description: ride.description,
+                  rideType: ride.rideType,
+                  distanceKm: ride.distanceKm,
+                  durationMinutes: ride.durationMinutes,
+                  averageSpeedKmh: ride.averageSpeedKmh,
+                  curveCount: ride.curveCount,
+                  mapImage: ride.mapImage,
+                },
+                photos: ride.photos,
+                likeCount: ride.likeCount,
+                commentCount: ride.commentCount,
+                isLiked: ride.isLiked,
+                isFollowingAuthor: community.isFollowing,
+                audience: 'public',
+              }}
+              onAuthorPress={() => undefined}
+              onLikePress={() => toggleLike(ride)}
+              onCommentPress={openComments}
+              onSharePress={() => shareRide(ride)}
+            />
+          ) : (
           <RideActivityCard
             riderName={riderName}
             riderAvatar={riderAvatar}
@@ -147,6 +194,7 @@ export function RiderRidesFeed({
             onSharePress={() => shareRide(ride)}
             onMorePress={own ? undefined : () => openRideMenu(ride)}
           />
+          )}
         </View>
       ))}
     </View>

@@ -9,11 +9,15 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.roltapp.rolt",
+      "appleTeamId": "6YGCVJV7BA",
       "config": {
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -86,7 +90,16 @@
           "isAccessMediaLocationEnabled": true
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-sharing",
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "ROLT, sürüş sırasında yatış açını ölçmek için telefonun hareket sensörlerini kullanır."
+        }
+      ],
+      "@bacons/apple-targets",
+      "expo-widgets"
     ],
     "scheme": "rolt",
     "experiments": {
@@ -101,6 +114,12 @@
         "projectId": "33f1ffce-5ef5-459a-ba50-710a0988cba8"
       }
     },
-    "owner": "milbas"
+    "owner": "milbas",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/33f1ffce-5ef5-459a-ba50-710a0988cba8"
+    }
   }
 }

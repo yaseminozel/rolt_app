@@ -2,6 +2,7 @@ import { NavArrowRight } from 'iconoir-react-native';
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
 
 import { MotorcycleBrandLogo, type MotorcycleBrand } from '@/components/brand/MotorcycleBrandLogo';
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, fontFamily, spacing } from '@/theme';
 
 const LOGO_SIZE = 28;
@@ -23,7 +24,7 @@ type BrandRowProps = {
 export function BrandRow({ brand, label, onPress, disabled, style }: BrandRowProps) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       disabled={disabled}
       accessibilityRole="button"
       accessibilityLabel={label}

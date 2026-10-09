@@ -18,6 +18,8 @@ type ProfileTopBarProps = {
   onBack?: () => void;
   /** Trailing 20 pt icon actions, e.g. share and "…" (01.8) or QR and settings (03.0). */
   actions: ProfileTopBarAction[];
+  /** Leading action of the own profile (09.01 "Action / Ekle (+)"). */
+  leading?: ProfileTopBarAction;
 };
 
 const BACK_ICON_SIZE = 24;
@@ -34,7 +36,7 @@ const TRAILING_INSET = layout.screenGutter - (layout.minTouchTarget - DESIGN_ACT
  * Profile top bar (gKG8D / Dimdp "ROLT UI/Frame 34" + "Geri"): back chevron on the left and
  * icon actions on the right, drawn over the white screen background. Handles the top inset.
  */
-export function ProfileTopBar({ onBack, actions }: ProfileTopBarProps) {
+export function ProfileTopBar({ onBack, actions, leading }: ProfileTopBarProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
@@ -47,6 +49,14 @@ export function ProfileTopBar({ onBack, actions }: ProfileTopBarProps) {
           accessibilityLabel={t('actions.back')}
           style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
           <NavArrowLeft width={BACK_ICON_SIZE} height={BACK_ICON_SIZE} color={colors.textPrimary} />
+        </Pressable>
+      ) : leading ? (
+        <Pressable
+          onPress={leading.onPress}
+          accessibilityRole="button"
+          accessibilityLabel={leading.accessibilityLabel}
+          style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
+          <leading.icon width={ACTION_ICON_SIZE} height={ACTION_ICON_SIZE} color={colors.textPrimary} />
         </Pressable>
       ) : null}
       <View style={styles.actions}>
