@@ -6,6 +6,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LeanDial } from '@/components/lean/LeanDial';
+import { RECORD_SHEET_TOP_GAP, useSheetTopInset } from '@/components/record/recordSheetLayout';
 import { calibrationFlow } from '@/features/lean/calibrationFlow';
 import { leanCalibration } from '@/features/lean/leanCalibration';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
@@ -31,9 +32,10 @@ const isShaking = (reading: { spreadDeg: number; rateDegS: number }) =>
  * as the zero point for this phone position; moving or tilting cancels it. "Kayda geç" (or
  * "Atla") returns to the Record tab, which then starts the ride (`then=record`).
  */
-export default function CalibrateLeanScreen() {
+export function CalibrationScreen() {
   const { t } = useTranslation('ride');
   const insets = useSafeAreaInsets();
+  const topInset = useSheetTopInset();
   const { then } = useLocalSearchParams<{ then?: 'record' }>();
   const [phase, setPhase] = useState<Phase>('live');
   const [reading, setReading] = useState({ rawDeg: 0, spreadDeg: 0, rateDegS: 0 });
@@ -178,7 +180,7 @@ export default function CalibrateLeanScreen() {
   const ctaEnabled = phase === 'done' || (phase === 'live' && posture === 'upright');
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
+    <View style={[styles.screen, { paddingTop: topInset + RECORD_SHEET_TOP_GAP - TOP_BAR_PADDING }]}>
       <View style={styles.topBar}>
         <Pressable
           onPress={() => router.back()}
@@ -321,6 +323,9 @@ export default function CalibrateLeanScreen() {
     </View>
   );
 }
+
+/** The top bar's own top padding (Pencil `AAXNS`, 8): its back button lines up with the sheet's ⌄. */
+const TOP_BAR_PADDING = 8;
 
 const styles = StyleSheet.create({
   screen: {

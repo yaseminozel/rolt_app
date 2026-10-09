@@ -138,8 +138,11 @@ function RootNavigator() {
           name="share-profile"
           options={{ presentation: 'transparentModal', animation: 'fade' }}
         />
-        {/* 08.00 Kalibrasyon: lean angle zero point, its own top bar. */}
-        <Stack.Screen name="calibrate-lean" />
+        {/* 08.x Kayıt: a page sheet over the tabs, opened by the Kaydet tab (Pencil `w90Kk`). */}
+        <Stack.Screen
+          name="record-ride"
+          options={{ presentation: 'modal', gestureEnabled: false, contentStyle: { backgroundColor: colors.surface } }}
+        />
         {/* 09.03 Sürüşü paylaş: share templates as a native sheet. */}
         <Stack.Screen
           name="share-ride"

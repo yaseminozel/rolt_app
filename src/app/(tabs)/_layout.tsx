@@ -1,8 +1,11 @@
+import { router } from 'expo-router';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
 
 import { TabBarVisibilityProvider } from '@/components/layout/TabBarVisibility';
 import { usePermissionPromptSheet } from '@/features/auth/usePermissionPromptSheet';
+import { rememberTab } from '@/features/rides/recordSheet';
 import { colors } from '@/theme';
 
 /**
@@ -24,8 +27,8 @@ const icons = {
 /**
  * Primary navigation (Pencil "Navigation Bar / Floating — MVP", `N2T9Y`): Keşfet, Kaydet,
  * Topluluk, Profil. Rendered natively so iOS 26 draws it with Liquid Glass; the order, labels
- * and icons come from the design. Record hides the bar while open (08.x frames draw none and
- * offer their own back button).
+ * and icons come from the design. Kaydet opens the record sheet (`/record-ride`, Pencil `w90Kk`)
+ * over the current tab instead of switching to a tab of its own.
  */
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -35,12 +38,27 @@ export default function TabsLayout() {
   return (
     <TabBarVisibilityProvider>
       {(hidden) => (
-        <NativeTabs tintColor={colors.textPrimary} hidden={hidden}>
+        <NativeTabs
+          tintColor={colors.textPrimary}
+          hidden={hidden}
+          screenListeners={({ route }) => ({ focus: () => rememberTab(route.name) })}>
           <NativeTabs.Trigger name="discover">
             <NativeTabs.Trigger.Icon src={icons.discover} />
             <NativeTabs.Trigger.Label>{t('tabs.discover')}</NativeTabs.Trigger.Label>
           </NativeTabs.Trigger>
-          <NativeTabs.Trigger name="record">
+          {/* Kaydet opens the record sheet instead of switching tabs. iOS keeps the current tab
+              (`disabled`; the press still arrives as `tabPress`); Android selects the tab, whose
+              screen hands over to the sheet. */}
+          <NativeTabs.Trigger
+            name="record"
+            disabled
+            listeners={{
+              tabPress: () => {
+                if (Platform.OS === 'ios') {
+                  router.push('/record-ride');
+                }
+              },
+            }}>
             <NativeTabs.Trigger.Icon src={icons.record} />
             <NativeTabs.Trigger.Label>{t('tabs.record')}</NativeTabs.Trigger.Label>
           </NativeTabs.Trigger>

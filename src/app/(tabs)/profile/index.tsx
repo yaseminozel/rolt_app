@@ -256,7 +256,7 @@ function OwnRides({
         <Button
           size="lg"
           label={t('own.empty.action')}
-          onPress={() => router.navigate('/record')}
+          onPress={() => router.push('/record-ride')}
         />
       </View>
     );

@@ -190,7 +190,7 @@ export default function SettingsScreen() {
         icon: Position,
         label: t('items.sensors'),
         value: t(leanCalibrated ? 'values.sensorsCalibrated' : 'values.sensorsNotCalibrated'),
-        onPress: () => router.push('/calibrate-lean'),
+        onPress: () => router.push('/settings/calibrate'),
       },
       {
         id: 'help',

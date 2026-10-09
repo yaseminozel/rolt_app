@@ -32,6 +32,8 @@ export default function SettingsLayout() {
         contentStyle: { backgroundColor: colors.surface },
       }}>
       <Stack.Screen name="index" />
+      {/* 08.00 Kalibrasyon draws its own top bar. */}
+      <Stack.Screen name="calibrate" options={{ headerShown: false }} />
       <Stack.Screen name="ride-visibility" options={sheet} />
       <Stack.Screen name="language" options={sheet} />
       <Stack.Screen name="units" options={sheet} />

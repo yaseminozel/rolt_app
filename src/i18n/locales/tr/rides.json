@@ -55,7 +55,10 @@
       "confirm": "Sürüşü sil",
       "cancel": "Vazgeç"
     },
-    "locationRequired": "Kayıt için konum izni gerekli."
+    "locationRequired": "Kayıt için konum izni gerekli.",
+    "closeSheet": "Kapat",
+    "panelCollapse": "Paneli küçült",
+    "panelExpand": "Paneli büyüt"
   },
   "share": {
     "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"

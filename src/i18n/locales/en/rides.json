@@ -55,7 +55,10 @@
       "confirm": "Delete ride",
       "cancel": "Cancel"
     },
-    "locationRequired": "Location access is needed to record."
+    "locationRequired": "Location access is needed to record.",
+    "closeSheet": "Close",
+    "panelCollapse": "Collapse panel",
+    "panelExpand": "Expand panel"
   },
   "share": {
     "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"

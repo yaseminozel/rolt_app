@@ -304,6 +304,11 @@ export const colors = {
   skeleton: palette.gray125,
 
   scrim: 'rgba(15, 18, 23, 0.31)',
+  /** Handle of the record panel ("Sheet grabber", `un0E9`, #10131873). */
+  sheetGrabber: 'rgba(16, 19, 24, 0.45)',
+  /** White fade over the top of the record sheet's map ("Top fade", `iz6RG`). */
+  mapTopFade: 'rgba(255, 255, 255, 0.9)',
+  mapTopFadeEnd: 'rgba(255, 255, 255, 0)',
   /** Over the ride map behind the countdown and sheets (06.05 "Overlay / Scrim", #0000005C). */
   mapScrim: 'rgba(0, 0, 0, 0.36)',
   /** Behind centered dialogs over a screen ("04.x Çıkış — Taslak kaydet", `zMCLP`). */

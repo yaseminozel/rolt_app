@@ -113,7 +113,7 @@ export default function CommunityScreen() {
                 <Text style={styles.emptyDescription}>{t('empty.description')}</Text>
               </View>
               <View style={styles.emptyActions}>
-                <Button label={t('empty.shareRide')} onPress={() => router.navigate('/record')} />
+                <Button label={t('empty.shareRide')} onPress={() => router.push('/record-ride')} />
                 <Button
                   variant="text"
                   label={t('empty.discover')}

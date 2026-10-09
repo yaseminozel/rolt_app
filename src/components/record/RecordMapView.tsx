@@ -9,6 +9,9 @@ import { colors } from '@/theme';
 
 const TRACK_WIDTH = 5;
 const FOLLOW_ZOOM = 15.5;
+/** The collapsed panel shows the map closer (`un0E9` dragged down). */
+const DETAIL_ZOOM_STEP = 1;
+const CAMERA_MS = 600;
 /** Expo Go / web artwork: where the rider sits on the design's map (08.01 "Map/Heading Marker"). */
 const FALLBACK_RIDER = { x: 0.63, y: 0.3 };
 
@@ -22,6 +25,10 @@ type RecordMapViewProps = {
   onUserGesture?: () => void;
   mapStyle?: MapStyle;
   weakSignal?: boolean;
+  /** Closer zoom while the controls panel is collapsed. */
+  detail?: boolean;
+  /** Height covered by the controls panel: the rider is centred in the map above it. */
+  bottomInset?: number;
   overlay?: ReactNode;
   style?: StyleProp<ViewStyle>;
 };
@@ -38,6 +45,8 @@ export function RecordMapView({
   onUserGesture,
   mapStyle,
   weakSignal,
+  detail = false,
+  bottomInset = 0,
   overlay,
   style,
 }: RecordMapViewProps) {
@@ -86,8 +95,9 @@ export function RecordMapView({
             {follow && position ? (
               <Mapbox.Camera
                 centerCoordinate={position}
-                zoomLevel={FOLLOW_ZOOM}
-                animationDuration={800}
+                zoomLevel={FOLLOW_ZOOM + (detail ? DETAIL_ZOOM_STEP : 0)}
+                padding={{ paddingTop: 0, paddingLeft: 0, paddingRight: 0, paddingBottom: bottomInset }}
+                animationDuration={CAMERA_MS}
                 animationMode="easeTo"
               />
             ) : null}
