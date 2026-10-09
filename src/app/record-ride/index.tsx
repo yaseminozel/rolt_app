@@ -1,5 +1,6 @@
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as Location from 'expo-location';
-import { router, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect, useIsFocused } from 'expo-router';
 import { Collapse, Expand, NavArrowDown, NavigatorAlt } from 'iconoir-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +48,7 @@ const illustration = require('../../../assets/images/location-off-illustration.p
 const READY_BANNER_MS = 3_000;
 /** "Sürüş çok kısa" (08.04) disappears after this long. */
 const TOO_SHORT_BANNER_MS = 4_000;
+const KEEP_AWAKE_TAG = 'rolt-recording';
 /** "Konumum" before the first fix accepts a system fix this recent. */
 const LOCATE_MAX_AGE_MS = 10_000;
 /** Timed banners are checked this often. */
@@ -245,6 +247,20 @@ export default function RecordScreen() {
   const snapshot = active?.snapshot;
   const phase = snapshot?.phase;
   const autoPaused = snapshot?.autoPaused === true;
+
+  // While a ride is being recorded with this sheet open the screen stays on (the phone sits in
+  // the mount, as in navigation); paused, closed or locked by hand, the phone sleeps as usual.
+  const focused = useIsFocused();
+  const keepAwake = focused && phase === 'recording';
+  useEffect(() => {
+    if (!keepAwake) {
+      return;
+    }
+    activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => undefined);
+    return () => {
+      deactivateKeepAwake(KEEP_AWAKE_TAG).catch(() => undefined);
+    };
+  }, [keepAwake]);
   const shownInterrupted = !active ? interrupted : null;
   // 08.03: an unfinished ride waiting on open asks for attention.
   useHapticOnSet(shownInterrupted?.id, 'warning', { onMount: true });
