@@ -1,4 +1,4 @@
-import * as Haptics from 'expo-haptics';
+import { haptics } from '@/features/haptics/haptics';
 
 /**
  * Touch feedback for 08.00 Kalibrasyon, so the rider can level the bike without staring at
@@ -19,15 +19,13 @@ export const CALIBRATION_HAPTIC_RULES = {
 
 export type CalibrationPosture = 'upright' | 'tilted' | 'shaking';
 
-const ignore = () => {};
-
 const play = {
-  tick: () => Haptics.selectionAsync().catch(ignore),
-  upright: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(ignore),
-  tilted: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(ignore),
-  countdown: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(ignore),
-  saved: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(ignore),
-  cancelled: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(ignore),
+  tick: haptics.select,
+  upright: haptics.press,
+  tilted: haptics.warning,
+  countdown: haptics.tap,
+  saved: haptics.success,
+  cancelled: haptics.error,
 };
 
 /** Per-screen haptic state; feed it every rendered reading. */
