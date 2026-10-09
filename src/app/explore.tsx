@@ -76,6 +76,7 @@ import { RouteCard } from '@/components/route/RouteCard';
 import { createProjection, polylinePath } from '@/components/route-builder/routeProjection';
 import { FilterChip } from '@/components/ui/FilterChip';
 import { SearchField } from '@/components/ui/SearchField';
+import { haptics } from '@/features/haptics/haptics';
 import { useDeviceLocation } from '@/features/location/useDeviceLocation';
 import { usePlacesInArea } from '@/features/places/queries';
 import type { ServicePlace, ServicePlaceCategory } from '@/features/places/types';
@@ -247,6 +248,7 @@ export default function ExploreMapScreen() {
 
   const selectRoute = useCallback(
     (route: Route) => {
+      haptics.select();
       setSelectedRoute(route);
       cameraRef.current?.setCamera({
         bounds: cameraBoundsFor(route.coordinates, cameraPadding(selectedSheetHeight)),
@@ -264,6 +266,7 @@ export default function ExploreMapScreen() {
   };
 
   const focusPlace = (place: ServicePlace) => {
+    haptics.select();
     cameraRef.current?.setCamera({
       centerCoordinate: place.coordinates,
       zoomLevel: CLUSTER_STREET_ZOOM,
@@ -288,6 +291,7 @@ export default function ExploreMapScreen() {
   );
 
   const openCluster = (members: Route[]) => {
+    haptics.tap();
     setSelectedRoute(null);
     const points = members.map(routeMidpoint);
     if (!isNativeMapAvailable) {

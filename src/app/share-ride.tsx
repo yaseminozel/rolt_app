@@ -14,6 +14,7 @@ import {
   type ShareTemplate,
 } from '@/components/share/ShareTemplateCard';
 import { Button } from '@/components/ui/Button';
+import { haptics } from '@/features/haptics/haptics';
 import { useRiderRides } from '@/features/riders/queries';
 import { useRideRecord } from '@/features/rides/queries';
 import { rideTitle } from '@/features/rides/rideTitle';
@@ -120,7 +121,12 @@ export default function ShareRideSheet() {
             {templates.map((item) => (
               <Pressable
                 key={item}
-                onPress={() => setTemplate(item)}
+                onPress={() => {
+                  if (item !== template) {
+                    haptics.select();
+                  }
+                  setTemplate(item);
+                }}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: template === item }}
                 accessibilityLabel={t(`shareSheet.templates.${item}`)}>
