@@ -1,25 +1,41 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { colors } from '@/theme';
+import { colors } from "@/theme";
 
 /**
  * 08.x Kayıt as a sheet over the tabs (Pencil `w90Kk` "Record sheet"): the record screen, the
- * lean calibration it may open first (08.00) and the background permission sheet (06.04).
+ * lean calibration it opens on every start (08.00) and the background permission sheet (06.04).
+ * Its own gesture root: the panel grabber's pan lives in a native modal.
  */
 export default function RecordRideLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="calibrate" />
-      {/* 06.04, same sheet as before navigation: tall content, fixed detents. */}
-      <Stack.Screen
-        name="background-permission"
-        options={{
-          presentation: 'formSheet',
-          sheetAllowedDetents: [0.92, 1],
-          sheetGrabberVisible: true,
+    <GestureHandlerRootView style={styles.root}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.surface },
         }}
-      />
-    </Stack>
+      >
+        <Stack.Screen name="index" />
+        <Stack.Screen name="calibrate" />
+        {/* 06.04, same sheet as before navigation: tall content, fixed detents. */}
+        <Stack.Screen
+          name="background-permission"
+          options={{
+            presentation: "formSheet",
+            sheetAllowedDetents: [0.92, 1],
+            sheetGrabberVisible: true,
+          }}
+        />
+      </Stack>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

@@ -383,7 +383,7 @@ export default function RecordScreen() {
         <Button
           size="xl"
           label={t('record.start')}
-          onPress={handleStart}
+          onPress={() => handleStart()}
           loading={busy}
           disabled={access === 'unknown'}
         />
