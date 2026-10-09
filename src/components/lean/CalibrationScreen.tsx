@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LeanDial } from '@/components/lean/LeanDial';
 import { RECORD_SHEET_TOP_GAP, useSheetTopInset } from '@/components/record/recordSheetLayout';
 import { calibrationFlow } from '@/features/lean/calibrationFlow';
+import { createCalibrationHaptics } from '@/features/lean/calibrationHaptics';
 import { leanCalibration } from '@/features/lean/leanCalibration';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
 import { subscribeLean, type LeanSample } from '@/features/lean/leanSensor';
@@ -24,13 +25,16 @@ const isTilted = (rawDeg: number) => Math.abs(rawDeg) > LEAN_SENSOR_RULES.uprigh
 const isShaking = (reading: { spreadDeg: number; rateDegS: number }) =>
   reading.spreadDeg > LEAN_SENSOR_RULES.stableSpreadDeg ||
   reading.rateDegS > LEAN_SENSOR_RULES.stableRateDegS;
+const postureOf = (reading: { rawDeg: number; spreadDeg: number; rateDegS: number }): Posture =>
+  isTilted(reading.rawDeg) ? 'tilted' : isShaking(reading) ? 'shaking' : 'upright';
 
 /**
  * 08.00 Record / Kalibrasyon — Yatış açısı (Pencil `VnDkS` ready, `Z6SiY` tilted, `EoOOC`
  * shaking, `Ruy57` measuring, `OPOwg` done). The dial follows the phone's roll live from the
  * motion sensors. With the bike upright (±10°) and still, "Kalibre et" averages three seconds
  * as the zero point for this phone position; moving or tilting cancels it. "Kayda geç" (or
- * "Atla") returns to the Record tab, which then starts the ride (`then=record`).
+ * "Atla") returns to the Record tab, which then starts the ride (`then=record`). Haptics
+ * (`calibrationHaptics`) mark the detents, the green and red states and the countdown.
  */
 export function CalibrationScreen() {
   const { t } = useTranslation('ride');
@@ -46,6 +50,9 @@ export function CalibrationScreen() {
   const smoothed = useRef<number | null>(null);
   const phaseRef = useRef<Phase>('live');
   const measureStartRef = useRef(0);
+  const offsetRef = useRef(0);
+  const remainingRef = useRef(0);
+  const [haptics] = useState(createCalibrationHaptics);
 
   useEffect(() => {
     const subscription = subscribeLean((sample) => {
@@ -74,21 +81,38 @@ export function CalibrationScreen() {
         rateDegS: Math.max(...samples.map((item) => item.rateDegS)),
       };
       setReading(next);
+      const now = Date.now();
+      if (phaseRef.current === 'live') {
+        haptics.reading(next.rawDeg, postureOf(next), now);
+      } else if (phaseRef.current === 'done') {
+        haptics.reading(next.rawDeg - offsetRef.current, null, now);
+      }
       // Measuring: moving or tilting cancels; three still seconds save the zero point.
       if (phaseRef.current === 'measuring') {
-        const elapsed = Date.now() - measureStartRef.current;
-        if (isTilted(next.rawDeg) || isShaking(next)) {
+        const elapsed = now - measureStartRef.current;
+        const posture = postureOf(next);
+        if (posture !== 'upright') {
+          haptics.cancelled(posture);
+          haptics.resetTicks();
           phaseRef.current = 'live';
           setPhase('live');
         } else if (elapsed >= LEAN_SENSOR_RULES.calibrationMs) {
           const taken = measured.current;
           const zero = taken.reduce((sum, value) => sum + value, 0) / Math.max(taken.length, 1);
           leanCalibration.save(zero);
+          offsetRef.current = zero;
           setOffset(zero);
+          haptics.saved();
+          haptics.resetTicks();
           phaseRef.current = 'done';
           setPhase('done');
         } else {
-          setRemainingS(Math.ceil((LEAN_SENSOR_RULES.calibrationMs - elapsed) / 1000));
+          const remaining = Math.ceil((LEAN_SENSOR_RULES.calibrationMs - elapsed) / 1000);
+          if (remaining < remainingRef.current) {
+            haptics.countdown();
+          }
+          remainingRef.current = remaining;
+          setRemainingS(remaining);
         }
       }
     }, RENDER_MS);
@@ -96,7 +120,7 @@ export function CalibrationScreen() {
       subscription.remove();
       clearInterval(timer);
     };
-  }, []);
+  }, [haptics]);
 
   const lean = phase === 'done' ? reading.rawDeg - offset : reading.rawDeg;
   const shaking = isShaking(reading);
@@ -107,7 +131,9 @@ export function CalibrationScreen() {
   const startMeasuring = () => {
     measured.current = [];
     measureStartRef.current = Date.now();
-    setRemainingS(LEAN_SENSOR_RULES.calibrationMs / 1000);
+    remainingRef.current = LEAN_SENSOR_RULES.calibrationMs / 1000;
+    setRemainingS(remainingRef.current);
+    haptics.countdown();
     phaseRef.current = 'measuring';
     setPhase('measuring');
   };
