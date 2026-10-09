@@ -11,12 +11,16 @@ import { fetchNotificationSettings, updateUserSettings, type UserSettingsPatch }
  * (the `push` edge function reads them); the device keeps a copy per account so the switches show
  * at once. Guests (and builds without Supabase) keep them on the device only. Messages and route
  * suggestions have no switch on the screen and keep their server default (on).
+ *
+ * `emailMarketing` is the consent to news and offers by email: off until the rider turns it on,
+ * accounts only (the server logs every change as the consent record, migration 0110).
  */
 export type NotificationPreferences = {
   likes: boolean;
   comments: boolean;
   followers: boolean;
   productUpdates: boolean;
+  emailMarketing: boolean;
 };
 
 const KEY = 'rolt.settings.notifications';
@@ -26,6 +30,7 @@ const DEFAULTS: NotificationPreferences = {
   comments: true,
   followers: true,
   productUpdates: false,
+  emailMarketing: false,
 };
 
 const COLUMNS: Record<keyof NotificationPreferences, keyof UserSettingsPatch> = {
@@ -33,6 +38,7 @@ const COLUMNS: Record<keyof NotificationPreferences, keyof UserSettingsPatch> = 
   comments: 'notify_comments',
   followers: 'notify_followers',
   productUpdates: 'notify_product_updates',
+  emailMarketing: 'email_marketing',
 };
 
 /** Server-backed only with Supabase and a session; otherwise the device copy is the source. */
@@ -73,6 +79,7 @@ async function read(userId: string | null): Promise<NotificationPreferences> {
       comments: row.notify_comments,
       followers: row.notify_followers,
       productUpdates: row.notify_product_updates,
+      emailMarketing: row.email_marketing,
     };
     await deviceStore.set(storageKey(userId), JSON.stringify(next));
     return next;

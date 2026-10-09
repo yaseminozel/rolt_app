@@ -47,6 +47,11 @@
               "scheme": "https",
               "host": "roltapp.com",
               "pathPrefix": "/r/"
+            },
+            {
+              "scheme": "https",
+              "host": "roltapp.com",
+              "pathPrefix": "/rota/"
             }
           ],
           "category": [

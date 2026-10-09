@@ -14,6 +14,7 @@ export type UserSettingsPatch = Pick<
   | 'notify_messages'
   | 'notify_route_suggestions'
   | 'notify_product_updates'
+  | 'email_marketing'
 >;
 
 /** Every profile has its settings row (created with the account), so an update is enough. */
@@ -27,7 +28,7 @@ export async function fetchNotificationSettings() {
   const row = unwrap(
     await supabase
       .from('user_settings')
-      .select('notify_likes, notify_comments, notify_followers, notify_product_updates')
+      .select('notify_likes, notify_comments, notify_followers, notify_product_updates, email_marketing')
       .eq('user_id', userId)
       .single(),
   );

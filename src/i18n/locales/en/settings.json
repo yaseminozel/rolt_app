@@ -195,6 +195,9 @@
     "followersHint": "When someone starts following you",
     "productUpdates": "Product updates",
     "productUpdatesHint": "New features and important news",
+    "email": "EMAIL",
+    "emailMarketing": "News and offers",
+    "emailMarketingHint": "Get new features, route picks and offers by email. Turn it off here or from the link in any email, any time.",
     "phoneSettings": "Phone notification settings",
     "phoneOn": "ROLT notifications are on",
     "phoneOff": "ROLT notifications are off",
@@ -318,7 +321,7 @@
     "lastUpdated": "Last updated: {{date}}",
     "privacy": {
       "title": "Privacy Policy",
-      "updated": "4 March 2026",
+      "updated": "9 October 2026",
       "intro": "ROLT processes some data to record your rides and suggest routes to you. This text explains which data we collect, why, and how long we keep it.",
       "sections": [
         {
@@ -338,6 +341,13 @@
           "title": "3. Sharing",
           "paragraphs": [
             "By default your rides are visible only to you. You can change visibility in Settings › Ride visibility."
+          ]
+        },
+        {
+          "title": "4. Email",
+          "paragraphs": [
+            "Account emails (verification, password resets, security notices) are sent because your account needs them.",
+            "We only send news and offers if you turn on Settings › Notifications › News and offers. You can withdraw this any time in the same place or with the “Unsubscribe” link in every email. We keep the date you gave and withdrew consent as proof."
           ]
         }
       ]

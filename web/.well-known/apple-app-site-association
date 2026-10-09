@@ -2,10 +2,22 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["6YGCVJV7BA.com.roltapp.rolt"],
+        "appIDs": [
+          "6YGCVJV7BA.com.roltapp.rolt"
+        ],
         "components": [
-          { "/": "/u/*", "comment": "Profile share links (09.02)" },
-          { "/": "/r/*", "comment": "Ride share links (08.11)" }
+          {
+            "/": "/u/*",
+            "comment": "Profile share links (09.02)"
+          },
+          {
+            "/": "/r/*",
+            "comment": "Ride share links (08.11)"
+          },
+          {
+            "/": "/rota/*",
+            "comment": "Route pages (roltapp.com/rota/<id>, 05.04)"
+          }
         ]
       }
     ]

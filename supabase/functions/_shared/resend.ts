@@ -7,6 +7,11 @@ export type OutgoingEmail = {
   text: string;
   /** Resend tag for filtering in the dashboard, e.g. "auth-signup". */
   tag?: string;
+  /**
+   * Marketing emails only (`unsubscribeUrl` from `_shared/unsubscribe.ts`): adds the one-click
+   * unsubscribe headers (RFC 8058) Gmail and Yahoo require from bulk senders.
+   */
+  unsubscribeUrl?: string;
 };
 
 /** Sends one email through Resend. Throws with Resend's message on failure. */
@@ -28,6 +33,14 @@ export async function sendEmail(email: OutgoingEmail) {
       text: email.text,
       ...(env.emailReplyTo ? { reply_to: env.emailReplyTo } : {}),
       ...(email.tag ? { tags: [{ name: 'category', value: email.tag }] } : {}),
+      ...(email.unsubscribeUrl
+        ? {
+            headers: {
+              'List-Unsubscribe': `<${email.unsubscribeUrl}>`,
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            },
+          }
+        : {}),
     }),
   });
   if (!response.ok) {

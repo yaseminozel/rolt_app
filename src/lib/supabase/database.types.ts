@@ -1303,6 +1303,8 @@ export type Database = {
         Row: {
           created_at: string
           default_ride_visibility: string
+          email_marketing: boolean
+          email_marketing_updated_at: string | null
           endpoint_distance_m: number
           hide_endpoints: boolean
           home_location: unknown
@@ -1322,6 +1324,8 @@ export type Database = {
         Insert: {
           created_at?: string
           default_ride_visibility?: string
+          email_marketing?: boolean
+          email_marketing_updated_at?: string | null
           endpoint_distance_m?: number
           hide_endpoints?: boolean
           home_location?: unknown
@@ -1341,6 +1345,8 @@ export type Database = {
         Update: {
           created_at?: string
           default_ride_visibility?: string
+          email_marketing?: boolean
+          email_marketing_updated_at?: string | null
           endpoint_distance_m?: number
           hide_endpoints?: boolean
           home_location?: unknown

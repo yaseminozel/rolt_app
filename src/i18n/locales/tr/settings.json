@@ -195,6 +195,9 @@
     "followersHint": "Biri seni takip etmeye başladığında",
     "productUpdates": "Ürün güncellemeleri",
     "productUpdatesHint": "Yeni özellikler ve önemli duyurular",
+    "email": "E-POSTA",
+    "emailMarketing": "Haberler ve kampanyalar",
+    "emailMarketingHint": "Yeni özellikler, rota seçkileri ve kampanyalar e-posta adresine gelsin. İstediğin zaman buradan ya da e-postadaki bağlantıdan kapatabilirsin.",
     "phoneSettings": "Telefon bildirim ayarları",
     "phoneOn": "ROLT bildirimleri şu anda açık",
     "phoneOff": "ROLT bildirimleri şu anda kapalı",
@@ -318,7 +321,7 @@
     "lastUpdated": "Son güncelleme: {{date}}",
     "privacy": {
       "title": "Gizlilik Politikası",
-      "updated": "4 Mart 2026",
+      "updated": "9 Ekim 2026",
       "intro": "ROLT, sürüşlerini kaydetmek ve sana rota önerebilmek için bazı verileri işler. Bu metin hangi verileri topladığımızı, neden topladığımızı ve ne kadar süre sakladığımızı anlatır.",
       "sections": [
         {
@@ -338,6 +341,13 @@
           "title": "3. Paylaşım",
           "paragraphs": [
             "Sürüşlerin varsayılan olarak yalnızca sana görünür. Görünürlüğü Ayarlar › Sürüş görünürlüğü bölümünden değiştirebilirsin."
+          ]
+        },
+        {
+          "title": "4. E-posta ile iletişim",
+          "paragraphs": [
+            "Hesabınla ilgili e-postalar (doğrulama, şifre sıfırlama, güvenlik bildirimleri) hesabının çalışması için gönderilir.",
+            "Haber ve kampanya e-postalarını yalnızca Ayarlar › Bildirimler › Haberler ve kampanyalar seçeneğini açarsan göndeririz. Bu izni istediğin zaman aynı yerden ya da her e-postadaki “Abonelikten çık” bağlantısıyla geri alabilirsin. İznin ve geri alma tarihini ispat amacıyla saklarız."
           ]
         }
       ]

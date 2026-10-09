@@ -42,4 +42,9 @@ insertAfter(/^( +)VERIFY_JWT: "?\$\{FUNCTIONS_VERIFY_JWT\}"?$/m, 'INTERNAL_HOOK_
   'EXPO_ACCESS_TOKEN: ${EXPO_ACCESS_TOKEN:-}',
 ]);
 
+// Public Mapbox token for the static maps of the website's pages (`site` function).
+insertAfter(/^( +)EXPO_ACCESS_TOKEN: \$\{EXPO_ACCESS_TOKEN:-\}$/m, 'MAPBOX_ACCESS_TOKEN', [
+  'MAPBOX_ACCESS_TOKEN: ${MAPBOX_ACCESS_TOKEN:-}',
+]);
+
 fs.writeFileSync(file, text);

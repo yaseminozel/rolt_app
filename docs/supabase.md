@@ -105,6 +105,26 @@ Templates: `supabase/functions/_shared/templates.ts` — sign-up confirmation, p
 change, re-authentication code, password changed, welcome (once, when registration finishes) and
 account deleted. Logo: `public-assets/brand/rolt-wordmark.png`.
 
+Marketing consent (migration `0110_marketing_consent.sql`): `user_settings.email_marketing` (off by
+default; the switch in 10.09). Every change is logged in `private.consent_log` (address, granted,
+source `app` / `unsubscribe_link` / `admin`, wording version) — the record of consent; it survives
+account deletion. Recipients: `select * from public.email_marketing_audience();` (confirmed,
+opted-in accounts with their locale; service role only). Every marketing email must be sent with
+`sendEmail({ …, unsubscribeUrl: await unsubscribeUrl(to) })` (adds `List-Unsubscribe` +
+`List-Unsubscribe-Post`) and the template's `unsubscribe` footer link. The `unsubscribe` function
+(`/functions/v1/unsubscribe?t=…`, HMAC token keyed with `INTERNAL_HOOK_SECRET`) shows a confirmation
+page on GET and unsubscribes on POST (mail apps' one-click), for the account and `waitlist.unsubscribed_at`.
+
+## Website pages
+
+The `site` function renders roltapp.com's dynamic pages; the website's nginx proxies `/rota/<id>`,
+`/rotalar`, `/rotalar/<city>`, `/u/<handle>`, `/r/<ride id>`, `/harita/(rota|r)/<id>.png` and
+`/sitemap.xml` to `/functions/v1/site/…`. It reads with the anon key only (route_by_id,
+routes_search, get_ride, rider_id_by_handle, get_rider), so pages never show more than the app shows
+a guest. Static maps use Mapbox Static Images with `MAPBOX_ACCESS_TOKEN` (public `pk.` token in
+`.env.server`, passed to the functions container by `configure-server.sh`). Pages are cached 5 min,
+maps 1 day. Check: `curl -s https://roltapp.com/rota/kas-kalkan | grep og:`.
+
 ## Backups
 
 Nightly at 03:25 (host time) `/root/backups/rolt/backup.sh` (source: `scripts/supabase/server/backup.sh`,

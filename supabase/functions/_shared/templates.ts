@@ -36,6 +36,8 @@ type Layout = {
   blocks: Block[];
   /** Why the rider got this mail; one line in the footer. */
   reason: string;
+  /** Marketing emails: "Abonelikten çık" link in the footer (same URL as the List-Unsubscribe header). */
+  unsubscribe?: { url: string; label: string };
 };
 
 function renderBlock(block: Block) {
@@ -74,6 +76,7 @@ function renderText(layout: Layout) {
     }
   }
   lines.push('—', 'ROLT · roltapp.com', layout.reason);
+  if (layout.unsubscribe) lines.push(`${layout.unsubscribe.label}: ${layout.unsubscribe.url}`);
   return lines.join('\n');
 }
 
@@ -92,7 +95,11 @@ function render(layout: Layout) {
 ${layout.blocks.map(renderBlock).join('\n')}
 </td></tr>
 <tr><td style="padding:20px 4px 0;font-size:12px;line-height:18px;color:${colors.tertiary};">
-${escapeHtml(layout.reason)}<br>ROLT · <a href="https://roltapp.com" style="color:${colors.tertiary};">roltapp.com</a>
+${escapeHtml(layout.reason)}<br>ROLT · <a href="https://roltapp.com" style="color:${colors.tertiary};">roltapp.com</a>${
+  layout.unsubscribe
+    ? ` · <a href="${escapeHtml(layout.unsubscribe.url)}" style="color:${colors.tertiary};">${escapeHtml(layout.unsubscribe.label)}</a>`
+    : ''
+}
 </td></tr>
 </table></td></tr></table></body></html>`;
   return { html, text: renderText(layout) };
@@ -243,11 +250,18 @@ export function accountDeletedEmail(locale: Locale, name: string): RenderedEmail
 }
 
 /** Small landing pages served by `auth-link` when an email link is opened in a browser. */
-export function landingPage(locale: Locale, options: { title: string; text: string; appUrl?: string; buttonLabel?: string }) {
-  const button = options.appUrl
+export function landingPage(
+  locale: Locale,
+  options: { title: string; text: string; appUrl?: string; buttonLabel?: string; formAction?: string },
+) {
+  // `formAction`: the button posts there instead of opening the app (unsubscribe confirmation, so
+  // link scanners that open every URL in a mail don't unsubscribe anyone).
+  const button = options.formAction
+    ? `<form method="post" action="${escapeHtml(options.formAction)}" style="margin:0;"><button type="submit" style="margin-top:8px;padding:13px 24px;font-size:14px;font-weight:600;color:#fff;background:${colors.button};border:0;border-radius:12px;cursor:pointer;font-family:${font};">${escapeHtml(options.buttonLabel ?? 'OK')}</button></form>`
+    : options.appUrl
     ? `<a href="${escapeHtml(options.appUrl)}" style="display:inline-block;margin-top:8px;padding:13px 24px;font-size:14px;font-weight:600;color:#fff;background:${colors.button};border-radius:12px;text-decoration:none;">${escapeHtml(options.buttonLabel ?? 'ROLT')}</a>`
     : '';
-  const redirect = options.appUrl
+  const redirect = options.appUrl && !options.formAction
     ? `<script>setTimeout(function(){location.href=${JSON.stringify(options.appUrl)}},150)</script>`
     : '';
   return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
