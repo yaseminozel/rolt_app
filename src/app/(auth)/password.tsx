@@ -9,6 +9,7 @@ import { AlertBanner } from '@/components/feedback/AlertBanner';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/TextField';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import {
   firstParam,
   LOCK_DURATION_MINUTES,
@@ -51,6 +52,7 @@ function PasswordForm({ email, mode }: PasswordFormProps) {
   const [lockedUntil, setLockedUntil] = useState<Date | null>(null);
   const lockRemaining = useCountdownUntil(lockedUntil);
   const locked = lockRemaining > 0;
+  useHapticOnSet(locked, 'warning');
   const wasLocked = useRef(false);
   const isExisting = mode === 'existing';
 

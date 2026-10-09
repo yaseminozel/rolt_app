@@ -24,6 +24,7 @@ import {
   type SignInPromptReason,
 } from '@/features/auth/signInPromptReasons';
 import type { SocialProvider } from '@/features/auth/types';
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { colors, layout, radius, spacing, typography } from '@/theme';
 import { useSheetBottomPadding } from '@/lib/useSheetBottomPadding';
 
@@ -81,6 +82,7 @@ export default function SignInPromptScreen() {
     [],
   );
   const [error, setError] = useState<string | null>(null);
+  useHapticOnSet(error, 'error');
 
   const Icon = reason ? reasonIcons[reason] : GenericIcon;
   const title = reason

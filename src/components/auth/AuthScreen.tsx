@@ -6,6 +6,7 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } fr
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Toast } from '@/components/feedback/Toast';
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { colors, layout, spacing, typography } from '@/theme';
 
 export type AuthScreenProps = {
@@ -46,6 +47,7 @@ export function AuthScreen({
   illustration,
   children,
 }: AuthScreenProps) {
+  useHapticOnSet(errorMessage, 'error');
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { t } = useTranslation('auth');

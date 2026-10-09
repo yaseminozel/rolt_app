@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { haptics } from '@/features/haptics/haptics';
 import { colors, layout, radius, shadows, spacing, typography } from '@/theme';
 
 /**
@@ -72,7 +73,10 @@ export function Switch({
 
   return (
     <Pressable
-      onPress={() => onValueChange(!value)}
+      onPress={() => {
+        haptics.select();
+        onValueChange(!value);
+      }}
       disabled={disabled}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

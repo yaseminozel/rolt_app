@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, layout, radius, spacing, typography } from '@/theme';
 
 /**
@@ -90,7 +91,7 @@ export function RadioButton({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       disabled={disabled}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

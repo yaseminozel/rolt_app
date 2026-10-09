@@ -1,6 +1,7 @@
 import { NavArrowRight } from 'iconoir-react-native';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, fontFamily, layout, spacing } from '@/theme';
 
 const ROW_HEIGHT = 52;
@@ -17,7 +18,7 @@ type OptionRowProps = {
 export function OptionRow({ label, value, onPress }: OptionRowProps) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       accessibilityRole="button"
       accessibilityLabel={value ? `${label}, ${value}` : label}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}>

@@ -1,6 +1,7 @@
 import { Check } from 'iconoir-react-native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, fontFamily, layout, spacing } from '@/theme';
 
 const CHECK_SIZE = 20;
@@ -21,7 +22,7 @@ type CityOptionRowProps = {
 export function CityOptionRow({ label, selected, onPress }: CityOptionRowProps) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       accessibilityRole="radio"
       accessibilityLabel={label}
       accessibilityState={{ checked: selected }}

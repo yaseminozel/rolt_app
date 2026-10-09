@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, layout, radius, spacing, typography } from '@/theme';
 
 export type CheckboxProps = {
@@ -57,7 +58,7 @@ export function Checkbox({
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={withHaptic(onPress)}
       disabled={disabled}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

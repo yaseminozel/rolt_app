@@ -12,6 +12,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { colors, radius, spacing, typography } from '@/theme';
 
 /** Design "Type": Standard · Multi-line · Currency · Select. Currency and Select render identically. */
@@ -94,6 +95,7 @@ export function TextField({
   const [revealed, setRevealed] = useState(false);
   const multiline = type === 'multiline';
   const hasError = !!errorText;
+  useHapticOnSet(errorText, 'error');
   const hasSuccess = !hasError && !!successText;
   // One trailing slot: secure toggle > success check > suffix selector.
   const showSecureToggle = secureToggle && !multiline;

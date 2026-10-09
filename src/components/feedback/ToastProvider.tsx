@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Animated, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { haptics, type HapticEffect } from '@/features/haptics/haptics';
 import { layout } from '@/theme';
 
 import { Toast, type ToastProps } from './Toast';
@@ -23,6 +24,15 @@ type ToastContextValue = {
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
+
+/** Each toast is felt as well as seen; a plain notice stays silent. */
+const TOAST_HAPTICS: Record<ToastOptions['variant'], HapticEffect | null> = {
+  success: 'success',
+  failure: 'error',
+  saved: 'tap',
+  removed: 'tap',
+  info: null,
+};
 
 const DEFAULT_DURATION_MS = 3000;
 const ACTION_DURATION_MS = 5000;
@@ -55,6 +65,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         clearTimeout(timer.current);
       }
       setToast(options);
+      const effect = TOAST_HAPTICS[options.variant];
+      if (effect) {
+        haptics[effect]();
+      }
       Animated.timing(opacity, { toValue: 1, duration: FADE_MS, useNativeDriver: true }).start();
       const duration = options.duration ?? (options.actionLabel ? ACTION_DURATION_MS : DEFAULT_DURATION_MS);
       timer.current = setTimeout(hideToast, duration);
@@ -102,6 +116,7 @@ function ToastContent({ toast, onAction }: { toast: ToastOptions; onAction: () =
         onActionPress={
           onActionPress
             ? () => {
+                haptics.tap();
                 onActionPress();
                 onAction();
               }

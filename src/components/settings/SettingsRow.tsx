@@ -14,6 +14,7 @@ import type { SvgProps } from 'react-native-svg';
 
 import { RadioButton } from '@/components/ui/RadioButton';
 import { Switch } from '@/components/ui/Switch';
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, fontFamily, spacing } from '@/theme';
 
 const ICON_SIZE = 20;
@@ -112,7 +113,7 @@ export function SettingsRow(props: SettingsRowProps) {
           />
         </Decorative>
       );
-      onPress = () => onSwitchValueChange(!switchValue);
+      onPress = withHaptic(() => onSwitchValueChange(!switchValue));
       role = 'switch';
       state = { checked: switchValue, disabled };
       break;
@@ -128,7 +129,7 @@ export function SettingsRow(props: SettingsRowProps) {
       ) : (
         <View style={styles.trailingPlaceholder} />
       );
-      onPress = props.onPress;
+      onPress = withHaptic(props.onPress);
       role = 'radio';
       state = { selected: props.selected, disabled };
       break;
@@ -138,7 +139,7 @@ export function SettingsRow(props: SettingsRowProps) {
           <RadioButton variant="outlined" selected={props.selected} disabled={disabled} />
         </Decorative>
       );
-      onPress = props.onPress;
+      onPress = withHaptic(props.onPress);
       role = 'radio';
       state = { checked: props.selected, disabled };
       break;

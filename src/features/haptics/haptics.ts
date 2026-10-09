@@ -41,3 +41,17 @@ export const haptics = {
 };
 
 export type HapticEffect = keyof typeof haptics;
+
+/** Wraps a handler so it plays `effect` first; keeps `undefined` (display-only controls) as is. */
+export function withHaptic<Args extends unknown[]>(
+  handler: ((...args: Args) => void) | undefined,
+  effect: HapticEffect = 'select',
+) {
+  if (!handler) {
+    return undefined;
+  }
+  return (...args: Args) => {
+    haptics[effect]();
+    handler(...args);
+  };
+}

@@ -17,6 +17,7 @@ import { RideToggleCard } from '@/components/navigation/RideToggleCard';
 import { Button } from '@/components/ui/Button';
 import { wasBackgroundPromptShown } from '@/features/navigation/backgroundPrompt';
 import { navigationDirections } from '@/features/navigation/directions';
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { formatStopDistance } from '@/features/navigation/instructions';
 import { isSimulatedNavigation } from '@/features/navigation/location';
 import { useRideSession } from '@/features/navigation/RideSessionProvider';
@@ -68,6 +69,7 @@ export default function RidePrepareScreen() {
   const originKey = approach && position ? `${position[0].toFixed(3)},${position[1].toFixed(3)}` : '';
   const planKey = `${reversed}|${stops.map((stop) => stop.id).join(',')}|${originKey}|${attempt}`;
   const planState: PlanState = planResult?.key === planKey ? planResult.state : 'loading';
+  useHapticOnSet(planState === 'error', 'error');
 
   useEffect(() => {
     if (!position && !isSimulatedNavigation) {
