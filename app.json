@@ -93,7 +93,8 @@
         {
           "motionPermission": "ROLT, sürüş sırasında yatış açını ölçmek için telefonun hareket sensörlerini kullanır."
         }
-      ]
+      ],
+      "expo-widgets"
     ],
     "scheme": "rolt",
     "experiments": {

@@ -36,6 +36,8 @@ import {
 import type { NavigationSnapshot } from '@/features/navigation/navigationTracker';
 import { haptics } from '@/features/haptics/haptics';
 import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
+import { navigationActivityProps } from '@/features/liveActivity/rideActivityProps';
+import { LIVE_ACTIVITY_INTERVAL_MS, rideLiveActivity } from '@/features/liveActivity/rideLiveActivity';
 import { useRideSession } from '@/features/navigation/RideSessionProvider';
 import type { NavigationPlan } from '@/features/navigation/types';
 import { useNavigationSession } from '@/features/navigation/useNavigationSession';
@@ -305,6 +307,21 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
       ),
     },
   ];
+
+  // Lock Screen / Dynamic Island: the next maneuver and the ride so far, until the finish.
+  const activityTitle = guidance.title;
+  const activitySubtitle = guidance.subtitle;
+  useEffect(() => {
+    if (snapshot.finished) {
+      rideLiveActivity.end();
+      return;
+    }
+    rideLiveActivity.show(
+      navigationActivityProps(snapshot, { title: activityTitle, subtitle: activitySubtitle }, route.name),
+      LIVE_ACTIVITY_INTERVAL_MS.navigation,
+    );
+  }, [activitySubtitle, activityTitle, route.name, snapshot]);
+  useEffect(() => () => rideLiveActivity.end(), []);
 
   return (
     <View style={styles.screen}>

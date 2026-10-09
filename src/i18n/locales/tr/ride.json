@@ -166,7 +166,11 @@
     "soundOffA11y": "Sesli yönlendirmeyi aç",
     "loading": "Navigasyon başlatılıyor",
     "notificationTitle": "ROLT navigasyon",
-    "notificationBody": "Rotan takip ediliyor"
+    "notificationBody": "Rotan takip ediliyor",
+    "liveActivity": {
+      "status": "Rotayı sürüyorsun",
+      "weak": "GPS zayıf"
+    }
   },
   "exit": {
     "title": "Navigasyonu kapatmak istiyor musun?",

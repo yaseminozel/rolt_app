@@ -73,6 +73,12 @@
         "paused": "Paused"
       },
       "a11y": "{{status}}, {{time}}, {{distance}}. Back to recording."
+    },
+    "liveActivity": {
+      "title": "ROLT",
+      "distance": "Distance",
+      "duration": "Time",
+      "averageSpeed": "Avg. speed"
     }
   },
   "share": {

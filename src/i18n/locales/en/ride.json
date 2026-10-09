@@ -166,7 +166,11 @@
     "soundOffA11y": "Turn voice guidance on",
     "loading": "Starting navigation",
     "notificationTitle": "ROLT navigation",
-    "notificationBody": "Following your route"
+    "notificationBody": "Following your route",
+    "liveActivity": {
+      "status": "Riding the route",
+      "weak": "Weak GPS"
+    }
   },
   "exit": {
     "title": "Do you want to end navigation?",

@@ -19,6 +19,8 @@ import { subscribeLean } from '@/features/lean/leanSensor';
 import type { LocationFix, LocationSource } from '@/features/navigation/types';
 import { ROUTE_FIXTURES } from '@/features/routes/fixtures/routes';
 import type { LngLat } from '@/features/routes/types';
+import { recordingActivityProps } from '@/features/liveActivity/rideActivityProps';
+import { LIVE_ACTIVITY_INTERVAL_MS, rideLiveActivity } from '@/features/liveActivity/rideLiveActivity';
 import { i18n } from '@/i18n';
 
 import { RECORDER_RULES, RideRecorder, type RecorderSnapshot } from './rideRecorder';
@@ -217,6 +219,20 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => stopTracking, [stopTracking]);
+
+  // Lock Screen / Dynamic Island (user decision 2026-10-09): one left over from a killed app is
+  // stale; a running ride shows and refreshes it, and it goes when the ride is saved or deleted.
+  useEffect(() => rideLiveActivity.endStale(), []);
+  useEffect(() => {
+    if (!active) {
+      rideLiveActivity.end();
+      return;
+    }
+    rideLiveActivity.show(
+      recordingActivityProps(active.snapshot, Date.now()),
+      LIVE_ACTIVITY_INTERVAL_MS.recording,
+    );
+  }, [active]);
 
   const startPreview = useCallback(() => {
     let stop: (() => void) | null = null;

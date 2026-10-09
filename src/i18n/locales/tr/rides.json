@@ -73,6 +73,12 @@
         "paused": "Duraklatıldı"
       },
       "a11y": "{{status}}, {{time}}, {{distance}}. Kayda dön."
+    },
+    "liveActivity": {
+      "title": "ROLT",
+      "distance": "Mesafe",
+      "duration": "Süre",
+      "averageSpeed": "Ort. hız"
     }
   },
   "share": {
