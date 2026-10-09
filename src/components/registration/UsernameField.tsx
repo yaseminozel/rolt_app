@@ -55,7 +55,12 @@ export function UsernameField({
       <View style={styles.fieldBlock}>
         <Text style={styles.label}>{label}</Text>
         <View>
-          <TextField {...fieldProps} errorText={errorText} accessibilityLabel={label} />
+          <TextField
+            {...fieldProps}
+            errorText={errorText}
+            errorHaptic={false}
+            accessibilityLabel={label}
+          />
           {errorText ? (
             <View style={styles.errorIcon} accessibilityElementsHidden importantForAccessibility="no">
               <WarningTriangle

@@ -139,6 +139,7 @@ function EditProfileForm({ profile }: { profile: OwnProfile }) {
               textContentType="username"
               helperText={t('edit.profileLink', { link: profileLinkLabel(handle || ownHandle) })}
               errorText={usernameError}
+              errorHaptic={false}
             />
             <TextField
               type="multiline"
