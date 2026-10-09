@@ -3,13 +3,16 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   cancelAnimation,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withDecay,
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 
+import { haptics } from '@/features/haptics/haptics';
 import { colors, radius, shadows, typography } from '@/theme';
 
 import { DesignFade } from './DesignFade';
@@ -27,6 +30,8 @@ import {
 const ORBIT_CENTER = { x: 196, y: 262 };
 /** Square the items orbit in; larger than the ring the items sit on (≈ 176 pt radius). */
 const ORBIT_SIZE = 520;
+/** Spinning the dial ticks every this many degrees, and keeps ticking (slower) as a flick decays. */
+const SPIN_DETENT_DEG = 30;
 /** One full turn of the orbit. */
 const ORBIT_MS = 80000;
 /** "Halka / İç, Orta, Dış" (`FudyB`, `e8eoP`, `PTCzu`), exported with 40 pt room for their shadow. */
@@ -180,6 +185,17 @@ export function ShareOrbit({ running }: ShareOrbitProps) {
   const logoPop = useSharedValue(1);
   const itemPops = items.map(() => useSharedValue(1)); // eslint-disable-line react-hooks/rules-of-hooks -- fixed-length list
 
+  // Only the rider's spin moves `spin` (the slow automatic turn is the clock), so the dial ticks
+  // under the finger and while a flick runs out.
+  useAnimatedReaction(
+    () => Math.floor(spin.value / SPIN_DETENT_DEG),
+    (detent, previous) => {
+      if (previous !== null && detent !== previous) {
+        scheduleOnRN(haptics.select);
+      }
+    },
+  );
+
   const pan = Gesture.Pan()
     .enabled(SCENE_GESTURES_ENABLED)
     .activeOffsetY([-DRAG_ACTIVATION, DRAG_ACTIVATION])
@@ -220,6 +236,7 @@ export function ShareOrbit({ running }: ShareOrbitProps) {
       const dy = event.y - ORBIT_CENTER.y;
       if (Math.abs(dx) <= LOGO_SIZE / 2 && Math.abs(dy) <= LOGO_SIZE / 2) {
         logoPop.set(popScale(1.15));
+        scheduleOnRN(haptics.tap);
         return;
       }
       // Items sit on the turned orbit: undo the turn to find which one is under the finger.
@@ -230,6 +247,7 @@ export function ShareOrbit({ running }: ShareOrbitProps) {
         const item = itemCenters[index];
         if (Math.abs(x - item.x) <= item.halfWidth && Math.abs(y - item.y) <= item.halfHeight) {
           itemPops[index].set(popScale(1.18));
+          scheduleOnRN(haptics.tap);
           return;
         }
       }

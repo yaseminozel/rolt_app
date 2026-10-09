@@ -10,8 +10,10 @@ import Animated, {
   withSpring,
   type SharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import Svg, { G, Path } from 'react-native-svg';
 
+import { haptics } from '@/features/haptics/haptics';
 import { colors } from '@/theme';
 
 import { DesignFade } from './DesignFade';
@@ -130,6 +132,7 @@ export function RecordRouteScene({ running, reduceMotion }: RecordRouteSceneProp
       const t = reduceMotion ? STILL_MS : clock.value % CYCLE_MS;
       if (hits(event, STRIP_FRAME, PIN_HIT_INSET + 8)) {
         stripPop.value = popScale();
+        scheduleOnRN(haptics.tap);
         return;
       }
       // Pins live on the drifting, zoomed map: map the touch back into design coordinates.
@@ -142,12 +145,14 @@ export function RecordRouteScene({ running, reduceMotion }: RecordRouteSceneProp
         const pin = pins[index];
         if (t >= DRAW_START_MS + pin.at * DRAW_MS && hits(point, pin.frame, PIN_HIT_INSET)) {
           pinPops[index].value = popScale();
+          scheduleOnRN(haptics.tap);
           return;
         }
       }
       // Replay: jump to the loop's fade-out, which then draws the route again.
       if (!reduceMotion && t >= STRIP_IN_MS && t < FADE_OUT_START_MS) {
         clock.set(clock.get() + FADE_OUT_START_MS - t);
+        scheduleOnRN(haptics.select);
       }
     });
 
