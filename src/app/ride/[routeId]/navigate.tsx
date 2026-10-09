@@ -34,6 +34,8 @@ import {
   type SimulationScenario,
 } from '@/features/navigation/location';
 import type { NavigationSnapshot } from '@/features/navigation/navigationTracker';
+import { haptics } from '@/features/haptics/haptics';
+import { useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { useRideSession } from '@/features/navigation/RideSessionProvider';
 import type { NavigationPlan } from '@/features/navigation/types';
 import { useNavigationSession } from '@/features/navigation/useNavigationSession';
@@ -117,6 +119,8 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
     source,
     voiceEnabled,
   });
+  // 06.07: arrival is felt; nothing else buzzes on the move (the phone sits in a vibrating mount).
+  useHapticOnSet(snapshot.finished, 'success');
 
   useEffect(() => {
     if (!keepScreenOn) {
@@ -361,7 +365,10 @@ function Navigation({ plan }: { plan: NavigationPlan }) {
             icon={<Compass width={20} height={20} color={colors.textPrimary} strokeWidth={1.5} />}
           />
           <MapSquareButton
-            onPress={() => setVoiceEnabled(!voiceEnabled)}
+            onPress={() => {
+              haptics.select();
+              setVoiceEnabled(!voiceEnabled);
+            }}
             accessibilityLabel={
               voiceEnabled ? t('navigation.soundOnA11y') : t('navigation.soundOffA11y')
             }

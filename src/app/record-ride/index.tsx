@@ -28,6 +28,8 @@ import { RECORD_SHEET_TOP_GAP, useSheetTopInset } from '@/components/record/reco
 import { RideTypeSelector } from '@/components/ride/RideTypeSelector';
 import { Button } from '@/components/ui/Button';
 import { useRequireAccount } from '@/features/auth/useRequireAccount';
+import { haptics, withHaptic } from '@/features/haptics/haptics';
+import { useHapticOnChange, useHapticOnSet } from '@/features/haptics/useHapticOnSet';
 import { wasBackgroundPromptShown } from '@/features/navigation/backgroundPrompt';
 import { isSimulatedNavigation } from '@/features/navigation/location';
 import { MIN_SAVE_DISTANCE_M, useRideRecording } from '@/features/rides/RideRecordingProvider';
@@ -111,6 +113,7 @@ export default function RecordScreen() {
     setBusy(true);
     try {
       await recording.start({ rideType });
+      haptics.thud();
       setFollow(true);
     } finally {
       setBusy(false);
@@ -137,6 +140,9 @@ export default function RecordScreen() {
   );
 
   const gpsReady = preview.gps === 'ready';
+  // 08.01: the GPS turning ready is felt like calibration turning green.
+  useHapticOnSet(previewing && gpsReady, 'press');
+  useHapticOnChange(collapsed, 'tap');
 
   // `calibrated`: back from 08.00 ("Kayda geç" / "Atla"), so the start goes on to recording.
   const handleStart = (calibrated = false) =>
@@ -176,9 +182,11 @@ export default function RecordScreen() {
     try {
       const result = await recording.finish();
       if (result.kind === 'tooShort') {
+        haptics.warning();
         setTooShortUntil(Date.now() + TOO_SHORT_BANNER_MS);
         return;
       }
+      haptics.press();
       setFullScreen(false);
       // The save form takes the sheet's place: a screen pushed under a native modal would stay
       // hidden behind it on iOS.
@@ -205,6 +213,7 @@ export default function RecordScreen() {
   const confirmDelete = async () => {
     setDeleteVisible(false);
     await recording.discard();
+    haptics.press();
   };
 
   // "⌄" and "Şimdi değil": the sheet goes back down; a running recording carries on.
@@ -220,6 +229,8 @@ export default function RecordScreen() {
   const phase = snapshot?.phase;
   const autoPaused = snapshot?.autoPaused === true;
   const shownInterrupted = !active ? interrupted : null;
+  // 08.03: an unfinished ride waiting on open asks for attention.
+  useHapticOnSet(shownInterrupted?.id, 'warning', { onMount: true });
   const permissionMissing =
     !active && !shownInterrupted && (access === 'askable' || access === 'blocked');
 
@@ -331,6 +342,7 @@ export default function RecordScreen() {
             size="xl"
             label={t('record.resume')}
             onPress={async () => {
+              haptics.press();
               await recording.restoreInterrupted();
               recording.resume();
             }}
@@ -364,7 +376,7 @@ export default function RecordScreen() {
           <Button
             size="xl"
             label={paused ? t('record.resume') : t('record.pause')}
-            onPress={paused ? recording.resume : recording.pause}
+            onPress={withHaptic(paused ? recording.resume : recording.pause, 'press')}
             style={styles.flex}
           />
         </View>

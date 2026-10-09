@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AccessibilityInfo, StyleSheet, Text, View } from 'react-native';
 
 import { NavigationMapView } from '@/components/navigation/NavigationMapView';
+import { haptics } from '@/features/haptics/haptics';
 import { useRideSession } from '@/features/navigation/RideSessionProvider';
 import { rideLine } from '@/features/navigation/ridePlan';
 import { formatNumber } from '@/i18n/format';
@@ -15,6 +16,7 @@ const TICK_MS = 1_000;
 /**
  * 06.05 Rotayı sür / Geri sayım (Pencil `JMd0a`): 5 → 1 over the dimmed map with "Telefonunu
  * sabitle, kaskını tak", then navigation replaces it (back can't return to the countdown).
+ * A light tap marks each second and a heavy one the start.
  */
 export default function CountdownScreen() {
   const { routeId } = useLocalSearchParams<{ routeId: string }>();
@@ -26,9 +28,12 @@ export default function CountdownScreen() {
   useEffect(() => {
     AccessibilityInfo.announceForAccessibility(t('countdown.a11y', { count }));
     if (count === 0) {
+      haptics.thud();
       router.replace({ pathname: '/ride/[routeId]/navigate', params: { routeId } });
       return;
     }
+    // Each second is felt too: the phone may already sit in the mount.
+    haptics.tap();
     const timer = setTimeout(() => setCount((value) => value - 1), TICK_MS);
     return () => clearTimeout(timer);
   }, [count, routeId, t]);
