@@ -8,6 +8,7 @@ import type { LocationSource, NavigationPlan } from './types';
 import { speak, stopSpeaking, VOICE_THRESHOLDS_M } from './voiceGuidance';
 import { leanCalibration } from '@/features/lean/leanCalibration';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
+import { createLeanLogger } from '@/features/lean/leanLog';
 import { subscribeLean } from '@/features/lean/leanSensor';
 
 const TICK_MS = 1_000;
@@ -145,11 +146,13 @@ export function useNavigationSession({ plan, stops, source, voiceEnabled }: Navi
     // Calibrated phones measure lean with the motion sensors (08.00).
     const calibration = leanCalibration.get();
     let smoothed: number | null = null;
+    const logLean = createLeanLogger('navigation');
     const leanSubscription = calibration
       ? subscribeLean((sample) => {
           const lean = sample.rawDeg - calibration.offsetDeg;
           smoothed =
             smoothed === null ? lean : smoothed + (lean - smoothed) * LEAN_SENSOR_RULES.smoothing;
+          logLean(smoothed, sample.rawDeg, calibration.offsetDeg);
           tracker.addSensorLean(smoothed);
         }, LEAN_INTERVAL_MS)
       : null;

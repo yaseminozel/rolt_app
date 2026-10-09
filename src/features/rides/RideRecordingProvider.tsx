@@ -15,6 +15,7 @@ import {
 } from '@/features/navigation/location';
 import { leanCalibration } from '@/features/lean/leanCalibration';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
+import { createLeanLogger } from '@/features/lean/leanLog';
 import { subscribeLean } from '@/features/lean/leanSensor';
 import type { LocationFix, LocationSource } from '@/features/navigation/types';
 import { ROUTE_FIXTURES } from '@/features/routes/fixtures/routes';
@@ -207,12 +208,14 @@ export function RideRecordingProvider({ children }: { children: ReactNode }) {
       const calibration = leanCalibration.get();
       if (calibration) {
         let smoothed: number | null = null;
+        const logLean = createLeanLogger('recording');
         leanSubscriptionRef.current = subscribeLean((sample) => {
           const lean = sample.rawDeg - calibration.offsetDeg;
           smoothed =
             smoothed === null
               ? lean
               : smoothed + (lean - smoothed) * LEAN_SENSOR_RULES.smoothing;
+          logLean(smoothed, sample.rawDeg, calibration.offsetDeg);
           recorderRef.current?.addSensorLean(smoothed);
         }, LEAN_RECORD_INTERVAL_MS);
       }

@@ -10,6 +10,7 @@ import { RECORD_SHEET_TOP_GAP, useSheetTopInset } from '@/components/record/reco
 import { calibrationFlow } from '@/features/lean/calibrationFlow';
 import { createCalibrationHaptics } from '@/features/lean/calibrationHaptics';
 import { leanCalibration } from '@/features/lean/leanCalibration';
+import { createLeanLogger } from '@/features/lean/leanLog';
 import { LEAN_SENSOR_RULES } from '@/features/lean/leanMath';
 import { subscribeLean, type LeanSample } from '@/features/lean/leanSensor';
 import { formatNumber } from '@/i18n/format';
@@ -53,6 +54,7 @@ export function CalibrationScreen() {
   const offsetRef = useRef(0);
   const remainingRef = useRef(0);
   const [haptics] = useState(createCalibrationHaptics);
+  const [logLean] = useState(() => createLeanLogger('calibration'));
 
   useEffect(() => {
     const subscription = subscribeLean((sample) => {
@@ -81,6 +83,7 @@ export function CalibrationScreen() {
         rateDegS: Math.max(...samples.map((item) => item.rateDegS)),
       };
       setReading(next);
+      logLean(next.rawDeg - offsetRef.current, next.rawDeg, offsetRef.current);
       const now = Date.now();
       if (phaseRef.current === 'live') {
         haptics.reading(next.rawDeg, postureOf(next), now);
@@ -120,7 +123,7 @@ export function CalibrationScreen() {
       subscription.remove();
       clearInterval(timer);
     };
-  }, [haptics]);
+  }, [haptics, logLean]);
 
   const lean = phase === 'done' ? reading.rawDeg - offset : reading.rawDeg;
   const shaking = isShaking(reading);
