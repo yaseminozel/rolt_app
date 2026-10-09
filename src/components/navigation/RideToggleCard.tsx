@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Switch } from '@/components/ui/Switch';
+import { withHaptic } from '@/features/haptics/haptics';
 import { colors, fontFamily, radius, spacing } from '@/theme';
 
 export type RideToggle = { key: string; label: string; value: boolean; onChange: (value: boolean) => void };
@@ -14,7 +15,7 @@ export function RideToggleCard({ toggles }: { toggles: RideToggle[] }) {
         <Fragment key={toggle.key}>
           {index > 0 ? <View style={styles.divider} /> : null}
           <Pressable
-            onPress={() => toggle.onChange(!toggle.value)}
+            onPress={withHaptic(() => toggle.onChange(!toggle.value))}
             accessibilityRole="switch"
             accessibilityLabel={toggle.label}
             accessibilityState={{ checked: toggle.value }}

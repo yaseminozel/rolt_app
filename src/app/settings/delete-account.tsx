@@ -10,6 +10,7 @@ import { SelectField } from '@/components/ride-form/SelectField';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { haptics } from '@/features/haptics/haptics';
 import { ownProfileRepository } from '@/features/profile/ownProfileRepository';
 import { useOwnProfile } from '@/features/profile/queries';
 import { useRiderRides, useRiderRoutes } from '@/features/riders/queries';
@@ -72,6 +73,7 @@ export default function DeleteAccountScreen() {
         ownProfileRepository.remove(session.userId),
       ]);
       savedIds.forEach((id) => setSaved(id, false));
+      haptics.press();
       setConfirming(false);
       router.dismissAll();
       router.replace('/onboarding');

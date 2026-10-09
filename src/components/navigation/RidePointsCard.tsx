@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
-import { createSlotTicker, haptics } from '@/features/haptics/haptics';
+import { createSlotTicker, haptics, withHaptic } from '@/features/haptics/haptics';
 import type { RideStop } from '@/features/navigation/types';
 import { colors, fontFamily, layout, radius, shadows, spacing } from '@/theme';
 
@@ -106,7 +106,7 @@ export function RidePointsCard({
           {closeButton}
           {onSwap ? (
             <Pressable
-              onPress={onSwap}
+              onPress={withHaptic(onSwap)}
               accessibilityRole="button"
               accessibilityLabel={t('prepare.a11y.swap')}
               style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}>
