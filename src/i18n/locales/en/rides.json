@@ -65,7 +65,15 @@
     "locationRequired": "Location access is needed to record.",
     "closeSheet": "Close",
     "panelCollapse": "Collapse panel",
-    "panelExpand": "Expand panel"
+    "panelExpand": "Expand panel",
+    "accessory": {
+      "status": {
+        "recording": "Recording ride",
+        "weak": "Weak GPS, paused",
+        "paused": "Paused"
+      },
+      "a11y": "{{status}}, {{time}}, {{distance}}. Back to recording."
+    }
   },
   "share": {
     "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"

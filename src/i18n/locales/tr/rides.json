@@ -65,7 +65,15 @@
     "locationRequired": "Kayıt için konum izni gerekli.",
     "closeSheet": "Kapat",
     "panelCollapse": "Paneli küçült",
-    "panelExpand": "Paneli büyüt"
+    "panelExpand": "Paneli büyüt",
+    "accessory": {
+      "status": {
+        "recording": "Sürüş kaydediliyor",
+        "weak": "GPS zayıf, duraklatıldı",
+        "paused": "Duraklatıldı"
+      },
+      "a11y": "{{status}}, {{time}}, {{distance}}. Kayda dön."
+    }
   },
   "share": {
     "message": "{{title}} · {{distance}} · {{duration}}\n{{link}}"
