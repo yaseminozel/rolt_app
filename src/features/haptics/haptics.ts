@@ -64,3 +64,19 @@ export function hapticToggle(on: boolean) {
     haptics.select();
   }
 }
+
+/** Ticks once per new slot while dragging (a reorder row, a dial); `reset` sets the start slot. */
+export function createSlotTicker() {
+  let current = -1;
+  return {
+    reset(slot: number) {
+      current = slot;
+    },
+    move(slot: number) {
+      if (slot !== current) {
+        current = slot;
+        haptics.select();
+      }
+    },
+  };
+}

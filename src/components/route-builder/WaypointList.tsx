@@ -6,6 +6,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
+import { haptics } from '@/features/haptics/haptics';
 import { placeShortLabel } from '@/features/route-suggestion/placeFormat';
 import { MAX_STOPS, type Waypoint } from '@/features/route-suggestion/types';
 import { colors, fontFamily, layout, radius, spacing, typography } from '@/theme';
@@ -287,15 +288,24 @@ function StopGrip({ name, position, count, dragFrom, dragTo, dragY, onCommit }: 
       dragFrom.set(position);
       dragTo.set(position);
       dragY.set(0);
+      scheduleOnRN(haptics.press);
     })
     .onUpdate((event) => {
       const y = Math.min(Math.max(event.translationY, -position * ROW_PITCH), (count - 1 - position) * ROW_PITCH);
       dragY.set(y);
-      dragTo.set(Math.min(Math.max(position + Math.round(y / ROW_PITCH), 0), count - 1));
+      const to = Math.min(Math.max(position + Math.round(y / ROW_PITCH), 0), count - 1);
+      if (to !== dragTo.get()) {
+        // Each new slot is a tick, like a detent.
+        scheduleOnRN(haptics.select);
+      }
+      dragTo.set(to);
     })
     .onEnd(() => {
       const to = dragTo.get();
       dragY.set((to - position) * ROW_PITCH);
+      if (to !== position) {
+        scheduleOnRN(haptics.tap);
+      }
       scheduleOnRN(onCommit, position, to);
     })
     .onFinalize((_event, success) => {
