@@ -9,6 +9,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.roltapp.rolt",
+      "appleTeamId": "6YGCVJV7BA",
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -94,6 +95,7 @@
           "motionPermission": "ROLT, sürüş sırasında yatış açını ölçmek için telefonun hareket sensörlerini kullanır."
         }
       ],
+      "@bacons/apple-targets",
       "expo-widgets"
     ],
     "scheme": "rolt",
