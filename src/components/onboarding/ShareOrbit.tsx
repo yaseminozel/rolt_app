@@ -249,7 +249,9 @@ export function ShareOrbit({ running }: ShareOrbitProps) {
           <PulsingRing key={ring.size} ring={ring} order={rings.length - 1 - index} clock={clock} />
         ))}
         <Animated.View style={[styles.logo, logoStyle]}>
-          <Text style={styles.logoText}>ROLT</Text>
+          <Text style={styles.logoText} numberOfLines={1}>
+            ROLT
+          </Text>
         </Animated.View>
         <Animated.View style={[styles.orbit, orbitStyle]}>
           {items.map((item, index) => (
@@ -387,6 +389,9 @@ const styles = StyleSheet.create({
   logoText: {
     ...typography.wordmarkTile,
     fontSize: WORDMARK_SIZE * WORDMARK_OVERSAMPLE,
+    // Laid out wider than the tile (then scaled back), or "ROLT" wraps and the T is cut off.
+    width: LOGO_SIZE * WORDMARK_OVERSAMPLE,
+    textAlign: 'center',
     color: colors.textInverse,
     transform: [{ scale: 1 / WORDMARK_OVERSAMPLE }],
   },
