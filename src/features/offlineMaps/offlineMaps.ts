@@ -117,6 +117,14 @@ export const offlineMaps = {
     if (!offline || maps[route.id]?.state === 'downloading') {
       return;
     }
+    // The stored record opens the route offline (navigation too), so it needs the exact line of
+    // `getById`, never a list's simplified copy (Rota detayı passes the full route).
+    if (route.geometryDetail === 'simplified') {
+      if (__DEV__) {
+        console.warn('offlineMaps.download needs the full route (getById), got a list copy');
+      }
+      return;
+    }
     commit({
       ...maps,
       [route.id]: {

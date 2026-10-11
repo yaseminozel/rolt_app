@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://supabase.roltapp.com; img-src https://supabase.roltapp.com data:; base-uri 'none'; form-action 'none'"
+    />
+    <title>ROLT — Yönetim</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bakbak+One&family=Inter:wght@400;500;600&display=swap" />
+    <!-- supabase-js, pinned to the app's version; SRI = sha384 of this exact file. -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.js"
+      integrity="sha384-BWcjm9OdFth9TbhCxZPdm+gAOUMAzQy9nmTs12ioXdCcbVnJaPMn+fMUoQCLt60R"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      :root {
+        --text: #101318;
+        --text-2: #6b6e73;
+        --text-3: #9ea0a4;
+        --surface: #ffffff;
+        --muted: #f3f4f4;
+        --subtle: #f9fafa;
+        --border: #e5e6e8;
+        --border-strong: #d2d3d6;
+        --brand: #1515ff;
+        --danger: #dc2626;
+        --danger-text: #b91c1c;
+        --danger-bg: #fee2e2;
+        --success: #15803d;
+        --success-bg: #dcfce7;
+        --warning: #b45309;
+        --warning-bg: #fef3c7;
+        --info: #1d4ed8;
+        --info-bg: #dbeafe;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { background: var(--subtle); }
+      body {
+        color: var(--text);
+        font: 400 14px/20px 'Inter', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        min-height: 100vh;
+      }
+      [hidden] { display: none !important; }
+      button, input, select, textarea { font: inherit; color: inherit; }
+
+      .wordmark { font-family: 'Bakbak One', sans-serif; color: var(--brand); font-size: 24px; letter-spacing: 0.5px; }
+
+      /* Sign-in and access screens */
+      .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+      .gate-card {
+        width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 32px 24px; display: grid; gap: 16px;
+      }
+      .gate-card h1 { font-size: 18px; line-height: 24px; font-weight: 600; }
+      .gate-card p { color: var(--text-2); }
+
+      label { display: grid; gap: 6px; font-weight: 500; }
+      input, select, textarea {
+        width: 100%; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--surface);
+        padding: 10px 12px; min-height: 44px; font-size: 16px; line-height: 22px;
+      }
+      textarea { min-height: 72px; resize: vertical; }
+      input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible {
+        outline: 2px solid var(--brand); outline-offset: 2px;
+      }
+
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        min-height: 44px; padding: 0 20px; border-radius: 12px; border: 1px solid transparent;
+        background: var(--text); color: #fff; font-weight: 500; cursor: pointer; white-space: nowrap;
+      }
+      .btn:hover { background: #2a2e36; }
+      .btn:disabled { opacity: 0.4; cursor: default; }
+      .btn--outline { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+      .btn--outline:hover { background: var(--muted); }
+      .btn--danger { background: var(--danger); }
+      .btn--danger:hover { background: var(--danger-text); }
+      .btn--text { background: none; color: var(--text-2); padding: 0 12px; }
+      .btn--text:hover { background: var(--muted); color: var(--text); }
+      .btn--sm { min-height: 36px; padding: 0 14px; font-size: 13px; }
+
+      .message { border-radius: 12px; padding: 10px 12px; font-size: 13px; }
+      .message--error { background: var(--danger-bg); color: var(--danger-text); }
+      .message--success { background: var(--success-bg); color: var(--success); }
+
+      /* Shell */
+      header.top {
+        position: sticky; top: 0; z-index: 2; background: var(--surface); border-bottom: 1px solid var(--border);
+      }
+      .top-row { max-width: 1080px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+      .top-row .who { margin-left: auto; color: var(--text-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+      nav.tabs { max-width: 1080px; margin: 0 auto; padding: 0 24px; display: flex; gap: 4px; }
+      nav.tabs button {
+        border: 0; background: none; padding: 12px 12px 10px; border-bottom: 2px solid transparent;
+        color: var(--text-2); font-weight: 500; cursor: pointer; display: inline-flex; gap: 6px; align-items: center;
+      }
+      nav.tabs button[aria-selected='true'] { color: var(--text); border-bottom-color: var(--text); }
+      .count-pill {
+        min-width: 20px; height: 20px; padding: 0 6px; border-radius: 9999px; background: var(--danger);
+        color: #fff; font-size: 12px; line-height: 20px; text-align: center;
+      }
+      main { max-width: 1080px; margin: 0 auto; padding: 24px; display: grid; gap: 16px; }
+
+      .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .toolbar .spacer { flex: 1; }
+      .segmented { display: inline-flex; background: var(--muted); border-radius: 12px; padding: 4px; gap: 4px; }
+      .segmented button {
+        border: 0; background: none; border-radius: 8px; padding: 6px 12px; min-height: 36px; cursor: pointer;
+        color: var(--text-2); font-weight: 500;
+      }
+      .segmented button[aria-pressed='true'] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(16, 19, 24, 0.08); }
+
+      .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+      .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+      .stat .label { color: var(--text-2); font-size: 13px; }
+      .stat .value { font-size: 28px; line-height: 36px; font-weight: 600; margin-top: 4px; }
+      .stat .sub { color: var(--text-3); font-size: 12px; }
+
+      .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+      .card-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      .card-head .when { margin-left: auto; color: var(--text-3); font-size: 12px; }
+      .card h3 { font-size: 16px; line-height: 22px; font-weight: 600; }
+      .card .body { white-space: pre-wrap; overflow-wrap: anywhere; }
+      .meta { color: var(--text-2); font-size: 13px; display: flex; gap: 4px 12px; flex-wrap: wrap; }
+      .badge {
+        display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 9999px;
+        font-size: 12px; font-weight: 500; background: var(--muted); color: var(--text);
+      }
+      .badge--danger { background: var(--danger-bg); color: var(--danger-text); }
+      .badge--success { background: var(--success-bg); color: var(--success); }
+      .badge--warning { background: var(--warning-bg); color: var(--warning); }
+      .badge--info { background: var(--info-bg); color: var(--info); }
+      .photos { display: flex; gap: 8px; flex-wrap: wrap; }
+      .photos a { display: block; }
+      .photos img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; background: var(--muted); display: block; }
+      details summary { cursor: pointer; color: var(--text-2); font-size: 13px; }
+      .reports { margin-top: 8px; display: grid; gap: 6px; }
+      .reports li { list-style: none; font-size: 13px; color: var(--text-2); }
+      .reports li strong { color: var(--text); font-weight: 500; }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; }
+      .actions input { flex: 1 1 200px; min-height: 36px; font-size: 14px; padding: 6px 10px; }
+      .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+      .waypoints { display: grid; gap: 4px; padding-left: 0; }
+      .waypoints li { list-style: none; font-size: 13px; }
+      .waypoints li span { color: var(--text-3); }
+      .empty { text-align: center; color: var(--text-2); padding: 48px 16px; background: var(--surface); border: 1px dashed var(--border-strong); border-radius: 12px; }
+      .loading { color: var(--text-2); padding: 24px 0; text-align: center; }
+      .toast {
+        position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 5;
+        background: var(--text); color: #fff; border-radius: 12px; padding: 10px 16px; font-size: 13px;
+        box-shadow: 0 8px 24px rgba(16, 19, 24, 0.2); max-width: calc(100vw - 32px);
+      }
+      .toast--error { background: var(--danger-text); }
+      @media (max-width: 600px) {
+        .top-row, nav.tabs, main { padding-left: 16px; padding-right: 16px; }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript><p style="padding: 24px">Yönetim paneli JavaScript gerektirir.</p></noscript>
+
+    <section id="view-loading" class="gate"><p class="loading">Yükleniyor…</p></section>
+
+    <section id="view-signin" class="gate" hidden>
+      <form id="signin-form" class="gate-card" novalidate>
+        <span class="wordmark">ROLT</span>
+        <h1>Yönetim paneli</h1>
+        <p>Yönetici hesabınızla giriş yapın.</p>
+        <label>E-posta <input id="signin-email" type="email" autocomplete="username" required /></label>
+        <label>Şifre <input id="signin-password" type="password" autocomplete="current-password" required /></label>
+        <p id="signin-error" class="message message--error" role="alert" hidden></p>
+        <button id="signin-submit" class="btn" type="submit">Giriş yap</button>
+      </form>
+    </section>
+
+    <section id="view-denied" class="gate" hidden>
+      <div class="gate-card">
+        <span class="wordmark">ROLT</span>
+        <h1>Bu sayfayı görme yetkiniz yok.</h1>
+        <p id="denied-email"></p>
+        <button class="btn btn--outline" type="button" data-action="sign-out">Çıkış yap</button>
+      </div>
+    </section>
+
+    <div id="view-app" hidden>
+      <header class="top">
+        <div class="top-row">
+          <span class="wordmark">ROLT</span>
+          <span class="who" id="app-email"></span>
+          <button class="btn btn--text btn--sm" type="button" data-action="sign-out">Çıkış yap</button>
+        </div>
+        <nav class="tabs" role="tablist">
+          <button type="button" role="tab" data-tab="overview" aria-selected="true">Özet</button>
+          <button type="button" role="tab" data-tab="reports" aria-selected="false">Şikâyetler <span class="count-pill" id="pill-reports" hidden></span></button>
+          <button type="button" role="tab" data-tab="suggestions" aria-selected="false">Rota önerileri <span class="count-pill" id="pill-suggestions" hidden></span></button>
+        </nav>
+      </header>
+      <main>
+        <section id="tab-overview" role="tabpanel"></section>
+        <section id="tab-reports" role="tabpanel" hidden>
+          <div class="toolbar">
+            <div class="segmented" id="reports-filter">
+              <button type="button" data-value="open" aria-pressed="true">Açık</button>
+              <button type="button" data-value="closed" aria-pressed="false">Sonuçlanan</button>
+            </div>
+            <span class="spacer"></span>
+            <button class="btn btn--outline btn--sm" type="button" data-action="refresh">Yenile</button>
+          </div>
+          <div id="reports-list" class="list"></div>
+        </section>
+        <section id="tab-suggestions" role="tabpanel" hidden>
+          <div class="toolbar">
+            <div class="segmented" id="suggestions-filter">
+              <button type="button" data-value="pending" aria-pressed="true">Bekleyen</button>
+              <button type="button" data-value="approved" aria-pressed="false">Onaylanan</button>
+              <button type="button" data-value="rejected" aria-pressed="false">Reddedilen</button>
+            </div>
+            <span class="spacer"></span>
+            <button class="btn btn--outline btn--sm" type="button" data-action="refresh">Yenile</button>
+          </div>
+          <div id="suggestions-list" class="list"></div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script>
+      (function () {
+        'use strict';
+
+        var SUPABASE_URL = 'https://supabase.roltapp.com';
+        var SUPABASE_ANON_KEY = '__ANON_KEY__';
+
+        if (!window.supabase || !window.supabase.createClient) {
+          document.getElementById('view-loading').textContent = 'Supabase kitaplığı yüklenemedi. Sayfayı yenileyin.';
+          return;
+        }
+        var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, storageKey: 'rolt-admin-auth' },
+        });
+
+        // Labels -------------------------------------------------------------------------------
+        var TARGET_LABELS = { post: 'Gönderi', comment: 'Yorum', ride: 'Sürüş', route: 'Rota', rider: 'Sürücü', message: 'Mesaj' };
+        var COMMENT_LABELS = { postComment: 'Gönderi yorumu', rideComment: 'Sürüş yorumu' };
+        var TAG_LABELS = { coast: 'Sahil', curvy: 'Virajlı', scenic: 'Manzara', city: 'Şehir İçi', nature: 'Doğa', offRoad: 'Off-road', longTour: 'Uzun tur' };
+        var DIFFICULTY_LABELS = { easy: 'Kolay', moderate: 'Orta', hard: 'Zorlu' };
+        var VISIBILITY_LABELS = { public: 'Herkese açık', followers: 'Takipçilere açık', private: 'Sadece sahibi' };
+        var HIDDEN_REASON_LABELS = { reports: 'şikâyetlerle otomatik', admin: 'yönetici', removed: 'kaldırıldı' };
+        var RESOLUTION_LABELS = { dismiss: 'Şikâyet reddedildi', hide: 'Gizli tutuldu', remove: 'Kaldırıldı', suspend: 'Hesap askıya alındı' };
+        var WAYPOINT_LABELS = { start: 'Başlangıç', stop: 'Durak', end: 'Bitiş' };
+
+        var numberFormat = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 });
+        var dateFormat = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium', timeStyle: 'short' });
+
+        // DOM helpers (user content only ever goes through textContent) ------------------------
+        function h(tag, attrs) {
+          var el = document.createElement(tag);
+          if (attrs) {
+            Object.keys(attrs).forEach(function (key) {
+              var value = attrs[key];
+              if (value === null || value === undefined || value === false) return;
+              if (key === 'class') el.className = value;
+              else if (key === 'text') el.textContent = value;
+              else if (key.slice(0, 2) === 'on') el.addEventListener(key.slice(2), value);
+              else el.setAttribute(key, value === true ? '' : value);
+            });
+          }
+          for (var i = 2; i < arguments.length; i++) {
+            var child = arguments[i];
+            if (child === null || child === undefined || child === false) continue;
+            if (Array.isArray(child)) child.forEach(function (c) { if (c) el.appendChild(c); });
+            else el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+          }
+          return el;
+        }
+        function $(id) { return document.getElementById(id); }
+        function fmtDate(value) { return value ? dateFormat.format(new Date(value)) : ''; }
+        function fmtNumber(value) { return numberFormat.format(value || 0); }
+        function fmtDuration(minutes) {
+          var m = Math.round(minutes || 0);
+          return m >= 60 ? Math.floor(m / 60) + ' sa ' + (m % 60) + ' dk' : m + ' dk';
+        }
+        function personLabel(person) {
+          if (!person) return 'Silinmiş hesap';
+          var name = person.name || '';
+          var handle = person.handle ? '@' + person.handle : '';
+          return [name, handle].filter(Boolean).join(' ') || person.id;
+        }
+        function imageUrl(bucket, path, size) {
+          return SUPABASE_URL + '/storage/v1/render/image/public/' + bucket + '/' +
+            path.split('/').map(encodeURIComponent).join('/') + '?width=' + size + '&height=' + size + '&resize=cover';
+        }
+        function publicUrl(bucket, path) {
+          return SUPABASE_URL + '/storage/v1/object/public/' + bucket + '/' + path.split('/').map(encodeURIComponent).join('/');
+        }
+        function photoStrip(items) {
+          if (!items.length) return null;
+          return h('div', { class: 'photos' }, items.map(function (item) {
+            return h('a', { href: item.full, target: '_blank', rel: 'noopener noreferrer' },
+              h('img', { src: item.thumb, alt: '', loading: 'lazy' }));
+          }));
+        }
+
+        var toastTimer;
+        function toast(text, isError) {
+          var el = $('toast');
+          el.textContent = text;
+          el.className = 'toast' + (isError ? ' toast--error' : '');
+          el.hidden = false;
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(function () { el.hidden = true; }, 3500);
+        }
+        function errorText(error) {
+          if (!error) return 'Bilinmeyen hata.';
+          if (error.code === '42501') return 'Bu işlem için yetkiniz yok.';
+          if (error.code === 'P0002') return 'Kayıt bulunamadı ya da zaten işlenmiş.';
+          return error.message || String(error);
+        }
+
+        // Views --------------------------------------------------------------------------------
+        function show(view) {
+          ['loading', 'signin', 'denied', 'app'].forEach(function (name) {
+            $('view-' + name).hidden = name !== view;
+          });
+        }
+
+        var currentUserId = null;
+        async function route(session) {
+          if (!session) {
+            currentUserId = null;
+            show('signin');
+            return;
+          }
+          if (session.user.id === currentUserId) return;
+          currentUserId = session.user.id;
+          show('loading');
+          var result = await db.rpc('is_admin');
+          if (result.error) {
+            currentUserId = null;
+            show('signin');
+            showSignInError(errorText(result.error));
+            return;
+          }
+          if (result.data !== true) {
+            $('denied-email').textContent = session.user.email || '';
+            show('denied');
+            return;
+          }
+          $('app-email').textContent = session.user.email || '';
+          show('app');
+          selectTab(activeTab);
+        }
+
+        function showSignInError(text) {
+          var el = $('signin-error');
+          el.textContent = text;
+          el.hidden = !text;
+        }
+
+        $('signin-form').addEventListener('submit', async function (event) {
+          event.preventDefault();
+          var email = $('signin-email').value.trim();
+          var password = $('signin-password').value;
+          if (!email || !password) {
+            showSignInError('E-posta ve şifre gerekli.');
+            return;
+          }
+          showSignInError('');
+          $('signin-submit').disabled = true;
+          var result = await db.auth.signInWithPassword({ email: email, password: password });
+          $('signin-submit').disabled = false;
+          if (result.error) {
+            var message = result.error.message || '';
+            if (message.indexOf('account_locked') === 0) showSignInError('Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin.');
+            else if (/email not confirmed/i.test(message)) showSignInError('E-posta adresi doğrulanmamış.');
+            else if (/invalid login credentials/i.test(message)) showSignInError('E-posta ya da şifre hatalı.');
+            else showSignInError(message || 'Giriş yapılamadı.');
+            return;
+          }
+          $('signin-password').value = '';
+        });
+
+        document.addEventListener('click', function (event) {
+          var target = event.target.closest('[data-action]');
+          if (!target) return;
+          if (target.dataset.action === 'sign-out') db.auth.signOut();
+          if (target.dataset.action === 'refresh') selectTab(activeTab);
+        });
+
+        db.auth.onAuthStateChange(function (_event, session) {
+          // Supabase recommends not awaiting other calls inside this callback.
+          setTimeout(function () { route(session); }, 0);
+        });
+
+        // Tabs ---------------------------------------------------------------------------------
+        var activeTab = 'overview';
+        var reportsFilter = 'open';
+        var suggestionsFilter = 'pending';
+
+        document.querySelectorAll('nav.tabs button').forEach(function (button) {
+          button.addEventListener('click', function () { selectTab(button.dataset.tab); });
+        });
+        function setupSegmented(id, onChange) {
+          var group = $(id);
+          group.querySelectorAll('button').forEach(function (button) {
+            button.addEventListener('click', function () {
+              group.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b === button)); });
+              onChange(button.dataset.value);
+            });
+          });
+        }
+        setupSegmented('reports-filter', function (value) { reportsFilter = value; loadReports(); });
+        setupSegmented('suggestions-filter', function (value) { suggestionsFilter = value; loadSuggestions(); });
+
+        function selectTab(tab) {
+          activeTab = tab;
+          document.querySelectorAll('nav.tabs button').forEach(function (button) {
+            button.setAttribute('aria-selected', String(button.dataset.tab === tab));
+          });
+          ['overview', 'reports', 'suggestions'].forEach(function (name) { $('tab-' + name).hidden = name !== tab; });
+          if (tab === 'overview') loadOverview();
+          if (tab === 'reports') loadReports();
+          if (tab === 'suggestions') loadSuggestions();
+        }
+
+        function setPill(id, count) {
+          var el = $(id);
+          el.textContent = count > 99 ? '99+' : String(count);
+          el.hidden = !count;
+        }
+
+        // Özet ---------------------------------------------------------------------------------
+        async function loadOverview() {
+          var panel = $('tab-overview');
+          panel.replaceChildren(h('p', { class: 'loading', text: 'Yükleniyor…' }));
+          var result = await db.rpc('admin_overview');
+          if (result.error) {
+            panel.replaceChildren(h('p', { class: 'message message--error', text: errorText(result.error) }));
+            return;
+          }
+          var o = result.data;
+          setPill('pill-reports', o.openReportTargets);
+          setPill('pill-suggestions', o.pendingSuggestions);
+          function stat(label, value, sub) {
+            return h('div', { class: 'stat' },
+              h('div', { class: 'label', text: label }),
+              h('div', { class: 'value', text: fmtNumber(value) }),
+              sub ? h('div', { class: 'sub', text: sub }) : null);
+          }
+          panel.replaceChildren(h('div', { class: 'stats' },
+            stat('Kullanıcılar', o.users, 'Son 7 gün: ' + fmtNumber(o.usersLast7d) + ' · Profili tamam: ' + fmtNumber(o.profilesCompleted)),
+            stat('Sürüşler', o.rides, 'Son 7 gün: ' + fmtNumber(o.ridesLast7d)),
+            stat('Gönderiler', o.posts, 'Son 7 gün: ' + fmtNumber(o.postsLast7d)),
+            stat('Açık şikâyetler', o.openReportTargets, fmtNumber(o.openReports) + ' şikâyet'),
+            stat('Bekleyen rota önerileri', o.pendingSuggestions),
+            stat('Gizlenen içerik', o.hiddenItems),
+            stat('Askıdaki hesaplar', o.suspendedRiders)));
+        }
+
+        // Şikâyetler -----------------------------------------------------------------------------
+        var ACTIONS = {
+          dismiss: { label: 'Şikâyeti reddet', className: 'btn btn--outline btn--sm', done: 'Şikâyet reddedildi, içerik yeniden görünür.' },
+          hide: { label: 'Gizli tut', className: 'btn btn--sm', done: 'İçerik gizli tutuluyor.' },
+          remove: { label: 'Kaldır', className: 'btn btn--danger btn--sm', done: 'İçerik kaldırıldı.',
+            confirm: 'İçerik kaldırılsın mı? Gönderi, yorum ve mesajlar kalıcı olarak silinir; sürüş ve rotalar gizli kalır.' },
+          suspend: { label: 'Hesabı askıya al', className: 'btn btn--danger btn--sm', done: 'Hesap askıya alındı.',
+            confirm: 'Hesap askıya alınsın mı? Sürücünün profili ve tüm içeriği diğer kullanıcılardan gizlenir.' },
+        };
+
+        async function loadReports() {
+          var list = $('reports-list');
+          list.replaceChildren(h('p', { class: 'loading', text: 'Yükleniyor…' }));
+          var result = await db.rpc('admin_reports', { p_status: reportsFilter, p_limit: 200 });
+          if (result.error) {
+            list.replaceChildren(h('p', { class: 'message message--error', text: errorText(result.error) }));
+            return;
+          }
+          var groups = result.data || [];
+          if (reportsFilter === 'open') setPill('pill-reports', groups.length);
+          if (!groups.length) {
+            list.replaceChildren(h('p', { class: 'empty', text: reportsFilter === 'open' ? 'Açık şikâyet yok.' : 'Sonuçlanan şikâyet yok.' }));
+            return;
+          }
+          list.replaceChildren.apply(list, groups.map(reportCard));
+          list.style.display = 'grid';
+          list.style.gap = '12px';
+        }
+
+        function reportCard(group) {
+          var t = group.target || { exists: false };
+          var kind = t.kind && COMMENT_LABELS[t.kind] ? COMMENT_LABELS[t.kind] : TARGET_LABELS[group.targetType] || group.targetType;
+          var badges = [h('span', { class: 'badge badge--info', text: kind })];
+          if (!t.exists) badges.push(h('span', { class: 'badge', text: 'Silinmiş' }));
+          else if (t.hidden) {
+            var reason = HIDDEN_REASON_LABELS[t.hiddenReason];
+            var hiddenLabel = group.targetType === 'rider' ? 'Askıda' : 'Gizli';
+            badges.push(h('span', { class: 'badge badge--danger', text: reason ? hiddenLabel + ' · ' + reason : hiddenLabel }));
+          } else badges.push(h('span', { class: 'badge badge--success', text: 'Yayında' }));
+          if (group.resolution) badges.push(h('span', { class: 'badge', text: RESOLUTION_LABELS[group.resolution] || group.resolution }));
+
+          var photos = (t.photoPaths || []).map(function (path) {
+            return { thumb: imageUrl(t.bucket, path, 192), full: publicUrl(t.bucket, path) };
+          });
+
+          var meta = [];
+          meta.push(h('span', { text: (group.openCount || group.reportCount) + ' şikâyet · ' + group.reporterCount + ' kişi' }));
+          if (t.author) meta.push(h('span', { text: 'Sahibi: ' + personLabel(t.author) + (t.author.isSuspended ? ' (askıda)' : '') }));
+          if (t.subtitle) meta.push(h('span', { text: VISIBILITY_LABELS[t.subtitle] || t.subtitle }));
+          if (t.stats && t.stats.distanceM !== undefined) meta.push(h('span', { text: fmtNumber(t.stats.distanceM / 1000) + ' km' }));
+          if (t.stats && t.stats.distanceKm !== undefined) meta.push(h('span', { text: fmtNumber(t.stats.distanceKm) + ' km · ' + fmtDuration(t.stats.durationMinutes) }));
+          if (t.stats && t.stats.followers !== undefined) meta.push(h('span', { text: fmtNumber(t.stats.followers) + ' takipçi · ' + fmtNumber(t.stats.rides) + ' sürüş' }));
+          if (t.createdAt) meta.push(h('span', { text: 'Oluşturma: ' + fmtDate(t.createdAt) }));
+          meta.push(h('span', { text: 'Kimlik: ' + group.targetId }));
+
+          var reasons = h('ul', { class: 'reports' }, (group.reports || []).map(function (r) {
+            return h('li', null,
+              h('strong', { text: personLabel(r.reporter) }),
+              ' · ' + fmtDate(r.createdAt) + (r.status !== 'open' ? ' · ' + (r.status === 'dismissed' ? 'reddedildi' : 'incelendi') : ''),
+              r.reason ? h('div', { class: 'body', text: r.reason }) : null);
+          }));
+
+          var note = h('input', { type: 'text', placeholder: 'Not (isteğe bağlı)', 'aria-label': 'Not', maxlength: '1000' });
+          var buttons = Object.keys(ACTIONS).filter(function (action) {
+            if (group.targetType === 'rider') return action !== 'remove';
+            if (group.targetType === 'message') return action === 'dismiss' || action === 'remove' || action === 'suspend';
+            return true;
+          }).map(function (action) {
+            var config = ACTIONS[action];
+            var label = group.targetType === 'rider' && action === 'dismiss' ? 'Reddet ve hesabı aç' : config.label;
+            var button = h('button', { type: 'button', class: config.className, text: label });
+            button.addEventListener('click', async function () {
+              if (config.confirm && !window.confirm(config.confirm)) return;
+              card.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+              var result = await db.rpc('admin_resolve_report', {
+                p_target_type: group.targetType, p_target_id: group.targetId, p_action: action, p_note: note.value.trim() || null,
+              });
+              if (result.error) {
+                card.querySelectorAll('button').forEach(function (b) { b.disabled = false; });
+                toast(errorText(result.error), true);
+                return;
+              }
+              toast(config.done);
+              loadReports();
+            });
+            return button;
+          });
+          if (!t.exists) buttons = buttons.filter(function (b, i) { return i === 0; });
+
+          var card = h('article', { class: 'card' },
+            h('div', { class: 'card-head' }, badges, h('span', { class: 'when', text: 'Son şikâyet: ' + fmtDate(group.lastReportedAt) })),
+            t.title ? h('h3', { text: t.title }) : null,
+            t.text ? h('p', { class: 'body', text: t.text }) : null,
+            photoStrip(photos),
+            h('div', { class: 'meta' }, meta),
+            h('details', null, h('summary', { text: 'Şikâyetler (' + (group.reports || []).length + ')' }), reasons),
+            h('div', { class: 'actions' }, note, buttons));
+          return card;
+        }
+
+        // Rota önerileri -------------------------------------------------------------------------
+        async function loadSuggestions() {
+          var list = $('suggestions-list');
+          list.replaceChildren(h('p', { class: 'loading', text: 'Yükleniyor…' }));
+          var result = await db.rpc('admin_route_suggestions', { p_status: suggestionsFilter, p_limit: 200 });
+          if (result.error) {
+            list.replaceChildren(h('p', { class: 'message message--error', text: errorText(result.error) }));
+            return;
+          }
+          var items = result.data || [];
+          if (suggestionsFilter === 'pending') setPill('pill-suggestions', items.length);
+          if (!items.length) {
+            var empty = { pending: 'Bekleyen öneri yok.', approved: 'Onaylanan öneri yok.', rejected: 'Reddedilen öneri yok.' };
+            list.replaceChildren(h('p', { class: 'empty', text: empty[suggestionsFilter] }));
+            return;
+          }
+          // Photos are private: one batch of signed URLs (1 hour) for the whole list.
+          var paths = [];
+          items.forEach(function (s) { (s.photoPaths || []).forEach(function (p) { paths.push(p); }); });
+          var signed = {};
+          if (paths.length) {
+            var signResult = await db.storage.from('suggestion-photos').createSignedUrls(paths, 3600);
+            (signResult.data || []).forEach(function (entry) {
+              if (entry.signedUrl && !entry.error) signed[entry.path] = entry.signedUrl;
+            });
+          }
+          list.replaceChildren.apply(list, items.map(function (s) { return suggestionCard(s, signed); }));
+          list.style.display = 'grid';
+          list.style.gap = '12px';
+        }
+
+        // "Konyaaltı, Antalya" → "Antalya": the province is the last part of a place subtitle.
+        function guessCity(suggestion) {
+          var first = suggestion.waypoints && suggestion.waypoints[0] && suggestion.waypoints[0].place;
+          var text = first && (first.subtitle || first.name);
+          if (!text) return '';
+          var parts = text.split(',').map(function (p) { return p.trim(); }).filter(function (p) { return p && p !== 'Türkiye' && p !== 'Turkey'; });
+          return parts.length ? parts[parts.length - 1] : '';
+        }
+
+        function suggestionCard(s, signed) {
+          var statusBadge = s.status === 'pending' ? h('span', { class: 'badge badge--warning', text: 'Bekliyor' })
+            : s.status === 'approved' ? h('span', { class: 'badge badge--success', text: 'Onaylandı' })
+            : h('span', { class: 'badge badge--danger', text: 'Reddedildi' });
+          var tags = (s.tags || []).map(function (tag) { return h('span', { class: 'badge', text: TAG_LABELS[tag] || tag }); });
+
+          var meta = [
+            h('span', { text: fmtNumber(s.distanceKm) + ' km' }),
+            h('span', { text: fmtDuration(s.durationMinutes) }),
+            s.elevationGainM !== null && s.elevationGainM !== undefined ? h('span', { text: fmtNumber(s.elevationGainM) + ' m tırmanış' }) : null,
+            h('span', { text: 'Zorluk: ' + (DIFFICULTY_LABELS[s.difficulty] || s.difficulty) }),
+            h('span', { text: fmtNumber(s.pointCount) + ' nokta' }),
+          ].filter(Boolean);
+          var author = h('div', { class: 'meta' },
+            h('span', { text: 'Gönderen: ' + personLabel(s.author) + (s.author && s.author.isSuspended ? ' (askıda)' : '') }),
+            s.authorEmail ? h('span', { text: s.authorEmail }) : null,
+            h('span', { text: 'Gönderim: ' + fmtDate(s.createdAt) }),
+            s.reviewedAt ? h('span', { text: 'İnceleme: ' + fmtDate(s.reviewedAt) }) : null,
+            s.routeId ? h('span', { text: 'Rota: ' + s.routeId }) : null);
+
+          var waypoints = h('ol', { class: 'waypoints' }, (s.waypoints || []).map(function (w) {
+            var place = w.place || {};
+            var coords = Array.isArray(place.coordinates) ? place.coordinates.map(function (c) { return Number(c).toFixed(5); }).join(', ') : '';
+            return h('li', null, (WAYPOINT_LABELS[w.kind] || w.kind) + ': ' + (place.name || '—') + ' ',
+              h('span', { text: [place.subtitle, coords].filter(Boolean).join(' · ') }));
+          }));
+
+          var photos = (s.photoPaths || []).filter(function (p) { return signed[p]; }).map(function (p) {
+            return { thumb: signed[p], full: signed[p] };
+          });
+
+          var children = [
+            h('div', { class: 'card-head' }, statusBadge, h('span', { class: 'badge', text: s.trackingId }), tags,
+              h('span', { class: 'when', text: fmtDate(s.createdAt) })),
+            h('h3', { text: s.name }),
+            s.description ? h('p', { class: 'body', text: s.description }) : null,
+            h('div', { class: 'meta' }, meta),
+            waypoints,
+            photoStrip(photos),
+            (s.photoPaths || []).length > photos.length ? h('p', { class: 'meta', text: ((s.photoPaths || []).length - photos.length) + ' fotoğraf yüklenemedi.' }) : null,
+            author,
+            s.reviewNote ? h('p', { class: 'meta', text: 'Not: ' + s.reviewNote }) : null,
+          ];
+
+          if (s.status === 'pending') {
+            var name = h('input', { type: 'text', value: s.name, maxlength: '120' });
+            var city = h('input', { type: 'text', value: guessCity(s), maxlength: '80' });
+            var tag = h('select', null, Object.keys(TAG_LABELS).map(function (key) {
+              return h('option', { value: key, text: TAG_LABELS[key], selected: (s.tags || [])[0] === key });
+            }));
+            var summary = h('input', { type: 'text', value: (s.description || '').slice(0, 80), maxlength: '160' });
+            var rejectNote = h('input', { type: 'text', placeholder: 'Ret notu (isteğe bağlı)', 'aria-label': 'Ret notu', maxlength: '500' });
+            var approve = h('button', { type: 'button', class: 'btn btn--sm', text: 'Onayla ve yayımla' });
+            var reject = h('button', { type: 'button', class: 'btn btn--outline btn--sm', text: 'Reddet' });
+            approve.addEventListener('click', async function () {
+              if (!name.value.trim() || !city.value.trim()) {
+                toast('Rota adı ve il gerekli.', true);
+                return;
+              }
+              if (!window.confirm('"' + name.value.trim() + '" rota kataloğunda yayımlansın mı?')) return;
+              approve.disabled = reject.disabled = true;
+              var result = await db.rpc('admin_approve_route_suggestion', {
+                p_id: s.id,
+                p_overrides: { name: name.value.trim(), city: city.value.trim(), tag: tag.value, summary: summary.value.trim() },
+              });
+              if (result.error) {
+                approve.disabled = reject.disabled = false;
+                toast(errorText(result.error), true);
+                return;
+              }
+              toast('Rota yayımlandı.');
+              loadSuggestions();
+            });
+            reject.addEventListener('click', async function () {
+              if (!window.confirm('Öneri reddedilsin mi?')) return;
+              approve.disabled = reject.disabled = true;
+              var result = await db.rpc('admin_reject_route_suggestion', { p_id: s.id, p_note: rejectNote.value.trim() || null });
+              if (result.error) {
+                approve.disabled = reject.disabled = false;
+                toast(errorText(result.error), true);
+                return;
+              }
+              toast('Öneri reddedildi.');
+              loadSuggestions();
+            });
+            children.push(h('div', { class: 'actions' },
+              h('div', { class: 'form-grid', style: 'flex: 1 1 100%' },
+                h('label', null, 'Rota adı', name),
+                h('label', null, 'İl', city),
+                h('label', null, 'Tür', tag),
+                h('label', null, 'Kısa açıklama', summary)),
+              approve,
+              rejectNote,
+              reject));
+          }
+          return h('article', { class: 'card' }, children);
+        }
+      })();
+    </script>
+  </body>
+</html>

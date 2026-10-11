@@ -13,6 +13,7 @@ import type {
   RoadSurface,
   Route,
   RouteDifficulty,
+  RouteGeometryDetail,
   RoutesRepository,
   RouteStop,
   RouteTag,
@@ -27,7 +28,10 @@ const AREA_NEARBY_CITY = 'Antalya';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** `public.route_json` (supabase/migrations/0002_routes.sql). */
+/**
+ * `public.route_json` (supabase/migrations/0002_routes.sql); the list RPCs return
+ * `private.route_list_json` (0090_route_list_geometry.sql): the same with a simplified line.
+ */
 type RouteJson = {
   id: string;
   name: string;
@@ -53,6 +57,7 @@ type RouteJson = {
   coverPath: string | null;
   photoPaths: string[] | null;
   coordinates: LngLat[] | null;
+  geometryDetail: RouteGeometryDetail;
   popularity: number;
   isLoop: boolean;
   rating: number;
@@ -91,6 +96,7 @@ function toRoute(json: RouteJson): Route {
     coverImage: imageSource('route-photos', coverPath, 'card') ?? FALLBACK_COVER,
     photos: photoPaths.flatMap((path) => imageSource('route-photos', path, 'full') ?? []),
     coordinates: json.coordinates ?? [],
+    geometryDetail: json.geometryDetail,
     popularity: json.popularity,
     isLoop: json.isLoop,
     rating: json.rating,

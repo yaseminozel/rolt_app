@@ -30,7 +30,8 @@ export default function EmailVerificationScreen() {
     <AuthScreen
       title={t('emailVerification.title')}
       subtitle={t('emailVerification.subtitle')}
-      errorMessage={error}>
+      errorMessage={error}
+      testID="email-verification-screen">
       <ResendEmailForm
         email={email}
         onResend={() => service.requestEmailVerification(email)}

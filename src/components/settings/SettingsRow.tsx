@@ -36,6 +36,8 @@ type SettingsRowBaseProps = {
   destructive?: boolean;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** E2E selector (Maestro `id:`); see docs/testing.md. */
+  testID?: string;
 };
 
 type ChevronRowProps = { trailing: 'chevron'; onPress: () => void };
@@ -74,7 +76,7 @@ export type SettingsRowProps = SettingsRowBaseProps &
  * Onay, Yok, Radyo). Grouping cards and dividers belong to the screen.
  */
 export function SettingsRow(props: SettingsRowProps) {
-  const { icon: Icon, label, description, destructive, disabled, style } = props;
+  const { icon: Icon, label, description, destructive, disabled, style, testID } = props;
 
   let trailing: ReactNode = null;
   let onPress: (() => void) | undefined;
@@ -168,13 +170,18 @@ export function SettingsRow(props: SettingsRowProps) {
   const rowStyle = [styles.container, props.trailing === 'switch' && styles.switchRow, style];
 
   if (!onPress) {
-    return <View style={rowStyle}>{content}</View>;
+    return (
+      <View style={rowStyle} testID={testID}>
+        {content}
+      </View>
+    );
   }
 
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      testID={testID}
       accessibilityRole={role}
       accessibilityLabel={label}
       accessibilityHint={description}

@@ -134,6 +134,7 @@ export function CommunityPostCard({
             count={post.commentCount}
             label={t('post.comment')}
             onPress={onCommentPress}
+            testID="post-comment"
           />
         </View>
         <Pressable
@@ -339,6 +340,8 @@ type CountActionProps = {
   label: string;
   selected?: boolean;
   onPress?: () => void;
+  /** E2E selector (Maestro `id:`); see docs/testing.md. */
+  testID?: string;
 };
 
 /** Like / comment / save glyph with its count (Mono); without `onPress` it only shows the count. */
@@ -349,12 +352,14 @@ export function CountAction({
   label,
   selected,
   onPress,
+  testID,
 }: CountActionProps) {
   const value = formatNumber(count);
   return (
     <Pressable
       onPress={onPress}
       hitSlop={ACTION_HIT_SLOP}
+      testID={testID}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={label}
       accessibilityValue={{ text: value }}

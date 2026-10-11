@@ -92,7 +92,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <AuthScreen title={t('signIn.title')} errorMessage={error} showLegalFooter>
+    <AuthScreen title={t('signIn.title')} errorMessage={error} showLegalFooter testID="sign-in-screen">
       <View style={styles.sections}>
         <View style={styles.social}>
           <Button
@@ -127,6 +127,7 @@ export default function SignInScreen() {
             textContentType="emailAddress"
             returnKeyType="go"
             onSubmitEditing={handleEmail}
+            testID="sign-in-email"
           />
           <View style={styles.actions}>
             <Button
@@ -134,8 +135,14 @@ export default function SignInScreen() {
               disabled={!canSubmitEmail}
               loading={pending === 'email'}
               onPress={handleEmail}
+              testID="sign-in-continue"
             />
-            <Button variant="text" label={t('signIn.continueAsGuest')} onPress={handleGuest} />
+            <Button
+              variant="text"
+              label={t('signIn.continueAsGuest')}
+              onPress={handleGuest}
+              testID="sign-in-guest"
+            />
           </View>
         </View>
       </View>

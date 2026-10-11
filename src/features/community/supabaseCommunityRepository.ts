@@ -12,16 +12,11 @@ import {
   str,
 } from '@/features/riders/supabaseMappers';
 import type { RideType } from '@/features/rides/rideTypes';
+import { uploadImage } from '@/lib/media/uploadImage';
 import { staticTrackImage } from '@/lib/staticTrackImage';
 import { requireUserId, supabase, unwrap } from '@/lib/supabase/client';
 import type { Json } from '@/lib/supabase/database.types';
-import {
-  contentTypeOf,
-  imageSource,
-  newObjectPath,
-  removeFiles,
-  uploadFile,
-} from '@/lib/supabase/storage';
+import { imageSource, removeFiles } from '@/lib/supabase/storage';
 
 import {
   FEED_LIMIT,
@@ -158,11 +153,9 @@ export const supabaseCommunityRepository: CommunityRepository = {
   async createPost({ text, photoUris, ride, rideId, audience }) {
     const userId = await requireUserId();
     // Photos first: the row only stores paths, and RLS wants them in the author's folder.
+    // Prepared one at a time (resized JPEG without metadata), uploaded side by side.
     const photoPaths = await Promise.all(
-      photoUris.map((uri) => {
-        const contentType = contentTypeOf(uri);
-        return uploadFile('post-photos', newObjectPath(userId, contentType), uri, { contentType });
-      }),
+      photoUris.map((uri) => uploadImage('post-photos', userId, uri)),
     );
     try {
       const inserted = unwrap(

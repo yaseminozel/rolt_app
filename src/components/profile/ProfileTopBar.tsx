@@ -11,6 +11,8 @@ export type ProfileTopBarAction = {
   icon: ComponentType<SvgProps>;
   accessibilityLabel: string;
   onPress: () => void;
+  /** E2E selector (Maestro `id:`); see docs/testing.md. */
+  testID?: string;
 };
 
 type ProfileTopBarProps = {
@@ -60,10 +62,11 @@ export function ProfileTopBar({ onBack, actions, leading }: ProfileTopBarProps) 
         </Pressable>
       ) : null}
       <View style={styles.actions}>
-        {actions.map(({ icon: Icon, accessibilityLabel, onPress }) => (
+        {actions.map(({ icon: Icon, accessibilityLabel, onPress, testID }) => (
           <Pressable
             key={accessibilityLabel}
             onPress={onPress}
+            testID={testID}
             accessibilityRole="button"
             accessibilityLabel={accessibilityLabel}
             style={({ pressed }) => [styles.button, pressed && styles.pressed]}>

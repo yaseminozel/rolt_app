@@ -105,6 +105,7 @@ export function CommentsSheet({ target, subject }: CommentsSheetProps) {
 
   return (
     <KeyboardAvoidingView
+      testID="comments-sheet"
       style={styles.sheet}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <SheetHeader
@@ -141,6 +142,7 @@ export function CommentsSheet({ target, subject }: CommentsSheetProps) {
             multiline
             style={styles.input}
             accessibilityLabel={t('comments.placeholder')}
+            testID="comments-input"
           />
           <Pressable
             onPress={send}

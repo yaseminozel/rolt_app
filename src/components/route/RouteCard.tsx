@@ -43,6 +43,8 @@ type RouteCardBaseProps = {
   saved?: boolean;
   onToggleSave?: () => void;
   style?: StyleProp<ViewStyle>;
+  /** E2E selector (Maestro `id:`) on the card's press target; see docs/testing.md. */
+  testID?: string;
 };
 
 type CompactRouteCardProps = RouteCardBaseProps & {
@@ -88,6 +90,7 @@ function CompactRouteCard({
   onToggleSave,
   onPress,
   style,
+  testID,
 }: CompactRouteCardProps) {
   const { t } = useTranslation();
   const BookmarkIcon = saved ? BookmarkSolid : Bookmark;
@@ -96,6 +99,7 @@ function CompactRouteCard({
     <Pressable
       onPress={onPress}
       disabled={!onPress}
+      testID={testID}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={title}
       style={[styles.compact, style]}>
@@ -152,6 +156,7 @@ function RowRouteCard({
   onToggleSave,
   onPress,
   style,
+  testID,
 }: RowRouteCardProps) {
   const { t } = useTranslation();
   const BookmarkIcon = saved ? BookmarkSolid : Bookmark;
@@ -160,6 +165,7 @@ function RowRouteCard({
     <Pressable
       onPress={onPress}
       disabled={!onPress}
+      testID={testID}
       accessibilityRole={onPress ? 'button' : undefined}
       accessibilityLabel={title}
       style={[styles.row, style]}>

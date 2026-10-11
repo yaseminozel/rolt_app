@@ -148,6 +148,7 @@ export default function OnboardingScreen() {
           label={t('onboarding.skip')}
           onPress={handleSkip}
           style={[styles.skip, { top: insets.top + SKIP_TOP }]}
+          testID="onboarding-skip"
         />
       )}
 
@@ -170,6 +171,7 @@ export default function OnboardingScreen() {
             label={isLast ? t('onboarding.start') : t('onboarding.next')}
             onPress={isLast ? handleStart : () => goToPage(pageIndex + 1)}
             style={styles.primary}
+            testID={isLast ? 'onboarding-start' : 'onboarding-next'}
           />
         </View>
         {isLast ? (

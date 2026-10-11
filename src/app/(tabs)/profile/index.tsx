@@ -152,6 +152,7 @@ export default function ProfileScreen() {
             icon: Settings,
             accessibilityLabel: t('actions.settings'),
             onPress: () => router.push('/settings'),
+            testID: 'profile-settings',
           },
         ]}
       />

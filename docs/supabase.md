@@ -63,6 +63,10 @@ backend needs is in this repo:
   (`can_view_ride`, `can_view_post`). Follows have a `status` (`pending` is ready for private
   accounts: follow requests).
 - Counters (likes, comments, saves, followers, rides) are kept by triggers; never computed in queries.
+- Route lists (`routes_recommended`, `_search`, `_suggest`, `_in_area`, `_near`, `_by_ids`,
+  `_by_author`) return a simplified line (`private.route_list_json`, ~20 m, exact start / end,
+  `geometryDetail: 'simplified'`); only `route_by_id` returns the full line (`'full'`). Navigation
+  and offline maps use the full one (migration `0090_route_list_geometry.sql`).
 - Storage buckets: `avatars`, `ride-photos`, `post-photos`, `route-photos`, `public-assets` (public,
   random paths under `<user id>/`), `suggestion-photos`, `feedback` (private). Images in lists use the
   image transformer (`/storage/v1/render/image/…?width=…`).
@@ -209,6 +213,15 @@ source maps of that build / update (EAS Update keeps them) until a crash reporte
 crashes (Swift / Kotlin, out-of-memory kills) never reach JS and need Sentry or Crashlytics later.
 Anyone with the anon key can insert rows: the per-IP budget limits floods, but the data is
 untrusted input.
+
+## Monitoring
+
+Every 5 minutes `/root/backups/rolt/healthcheck.sh` (source `scripts/supabase/server/healthcheck.sh`,
+installed with `scripts/supabase/install-monitoring.sh`) checks auth, REST, storage, edge functions,
+the website and share links, the stack's containers, `pg_isready`, TLS certificates (≥ 14 days
+left), the last backup (OK, < 26 h old), disk (< 90 %), failed pg_cron runs and failed push / email
+calls (`net._http_response`). It mails the backup alert address when a check starts failing (or
+the set of problems changes) and once when everything passes again; history in `health.log`.
 
 ## Changing the backend
 

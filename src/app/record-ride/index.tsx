@@ -371,6 +371,7 @@ export default function RecordScreen() {
       onPress={shownInterrupted ? handleRecoveryFinish : handleFinish}
       disabled={busy}
       style={styles.flex}
+      testID="record-finish"
     />
   );
 
@@ -443,6 +444,7 @@ export default function RecordScreen() {
             label={paused ? t('record.resume') : t('record.pause')}
             onPress={withHaptic(paused ? recording.resume : recording.pause, 'press')}
             style={styles.flex}
+            testID={paused ? 'record-resume' : 'record-pause'}
           />
         </View>
         {note}
@@ -463,6 +465,7 @@ export default function RecordScreen() {
           onPress={() => handleStart()}
           loading={busy}
           disabled={access === 'unknown'}
+          testID="record-start"
         />
         {note}
       </>

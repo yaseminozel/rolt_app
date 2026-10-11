@@ -17,6 +17,7 @@ export type RouteFilter = 'all' | 'nearby' | RouteTag;
 export type RouteSort = 'recommended' | 'nearest' | 'shortest' | 'longest' | 'popular';
 
 export type RouteDifficulty = 'easy' | 'moderate' | 'hard';
+export type RouteGeometryDetail = 'simplified' | 'full';
 export type RoadSurface = 'asphalt' | 'mixed' | 'gravel';
 
 /** One point of "Rota durakları" (05.04 `Q9Cbe`): start, intermediate stops and finish. */
@@ -72,6 +73,12 @@ export type Route = {
   photos: ImageSourcePropType[];
   /** Route line from start to finish. */
   coordinates: LngLat[];
+  /**
+   * `simplified` (~20 m) in lists, which only draw it small; the exact first and last points are
+   * kept. Navigation, offline maps and the detail map need `full` (`getById` / `useRoute`).
+   * Unset means full (fixtures, offline map records of older builds).
+   */
+  geometryDetail?: RouteGeometryDetail;
   /** Relative popularity used by the "En popüler" / "Önerilen" sorts. */
   popularity: number;
   /** Ends where it starts ("Sadece döngü rotalar" filter). */

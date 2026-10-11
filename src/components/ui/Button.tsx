@@ -46,6 +46,8 @@ export type ButtonProps = {
   accessibilityLabel?: string;
   /** Outer layout only (margins, alignSelf, flex); visuals come from the variant. */
   style?: StyleProp<ViewStyle>;
+  /** E2E selector (Maestro `id:`); see docs/testing.md. */
+  testID?: string;
 };
 
 const ICON_SIZE = 20;
@@ -187,6 +189,7 @@ export function Button({
   trailingIcon: TrailingIcon,
   accessibilityLabel,
   style,
+  testID,
 }: ButtonProps) {
   const toneName: ButtonTone = toneProp ?? (destructive ? 'destructive' : 'neutral');
   const tone = disabled ? disabledTone[variant] : toneMap[toneName][variant];
@@ -207,6 +210,7 @@ export function Button({
     <Pressable
       onPress={loading ? undefined : onPress}
       disabled={disabled || loading}
+      testID={testID}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled, busy: loading }}

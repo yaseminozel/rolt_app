@@ -70,6 +70,7 @@ export function RecommendedRoutesSection({
             saved={isSaved(item.id)}
             onToggleSave={() => onToggleSave(item.id)}
             onPress={() => onRoutePress(item)}
+            testID="route-card"
           />
         )}
       />

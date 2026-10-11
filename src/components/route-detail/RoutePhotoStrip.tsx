@@ -38,6 +38,7 @@ export function RoutePhotoStrip({ photos }: { photos: readonly ImageSourcePropTy
           <Pressable
             key={index}
             onPress={() => open(index)}
+            testID={`route-photo-${index}`}
             style={({ pressed }) => [styles.slot, styles.tile, pressed && styles.pressed]}
             accessibilityRole="button"
             accessibilityLabel={

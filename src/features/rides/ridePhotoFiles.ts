@@ -1,5 +1,7 @@
 import { Directory, File, Paths } from 'expo-file-system';
 
+import { discardPreparedImage, prepareImage, type PreparedImage } from '@/lib/media/prepareImage';
+
 import {
   isRidePhotoCopy,
   reanchorRidePhotoUri,
@@ -17,21 +19,35 @@ import type { RidePhoto } from './types';
  */
 const folder = (rideId: string) => new Directory(Paths.document, RIDE_PHOTO_DIR, rideId);
 
-/** Resolves with the copy's uri; if copying fails (e.g. a full disk) with the picked uri. */
+/**
+ * Resolves with the copy's uri; if copying fails (e.g. a full disk) with the picked uri. The copy
+ * is the prepared photo (`prepareImage`: ≤ 2048 px JPEG without EXIF / GPS), so the ride stays
+ * small on the device and uploads as it is; if preparing fails the original is copied.
+ */
 export async function keepRidePhoto(rideId: string, photoId: string, uri: string): Promise<string> {
+  let prepared: PreparedImage | undefined;
   try {
     if (!uri.startsWith('file:') || isRidePhotoCopy(uri, Paths.document.uri)) {
       return uri;
     }
+    prepared = await prepareImage(uri, 'photo');
     const directory = folder(rideId);
     directory.create({ intermediates: true, idempotent: true });
-    const target = new File(directory, ridePhotoFileName(photoId, uri));
-    await new File(uri).copy(target, { overwrite: true });
+    const target = new File(directory, ridePhotoFileName(photoId, prepared.uri));
+    const source = new File(prepared.uri);
+    if (prepared.temporary) {
+      await source.move(target, { overwrite: true });
+    } else {
+      await source.copy(target, { overwrite: true });
+    }
     // Spelled like `Paths.document` (e.g. /var vs /private/var), so `isRidePhotoCopy` knows it.
     return reanchorRidePhotoUri(target.uri, Paths.document.uri);
   } catch (error) {
     if (__DEV__) {
       console.warn('ride photo copy failed', error);
+    }
+    if (prepared) {
+      discardPreparedImage(prepared);
     }
     return uri;
   }

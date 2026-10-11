@@ -327,6 +327,7 @@ export default function SettingsScreen() {
                 destructive
                 trailing="none"
                 onPress={() => setSignOutVisible(true)}
+                testID="settings-sign-out"
               />
             </View>
             <Text style={styles.version}>
@@ -368,6 +369,7 @@ export default function SettingsScreen() {
             destructive
             label={t('signOutDialog.confirm')}
             onPress={confirmSignOut}
+            testID="sign-out-confirm"
           />,
         ]}
       />

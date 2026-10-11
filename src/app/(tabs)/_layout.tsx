@@ -55,7 +55,7 @@ export default function TabsLayout() {
               <RideAccessory />
             </NativeTabs.BottomAccessory>
           ) : null}
-          <NativeTabs.Trigger name="discover">
+          <NativeTabs.Trigger name="discover" testID="tab-discover">
             <NativeTabs.Trigger.Icon src={icons.discover} />
             <NativeTabs.Trigger.Label>{t('tabs.discover')}</NativeTabs.Trigger.Label>
           </NativeTabs.Trigger>
@@ -64,6 +64,7 @@ export default function TabsLayout() {
               screen hands over to the sheet. */}
           <NativeTabs.Trigger
             name="record"
+            testID="tab-record"
             disabled
             listeners={{
               tabPress: () => {
@@ -75,11 +76,11 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Icon src={icons.record} />
             <NativeTabs.Trigger.Label>{t('tabs.record')}</NativeTabs.Trigger.Label>
           </NativeTabs.Trigger>
-          <NativeTabs.Trigger name="community">
+          <NativeTabs.Trigger name="community" testID="tab-community">
             <NativeTabs.Trigger.Icon src={icons.community} />
             <NativeTabs.Trigger.Label>{t('tabs.community')}</NativeTabs.Trigger.Label>
           </NativeTabs.Trigger>
-          <NativeTabs.Trigger name="profile">
+          <NativeTabs.Trigger name="profile" testID="tab-profile">
             <NativeTabs.Trigger.Icon src={icons.profile} />
             <NativeTabs.Trigger.Label>{t('tabs.profile')}</NativeTabs.Trigger.Label>
           </NativeTabs.Trigger>

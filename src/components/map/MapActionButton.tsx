@@ -29,6 +29,8 @@ export type MapActionButtonProps = {
   content?: ReactNode;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** E2E selector (Maestro `id:`); see docs/testing.md. */
+  testID?: string;
 };
 
 /** Round white button floating over a map. */
@@ -42,12 +44,14 @@ export function MapActionButton({
   content,
   disabled = false,
   style,
+  testID,
 }: MapActionButtonProps) {
   const spec = SIZES[size];
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      testID={testID}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ disabled, selected }}

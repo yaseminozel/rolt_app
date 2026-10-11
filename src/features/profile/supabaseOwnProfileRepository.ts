@@ -5,9 +5,10 @@ import { findCityByName } from '@/features/location/turkishCities';
 import type { RegistrationDraft } from '@/features/registration/types';
 import type { Place } from '@/features/route-suggestion/types';
 import { i18n } from '@/i18n';
+import { uploadImage } from '@/lib/media/uploadImage';
 import { requireUserId, supabase, unwrap } from '@/lib/supabase/client';
 import type { Json } from '@/lib/supabase/database.types';
-import { contentTypeOf, newObjectPath, publicUrl, removeFiles, uploadFile } from '@/lib/supabase/storage';
+import { publicUrl, removeFiles } from '@/lib/supabase/storage';
 
 import {
   UsernameTakenError,
@@ -118,8 +119,9 @@ function rethrow(error: unknown): never {
 
 const isRemote = (uri: string) => /^https?:/.test(uri);
 
+/** Avatars are shown small: 1024 px JPEG without metadata. */
 async function uploadAvatar(userId: string, uri: string) {
-  return uploadFile('avatars', newObjectPath(userId, contentTypeOf(uri)), uri);
+  return uploadImage('avatars', userId, uri, { preset: 'avatar' });
 }
 
 /** Deleting the replaced photo is housekeeping; the profile is already saved. */

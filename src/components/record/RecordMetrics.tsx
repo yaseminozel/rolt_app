@@ -54,6 +54,7 @@ export function RecordMetrics({
         <View
           key={metric.key}
           style={stacked ? styles.stackedMetric : styles.metric}
+          testID={`record-metric-${metric.key}`}
           accessible
           accessibilityLabel={`${metric.label} ${metric.value}`}>
           <Text

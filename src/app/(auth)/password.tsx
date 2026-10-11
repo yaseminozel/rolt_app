@@ -142,6 +142,7 @@ function PasswordForm({ email, mode }: PasswordFormProps) {
             returnKeyType="done"
             onSubmitEditing={handleSubmit}
             autoFocus
+            testID="password-input"
           />
         </View>
         {locked ? (
@@ -165,6 +166,7 @@ function PasswordForm({ email, mode }: PasswordFormProps) {
             disabled={locked}
             loading={submitting}
             onPress={handleSubmit}
+            testID="password-submit"
           />
           {isExisting ? (
             <Button

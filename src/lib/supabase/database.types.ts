@@ -561,6 +561,8 @@ export type Database = {
         Row: {
           author_id: string
           created_at: string
+          hidden_at: string | null
+          hidden_reason: string | null
           id: string
           parent_id: string | null
           post_id: string
@@ -569,6 +571,8 @@ export type Database = {
         Insert: {
           author_id?: string
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           parent_id?: string | null
           post_id: string
@@ -577,6 +581,8 @@ export type Database = {
         Update: {
           author_id?: string
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           parent_id?: string | null
           post_id?: string
@@ -640,6 +646,8 @@ export type Database = {
           author_id: string
           comment_count: number
           created_at: string
+          hidden_at: string | null
+          hidden_reason: string | null
           id: string
           like_count: number
           photo_paths: string[]
@@ -654,6 +662,8 @@ export type Database = {
           author_id?: string
           comment_count?: number
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           like_count?: number
           photo_paths?: string[]
@@ -668,6 +678,8 @@ export type Database = {
           author_id?: string
           comment_count?: number
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           like_count?: number
           photo_paths?: string[]
@@ -704,11 +716,14 @@ export type Database = {
           id: string
           is_official: boolean
           is_private: boolean
+          is_suspended: boolean
           name: string
           profile_completed: boolean
           ride_count: number
           ride_distance_m: number
           search_text: string | null
+          suspended_at: string | null
+          suspended_reason: string | null
           updated_at: string
         }
         Insert: {
@@ -722,11 +737,14 @@ export type Database = {
           id: string
           is_official?: boolean
           is_private?: boolean
+          is_suspended?: boolean
           name?: string
           profile_completed?: boolean
           ride_count?: number
           ride_distance_m?: number
           search_text?: string | null
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
         }
         Update: {
@@ -740,11 +758,14 @@ export type Database = {
           id?: string
           is_official?: boolean
           is_private?: boolean
+          is_suspended?: boolean
           name?: string
           profile_completed?: boolean
           ride_count?: number
           ride_distance_m?: number
           search_text?: string | null
+          suspended_at?: string | null
+          suspended_reason?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -789,6 +810,10 @@ export type Database = {
           id: string
           reason: string | null
           reporter_id: string | null
+          resolution: string | null
+          resolution_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           target_id: string
           target_type: string
@@ -798,6 +823,10 @@ export type Database = {
           id?: string
           reason?: string | null
           reporter_id?: string | null
+          resolution?: string | null
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           target_id: string
           target_type: string
@@ -807,6 +836,10 @@ export type Database = {
           id?: string
           reason?: string | null
           reporter_id?: string | null
+          resolution?: string | null
+          resolution_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           target_id?: string
           target_type?: string
@@ -818,12 +851,20 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reports_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       ride_comments: {
         Row: {
           author_id: string
           created_at: string
+          hidden_at: string | null
+          hidden_reason: string | null
           id: string
           ride_id: string
           text: string
@@ -831,6 +872,8 @@ export type Database = {
         Insert: {
           author_id?: string
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           ride_id: string
           text: string
@@ -838,6 +881,8 @@ export type Database = {
         Update: {
           author_id?: string
           created_at?: string
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           ride_id?: string
           text?: string
@@ -962,6 +1007,8 @@ export type Database = {
           distance_m: number
           duration_s: number
           ended_at: string | null
+          hidden_at: string | null
+          hidden_reason: string | null
           id: string
           like_count: number
           max_lean_left_deg: number | null
@@ -994,6 +1041,8 @@ export type Database = {
           distance_m?: number
           duration_s?: number
           ended_at?: string | null
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id: string
           like_count?: number
           max_lean_left_deg?: number | null
@@ -1026,6 +1075,8 @@ export type Database = {
           distance_m?: number
           duration_s?: number
           ended_at?: string | null
+          hidden_at?: string | null
+          hidden_reason?: string | null
           id?: string
           like_count?: number
           max_lean_left_deg?: number | null
@@ -1154,6 +1205,8 @@ export type Database = {
           elevation_loss_m: number
           end_name: string
           featured_rank: number | null
+          hidden_at: string | null
+          hidden_reason: string | null
           home_rank: number | null
           id: string
           is_loop: boolean
@@ -1194,6 +1247,8 @@ export type Database = {
           elevation_loss_m?: number
           end_name: string
           featured_rank?: number | null
+          hidden_at?: string | null
+          hidden_reason?: string | null
           home_rank?: number | null
           id?: string
           is_loop?: boolean
@@ -1234,6 +1289,8 @@ export type Database = {
           elevation_loss_m?: number
           end_name?: string
           featured_rank?: number | null
+          hidden_at?: string | null
+          hidden_reason?: string | null
           home_rank?: number | null
           id?: string
           is_loop?: boolean
@@ -1402,6 +1459,32 @@ export type Database = {
         Args: { p_id: string; p_target: string; p_text: string }
         Returns: Json
       }
+      admin_approve_route_suggestion: {
+        Args: { p_id: string; p_overrides?: Json }
+        Returns: string
+      }
+      admin_overview: { Args: never; Returns: Json }
+      admin_reject_route_suggestion: {
+        Args: { p_id: string; p_note?: string }
+        Returns: undefined
+      }
+      admin_reports: {
+        Args: { p_limit?: number; p_status?: string }
+        Returns: Json[]
+      }
+      admin_resolve_report: {
+        Args: {
+          p_action: string
+          p_note?: string
+          p_target_id: string
+          p_target_type: string
+        }
+        Returns: Json
+      }
+      admin_route_suggestions: {
+        Args: { p_limit?: number; p_status?: string }
+        Returns: Json[]
+      }
       approve_route_suggestion: {
         Args: { p_id: string; p_overrides?: Json }
         Returns: string
@@ -1449,11 +1532,13 @@ export type Database = {
         Args: { event: Json }
         Returns: Json
       }
+      is_admin: { Args: never; Returns: boolean }
       is_blocked_between: { Args: { a: string; b: string }; Returns: boolean }
       is_conversation_member: {
         Args: { p_conversation: string }
         Returns: boolean
       }
+      is_suspended: { Args: { p_id: string }; Returns: boolean }
       is_verified: { Args: never; Returns: boolean }
       list_blocked: { Args: never; Returns: Json[] }
       list_comments: {
@@ -1472,6 +1557,10 @@ export type Database = {
       }
       lookup_email: { Args: { p_email: string }; Returns: Json }
       mark_all_notifications_read: { Args: never; Returns: undefined }
+      moderation_visible: {
+        Args: { p_hidden_at: string; p_owner: string }
+        Returns: boolean
+      }
       own_profile: { Args: never; Returns: Json }
       own_rides_for_restore: {
         Args: { p_known_ids?: string[] }

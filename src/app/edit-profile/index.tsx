@@ -78,7 +78,8 @@ function EditProfileForm({ profile }: { profile: OwnProfile }) {
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.85,
+      // Full quality: the upload step resizes and re-encodes once (`src/lib/media/prepareImage.ts`).
+      quality: 1,
     });
     if (!result.canceled && result.assets[0]) {
       setPhotoUri(result.assets[0].uri);

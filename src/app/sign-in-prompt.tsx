@@ -128,7 +128,7 @@ export default function SignInPromptScreen() {
   };
 
   return (
-    <View style={[styles.sheet, { paddingBottom: bottomPadding }]}>
+    <View style={[styles.sheet, { paddingBottom: bottomPadding }]} testID="sign-in-prompt">
       <View style={styles.top}>
         <View
           style={styles.iconBadge}
@@ -162,7 +162,12 @@ export default function SignInPromptScreen() {
           onPress={() => handleProvider('apple')}
         />
         <Button label={t('signIn.continueWithEmail')} onPress={handleEmail} />
-        <Button variant="text" label={t('signInPrompt.notNow')} onPress={handleClose} />
+        <Button
+          variant="text"
+          label={t('signInPrompt.notNow')}
+          onPress={handleClose}
+          testID="sign-in-prompt-not-now"
+        />
       </View>
     </View>
   );

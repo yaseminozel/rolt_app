@@ -122,6 +122,7 @@ function TopBar({ route }: { route?: Route }) {
             accessibilityLabel={t('actions.save')}
             selected={saved}
             onPress={() => toggleBookmark(route.id, { toastBottomOffset: TOAST_BOTTOM_OFFSET })}
+            testID="route-detail-save"
           />
         </View>
       ) : null}
@@ -276,7 +277,7 @@ function RouteDetail({ route }: { route: Route }) {
             { paddingBottom: ROUTE_DETAIL_CTA_HEIGHT + insets.bottom + spacing.xxl },
           ]}>
           <View style={styles.heading}>
-            <Text style={styles.title} accessibilityRole="header">
+            <Text style={styles.title} accessibilityRole="header" testID="route-detail-title">
               {route.name}
             </Text>
             <RouteAuthorRow

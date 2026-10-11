@@ -47,7 +47,7 @@ export default function RideSavedScreen() {
   };
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.screen} testID="ride-saved-screen">
       <RideMapPreview track={ride.track} padding={MAP_PADDING} style={StyleSheet.absoluteFill} />
       <View style={[styles.panel, { paddingBottom: insets.bottom + spacing.lg }]}>
         <View style={styles.handle} />

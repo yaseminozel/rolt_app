@@ -1,5 +1,6 @@
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import { useIsRestoring, useQueryClient } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useFonts } from 'expo-font';
 import { DefaultTheme, Stack, ThemeProvider, type Theme } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -23,6 +24,7 @@ import { RideRecordingProvider } from '@/features/rides/RideRecordingProvider';
 import { SavedRoutesProvider } from '@/features/routes/SavedRoutesProvider';
 import '@/i18n';
 import { createQueryClient } from '@/lib/queryClient';
+import { queryPersistOptions, setQueryCacheOwner } from '@/lib/queryPersistence';
 import { appFonts, colors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -54,7 +56,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={styles.root}>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={queryPersistOptions}>
         <AuthProvider>
           <SavedRoutesProvider>
             <RideRecordingProvider>
@@ -73,7 +75,7 @@ export default function RootLayout() {
             </RideRecordingProvider>
           </SavedRoutesProvider>
         </AuthProvider>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </GestureHandlerRootView>
   );
 }
@@ -99,18 +101,27 @@ function RootNavigator() {
     session,
     isGuest,
   } = useAuth();
-  const ready = (fontsLoaded || fontError !== null) && isReady;
+  // The splash stays until the cache kept on the device is back, so screens open with content.
+  const isRestoring = useIsRestoring();
+  const ready = (fontsLoaded || fontError !== null) && isReady && !isRestoring;
   const queryClient = useQueryClient();
   const userId = session?.userId ?? null;
-  const previousUserId = useRef(userId);
+  // Undefined until auth is ready: the session it restores at launch is no account change.
+  const cacheOwner = useRef<string | null | undefined>(undefined);
 
-  // Another account (or none) sees nothing cached for the previous one: likes, follows, feeds.
+  // The device cache restores only for the account that wrote it. Another account (or none)
+  // sees nothing cached for the previous one, in memory or on the device: likes, follows, feeds.
   useEffect(() => {
-    if (previousUserId.current !== userId) {
-      previousUserId.current = userId;
+    if (!isReady || cacheOwner.current === userId) {
+      return;
+    }
+    const isSwitch = cacheOwner.current !== undefined;
+    cacheOwner.current = userId;
+    setQueryCacheOwner(userId);
+    if (isSwitch) {
       queryClient.clear();
     }
-  }, [queryClient, userId]);
+  }, [isReady, queryClient, userId]);
   const signedOut = session === null && !isGuest;
   const signedInToApp = canUseApp && session !== null && !needsPermissionPrompts;
 

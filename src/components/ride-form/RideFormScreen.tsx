@@ -151,6 +151,7 @@ export function RideFormScreen({ mode }: RideFormScreenProps) {
             loadingLabel={t('form.saving')}
             disabled={failed && !failedPhotosCanWait && !saving}
             onPress={() => setSaveRequested(true)}
+            testID="ride-form-save"
           />
         </View>
       </KeyboardAvoidingView>

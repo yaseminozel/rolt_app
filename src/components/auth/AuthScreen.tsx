@@ -22,6 +22,8 @@ export type AuthScreenProps = {
   /** Artwork above the title, 32 pt over the copy (02.07 "Süresi dolmuş bağlantı"). */
   illustration?: ReactNode;
   children?: ReactNode;
+  /** E2E selector (Maestro `id:`) on the screen root; see docs/testing.md. */
+  testID?: string;
 };
 
 /** Wordmark top, measured from the bottom of the design's 49 pt status bar (y 101 in 02.01–02.07). */
@@ -46,6 +48,7 @@ export function AuthScreen({
   showLegalFooter = false,
   illustration,
   children,
+  testID,
 }: AuthScreenProps) {
   useHapticOnSet(errorMessage, 'error');
   const insets = useSafeAreaInsets();
@@ -56,7 +59,7 @@ export function AuthScreen({
   const paddingTop = Math.max(insets.top + WORDMARK_TOP, headerHeight + spacing.sm);
 
   return (
-    <View style={styles.screen}>
+    <View style={styles.screen} testID={testID}>
       <KeyboardAvoidingView
         style={styles.fill}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>

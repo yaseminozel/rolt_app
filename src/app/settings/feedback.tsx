@@ -50,7 +50,8 @@ export default function FeedbackScreen() {
       mediaTypes: ['images'],
       allowsMultipleSelection: true,
       selectionLimit: room,
-      quality: 0.7,
+      // Full quality: the upload step resizes and re-encodes once (`src/lib/media/prepareImage.ts`).
+      quality: 1,
     });
     if (!result.canceled) {
       setScreenshots((current) => [

@@ -1,6 +1,7 @@
 import type { Json } from '@/lib/supabase/database.types';
 import { supabase, unwrap } from '@/lib/supabase/client';
-import { contentTypeOf, newObjectPath, removeFiles, uploadFile } from '@/lib/supabase/storage';
+import { uploadImage } from '@/lib/media/uploadImage';
+import { removeFiles } from '@/lib/supabase/storage';
 
 import { isLocalPhotoMissing } from '../ridePhotoFiles';
 import { rideStorage } from '../storage';
@@ -15,17 +16,18 @@ const FOLDER_LIST_LIMIT = 100;
 /** Folder of a ride's photos; storage RLS needs the owner first. */
 export const ridePhotoFolder = (ownerId: string, rideId: string) => `${ownerId}/${rideId}`;
 
-/** A new object path for a photo of `rideId`: `<owner>/<ride id>/<random>.<ext>`. */
-export const newRidePhotoPath = (ownerId: string, rideId: string, uri: string) =>
-  newObjectPath(ownerId, contentTypeOf(uri), rideId);
-
+/**
+ * Uploads a photo of `rideId` to `<owner>/<ride id>/<random>.jpg`. The device copy was prepared
+ * when the photo was added (`keepRidePhoto`), so a small JPEG goes as it is; a full-size copy
+ * (kept before photos were prepared, or when preparing failed) is prepared on the way.
+ */
 export async function uploadRidePhotoFile(
   ownerId: string,
   rideId: string,
   uri: string,
   onProgress?: (fraction: number) => void,
 ) {
-  return uploadFile(BUCKET, newRidePhotoPath(ownerId, rideId, uri), uri, { onProgress });
+  return uploadImage(BUCKET, ownerId, uri, { prefix: rideId, onProgress, skipWhenSmall: true });
 }
 
 /** Best effort: a leftover object costs storage, never a ride. */

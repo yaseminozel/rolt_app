@@ -508,6 +508,7 @@ export function PhotoViewer({ photos, initialIndex, onClosed }: PhotoViewerProps
         style={[styles.chrome, { top: insets.top + spacing.sm }, chromeStyle]}>
         <Pressable
           onPress={close}
+          testID="photo-viewer-close"
           accessibilityRole="button"
           accessibilityLabel={t('actions.close')}
           style={({ pressed }) => [styles.close, pressed && styles.pressed]}>

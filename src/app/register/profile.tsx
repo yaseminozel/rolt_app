@@ -58,7 +58,8 @@ export default function RegisterProfileScreen() {
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.8,
+      // Full quality: the upload step resizes and re-encodes once (`src/lib/media/prepareImage.ts`).
+      quality: 1,
     });
     const asset = result.canceled ? undefined : result.assets[0];
     if (asset) {

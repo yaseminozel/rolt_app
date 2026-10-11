@@ -1,5 +1,5 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
-import type { ComponentProps } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
@@ -24,12 +24,21 @@ const sheet = (detents: number[] | 'fitToContents'): ScreenOptions => ({
 export default function RideLayout() {
   const { routeId } = useLocalSearchParams<{ routeId: string }>();
   const { t } = useTranslation('routeDetail');
-  const { data: route, isPending } = useRoute(routeId);
+  const { data, isPending, refetch } = useRoute(routeId);
+  // The ride plan, stops and arrival follow the exact line; a list's simplified copy never rides.
+  const simplified = data?.geometryDetail === 'simplified';
+  const route = simplified ? undefined : data;
+
+  useEffect(() => {
+    if (simplified) {
+      refetch();
+    }
+  }, [refetch, simplified]);
 
   if (!route) {
     return (
       <View style={styles.state}>
-        {isPending ? (
+        {isPending || simplified ? (
           <ActivityIndicator color={colors.textSecondary} />
         ) : (
           <EmptyState title={t('notFound.title')} description={t('notFound.description')} />

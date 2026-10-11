@@ -1,8 +1,9 @@
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
+import { uploadImage } from '@/lib/media/uploadImage';
 import { currentUserId, hasSupabase, supabase } from '@/lib/supabase/client';
-import { contentTypeOf, newObjectPath, removeFiles, uploadFile } from '@/lib/supabase/storage';
+import { removeFiles } from '@/lib/supabase/storage';
 
 /** "Konu" of "Geri bildirim gönder" (10.13). */
 export type FeedbackTopic = 'bug' | 'idea' | 'route' | 'other';
@@ -28,8 +29,8 @@ const NETWORK_DELAY_MS = 800;
 
 /**
  * Sends a message to `public.feedback`. Signed-in riders' screenshots go to the private `feedback`
- * bucket first (their own folder); guests can't upload, so their message goes as text only.
- * Without Supabase (MOCK) it waits like a request and succeeds.
+ * bucket first (their own folder, as ≤ 1600 px JPEGs); guests can't upload, so their message goes
+ * as text only. Without Supabase (MOCK) it waits like a request and succeeds.
  */
 export async function sendFeedback(input: FeedbackInput) {
   const context = feedbackContext();
@@ -41,7 +42,7 @@ export async function sendFeedback(input: FeedbackInput) {
   const uploads = userId
     ? await Promise.allSettled(
         input.screenshotUris.map((uri) =>
-          uploadFile('feedback', newObjectPath(userId, contentTypeOf(uri)), uri),
+          uploadImage('feedback', userId, uri, { preset: 'screenshot' }),
         ),
       )
     : [];

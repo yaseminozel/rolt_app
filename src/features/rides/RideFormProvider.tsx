@@ -134,7 +134,8 @@ export function RideFormProvider({ ride, children }: { ride: RideRecord; childre
         .map((uri) => ({ id: newPhotoId(), uri, status: 'uploading', progress: 0 }));
       update((current) => ({ ...current, photos: [...current.photos, ...added] }));
       added.forEach((photo) => {
-        // Copied first (local, quick), so the upload and the ride use the kept file.
+        // Prepared and copied first (local, under a second), so the upload and the ride use the
+        // kept, small file.
         keepRidePhoto(ride.id, photo.id, photo.uri).then((uri) => {
           if (droppedRef.current.has(photo.id)) {
             deleteRidePhotoCopy(uri);

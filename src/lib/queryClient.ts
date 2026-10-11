@@ -2,6 +2,8 @@ import NetInfo from '@react-native-community/netinfo';
 import { focusManager, onlineManager, QueryClient } from '@tanstack/react-query';
 import { AppState, Platform } from 'react-native';
 
+import { applyPersistedQueryDefaults } from '@/lib/queryPersistence';
+
 let managersBound = false;
 
 /** React Native wiring for React Query: refetch on app focus, pause while offline. */
@@ -21,12 +23,13 @@ function bindManagers() {
 
 /**
  * The app's query client. Data is fresh for 30 s (lists don't refetch on every screen visit),
- * kept 10 min after the last screen leaves it, retried twice on failure (never on 4xx answers,
- * which won't change on retry).
+ * kept 10 min after the last screen leaves it (a day for the data kept on the device,
+ * `queryPersistence.ts`), retried twice on failure (never on 4xx answers, which won't change on
+ * retry).
  */
 export function createQueryClient() {
   bindManagers();
-  return new QueryClient({
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 30_000,
@@ -41,4 +44,6 @@ export function createQueryClient() {
       mutations: { retry: 0 },
     },
   });
+  applyPersistedQueryDefaults(queryClient);
+  return queryClient;
 }

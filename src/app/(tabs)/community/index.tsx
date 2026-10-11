@@ -80,6 +80,7 @@ export default function CommunityScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         ref={scrollRef}
+        testID="community-feed"
         contentContainerStyle={[
           styles.content,
           { paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + TAB_BAR_ROOM },
@@ -128,7 +129,7 @@ export default function CommunityScreen() {
           {feed.isPending ? (
             <ActivityIndicator style={styles.loading} color={colors.textSecondary} />
           ) : empty ? (
-            <View style={styles.empty}>
+            <View style={styles.empty} testID="community-empty">
               <StackedCardsIllustration />
               <View style={styles.emptyCopy}>
                 <Text style={styles.emptyTitle} accessibilityRole="header">
